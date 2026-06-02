@@ -1,0 +1,170 @@
+---
+name: issues-setup
+version: 1.0.0
+category: issues
+scope: universal
+phase: setup
+description: "Set up the brain/issues/ directory structure: create brain/issues/, brain/issues/completed/, and brain/issues/INDEX.md from scratch. Use when asked to \"setup issues\", \"init issues\", or \"bootstrap issues directory\"."
+triggers:
+  - setup issues
+  - init issues
+  - bootstrap issues directory
+  - initialize issues
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - AskUserQuestion
+risk: write-files
+disable-model-invocation: false
+---
+
+# Issues Setup — Bootstrap brain/issues/ Directory
+
+## Purpose
+
+Create the full `brain/issues/` directory structure from scratch:
+- `brain/issues/` — active issues
+- `brain/issues/completed/` — archived resolved issues
+- `brain/issues/INDEX.md` — master index with all issues grouped by priority
+
+---
+
+## Step 1 — Find or create the brain directory
+
+```bash
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+ISSUES_DIR="$REPO_ROOT/brain/issues"
+COMPLETED_DIR="$ISSUES_DIR/completed"
+echo "REPO_ROOT=$REPO_ROOT"
+echo "ISSUES_DIR=$ISSUES_DIR"
+```
+
+If `brain/` does not exist, create it:
+
+```bash
+mkdir -p "$ISSUES_DIR" "$COMPLETED_DIR"
+echo "Created: $ISSUES_DIR and $COMPLETED_DIR"
+```
+
+---
+
+## Step 2 — Create the INDEX.md
+
+Write `brain/issues/INDEX.md` with this exact structure:
+
+```markdown
+# Issues Index
+
+## Overview
+
+| Category | Count |
+|----------|-------|
+| Active issues | 0 |
+| Completed | 0 |
+| **Total** | **0** |
+
+## Completed Issues
+
+| ID | Title | Completed |
+|----|-------|-----------|
+| _none yet_ | | |
+
+## Active Issues by Priority
+
+### P0 — Critical
+
+| ID | Title |
+|----|-------|
+| _none_ | |
+
+### P1 — High
+
+| ID | Title |
+|----|-------|
+| _none_ | |
+
+### P2 — Medium
+
+| ID | Title |
+|----|-------|
+| _none_ | |
+
+## Issue Structure
+
+Each issue file contains:
+
+\`\`\`yaml
+---
+id: XXX
+title: ...
+severity: P0|P1|P2
+area: api|database|security|ui|worker|testing|maintainability|infra
+source: how-the-issue-was-found
+status: open|completed
+created: YYYY-MM-DD
+files:
+  - relevant-files
+related:
+  - related-issue-ids
+---
+
+## Summary
+
+## Evidence
+
+## Suggested fix
+
+## Acceptance criteria
+\`\`\`
+
+## Areas
+
+| Area | Description |
+|------|-------------|
+| api | HTTP/API routes and handlers |
+| database | Schema, migrations, persistence layer |
+| security | Auth, crypto, rate limiting, input validation |
+| ui | UI components, pages, navigation |
+| worker | Background jobs, queues, async workers |
+| testing | Test coverage gaps |
+| maintainability | Code quality, dead code, refactors |
+| infra | CI/CD, deploy, config, observability |
+
+Add or rename areas in this table to match the project. Omit unused rows.
+
+## Workstreams
+
+| Workstream | Issues |
+|-----------|--------|
+| _none yet_ | |
+```
+
+---
+
+## Step 3 — Verify structure
+
+```bash
+echo "=== Directory structure ==="
+ls -la "$ISSUES_DIR/"
+echo ""
+echo "=== Completed dir ==="
+ls -la "$COMPLETED_DIR/"
+echo ""
+echo "=== INDEX.md exists ==="
+[ -f "$ISSUES_DIR/INDEX.md" ] && echo "YES" || echo "MISSING"
+```
+
+---
+
+## Step 4 — Confirm to user
+
+Report what was created:
+- `brain/issues/` directory
+- `brain/issues/completed/` directory
+- `brain/issues/INDEX.md` with full template
+
+Then suggest next steps: use `/issues-scan` to populate with issues discovered from the codebase, or use `/issues-list` to see the empty state.

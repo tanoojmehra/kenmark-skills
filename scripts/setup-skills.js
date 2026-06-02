@@ -1,0 +1,575 @@
+#!/usr/bin/env node
+
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
+const {
+  wantsInteractive,
+  promptScope,
+  promptAction,
+  promptIde,
+  confirmPlan,
+  banner
+} = require("./interactive");
+const {
+  buildGlobalTargets,
+  buildProjectTargets,
+  buildMcpGlobalTargets,
+  buildMcpProjectTargets,
+  getStoreDir,
+  getMcpStorePath,
+  getBundledMcpPath,
+  listKenmarkBundledSkillNames,
+  installKenmarkSkillsToStore,
+  relinkSkillsToIdes,
+  adoptCatalogSkills,
+  uninstallKenmarkFromIdes,
+  installMcpToStore,
+  installMcpToIdes,
+  uninstallMcpFromIdes,
+  detectInstalledIdes,
+  resolveFallbackTargetIdes,
+  resolveLinkModeLabel
+} = require("./kenmark-hub");
+
+const homeDir = os.homedir();
+const projectDir = process.cwd();
+const repoRoot = path.resolve(__dirname, "..");
+const sourceDir = path.join(repoRoot, "skills", "user-skills");
+const catalogPath = path.join(sourceDir, "recommended-catalog.json");
+
+const globalTargets = buildGlobalTargets(homeDir);
+const projectTargets = buildProjectTargets(projectDir);
+const globalMcpTargets = buildMcpGlobalTargets(homeDir);
+const projectMcpTargets = buildMcpProjectTargets(projectDir);
+const bundledMcpPath = getBundledMcpPath(repoRoot);
+
+const MCP_CAPABLE_IDES = new Set(["cursor", "claude"]);
+
+function printUsage() {
+  console.log("Usage: kenmark-skills setup [options]");
+  console.log("");
+  console.log("Interactive by default in a terminal. Agents: pass flags + -y.");
+  console.log("");
+  console.log("Kenmark skills install to ~/.kenmark/store/skills, then link into each IDE.");
+  console.log("After install, catalog skills already present in any IDE root are adopted");
+  console.log("into ~/.kenmark/store and relinked (use --skip-adopt to disable).");
+  console.log("Bundled MCP servers install to ~/.kenmark/store/mcp.json and merge into");
+  console.log("Cursor (~/.cursor/mcp.json) and Claude (~/.claude.json or .mcp.json).");
+  console.log("Use --skip-mcp to disable MCP setup.");
+  console.log("");
+  console.log("Options:");
+  console.log("  --install | --uninstall   Action (default: install)");
+  console.log("  --global | --project      Install scope (default: global when non-interactive)");
+  console.log("  --ide <target>            cursor, claude, codex, all, …");
+  console.log("  --copy                    Copy into IDE paths instead of symlinks");
+  console.log("  --symlink                 Force symlinks (Windows: junction) instead of copy");
+  console.log("  --prefer-copy-on-windows  Copy on Windows (default: on)");
+  console.log("  --strict-targets          Fail if no IDE is detected and --ide is missing");
+  console.log("  --force                   Overwrite store even if present");
+  console.log("  --keep-store              On uninstall, leave ~/.kenmark/store intact");
+  console.log("  --skip-adopt              Skip post-install catalog adoption (advanced)");
+  console.log("  --skip-mcp                Skip bundled MCP server install/merge");
+  console.log("  --ecc-profile core        ECC profile (core, developer, …) when adopting");
+  console.log("  --dry-run                 Show plan only");
+  console.log("  -y, --yes                 Skip prompts");
+  console.log("  -h, --help                Show help");
+  console.log("");
+  console.log("Examples:");
+  console.log("  npx kenmark-skills setup");
+  console.log("  npx kenmark-skills setup --global --ide all -y");
+  console.log("  npx kenmark-skills setup --skip-adopt --global --ide cursor -y");
+  console.log("  npx kenmark-skills uninstall --global --ide claude");
+}
+
+function parseArgs(argv) {
+  const args = {
+    ide: null,
+    mode: null,
+    action: null,
+    yes: false,
+    dryRun: false,
+    forceCopy: false,
+    forceSymlink: false,
+    preferCopyOnWindows: true,
+    strictTargets: false,
+    force: false,
+    keepStore: true,
+    skipAdopt: false,
+    skipMcp: false,
+    eccProfile: null,
+    explicitMode: false,
+    explicitAction: false,
+    explicitIde: false
+  };
+  for (let i = 0; i < argv.length; i += 1) {
+    const token = argv[i];
+    if (token === "--help" || token === "-h") {
+      args.help = true;
+      continue;
+    }
+    if (token === "--ide") {
+      args.ide = argv[i + 1] || null;
+      args.explicitIde = true;
+      i += 1;
+      continue;
+    }
+    if (token === "--project") {
+      args.mode = "project";
+      args.explicitMode = true;
+      continue;
+    }
+    if (token === "--global") {
+      args.mode = "global";
+      args.explicitMode = true;
+      continue;
+    }
+    if (token === "--uninstall") {
+      args.action = "uninstall";
+      args.explicitAction = true;
+      continue;
+    }
+    if (token === "--install") {
+      args.action = "install";
+      args.explicitAction = true;
+      continue;
+    }
+    if (token === "--copy") {
+      args.forceCopy = true;
+      continue;
+    }
+    if (token === "--symlink") {
+      args.forceSymlink = true;
+      continue;
+    }
+    if (token === "--prefer-copy-on-windows") {
+      args.preferCopyOnWindows = true;
+      continue;
+    }
+    if (token === "--no-prefer-copy-on-windows") {
+      args.preferCopyOnWindows = false;
+      continue;
+    }
+    if (token === "--strict-targets") {
+      args.strictTargets = true;
+      continue;
+    }
+    if (token === "--force") {
+      args.force = true;
+      continue;
+    }
+    if (token === "--keep-store") {
+      args.keepStore = true;
+      continue;
+    }
+    if (token === "--no-keep-store") {
+      args.keepStore = false;
+      continue;
+    }
+    if (token === "--skip-adopt") {
+      args.skipAdopt = true;
+      continue;
+    }
+    if (token === "--skip-mcp") {
+      args.skipMcp = true;
+      continue;
+    }
+    if (token === "--ecc-profile") {
+      args.eccProfile = (argv[i + 1] || "").trim() || null;
+      i += 1;
+      continue;
+    }
+    if (token === "-y" || token === "--yes") {
+      args.yes = true;
+      continue;
+    }
+    if (token === "--dry-run") {
+      args.dryRun = true;
+      continue;
+    }
+  }
+  return args;
+}
+
+function resolveTargetIdes(args, targetMap) {
+  if (args.explicitIde && args.ide) {
+    const requested = String(args.ide).toLowerCase();
+    if (requested === "all") {
+      return Object.keys(targetMap);
+    }
+    if (requested.includes(",")) {
+      const list = requested.split(",").map((s) => s.trim().toLowerCase());
+      const invalid = list.filter((ide) => !targetMap[ide]);
+      if (invalid.length) {
+        throw new Error(`Unknown --ide value(s): ${invalid.join(", ")}`);
+      }
+      return list;
+    }
+    if (targetMap[requested]) {
+      return [requested];
+    }
+    throw new Error(`Unknown --ide value: ${args.ide}`);
+  }
+  return null;
+}
+
+function ensureTargetPath(targetPath) {
+  fs.mkdirSync(targetPath, { recursive: true });
+}
+
+function ensureParentDir(filePath) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+}
+
+function createClaudeCommandWrappers(basePath, dryRun) {
+  const commandsDir = path.join(path.dirname(basePath), "commands");
+  const skills = listKenmarkBundledSkillNames(sourceDir);
+
+  if (dryRun) {
+    return { commandsDir, count: skills.length };
+  }
+
+  for (const skillName of skills) {
+    const commandFile = path.join(commandsDir, `kenmark-${skillName}.md`);
+    const commandBody = [
+      `# Kenmark ${skillName}`,
+      "",
+      `Use the \`${skillName}\` skill from installed user skills.`,
+      "",
+      "Instructions:",
+      `- Invoke and follow the \`${skillName}\` skill from the user skills directory.`,
+      "- Execute the skill workflow end-to-end for the current request.",
+      "- If required context is missing, ask concise clarifying questions first."
+    ].join("\n");
+    ensureParentDir(commandFile);
+    fs.writeFileSync(commandFile, `${commandBody}\n`, "utf8");
+  }
+
+  return { commandsDir, count: skills.length };
+}
+
+function removeClaudeCommandWrappers(basePath, dryRun) {
+  const commandsDir = path.join(path.dirname(basePath), "commands");
+  const skills = listKenmarkBundledSkillNames(sourceDir);
+
+  let removed = 0;
+  for (const skillName of skills) {
+    const commandFile = path.join(commandsDir, `kenmark-${skillName}.md`);
+    if (fs.existsSync(commandFile)) {
+      if (!dryRun) {
+        fs.rmSync(commandFile, { force: true });
+      }
+      removed += 1;
+    }
+  }
+  return { commandsDir, removed };
+}
+
+function filterMcpIdes(targetIdes) {
+  return targetIdes.filter((ide) => MCP_CAPABLE_IDES.has(ide));
+}
+
+function executeInstall(targetMap, targetIdes, action, options) {
+  const {
+    dryRun,
+    forceCopy,
+    forceSymlink,
+    preferCopyOnWindows,
+    force,
+    keepStore,
+    skipAdopt,
+    skipMcp,
+    eccProfile,
+    mcpTargetMap
+  } = options;
+  const mcpIdes = filterMcpIdes(targetIdes);
+  const skillNames = listKenmarkBundledSkillNames(sourceDir);
+  const storeDir = getStoreDir();
+  const linkMode = resolveLinkModeLabel({ forceCopy, forceSymlink, preferCopyOnWindows });
+
+  const plan = [];
+  if (action === "install") {
+    plan.push(`Populate Kenmark store → ${storeDir}`);
+    for (const ide of targetIdes) {
+      plan.push(`Link Kenmark skills (${linkMode}) → ${ide}: ${targetMap[ide]}`);
+    }
+    if (!skipAdopt) {
+      plan.push("Adopt catalog skills (Impeccable, ECC, …) found in any IDE root → store + relink");
+    }
+    if (!skipMcp && mcpIdes.length && fs.existsSync(bundledMcpPath)) {
+      plan.push(`Merge bundled MCP servers → ${mcpIdes.join(", ")} (${getMcpStorePath()})`);
+    }
+  } else {
+    for (const ide of targetIdes) {
+      plan.push(`Remove Kenmark skill links → ${ide}: ${targetMap[ide]}`);
+    }
+    if (!keepStore) {
+      plan.push(`Remove Kenmark store → ${storeDir}`);
+    }
+    if (!skipMcp && mcpIdes.length) {
+      for (const ide of mcpIdes) {
+        plan.push(`Remove Kenmark MCP entries → ${ide}: ${mcpTargetMap[ide]}`);
+      }
+    }
+  }
+
+  return {
+    plan,
+    run: () => {
+      if (action === "install") {
+        const storeResult = installKenmarkSkillsToStore(sourceDir, {
+          force,
+          dryRun
+        });
+        if (!dryRun) {
+          console.log(`Kenmark store: ${storeDir}`);
+          for (const r of storeResult.results) {
+            if (r.action === "updated-store") {
+              console.log(`  store: ${r.name} (updated)`);
+            }
+          }
+        } else {
+          console.log(`[dry-run] would populate store at ${storeDir}`);
+        }
+
+        for (const ide of targetIdes) {
+          const targetPath = targetMap[ide];
+          if (dryRun) {
+            console.log(
+              `[dry-run] would link ${skillNames.length} skills to ${targetPath}`
+            );
+            if (ide === "claude") {
+              console.log(`[dry-run] would create Claude command wrappers`);
+            }
+            continue;
+          }
+          ensureTargetPath(targetPath);
+          const linkResults = relinkSkillsToIdes(skillNames, { [ide]: targetPath }, {
+            forceCopy,
+            forceSymlink,
+            preferCopyOnWindows,
+            dryRun: false
+          });
+          console.log(`Linked skills for ${ide}: ${targetPath}`);
+          const modes = [...new Set(linkResults.map((r) => r.mode).filter(Boolean))];
+          if (modes.length) {
+            console.log(`  link mode(s): ${modes.join(", ")}`);
+          }
+          if (ide === "claude") {
+            const result = createClaudeCommandWrappers(targetPath, false);
+            console.log(
+              `Installed Claude command wrappers (${result.count}): ${result.commandsDir}`
+            );
+          }
+        }
+
+        if (!skipAdopt) {
+          if (dryRun) {
+            console.log("\n[dry-run] would adopt catalog skills into store + relink IDEs");
+          } else {
+            console.log("\n━━━ Adopt catalog skills ━━━");
+            const adoptResult = adoptCatalogSkills({
+              sourceUserSkillsDir: sourceDir,
+              catalogPath,
+              targetMap,
+              eccProfile,
+              homeDir,
+              force: false,
+              forceCopy,
+              forceSymlink,
+              preferCopyOnWindows,
+              dryRun: false
+            });
+            const adopted = adoptResult.results.filter(
+              (r) => r.action === "adopted"
+            ).length;
+            const reviewRequired = adoptResult.results.filter(
+              (r) => r.action === "review-required"
+            ).length;
+            const total = adoptResult.results.length;
+            console.log(
+              `Adopt pass: ${adopted} adopted/updated of ${total} candidate(s)`
+            );
+            if (reviewRequired) {
+              console.log(
+                `  ${reviewRequired} skill(s) need review (store differs from IDE copy). Run adopt --adopt-overwrite to overwrite.`
+              );
+            }
+          }
+        }
+
+        if (!skipMcp && mcpIdes.length && fs.existsSync(bundledMcpPath)) {
+          if (dryRun) {
+            console.log("\n[dry-run] would install MCP servers to store + merge into IDEs");
+          } else {
+            console.log("\n━━━ MCP servers ━━━");
+            const storeMcp = installMcpToStore(bundledMcpPath, { force, dryRun: false });
+            console.log(`MCP store: ${getMcpStorePath()} (${storeMcp.action})`);
+            const mcpResults = installMcpToIdes(mcpTargetMap, mcpIdes, {
+              force,
+              dryRun: false,
+              repoRoot
+            });
+            for (const r of mcpResults.results) {
+              const added = r.added?.length ? r.added.join(", ") : "none";
+              const skipped = r.skipped?.length ? r.skipped.join(", ") : "none";
+              console.log(`  ${r.ide}: ${r.targetPath}`);
+              console.log(`    added: ${added}; skipped (already present): ${skipped}`);
+            }
+            console.log(
+              "Restart Cursor / Claude Code if MCP tools do not appear immediately."
+            );
+          }
+        }
+
+        console.log("Done.");
+        return;
+      }
+
+      if (!skipMcp && mcpIdes.length) {
+        if (dryRun) {
+          console.log("[dry-run] would remove Kenmark MCP server entries from IDE configs");
+        } else {
+          const mcpUninstall = uninstallMcpFromIdes(mcpTargetMap, mcpIdes, {
+            dryRun: false
+          });
+          if (mcpUninstall.serverNames.length) {
+            console.log(
+              `Removed Kenmark MCP servers (${mcpUninstall.serverNames.join(", ")}) from IDE configs.`
+            );
+          }
+        }
+      }
+
+      const uninstallResults = uninstallKenmarkFromIdes(skillNames, targetMap, {
+        keepStore,
+        dryRun
+      });
+      if (dryRun) {
+        console.log("[dry-run] uninstall complete (no files changed)");
+        return;
+      }
+
+      let removedCount = 0;
+      for (const r of uninstallResults) {
+        if (r.action === "removed") removedCount += 1;
+      }
+      console.log(`Removed ${removedCount} Kenmark skill path(s) from IDE directories.`);
+
+      if (targetIdes.includes("claude")) {
+        const claudePath = targetMap.claude;
+        const wrapperResult = removeClaudeCommandWrappers(claudePath, false);
+        console.log(
+          `Removed Claude command wrappers (${wrapperResult.removed}): ${wrapperResult.commandsDir}`
+        );
+      }
+
+      if (!keepStore) {
+        console.log(`Cleared Kenmark store entries for bundled skills under ${storeDir}`);
+      } else {
+        console.log(`Kenmark store preserved at ${storeDir} (--keep-store default)`);
+      }
+      console.log("Done.");
+    }
+  };
+}
+
+async function run() {
+  const args = parseArgs(process.argv.slice(2));
+  if (args.help) {
+    printUsage();
+    process.exit(0);
+  }
+
+  if (!fs.existsSync(sourceDir)) {
+    console.error(`Source skills directory missing: ${sourceDir}`);
+    process.exit(1);
+  }
+
+  const interactive = wantsInteractive(args);
+
+  if (interactive && !args.yes) {
+    banner("kenmark-skills setup", "Interactive · flags + -y for agents");
+  }
+
+  let mode = args.mode;
+  let action = args.action;
+  let targetIdes = resolveTargetIdes(args, globalTargets);
+
+  if (interactive) {
+    if (!args.explicitAction) {
+      action = await promptAction(action || "install");
+    }
+    if (!args.explicitMode) {
+      mode = await promptScope(mode || "global");
+    }
+    const targetMapPreview = mode === "project" ? projectTargets : globalTargets;
+    if (!args.explicitIde) {
+      const detected = detectInstalledIdes(targetMapPreview);
+      targetIdes = await promptIde(Object.keys(targetMapPreview), detected);
+    }
+  }
+
+  action = action || "install";
+  mode = mode || "global";
+
+  const targetMap = mode === "project" ? projectTargets : globalTargets;
+  const mcpTargetMap = mode === "project" ? projectMcpTargets : globalMcpTargets;
+
+  if (!targetIdes) {
+    targetIdes = resolveTargetIdes(args, targetMap);
+  }
+  if (!targetIdes) {
+    const fallback = resolveFallbackTargetIdes({
+      targetMap,
+      strictTargets: args.strictTargets,
+      mode
+    });
+    targetIdes = fallback.targetIdes;
+    if (fallback.message) {
+      console.log(fallback.message);
+    }
+  }
+
+  const { plan, run: runAction } = executeInstall(targetMap, targetIdes, action, {
+    dryRun: args.dryRun,
+    forceCopy: args.forceCopy,
+    forceSymlink: args.forceSymlink,
+    preferCopyOnWindows: args.preferCopyOnWindows,
+    force: args.force,
+    keepStore: args.keepStore,
+    skipAdopt: args.skipAdopt,
+    skipMcp: args.skipMcp,
+    eccProfile: args.eccProfile,
+    mcpTargetMap
+  });
+
+  console.log(`Operating system: ${process.platform}`);
+  console.log(`Action: ${action}`);
+  console.log(`Install mode: ${mode}`);
+  if (action === "install") {
+    console.log(`Skills source: ${sourceDir}`);
+    console.log(`Kenmark store: ${getStoreDir()}`);
+  }
+
+  const ok =
+    args.yes ||
+    args.dryRun ||
+    (await confirmPlan(plan, args.dryRun));
+  if (!ok) {
+    console.log("Cancelled.");
+    process.exit(0);
+  }
+
+  if (args.dryRun) {
+    console.log("\n(dry-run — no files changed)\n");
+  }
+
+  runAction();
+}
+
+run().catch((err) => {
+  console.error(err.message || err);
+  printUsage();
+  process.exit(1);
+});

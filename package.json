@@ -1,0 +1,76 @@
+{
+  "name": "kenmark-skills",
+  "version": "1.2.7",
+  "description": "13 Kenmark agent skills + CLI (init, setup, update, adopt, inventory) for Cursor, Codex, and Claude Code. Optional curated packs via install-recommended.",
+  "license": "MIT",
+  "private": false,
+  "type": "commonjs",
+  "bin": {
+    "kenmark-skills": "scripts/cli.js",
+    "kenmark-skills-setup": "scripts/setup-skills.js"
+  },
+  "scripts": {
+    "init": "node scripts/cli.js init",
+    "setup": "node scripts/cli.js setup",
+    "update": "node scripts/cli.js update",
+    "adopt": "node scripts/cli.js adopt",
+    "uninstall": "node scripts/cli.js uninstall",
+    "uninstall:skills": "node scripts/cli.js uninstall",
+    "inventory": "node scripts/cli.js inventory",
+    "subagents-inventory": "node scripts/cli.js subagents-inventory",
+    "install-recommended": "node scripts/cli.js install-recommended",
+    "setup:skills": "node scripts/setup-skills.js",
+    "pack:check": "npm pack --dry-run",
+    "publish:public": "npm publish --access public"
+  },
+  "files": [
+    "CHANGELOG.md",
+    "skills/COPIED_SKILLS.md",
+    "skills/user-skills-manifest.md",
+    "skills/user-skills/**/*",
+    "skills/user-skills/recommended-catalog.json",
+    "config/mcp-servers.json",
+    "scripts/cli.js",
+    "scripts/interactive.js",
+    "scripts/kenmark-hub.js",
+    "scripts/recommended-catalog.js",
+    "scripts/setup-skills.js",
+    "scripts/skills-adopt.js",
+    "scripts/doctor.js",
+    "scripts/skills-init.js",
+    "scripts/skills-inventory.js",
+    "scripts/skills-install-recommended.js",
+    "scripts/skills-update.js",
+    "scripts/subagents-inventory.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "Kenmark ITan Solutions",
+  "contributors": [
+    "Tanooj Mehra",
+    "Adwait Date"
+  ],
+  "keywords": [
+    "kenmark",
+    "cursor",
+    "codex",
+    "claude-code",
+    "skills",
+    "subagents",
+    "ai-agent",
+    "workflow",
+    "cli"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tanoojmehra/kenmark-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tanoojmehra/kenmark-skills/issues"
+  },
+  "homepage": "https://github.com/tanoojmehra/kenmark-skills#readme"
+}

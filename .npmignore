@@ -1,0 +1,10 @@
+# Keep in sync with .gitignore (local/workspace paths never published)
+
+temp/
+brain/
+.DS_Store
+
+# Local IDE installs from `kenmark-skills setup --project` (canonical: skills/user-skills/)
+.claude/
+.cursor/
+.agents/
