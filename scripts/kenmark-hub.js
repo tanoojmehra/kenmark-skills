@@ -719,6 +719,11 @@ function detectManagedIdes(targetMap) {
 /** Resolve --ide all | cursor,codex | single from CLI flags. */
 function resolveExplicitTargetIdes(ideArg, targetMap) {
   const requested = String(ideArg).toLowerCase();
+  if (requested === "auto") {
+    const detected = detectInstalledIdes(targetMap);
+    if (detected.length > 0) return detected;
+    return DEFAULT_AGENT_IDES.filter((ide) => targetMap[ide]);
+  }
   if (requested === "all") {
     return Object.keys(targetMap);
   }

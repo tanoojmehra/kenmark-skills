@@ -10,6 +10,7 @@ const {
   banner
 } = require("./interactive");
 const readline = require("readline");
+const { loadCatalog, defaultSelectedIds } = require("./recommended-catalog");
 
 const repoRoot = path.resolve(__dirname, "..");
 const setupScript = path.join(__dirname, "setup-skills.js");
@@ -25,7 +26,7 @@ function printUsage() {
   console.log("Options:");
   console.log("  --kenmark-only        Update Kenmark skills only (re-copy from package)");
   console.log("  --recommended-only    Re-run recommended pack installs only");
-  console.log("  --both                Update both (default when non-interactive)");
+  console.log("  --both                Update Kenmark skills and recommended packs");
   console.log("  --global              User-wide install paths (default)");
   console.log("  --project             Current project directory only");
   console.log("  --ide <target>        IDE for Kenmark sync: cursor, claude, all, …");
@@ -141,14 +142,14 @@ async function promptMode(preset) {
   console.log("  1) Kenmark skills only — re-sync from kenmark-skills package [default]");
   console.log("  2) Recommended packs only — Impeccable, ECC, … (npx reinstall)");
   console.log("  3) Both — npm package (optional) + Kenmark + recommended\n");
-  const answer = await ask(rl, "Choose [1/2/3] (default 3): ");
+  const answer = await ask(rl, "Choose [1/2/3] (default 1): ");
   rl.close();
   const lower = answer.toLowerCase();
-  if (!lower || lower === "3" || lower === "both" || lower === "b") return "both";
-  if (lower === "1" || lower === "kenmark" || lower === "k") return "kenmark";
+  if (!lower || lower === "1" || lower === "kenmark" || lower === "k") return "kenmark";
   if (lower === "2" || lower === "recommended" || lower === "r") return "recommended";
-  console.log('Unknown choice; using "both".');
-  return "both";
+  if (lower === "3" || lower === "both" || lower === "b") return "both";
+  console.log('Unknown choice; using "kenmark".');
+  return "kenmark";
 }
 
 async function promptNpmUpdate(skipPreset) {
@@ -267,7 +268,7 @@ async function run() {
       }
     }
   } else {
-    mode = mode || "both";
+    mode = mode || "kenmark";
     scope = scope || "global";
     runNpm = !args.skipNpm && (mode === "kenmark" || mode === "both") && globalKenmarkInstalled();
   }
@@ -310,10 +311,16 @@ async function run() {
   }
 
   if (mode === "kenmark" || mode === "both") {
-    const setupArgs = [scope === "project" ? "--project" : "--global", "--install"];
-    if (ide) setupArgs.push("--ide", ide);
+    const setupArgs = [
+      scope === "project" ? "--project" : "--global",
+      "--install",
+      "--ide",
+      ide || "auto",
+      "-y"
+    ];
     if (args.skipAdopt) setupArgs.push("--skip-adopt");
     if (args.eccProfile) setupArgs.push("--ecc-profile", args.eccProfile);
+    if (args.dryRun) setupArgs.push("--dry-run");
     const result = runNodeScript(setupScript, setupArgs, args.dryRun, "Kenmark skills");
     if (!args.dryRun && result.status !== 0) {
       console.error(`Kenmark update failed (exit ${result.status})`);
@@ -331,13 +338,15 @@ async function run() {
     } else if (args.allPacks) {
       recArgs.push("--all");
     } else {
-      recArgs.push("--all");
+      const catalog = loadCatalog();
+      const defaults = defaultSelectedIds(catalog);
+      recArgs.push("--ids", defaults.join(","));
     }
     if (args.eccProfile) {
       recArgs.push("--ecc-profile", args.eccProfile);
     }
     if (args.skipAdopt) recArgs.push("--skip-adopt");
-    if (ide) recArgs.push("--ide", ide);
+    recArgs.push("--ide", ide || "auto");
     if (args.dryRun) recArgs.push("--dry-run");
 
     const result = runNodeScript(

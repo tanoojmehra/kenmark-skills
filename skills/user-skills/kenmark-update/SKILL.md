@@ -45,7 +45,7 @@ Updating Kenmark skills does **not** remove third-party skills. Re-running recom
 | Audience | How to run |
 | --- | --- |
 | **Human** | `npx kenmark-skills update` — prompts for what to refresh, scope, npm update |
-| **Agent** | `npx kenmark-skills update --both --global -y` (add `--ide`, `--ids` as needed) |
+| **Agent** | `npx kenmark-skills update --kenmark-only --global --ide auto -y` (add `--both`, `--ids` only when needed) |
 
 ## Step 1 — Interactive CLI (preferred)
 
@@ -57,7 +57,7 @@ npx kenmark-skills update
 
 Prompts (in order):
 
-1. **What to update** — Kenmark only, recommended only, or both (default: both)
+1. **What to update** — Kenmark only (default), recommended only, or both
 2. **Scope** — `global` (default) vs `project` (current repo)
 3. **npm update** — optional `npm update -g kenmark-skills` if the package is installed globally
 4. **IDE** — Kenmark target (`cursor`, `claude`, `all`, or empty for auto-detect)

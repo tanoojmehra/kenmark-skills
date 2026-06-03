@@ -12,6 +12,15 @@
 - **kenmark-hub.js:** Legacy skill and Claude command cleanup requires ownership proof (symlink to `~/.kenmark/store`, `.kenmark-managed` parent, Kenmark markers in `SKILL.md`, or `manifest.json` `source: kenmark-package`). Unproven same-name paths are skipped with `legacy-candidate-review-required`; proven removals are backed up under `~/.kenmark/backups/legacy-cleanup/<timestamp>/`.
 - **setup-skills.js / kenmark-hub.js:** Stop generating Claude slash-command wrappers on install; install and uninstall remove stale `~/.claude/commands/kenmark-*.md` (legacy unprefixed wrapper names included). Namespaced skills under `~/.claude/skills/` are the supported entry point.
 
+## v2.0.2 — Update flow safe defaults
+
+### Fix
+
+- **kenmark-update.js:** Interactive and non-interactive default is Kenmark-only (not both). Empty recommended pack choice uses `defaultSelectedIds` (`--ids`), never implicit `--all`. After top-level confirmation, `setup-skills.js` always receives `-y` and `--ide auto` (or explicit IDE); recommended refresh always forwards `--ide auto`.
+- **kenmark-hub.js:** `--ide auto` resolves to detected IDEs or default agent IDEs.
+- **test-cli-smoke.js:** Assert update dry-run commands for Kenmark-only and both modes.
+- **kenmark-update skill:** Docs match Kenmark-only default and agent example.
+
 ## v2.0.1 — Issues ID ledger
 
 ### Fix
