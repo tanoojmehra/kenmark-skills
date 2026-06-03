@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New skill
+
+- **repo-quality-gates (1.0.0):** Universal verify-phase workflow — discover package scripts, run safe typecheck/lint/format/build/test/dev gates in order, classify failures, report fix plan without auto-editing (`category: workflow`, `phase: verify`, `risk: shell`).
+- **skills-router / README / package.json / skills/README.md:** Kenmark skill count 22 → 23; routing row for dev/build/type/lint/format errors.
+
 ### Validation entry points
 
 - **README / script headers:** Document two equivalent paths — `npm run validate` / `npm test` → `scripts/validate-repo.js`; `kenmark-skills validate` → `scripts/validate.js` → `validate-repo.js`. Both files remain in `package.json` `files`.
