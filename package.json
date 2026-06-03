@@ -1,7 +1,7 @@
 {
   "name": "kenmark-skills",
-  "version": "1.6.0",
-  "description": "23 universal Kenmark agent skills + 11-command CLI for Cursor, Claude Code, Codex, and other SKILL.md-compatible agents. Includes setup, init, update, adopt, validate, doctor, inventory, mcp, profile-based recommended packs, and repo-* maintenance skills.",
+  "version": "2.0.0",
+  "description": "23 universal Kenmark agent skills + 11-command CLI for Cursor, Claude Code, Codex, and other SKILL.md-compatible agents. Includes setup, init, update, adopt, validate, doctor, inventory, mcp, profile-based recommended packs, and kenmark-repo-* maintenance skills.",
   "license": "MIT",
   "private": false,
   "type": "commonjs",

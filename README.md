@@ -75,8 +75,11 @@ No global install required — `npx` downloads and runs the CLI each time (or us
 # Guided install: Kenmark skills + optional curated packs
 npx kenmark-skills init
 
-# Kenmark skills only, non-interactive
-npx kenmark-skills setup --global --ide all -y
+# Kenmark skills only, non-interactive (defaults to cursor, claude, codex when no IDE dirs are found)
+npx kenmark-skills setup --global -y
+
+# Or target those three explicitly:
+# npx kenmark-skills setup --global --ide cursor,claude,codex -y
 
 # In a project repo (agent chat)
 # "Run kenmark-init on this repo"
@@ -180,7 +183,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | Audience | Example |
 | --- | --- |
 | Human | `npx kenmark-skills init` |
-| Agent | `npx kenmark-skills init --global --ide all --skip-recommended -y` |
+| Agent | `npx kenmark-skills init --global --skip-recommended -y` |
 | Agent | `npx kenmark-skills setup --global --ide cursor -y` |
 | Agent | `npx kenmark-skills install-recommended --profile core-next --global -y` |
 | Agent | `npx kenmark-skills update --both --global -y` |
@@ -250,7 +253,7 @@ When store content already exists but differs from an IDE copy, adopt reports **
 
 ```bash
 npx kenmark-skills init
-npx kenmark-skills setup --global --ide all
+npx kenmark-skills setup --global -y
 ```
 
 `npx` fetches the package from npm when needed. Pin a version with `npx kenmark-skills@1.5.0 init` for reproducibility, or use `npx kenmark-skills@latest init` for the newest release.
@@ -269,7 +272,7 @@ Use this only if you run the CLI often and prefer omitting `npx`.
 Install into the current repo’s IDE folders instead of your home directory:
 
 ```bash
-npx kenmark-skills setup --project --ide all
+npx kenmark-skills setup --project -y
 ```
 
 ### Per-IDE targeting
@@ -278,10 +281,18 @@ npx kenmark-skills setup --project --ide all
 npx kenmark-skills setup --global --ide cursor
 npx kenmark-skills setup --global --ide claude
 npx kenmark-skills setup --global --ide codex
-npx kenmark-skills setup --global --ide all
+npx kenmark-skills setup --global --ide cursor,claude,codex
 ```
 
 Restart Claude Code if `/kenmark-*` slash commands do not appear immediately.
+
+### All IDEs (advanced)
+
+Use `--ide all` only when you want every harness path this package knows about (beyond cursor/claude/codex). It can create links in IDE folders you do not use.
+
+```bash
+npx kenmark-skills setup --global --ide all -y
+```
 
 ---
 
@@ -354,7 +365,7 @@ Full `uninstall` still removes Kenmark MCP entries when they were installed via 
 | Qoder | `~/.qoder/skills` |
 | MiniMax Code | `~/.minimax/skills` |
 
-**Claude Code** also gets slash commands under `~/.claude/commands/` (e.g. `/kenmark-init`, `/kenmark-commit`, one per shipped skill).
+**Claude Code** uses the same `kenmark-*` skill folders under `~/.claude/skills/`. Setup does not create duplicate slash-command wrappers in `~/.claude/commands/` (install/uninstall remove any stale `kenmark-*.md` files from older versions).
 
 ---
 

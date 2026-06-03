@@ -21,7 +21,7 @@ risk: read-only
 disable-model-invocation: false
 ---
 
-# Skills Router
+# Kenmark Router
 
 While **coding**, when you're not sure which skill applies, search the installed skill library and **auto-assign** the best match for the current task.
 

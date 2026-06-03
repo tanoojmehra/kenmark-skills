@@ -4,17 +4,24 @@
 
 ### Fix
 
+- **kenmark-hub.js:** Legacy skill and Claude command cleanup requires ownership proof (symlink to `~/.kenmark/store`, `.kenmark-managed` parent, Kenmark markers in `SKILL.md`, or `manifest.json` `source: kenmark-package`). Unproven same-name paths are skipped with `legacy-candidate-review-required`; proven removals are backed up under `~/.kenmark/backups/legacy-cleanup/<timestamp>/`.
+- **setup-skills.js / kenmark-hub.js:** Stop generating Claude slash-command wrappers on install; install and uninstall remove stale `~/.claude/commands/kenmark-*.md` (legacy unprefixed wrapper names included). Namespaced skills under `~/.claude/skills/` are the supported entry point.
+
+## v2.0.0 — Kenmark-prefixed skill names (semver major)
+
+**Major version:** Every bundled Kenmark skill was renamed (`commit-push` → `kenmark-commit`, `skills-router` → `kenmark-router`, `repo-quality-gates` → `kenmark-repo-quality`, etc.). Slash commands, symlinks, and docs that referenced unprefixed or legacy names break until you re-run setup. Do not publish as 1.x.
+
+### Fix
+
 - **CLI scripts:** Renamed `scripts/skills-init.js`, `skills-install-recommended.js`, and `skills-update.js` to `kenmark-setup.js`, `kenmark-packs.js`, and `kenmark-update.js` so `package.json` `files`, `cli.js`, and published tarballs match on-disk paths (`init`, `install-recommended`, `update`).
 - **validate-repo.js:** Assert each required `package.json` `files` entry exists on disk (except globs) and each `cli.js` spawn target is present — catches publish breaks when manifest and filesystem diverge.
 
-## v1.6.0 — Kenmark-prefixed skill names
-
 ### Breaking rename (23 bundled skills)
 
-All Kenmark bundled skills now use the `kenmark-<domain>` namespace (e.g. `kenmark-router`, `kenmark-commit`, `kenmark-repo-quality`). Folder names, frontmatter `name`, IDE symlinks, and Claude slash commands align (`/kenmark-router`, not `/kenmark-skills-router`).
+All Kenmark bundled skills now use the `kenmark-<domain>` namespace (e.g. `kenmark-router`, `kenmark-commit`, `kenmark-repo-quality`). Folder names, frontmatter `name`, and IDE symlinks align; invoke skills by name (e.g. `kenmark-router`), not duplicate slash-command wrappers.
 
 - **kenmark-hub.js:** `LEGACY_SKILL_RENAMES` map; `setup` removes unprefixed folders, old `kenmark-<legacy>` paths, and stale Claude command wrappers on install.
-- **setup-skills.js:** Claude commands use the skill folder basename when it already starts with `kenmark-`.
+- **setup-skills.js:** Claude command wrappers removed on install/uninstall; no longer created (use `kenmark-*` skills directly).
 - **Docs / router / inventory:** References and registry inference updated for `kenmark-*` names.
 
 Run `npx kenmark-skills setup --global --ide all --force -y` after upgrading to migrate local installs.

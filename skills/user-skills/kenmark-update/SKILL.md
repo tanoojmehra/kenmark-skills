@@ -118,7 +118,7 @@ npx kenmark-skills install-recommended --all --project -y
 ## Step 4 — Verify
 
 1. Confirm Kenmark skill folders exist (e.g. `~/.cursor/skills/kenmark-update`, `kenmark-router`, `kenmark-init`)
-2. For Claude Code, slash commands under `~/.claude/commands/kenmark-*.md` are regenerated on Kenmark sync
+2. For Claude Code, confirm `~/.claude/skills/kenmark-*` folders exist; setup removes stale `~/.claude/commands/kenmark-*.md` wrappers (no longer generated)
 3. Optional: `npx kenmark-skills inventory --markdown temp/skills-after-update.md`
 
 ## Related skills
