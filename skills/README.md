@@ -94,7 +94,7 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Need complete final deliverable? | `kenmark-output` |
 | Need issue tracking? | `kenmark-issues-setup` / `kenmark-issues-scan` |
 | Need skill choice? | `kenmark-router` |
-| Repo health (see table above) | `repo-*` family |
+| Repo health (see table above) | `kenmark-repo-*` family |
 | Installed skills inventory? | `kenmark-maintain` |
 | Need commit? | `kenmark-commit` |
 
