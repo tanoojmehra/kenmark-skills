@@ -107,8 +107,8 @@
           "Claude plugin: /plugin marketplace add pbakaus/impeccable"
         ],
         "verify": {
-          "global": "test -f \"$HOME/.agents/skills/impeccable/SKILL.md\" || test -L \"$HOME/.claude/skills/impeccable\"",
-          "project": "test -f \".agents/skills/impeccable/SKILL.md\" || test -L \".claude/skills/impeccable\""
+          "global": "test -f \"$HOME/.agents/skills/impeccable/SKILL.md\" || test -f \"$HOME/.cursor/skills/impeccable/SKILL.md\" || test -L \"$HOME/.claude/skills/impeccable\"",
+          "project": "test -f \".agents/skills/impeccable/SKILL.md\" || test -f \".cursor/skills/impeccable/SKILL.md\" || test -L \".claude/skills/impeccable\""
         }
       }
     },

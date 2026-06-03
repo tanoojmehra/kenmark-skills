@@ -12,6 +12,9 @@ const cliPath = path.join(__dirname, "cli.js");
 
 const COMMANDS = [
   ["help"],
+  ["version"],
+  ["--version"],
+  ["-v"],
   ["validate"],
   ["setup", "--dry-run", "--global", "--ide", "claude", "-y"],
   ["init", "--dry-run", "--global", "--ide", "claude", "--skip-recommended", "-y"],
@@ -79,9 +82,11 @@ const ASSERTIONS = [
       "-y"
     ],
     expectStdout: [/skills add pbakaus\/impeccable|pbakaus\/impeccable/],
-    rejectStdout: [/Skipping install/]
+    rejectStdout: [/Already installed: impeccable — skipping install/]
   }
 ];
+
+const pkgVersion = require(path.join(repoRoot, "package.json")).version;
 
 function runCli(args) {
   const label = `node scripts/cli.js ${args.join(" ")}`;
@@ -116,6 +121,17 @@ function main() {
     const { label, result } = runCli(args);
     const code = result.status === null ? 1 : result.status;
     const stdout = (result.stdout || "") + (result.stderr || "");
+    const isVersionCmd =
+      args[0] === "version" || args[0] === "--version" || args[0] === "-v";
+    if (isVersionCmd && code === 0 && !stdout.trim().includes(pkgVersion)) {
+      failures.push({
+        label,
+        code,
+        stderr: `expected version ${pkgVersion}, got: ${stdout.trim()}`
+      });
+      console.error(`  ✗ ${label} (version mismatch)`);
+      continue;
+    }
     if (code !== 0) {
       failures.push({
         label,

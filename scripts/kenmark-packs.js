@@ -269,10 +269,13 @@ function verifyPack(pack, scope, entry) {
   const cmd = resolveVerifyCommand(pack, scope, entry);
   if (!cmd) return null;
   const cwd = scope === "project" ? process.cwd() : undefined;
+  const home = process.env.HOME || os.homedir();
   const result = spawnSync(cmd, {
     shell: true,
     encoding: "utf8",
-    cwd: cwd || process.cwd()
+    stdio: "pipe",
+    cwd: cwd || process.cwd(),
+    env: { ...process.env, HOME: home }
   });
   return result.status === 0;
 }
@@ -473,16 +476,17 @@ async function run() {
       console.log(`Warning: ${pack.warning}`);
     }
 
-    const verifyCmd = resolveVerifyCommand(pack, scope, entry);
+    const hasVerify = resolveVerifyCommand(pack, scope, entry);
     const alreadyInstalled =
+      hasVerify &&
       !args.force &&
       !args.dryRun &&
-      verifyCmd &&
       verifyPack(pack, scope, entry);
 
     if (alreadyInstalled) {
-      console.log("Verify: already installed");
-      console.log("Skipping install. Use --force to reinstall.");
+      console.log(
+        `Already installed: ${pack.id} — skipping install. Use --force to reinstall.`
+      );
       continue;
     }
 
@@ -520,7 +524,7 @@ async function run() {
         break;
       }
     }
-    if (!args.dryRun && verifyCmd) {
+    if (!args.dryRun && hasVerify) {
       const okVerify = verifyPack(pack, scope, entry);
       const verifyHint =
         entry.seoSkills?.length > 1

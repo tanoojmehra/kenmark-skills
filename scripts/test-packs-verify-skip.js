@@ -11,6 +11,7 @@ const os = require("os");
 
 const repoRoot = path.resolve(__dirname, "..");
 const packsScript = path.join(__dirname, "kenmark-packs.js");
+const cliScript = path.join(__dirname, "cli.js");
 
 function rmDirSafe(dir) {
   if (!dir || !fs.existsSync(dir)) return;
@@ -19,6 +20,15 @@ function rmDirSafe(dir) {
 
 function runPacks(args, env) {
   return spawnSync(process.execPath, [packsScript, ...args], {
+    cwd: repoRoot,
+    encoding: "utf8",
+    env: { ...process.env, NO_COLOR: "1", ...env },
+    stdio: "pipe"
+  });
+}
+
+function runCli(args, env) {
+  return spawnSync(process.execPath, [cliScript, ...args], {
     cwd: repoRoot,
     encoding: "utf8",
     env: { ...process.env, NO_COLOR: "1", ...env },
@@ -52,13 +62,15 @@ function main() {
     `kenmark-packs-verify-${process.pid}-${Date.now()}`
   );
   try {
-    fs.mkdirSync(path.join(tempHome, ".agents", "skills", "impeccable"), {
-      recursive: true
-    });
-    fs.writeFileSync(
-      path.join(tempHome, ".agents", "skills", "impeccable", "SKILL.md"),
-      "# impeccable\n"
+    const agentsSkill = path.join(
+      tempHome,
+      ".agents",
+      "skills",
+      "impeccable",
+      "SKILL.md"
     );
+    fs.mkdirSync(path.dirname(agentsSkill), { recursive: true });
+    fs.writeFileSync(agentsSkill, "# impeccable\n");
 
     const skipRun = runPacks(
       ["--ids", "impeccable", "--global", "-y", "--skip-adopt"],
@@ -67,14 +79,38 @@ function main() {
     const skipStdout = (skipRun.stdout || "") + (skipRun.stderr || "");
     if (skipRun.status !== 0) {
       failures.push(`verify-OK skip run exited ${skipRun.status}`);
-    } else if (!/Verify: already installed/.test(skipStdout)) {
+    } else if (!/Already installed: impeccable — skipping install/.test(skipStdout)) {
       failures.push("verify-OK run did not report already installed");
-    } else if (!/Skipping install/.test(skipStdout)) {
-      failures.push("verify-OK run did not skip install");
+    } else if (!/Use --force to reinstall/.test(skipStdout)) {
+      failures.push("verify-OK run did not mention --force");
     } else if (/skills add pbakaus\/impeccable/.test(skipStdout)) {
       failures.push("verify-OK run still invoked skills add installer");
     } else {
       console.log("  ✓ verify-OK pack skips install");
+    }
+
+    const cliSkip = runCli(
+      [
+        "install-recommended",
+        "--ids",
+        "impeccable",
+        "--global",
+        "--ide",
+        "claude",
+        "-y",
+        "--skip-adopt"
+      ],
+      { HOME: tempHome }
+    );
+    const cliSkipStdout = (cliSkip.stdout || "") + (cliSkip.stderr || "");
+    if (cliSkip.status !== 0) {
+      failures.push(`cli verify-OK skip exited ${cliSkip.status}`);
+    } else if (!/Already installed: impeccable — skipping install/.test(cliSkipStdout)) {
+      failures.push("cli verify-OK run did not skip install");
+    } else if (/skills add pbakaus\/impeccable/.test(cliSkipStdout)) {
+      failures.push("cli verify-OK run still invoked skills add installer");
+    } else {
+      console.log("  ✓ cli install-recommended skips when verify OK");
     }
 
     const forceRun = runPacks(
@@ -86,10 +122,36 @@ function main() {
       failures.push(`--force dry-run exited ${forceRun.status}`);
     } else if (!/skills add pbakaus\/impeccable/.test(forceStdout)) {
       failures.push("--force dry-run did not show install command");
-    } else if (/Skipping install/.test(forceStdout)) {
+    } else if (/Already installed: impeccable — skipping install/.test(forceStdout)) {
       failures.push("--force dry-run incorrectly skipped install");
     } else {
       console.log("  ✓ --force shows install even when verify would pass");
+    }
+
+    const cliForce = runCli(
+      [
+        "install-recommended",
+        "--ids",
+        "impeccable",
+        "--global",
+        "--ide",
+        "claude",
+        "-y",
+        "--skip-adopt",
+        "--force",
+        "--dry-run"
+      ],
+      { HOME: tempHome }
+    );
+    const cliForceStdout = (cliForce.stdout || "") + (cliForce.stderr || "");
+    if (cliForce.status !== 0) {
+      failures.push(`cli --force dry-run exited ${cliForce.status}`);
+    } else if (!/skills add pbakaus\/impeccable/.test(cliForceStdout)) {
+      failures.push("cli --force dry-run did not show install command");
+    } else if (/Already installed: impeccable — skipping install/.test(cliForceStdout)) {
+      failures.push("cli --force dry-run incorrectly skipped install");
+    } else {
+      console.log("  ✓ cli --force shows install when verify would pass");
     }
   } finally {
     rmDirSafe(tempHome);
