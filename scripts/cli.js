@@ -5,6 +5,12 @@ const path = require("path");
 
 const args = process.argv.slice(2);
 const command = args[0];
+const pkg = require(path.join(__dirname, "..", "package.json"));
+
+if (command === "version" || command === "--version" || command === "-v") {
+  console.log(pkg.version);
+  process.exit(0);
+}
 
 function printUsage() {
   console.log("kenmark-skills CLI");
@@ -23,6 +29,7 @@ function printUsage() {
   console.log("  kenmark-skills adopt [--global|--project] [--ide <target>] [--dry-run] [-y]");
   console.log("  kenmark-skills validate");
   console.log("  kenmark-skills doctor [--soft] [--no-fail] [--json path]");
+  console.log("  kenmark-skills version");
   console.log("  kenmark-skills help");
   console.log("");
   console.log("Examples:");

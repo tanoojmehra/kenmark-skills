@@ -16,7 +16,9 @@
 
 ### Perf
 
-- **kenmark-packs.js:** Verify-before-install skips upstream pack installers when verify already passes; `--force` reinstalls without tying to `--adopt-overwrite`.
+- **kenmark-packs.js:** Verify-before-install skips upstream pack installers when verify already passes; `--force` reinstalls without tying to `--adopt-overwrite`. Skip message: `Already installed: <id> — skipping install`.
+- **recommended-catalog.json (impeccable):** Global/project verify also checks `~/.cursor/skills/impeccable/SKILL.md`.
+- **cli.js:** `version`, `--version`, and `-v` print package version from `package.json`.
 - **recommended-catalog.js:** Prefer local `skills` CLI over `npx --yes skills` when available on PATH.
 - **test-packs-verify-skip.js:** Regression tests for skip and `--force` reinstall.
 - **test-cli-smoke.js / validate-repo.js:** Wire verify-skip tests into `npm test`; assert update `--both` uses `--ids`, not `--all`.
