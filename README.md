@@ -26,11 +26,11 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 ## Overview
 
-`kenmark-skills` ships **13 first-party skills**, a **9-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
+`kenmark-skills` ships **14 first-party skills**, a **9-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
 
 | Asset | Count | Notes |
 | --- | ---: | --- |
-| Kenmark skills | 13 | Bundled in `skills/user-skills/` |
+| Kenmark skills | 14 | Bundled in `skills/user-skills/` |
 | CLI commands | 9 | See [CLI reference](#cli-reference) |
 | Bundled sub-agents | 0 | Inventory/maintain skills only |
 | Recommended packs | 5 | Impeccable, ECC, Graphify, code review, SEO/GEO |
@@ -91,6 +91,7 @@ Skills are grouped by use case. Open each `SKILL.md` for full workflows and trig
 | Skill | Purpose |
 | --- | --- |
 | [`skills-router`](skills/user-skills/skills-router/SKILL.md) | Search installed skills and auto-assign the best match for the current task |
+| [`troubleshoot`](skills/user-skills/troubleshoot/SKILL.md) | Universal diagnosis: evidence, hypotheses, ranked action plan (read-only first) |
 
 ### Ship
 
@@ -134,7 +135,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | Command | Description |
 | --- | --- |
 | `init` | First-time wizard: runs `setup` + optional `install-recommended` |
-| `setup` | Install 13 Kenmark skills → `~/.kenmark/store` + IDE symlinks |
+| `setup` | Install 14 Kenmark skills → `~/.kenmark/store` + IDE symlinks |
 | `uninstall` | Remove Kenmark links from IDE paths (`--keep-store` optional) |
 | `install-recommended` | Install packs from [`recommended-catalog.json`](skills/user-skills/recommended-catalog.json) |
 | `update` | Refresh Kenmark and/or recommended installs |
@@ -160,7 +161,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | | `init` | `setup` |
 | --- | --- | --- |
 | **Use when** | First install; want optional curated packs | Kenmark skills only; re-link IDEs |
-| **Installs** | Kenmark + optional catalog packs | 13 Kenmark skills |
+| **Installs** | Kenmark + optional catalog packs | 14 Kenmark skills |
 | **Implementation** | `setup` → `install-recommended` | `setup-skills.js` |
 | **Later refreshes** | Use `update`, not `init` again | `update` or `setup --force` |
 
@@ -430,7 +431,7 @@ kenmark-skills/
 │   └── setup-skills.js     # kenmark-skills-setup
 └── skills/
     ├── README.md           # logical categories vs flat on-disk layout
-    └── user-skills/        # 13 universal skills + recommended-catalog.json
+    └── user-skills/        # 14 universal skills + recommended-catalog.json
 ```
 
 **Not committed here:** `.claude/`, `.cursor/`, `.agents/` (local IDE installs), `brain/` (optional dev workspace). Edit `skills/user-skills/<name>/SKILL.md` for bundled skills.

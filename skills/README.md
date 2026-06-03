@@ -16,10 +16,11 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (13)
+skills/user-skills/          ← bundled universal skills (14)
   init-brain/                category: onboarding
   skills-init/
   skills-router/             category: workflow
+  troubleshoot/              category: workflow (phase: diagnose)
   commit-push/               category: git
   issues-setup/              category: issues
   issues-list/

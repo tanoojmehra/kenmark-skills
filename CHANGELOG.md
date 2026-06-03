@@ -2,6 +2,10 @@
 
 ## Unreleased — Profile-based recommended catalog
 
+- **troubleshoot:** New bundled workflow skill (`phase: diagnose`) — universal evidence-first diagnosis, hypothesis tree, test plan, and ranked action plan; optional sub-agent tracks for deep investigation.
+- **skills-router:** `infer_category` / `infer_phase` recognize troubleshoot/diagnose triggers; category quick map includes troubleshooting; `diagnose` documented as a workflow phase.
+- **README / package.json / skills/README.md:** Kenmark skill count 13 → 14.
+
 - **recommended-catalog.json:** `core-next` copy uses universal wording (`agency/client projects`, Next.js full-stack notes) instead of Kenmark-as-workflow assumptions.
 
 - **issues-setup / issues-scan / issues-list / issues-maintenance:** Expanded default `area` values (`frontend`, `backend`, `auth`, `performance`, `dx`, `docs`, `workflow`, `unknown`, …); `worker` documented as optional when the repo has background jobs; maintenance accepts legacy `maintainability`.
