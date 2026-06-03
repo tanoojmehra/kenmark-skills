@@ -20,6 +20,7 @@ const {
   resolveProfilePlan,
   summarizeProfile,
   resolveInstallCommands,
+  formatInstallPlanLine,
   resolveVerifyCommand,
   runGitSyncInstall,
   listProfiles,
@@ -290,9 +291,12 @@ function runShell(command, dryRun, cwd) {
   });
 }
 
-function runInstallCommand(cmdEntry, dryRun) {
+function runInstallCommand(cmdEntry, dryRun, packId) {
   if (cmdEntry.strategy === "manual") {
-    console.log(`Manual install: ${cmdEntry.message}`);
+    const msg =
+      cmdEntry.message ||
+      `Manual install required for ${packId || "pack"}`;
+    console.log(`Manual install: ${msg}`);
     if (cmdEntry.manualSteps?.length) {
       console.log("Steps:");
       for (const step of cmdEntry.manualSteps) {
@@ -461,8 +465,8 @@ async function run() {
       : `Custom packs · scope ${scope}`,
     `Packs: ${packLabels.join(", ")}`,
     ...installPlan.flatMap((entry) =>
-      resolveInstallCommands(entry, scope, catalog).map(
-        (c) => c.command || c.message || `Manual install: ${entry.packId}`
+      resolveInstallCommands(entry, scope, catalog).map((c) =>
+        formatInstallPlanLine(c, entry.packId)
       )
     )
   ];
@@ -521,7 +525,7 @@ async function run() {
       } else if (cmdEntry.label) {
         console.log(`Skill: ${cmdEntry.label}`);
       }
-      const result = runInstallCommand(cmdEntry, args.dryRun);
+      const result = runInstallCommand(cmdEntry, args.dryRun, pack.id);
       if (!args.dryRun && result.status !== 0) {
         console.error(`Install failed for ${pack.id} (exit ${result.status})`);
         if (pack.install?.alternatives?.length) {

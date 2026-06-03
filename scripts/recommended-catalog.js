@@ -323,6 +323,21 @@ function resolveInstallCommands(entry, scope, catalog) {
   return [{ command: cmd, cwd }];
 }
 
+/**
+ * One-line summary for confirm/dry-run plan output (never returns undefined).
+ */
+function formatInstallPlanLine(cmdEntry, packId) {
+  const id = packId || "pack";
+  if (cmdEntry?.strategy === "manual") {
+    const msg =
+      cmdEntry.message || `Manual install required for ${id}`;
+    return `Manual install: ${msg}`;
+  }
+  if (cmdEntry?.command) return cmdEntry.command;
+  if (cmdEntry?.message) return cmdEntry.message;
+  return `Manual install: ${id}`;
+}
+
 /** One SEO/GEO skill: SKILL.md under .agents or .claude skills dir. */
 function seoSkillVerifyClause(skill, scope) {
   const agents =
@@ -373,6 +388,7 @@ module.exports = {
   packBloatContribution,
   weightLabel,
   resolveInstallCommands,
+  formatInstallPlanLine,
   resolveVerifyCommand,
   buildSeoSkillsVerifyCommand,
   runGitSyncInstall,
