@@ -1,6 +1,6 @@
 ---
 name: issues-setup
-version: 1.0.0
+version: 1.1.0
 category: issues
 scope: universal
 phase: setup
@@ -102,7 +102,7 @@ Each issue file contains:
 id: XXX
 title: ...
 severity: P0|P1|P2
-area: api|database|security|ui|worker|testing|maintainability|infra
+area: frontend|backend|api|database|auth|security|ui|testing|performance|dx|infra|docs|workflow|unknown
 source: how-the-issue-was-found
 status: open|completed
 created: YYYY-MM-DD
@@ -125,16 +125,23 @@ related:
 
 | Area | Description |
 |------|-------------|
-| api | HTTP/API routes and handlers |
-| database | Schema, migrations, persistence layer |
-| security | Auth, crypto, rate limiting, input validation |
-| ui | UI components, pages, navigation |
-| worker | Background jobs, queues, async workers |
-| testing | Test coverage gaps |
-| maintainability | Code quality, dead code, refactors |
+| frontend | Web/mobile UI, components, pages, client routing |
+| backend | Server logic, services, domain layer (non-route HTTP) |
+| api | HTTP/API routes, handlers, webhooks, GraphQL |
+| database | Schema, migrations, ORM, persistence |
+| auth | Sessions, OAuth, permissions, identity |
+| security | Hardening, crypto, rate limits, input validation |
+| ui | Visual design, layout, accessibility, UX polish |
+| testing | Test gaps, flaky tests, missing coverage |
+| performance | Latency, bundle size, caching, Core Web Vitals |
+| dx | Tooling, refactors, dead code, developer ergonomics |
 | infra | CI/CD, deploy, config, observability |
+| docs | README, API docs, comments, onboarding |
+| workflow | Scripts, automation, issue/process tooling |
+| unknown | Area unclear until triaged |
+| worker | Background jobs, queues, cron (add row only if the repo has them) |
 
-Add or rename areas in this table to match the project. Omit unused rows.
+Add or rename areas in this table to match the project. Omit unused rows (especially `worker` when there are no background jobs).
 
 ## Workstreams
 

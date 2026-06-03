@@ -1,6 +1,6 @@
 ---
 name: issues-list
-version: 1.0.0
+version: 1.1.0
 category: issues
 scope: universal
 phase: discover
@@ -26,9 +26,10 @@ disable-model-invocation: false
 ## Purpose
 
 Read all open issues from `brain/issues/INDEX.md` and display them in a
-well-structured table grouped by area (from `brain/issues/INDEX.md` — e.g. api,
-database, security, ui, worker, testing, maintainability, infra), sorted by priority within
-each group.
+well-structured table grouped by area (from `brain/issues/INDEX.md` — e.g.
+frontend, backend, api, database, auth, security, ui, testing, performance, dx,
+infra, docs, workflow, unknown; plus `worker` when the project uses it), sorted
+by priority within each group.
 
 ---
 

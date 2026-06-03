@@ -380,7 +380,7 @@ Do **not** use this skill for first-time Kenmark setup; use **`skills-init`** or
 ## Routing algorithm
 
 1. **Parse intent** from the user message:
-   - **Domain** (category): git, issues, seo, design, backend, testing, skills, workflow
+   - **Domain** (category): git, issues, seo, design, backend, testing, admin, workflow
    - **Phase**: setup, ship, maintain, verify, discover, plan
    - **Stack**: frameworks or tools mentioned (django, react, python, …)
    - **Risk tolerance**: read-only listing vs writes vs destructive ops
@@ -427,7 +427,7 @@ Do **not** use this skill for first-time Kenmark setup; use **`skills-init`** or
 | UI polish, layout, visual design, MUI | `design` | `impeccable`, `design-taste-frontend` |
 | APIs, services, frameworks, languages | `backend` | `backend-patterns`, `django-patterns` |
 | Tests, QA, verification, evals | `testing` | `tdd-workflow`, `verification-loop` |
-| Skill install, update, inventory | `skills` | `skills-init`, `skills-maintain`, `skills-update` |
+| Skill install, update, inventory | `admin` | `skills-init`, `skills-maintain`, `skills-update` |
 | Agent workflow, discovery, learning | `workflow` | `find-skills`, `continuous-learning`, `skills-router` |
 
 ## Output format

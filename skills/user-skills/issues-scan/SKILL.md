@@ -1,6 +1,6 @@
 ---
 name: issues-scan
-version: 1.0.0
+version: 1.1.0
 category: issues
 scope: universal
 phase: discover
@@ -62,6 +62,14 @@ ls -la "$REPO_ROOT"
 
 Read `brain/issues/INDEX.md` **Areas** table (if present) for project-specific
 area tags. Prefer paths and patterns from open issues' `files:` frontmatter.
+
+**Default areas** (use the best fit; `unknown` only when triage is unclear):
+
+`frontend`, `backend`, `api`, `database`, `auth`, `security`, `ui`, `testing`,
+`performance`, `dx`, `infra`, `docs`, `workflow`, `unknown`.
+
+Use `worker` only when the repo has background jobs (e.g. `**/worker/**`,
+`**/jobs/**`, queue consumers, cron). Do not assume workers exist in every repo.
 
 ---
 
@@ -172,7 +180,7 @@ For each unique finding, create a file at `brain/issues/{id}-{slug}.md`:
 id: {next-id}
 title: {concise one-liner}
 severity: P0|P1|P2
-area: api|database|security|ui|worker|testing|maintainability|infra
+area: frontend|backend|api|database|auth|security|ui|testing|performance|dx|infra|docs|workflow|unknown
 source: issues-scan
 status: open
 created: {YYYY-MM-DD}
