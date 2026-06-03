@@ -384,6 +384,34 @@ function detectManagedIdes(targetMap) {
   return managed;
 }
 
+/** Resolve --ide all | cursor,codex | single from CLI flags. */
+function resolveExplicitTargetIdes(ideArg, targetMap) {
+  const requested = String(ideArg).toLowerCase();
+  if (requested === "all") {
+    return Object.keys(targetMap);
+  }
+  if (requested.includes(",")) {
+    const list = requested.split(",").map((s) => s.trim().toLowerCase());
+    const invalid = list.filter((ide) => !targetMap[ide]);
+    if (invalid.length) {
+      throw new Error(`Unknown --ide value(s): ${invalid.join(", ")}`);
+    }
+    return list;
+  }
+  if (targetMap[requested]) {
+    return [requested];
+  }
+  throw new Error(`Unknown --ide value: ${ideArg}`);
+}
+
+function buildTargetMapForIdes(fullMap, targetIdes) {
+  const filtered = {};
+  for (const ide of targetIdes) {
+    filtered[ide] = fullMap[ide];
+  }
+  return filtered;
+}
+
 function writeKenmarkManagedMarker(targetPath) {
   fs.mkdirSync(targetPath, { recursive: true });
   const markerPath = path.join(targetPath, KENMARK_MANAGED_MARKER);
@@ -1600,6 +1628,8 @@ module.exports = {
   KENMARK_MANAGED_MARKER,
   detectInstalledIdes,
   detectManagedIdes,
+  resolveExplicitTargetIdes,
+  buildTargetMapForIdes,
   ensureKenmarkTargetPath,
   resolveFallbackTargetIdes,
   resolveLinkModeLabel,

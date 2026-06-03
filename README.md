@@ -345,7 +345,7 @@ Full `uninstall` still removes Kenmark MCP entries when they were installed via 
 
 ### Recommended packs
 
-Catalog: [`skills/user-skills/recommended-catalog.json`](skills/user-skills/recommended-catalog.json) (v4 **profiles**: `lean`, `core-next-lite`, `core-next`, `growth-seo`, `audit-review`, `experimental-heavy`). Default profile is **lean**; **core-next** is the recommended Next.js full-stack profile (`core-next-lite` + Graphify).
+Catalog: [`skills/user-skills/recommended-catalog.json`](skills/user-skills/recommended-catalog.json) (v4 **profiles**: `lean`, `core-next-lite`, `core-next`, `core-next-agentic`, `growth-seo`, `audit-review`, `experimental-heavy`). Default profile is **lean**; **core-next** is the recommended Next.js full-stack profile (`core-next-lite` + Graphify). ECC is **manual** until the npm installer is verified — use **`core-next-agentic`** when you want ECC steps in the plan.
 
 ```bash
 npx kenmark-skills install-recommended --list-profiles

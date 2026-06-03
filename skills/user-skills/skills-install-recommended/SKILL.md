@@ -41,8 +41,9 @@ Read from:
 | Profile | Best for |
 | --- | --- |
 | `lean` | Daily coding, small projects, slow harnesses |
-| `core-next-lite` | Small Next.js sites — Impeccable + review + ECC minimal (no Graphify) |
-| `core-next` | Next.js + Tailwind + ShadCN + Prisma + agency/client work |
+| `core-next-lite` | Small Next.js sites — Impeccable + review (no Graphify, no ECC) |
+| `core-next` | Next.js + Tailwind + ShadCN + Prisma + agency/client work (+ Graphify) |
+| `core-next-agentic` | core-next + ECC minimal (manual/plugin install steps) |
 | `growth-seo` | Public sites — core-next + 6 selected SEO/GEO skills (not full pack) |
 | `audit-review` | Inherited repos, refactors — review + Graphify + ECC minimal (no Impeccable) |
 | `experimental-heavy` | Explicit opt-in — ECC core + full SEO pack (confirmation required) |

@@ -33,6 +33,7 @@ const {
   listMcpProfileNames,
   detectInstalledIdes,
   detectManagedIdes,
+  resolveExplicitTargetIdes,
   ensureKenmarkTargetPath,
   resolveFallbackTargetIdes,
   resolveLinkModeLabel
@@ -222,22 +223,7 @@ function parseArgs(argv) {
 
 function resolveTargetIdes(args, targetMap) {
   if (args.explicitIde && args.ide) {
-    const requested = String(args.ide).toLowerCase();
-    if (requested === "all") {
-      return Object.keys(targetMap);
-    }
-    if (requested.includes(",")) {
-      const list = requested.split(",").map((s) => s.trim().toLowerCase());
-      const invalid = list.filter((ide) => !targetMap[ide]);
-      if (invalid.length) {
-        throw new Error(`Unknown --ide value(s): ${invalid.join(", ")}`);
-      }
-      return list;
-    }
-    if (targetMap[requested]) {
-      return [requested];
-    }
-    throw new Error(`Unknown --ide value: ${args.ide}`);
+    return resolveExplicitTargetIdes(args.ide, targetMap);
   }
   return null;
 }

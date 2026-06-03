@@ -270,22 +270,9 @@ async function run() {
       "--install",
       "-y"
     ];
-    if (ideArg) {
-      if (ideArg.includes(",")) {
-        for (const ide of ideArg.split(",")) {
-          const one = [...setupArgs, "--ide", ide.trim()];
-          const result = runNode(setupScript, one, args.dryRun, `Kenmark → ${ide.trim()}`);
-          if (!args.dryRun && result.status !== 0) process.exit(result.status || 1);
-        }
-      } else {
-        setupArgs.push("--ide", ideArg);
-        const result = runNode(setupScript, setupArgs, args.dryRun, "Kenmark skills");
-        if (!args.dryRun && result.status !== 0) process.exit(result.status || 1);
-      }
-    } else {
-      const result = runNode(setupScript, setupArgs, args.dryRun, "Kenmark skills");
-      if (!args.dryRun && result.status !== 0) process.exit(result.status || 1);
-    }
+    if (ideArg) setupArgs.push("--ide", ideArg);
+    const result = runNode(setupScript, setupArgs, args.dryRun, "Kenmark skills");
+    if (!args.dryRun && result.status !== 0) process.exit(result.status || 1);
   }
 
   if (installRecommended) {
@@ -296,6 +283,7 @@ async function run() {
       recArgs.push("--ids", selectedPacks.join(","));
       if (eccProfile) recArgs.push("--ecc-profile", eccProfile);
     }
+    if (ideArg) recArgs.push("--ide", ideArg);
     if (args.dryRun) recArgs.push("--dry-run");
     recArgs.push("-y");
     const result = runNode(recommendedScript, recArgs, args.dryRun, "Recommended packs");

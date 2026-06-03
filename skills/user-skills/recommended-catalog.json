@@ -1,7 +1,7 @@
 {
   "version": 4,
   "updatedAt": "2026-06-03",
-  "notes": "Profile-based curated skill packs. Default profile is lean; core-next is recommended for Next.js full-stack work. skills-install-recommended reads this at runtime.",
+  "notes": "Profile-based curated skill packs. Default profile is lean; core-next is recommended for Next.js full-stack work (no ECC until installer verified). skills-install-recommended reads this at runtime.",
   "defaults": {
     "scope": "global",
     "profile": "lean"
@@ -35,7 +35,7 @@
     {
       "id": "core-next-lite",
       "name": "Core Next.js Lite",
-      "description": "Next.js full-stack essentials without Graphify — for smaller sites and faster harnesses.",
+      "description": "Next.js essentials without Graphify or ECC — Impeccable + code review for smaller sites and faster harnesses.",
       "recommendedFor": [
         "small Next.js sites",
         "marketing pages",
@@ -43,8 +43,7 @@
       ],
       "packs": [
         { "id": "impeccable" },
-        { "id": "code-review-skill" },
-        { "id": "ecc", "profile": "minimal" }
+        { "id": "code-review-skill" }
       ]
     },
     {
@@ -60,6 +59,17 @@
       ],
       "extends": "core-next-lite",
       "packs": [{ "id": "graphify" }]
+    },
+    {
+      "id": "core-next-agentic",
+      "name": "Core Next.js Agentic",
+      "description": "core-next plus ECC minimal — explicit opt-in; ECC uses manual/plugin install until the npm installer is verified.",
+      "recommendedFor": [
+        "structured agent workflows",
+        "when you already use or want ECC via plugin"
+      ],
+      "extends": "core-next",
+      "packs": [{ "id": "ecc", "profile": "minimal" }]
     },
     {
       "id": "growth-seo",
@@ -98,8 +108,7 @@
       ],
       "packs": [
         { "id": "code-review-skill" },
-        { "id": "graphify" },
-        { "id": "ecc", "profile": "minimal" }
+        { "id": "graphify" }
       ]
     },
     {
@@ -133,6 +142,7 @@
       "avoidWhen": ["backend-only scripts", "non-UI refactors"],
       "url": "https://github.com/pbakaus/impeccable",
       "description": "Design language for agent harnesses — UI/UX quality, anti-slop patterns, frontend polish workflows.",
+      "warning": "The upstream skills CLI may report partial failures for unsupported harnesses (e.g. PromptScript). If Verify is OK, Impeccable is installed for supported agents.",
       "install": {
         "global": {
           "command": "npx --yes skills add pbakaus/impeccable -g -y",
@@ -285,6 +295,7 @@
       "category": "harness",
       "weight": "heavy-variable",
       "bloatScore": 3,
+      "installStrategy": "manual",
       "recommendedByDefault": false,
       "defaultProfile": "minimal",
       "allowedProfiles": ["minimal", "core", "full"],
@@ -294,7 +305,7 @@
       "avoidWhen": ["already using ECC plugin", "minimal daily coding only"],
       "url": "https://github.com/affaan-m/ECC",
       "description": "Agent-harness performance optimization system — skills, agents, hooks, rules, and commands for Claude Code, Codex, Cursor, OpenCode. Minimal profile ships ~3–5 agents and ~10–15 skills; full is much larger.",
-      "warning": "Do not stack install methods — if you've already added ECC via /plugin install, do not also run the npx installer (and vice versa).",
+      "warning": "ECC npm installer (npx ecc-install) is not verified on npm. Kenmark prints manual/plugin steps instead of running it. Do not stack install methods — if you've already added ECC via /plugin install, do not also run a shell installer (and vice versa).",
       "install": {
         "defaultProfile": "minimal",
         "profiles": [

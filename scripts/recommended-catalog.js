@@ -248,6 +248,19 @@ function resolveInstallCommands(entry, scope, catalog) {
   if (!pack) return [];
 
   const installStrategy = pack.installStrategy || pack.install?.strategy;
+  if (installStrategy === "manual") {
+    const block = pack.install?.[scope];
+    return [
+      {
+        strategy: "manual",
+        message:
+          pack.warning ||
+          block?.summary ||
+          `Manual install required for ${pack.id}`,
+        manualSteps: pack.install?.alternatives || []
+      }
+    ];
+  }
   if (installStrategy === "git-sync") {
     const block = pack.install?.[scope];
     const repoUrl = pack.install?.repoUrl;

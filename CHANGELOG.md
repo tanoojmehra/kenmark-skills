@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Init, recommended packs, and catalog
+
+- **`skills-init.js`:** Single `setup-skills` run with comma-separated `--ide` (no per-IDE loop / repeated adopt passes). Forwards `--ide` to `skills-install-recommended` so curated packs align with the chosen targets.
+- **`skills-install-recommended.js` / `skills-adopt.js`:** `--ide` accepts `cursor,codex,claude` and `all` via shared `resolveExplicitTargetIdes` in the hub.
+- **`recommended-catalog.json`:** `core-next-lite` is Impeccable + code review only; `core-next` unchanged (lite + Graphify). New **`core-next-agentic`** (core-next + ECC minimal). ECC removed from default `core-next-lite` and `audit-review`. ECC pack uses **`installStrategy: manual`** until `ecc-install` is verified on npm.
+- **Impeccable:** Catalog warning documents upstream partial harness failures when verify passes.
+
 ### Brain KB (init-brain + commit-push)
 
 - **init-brain (1.1.0):** Step 1.5 inspects the repo and creates numbered `brain/kb/` (`00`–`11`, `features/`, `decisions/`); INDEX and pointer stub reference KB; `standards.md` / `workflow.md` templates add KB maintenance and update requirements.
