@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Fix
+
+- **CLI scripts:** Renamed `scripts/skills-init.js`, `skills-install-recommended.js`, and `skills-update.js` to `kenmark-setup.js`, `kenmark-packs.js`, and `kenmark-update.js` so `package.json` `files`, `cli.js`, and published tarballs match on-disk paths (`init`, `install-recommended`, `update`).
+
 ## v1.6.0 — Kenmark-prefixed skill names
 
 ### Breaking rename (23 bundled skills)
