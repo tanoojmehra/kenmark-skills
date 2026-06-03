@@ -2,9 +2,21 @@
 
 ## Unreleased — Profile-based recommended catalog
 
+- **recommended-catalog.json:** `core-next` copy uses universal wording (`agency/client projects`, Next.js full-stack notes) instead of Kenmark-as-workflow assumptions.
+
+- **issues-setup / issues-scan / issues-list / issues-maintenance:** Expanded default `area` values (`frontend`, `backend`, `auth`, `performance`, `dx`, `docs`, `workflow`, `unknown`, …); `worker` documented as optional when the repo has background jobs; maintenance accepts legacy `maintainability`.
+
+- **recommended-catalog.json / recommended-catalog.js:** SEO selected-skills profiles (e.g. `growth-seo`) use `batchSkillInstall` — one `npx skills add … -s` with space-separated skill names instead of six separate installs; per-skill fallback and `Installing SEO/GEO selected skills: N/M` progress when batch is unavailable.
+- **recommended-catalog.json / recommended-catalog.js:** `code-review-skill` uses `installStrategy: "git-sync"` — clone on first install, `git pull --ff-only` when the target is already a repo; safe to re-run `install-recommended --profile lean`.
+- **skills-install-recommended.js:** Runs git-sync installs via Node instead of a bare `git clone` shell command.
+
+- **MCP opt-in:** `setup` no longer installs bundled MCP by default. Use `--with-mcp` (profile `all`) or `--mcp-profile <name>` (`none`, `web`, `research`, `deep`, `all`). `--skip-mcp` overrides an explicit opt-in. Uninstall always removes Kenmark-managed MCP entries when present.
+- **config/mcp-profiles.json:** Profile → server name mapping for bundled MCP.
+- **kenmark-hub.js / setup-skills.js:** Profile filtering, manifest records `mcp.profile`.
+
 - **recommended-catalog.json (v4):** Setup profiles `lean` (default), `core-next` (Kenmark stack), `growth-seo`, `audit-review`, `power-user`; overlap install rules; richer pack metadata (`bloatScore`, `weight`, `bestFor`, `avoidWhen`, SEO install modes, ECC profiles).
 - **recommended-catalog.js:** Profile resolution (`extends`, pack merge), install plan builder, weight/bloat summaries, per-skill SEO installs.
-- **skills-install-recommended.js:** `--profile`, `--list-profiles`; interactive profile picker with install preview; power-user confirmation; ECC default **minimal** (was `core`).
+- **skills-install-recommended.js:** `--profile`, `--list-profiles`; interactive profile picker with install preview; power-user confirmation; ECC default **minimal** (was `core`). Adopt pass forwards `--copy`, `--symlink`, `--prefer-copy-on-windows`, `--adopt-overwrite` (same as `setup` / `adopt`).
 - **interactive.js:** `promptSelectProfile`, `printProfileSummary`, `promptHighBloatConfirm`.
 - **skills-init.js:** Recommended step uses profiles; `--profile` for agents.
 - **skills-install-recommended/SKILL.md, README, cli.js:** Docs updated for profile-first workflow.

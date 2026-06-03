@@ -41,7 +41,7 @@ Read from:
 | Profile | Best for |
 | --- | --- |
 | `lean` | Daily coding, small projects, slow harnesses |
-| `core-next` | Next.js + Tailwind + ShadCN + Prisma + Kenmark client work |
+| `core-next` | Next.js + Tailwind + ShadCN + Prisma + agency/client work |
 | `growth-seo` | Public sites — core-next + 6 selected SEO/GEO skills (not full pack) |
 | `audit-review` | Inherited repos, refactors — review + Graphify + ECC minimal (no Impeccable) |
 | `power-user` | Explicit opt-in — ECC core + full SEO pack (confirmation required) |
@@ -90,7 +90,7 @@ Interactive flow shows estimated weight, bloat risk, and what will install befor
 # Default lean stack (global)
 npx kenmark-skills install-recommended --profile lean --global -y
 
-# Kenmark Next.js stack
+# Next.js full-stack (core-next)
 npx kenmark-skills install-recommended --profile core-next --global -y
 
 # Public website + selected SEO skills (not full 20-skill pack)
@@ -137,3 +137,5 @@ npx kenmark-skills install-recommended --profile lean --global -y
 npx kenmark-skills install-recommended --profile growth-seo --project -y
 npx kenmark-skills install-recommended   # interactive profile picker
 ```
+
+Adopt relink flags (same as `setup` / `adopt`): `--copy`, `--symlink`, `--prefer-copy-on-windows`, `--no-prefer-copy-on-windows`, `--adopt-overwrite` (or `--force`) when store and IDE copies differ.

@@ -1,6 +1,6 @@
 ---
 name: issues-maintenance
-version: 1.0.0
+version: 1.1.0
 category: issues
 scope: universal
 phase: maintain
@@ -148,6 +148,11 @@ for f in brain/issues/[0-9]*.md brain/issues/completed/[0-9]*.md; do
   if [ -z "$status" ]; then echo "MISSING status: $f"; fi
   if [ -z "$severity" ]; then echo "MISSING severity: $f"; fi
   if [ -z "$area" ]; then echo "MISSING area: $f"; fi
+
+  # Validate area values (defaults + optional worker; legacy maintainability OK)
+  if [ -n "$area" ] && ! echo "$area" | grep -qE '^(frontend|backend|api|database|auth|security|ui|testing|performance|dx|infra|docs|workflow|unknown|worker|maintainability)$'; then
+    echo "INVALID area '$area': $f"
+  fi
 
   # Validate severity values
   if [ -n "$severity" ] && ! echo "$severity" | grep -qE '^(P0|P1|P2)$'; then

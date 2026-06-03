@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "none": [],
+    "web": ["playwright", "browsermcp"],
+    "research": ["context7", "fetch"],
+    "deep": ["sequential-thinking", "context7", "fetch"],
+    "all": [
+      "playwright",
+      "context7",
+      "sequential-thinking",
+      "fetch",
+      "browsermcp"
+    ]
+  }
+}
