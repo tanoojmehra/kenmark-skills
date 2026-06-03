@@ -12,6 +12,12 @@
 - **kenmark-hub.js:** Legacy skill and Claude command cleanup requires ownership proof (symlink to `~/.kenmark/store`, `.kenmark-managed` parent, Kenmark markers in `SKILL.md`, or `manifest.json` `source: kenmark-package`). Unproven same-name paths are skipped with `legacy-candidate-review-required`; proven removals are backed up under `~/.kenmark/backups/legacy-cleanup/<timestamp>/`.
 - **setup-skills.js / kenmark-hub.js:** Stop generating Claude slash-command wrappers on install; install and uninstall remove stale `~/.claude/commands/kenmark-*.md` (legacy unprefixed wrapper names included). Namespaced skills under `~/.claude/skills/` are the supported entry point.
 
+## v2.0.1 — Issues ID ledger
+
+### Fix
+
+- **kenmark-issues-scan / setup / check / maintain / list:** Global immutable issue IDs — next ID from `INDEX.md` + active + `completed/` (fixes ID reuse when issues are archived); ID Ledger in setup template; preservation rules on close; maintain validates `Last Assigned ID`; `validate-repo.js` regression markers on scan skill.
+
 ## v2.0.0 — Kenmark-prefixed skill names (semver major)
 
 **Major version:** Every bundled Kenmark skill was renamed (`commit-push` → `kenmark-commit`, `skills-router` → `kenmark-router`, `repo-quality-gates` → `kenmark-repo-quality`, etc.). Slash commands, symlinks, and docs that referenced unprefixed or legacy names break until you re-run setup. Do not publish as 1.x.
