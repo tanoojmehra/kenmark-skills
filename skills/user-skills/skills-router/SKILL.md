@@ -41,6 +41,9 @@ When several bundled skills could apply, prefer this order:
 | Make repo public / open source / public repo readiness | **`repo-public-readiness`** |
 
 **Ambiguous:** `sanitize repo` — if the user means **public** or **open-source** prep, use **`repo-public-readiness`** (often with **`repo-secrets-audit`**), not **`repo-hygiene`**. Use **`repo-hygiene`** only for clutter (files, docs, dumps, orphans).
+
+| Situation | Skill |
+| --- | --- |
 | Update brain after code change | **`repo-kb-sync`** |
 | Docs quality, README accuracy | **`repo-docs-audit`** |
 | Confusing folder layout | **`repo-structure-audit`** |
