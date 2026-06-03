@@ -2,20 +2,6 @@
 
 ## Unreleased
 
-### Repo skill family
-
-- **repo-hygiene (1.1.0):** Clutter-focused audit; delegates deep secrets to `repo-secrets-audit` and publish gate to `repo-public-readiness`.
-- **repo-secrets-audit:** Read-only deep credential scan with mandatory redaction and history-cleanup guidance.
-- **repo-public-readiness:** Read-only safe-to-publish verdict (Yes / No / Conditional), blockers, and history-rewrite flag.
-- **repo-kb-sync:** Incremental `brain/kb/` and `brain/CHANGELOG.md` updates after code changes.
-- **repo-docs-audit:** Documentation quality audit (README, env, scripts, KB freshness, links).
-- **repo-structure-audit:** Read-only folder layout and module-boundary recommendations.
-- **repo-dependency-audit:** Read-only package health (unused/duplicate deps, lockfile consistency).
-- **repo-release-readiness:** Pre-ship checklist (version, changelog, tests, build, meta consistency).
-- **skills-router / troubleshoot / skills-init / skills-maintain:** Repo family routing table; specialist tie-break over `repo-hygiene`.
-- **scripts/skills-inventory.js:** `KEEP_ALWAYS` includes all `repo-*` skills.
-- **README / package.json / skills/README.md:** Kenmark skill count 15 → 22.
-
 ### Init, recommended packs, and catalog
 
 - **`skills-init.js`:** Single `setup-skills` run with comma-separated `--ide` (no per-IDE loop / repeated adopt passes). Forwards `--ide` to `skills-install-recommended` so curated packs align with the chosen targets.
@@ -32,6 +18,22 @@
 ## Planned
 
 - **`troubleshoot-template` (CLI)** — `npx kenmark-skills troubleshoot-template --title "cursor slowdown"` writes `brain/troubleshooting/YYYY-MM-DD-<slug>.md` via `scripts/brain-template.js` (scaffolding exists; not registered in `cli.js` yet). Extend the same module for other `brain/` artifacts later. Referenced from the **troubleshoot** skill docs.
+
+## v1.4.0 — Repo skill family
+
+### Repo operating system (8 skills)
+
+- **repo-hygiene (1.1.0):** Clutter-focused audit; delegates deep secrets to `repo-secrets-audit` and publish gate to `repo-public-readiness`.
+- **repo-secrets-audit:** Read-only deep credential scan with mandatory redaction and history-cleanup guidance.
+- **repo-public-readiness:** Read-only safe-to-publish verdict (Yes / No / Conditional), blockers, and history-rewrite flag.
+- **repo-kb-sync:** Incremental `brain/kb/` and `brain/CHANGELOG.md` updates after code changes.
+- **repo-docs-audit:** Documentation quality audit (README, env, scripts, KB freshness, links).
+- **repo-structure-audit:** Read-only folder layout and module-boundary recommendations.
+- **repo-dependency-audit:** Read-only package health (unused/duplicate deps, lockfile consistency).
+- **repo-release-readiness:** Pre-ship checklist (version, changelog, tests, build, meta consistency).
+- **skills-router / troubleshoot / skills-init / skills-maintain:** Repo family routing table; specialist tie-break over `repo-hygiene`.
+- **scripts/skills-inventory.js:** `KEEP_ALWAYS` includes all `repo-*` skills.
+- **README / package.json / skills/README.md:** Kenmark skill count 15 → 22.
 
 ## v1.3.0 — Universal troubleshoot, validation, MCP profiles
 

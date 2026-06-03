@@ -250,7 +250,7 @@ npx kenmark-skills init
 npx kenmark-skills setup --global --ide all
 ```
 
-`npx` fetches the package from npm when needed. Pin a version with `npx kenmark-skills@1.3.0 init` for reproducibility, or use `npx kenmark-skills@latest init` for the newest release.
+`npx` fetches the package from npm when needed. Pin a version with `npx kenmark-skills@1.4.0 init` for reproducibility, or use `npx kenmark-skills@latest init` for the newest release.
 
 ### Optional: global CLI shorthand
 
