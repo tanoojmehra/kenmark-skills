@@ -1,6 +1,6 @@
 ---
 name: kenmark-issues-check
-version: 1.0.0
+version: 1.1.0
 category: issues
 scope: universal
 phase: verify
@@ -109,6 +109,17 @@ For each closed issue:
 3. Update the counts
 
 Read INDEX.md first, then edit to reflect the completed issue.
+
+## ID preservation rule
+
+When closing an issue:
+
+- Keep the same ID.
+- Move the file to `brain/issues/completed/`.
+- Do not renumber issues.
+- Do not reuse the completed ID for a new issue.
+- Update `INDEX.md` Completed table and counts.
+- Do not decrement `Last Assigned ID`.
 
 ---
 

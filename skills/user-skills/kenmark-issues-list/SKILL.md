@@ -1,6 +1,6 @@
 ---
 name: kenmark-issues-list
-version: 1.1.0
+version: 1.2.0
 category: issues
 scope: universal
 phase: discover
@@ -108,3 +108,9 @@ WORKSTREAMS
  UI accessibility                                 005, 006
 ════════════════════════════════════════════════════════════════════
 ```
+
+---
+
+## Read-only reminder
+
+This skill is read-only. If the list appears inconsistent with files on disk, do not infer missing IDs from folders. Run `kenmark-issues-maintain`.

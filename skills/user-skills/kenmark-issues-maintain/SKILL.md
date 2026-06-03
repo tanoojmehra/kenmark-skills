@@ -1,6 +1,6 @@
 ---
 name: kenmark-issues-maintain
-version: 1.1.0
+version: 1.2.0
 category: issues
 scope: universal
 phase: maintain
@@ -63,6 +63,43 @@ echo "OPEN count: $(wc -l < /tmp/open_ids.txt)"
 echo "COMPLETED count: $(wc -l < /tmp/completed_ids.txt)"
 echo "INDEX completed count: $(wc -l < /tmp/index_completed_ids.txt)"
 ```
+
+---
+
+## Step 1.5 — Global ID ledger check
+
+Collect IDs from:
+
+- `INDEX.md`
+- active files
+- completed files
+
+```bash
+ISSUES_DIR="$(git rev-parse --show-toplevel 2>/dev/null)/brain/issues"
+
+{
+  find "$ISSUES_DIR" -maxdepth 1 -type f -name "[0-9][0-9][0-9]-*.md" \
+    -exec basename {} \; 2>/dev/null | sed 's/-.*//'
+  find "$ISSUES_DIR/completed" -maxdepth 1 -type f -name "[0-9][0-9][0-9]-*.md" \
+    -exec basename {} \; 2>/dev/null | sed 's/-.*//'
+  grep -Eo '\b[0-9]{3}\b' "$ISSUES_DIR/INDEX.md" 2>/dev/null
+} | grep -E '^[0-9]{3}$' | sort -n | uniq > /tmp/all_ids.txt
+
+echo "Highest ID (all sources): $(tail -1 /tmp/all_ids.txt 2>/dev/null || echo none)"
+grep -E 'Last Assigned ID|Next ID' "$ISSUES_DIR/INDEX.md" 2>/dev/null || echo "ID Ledger section missing"
+```
+
+Report:
+
+- highest ID in INDEX
+- highest ID in active files
+- highest ID in completed files
+- duplicate IDs (open + completed)
+- missing files referenced by INDEX
+- files missing from INDEX
+- whether `Last Assigned ID` is correct
+
+If `Last Assigned ID` is lower than any observed issue ID, update it to the highest observed ID and set `Next ID` to highest + 1 (3-digit zero-padded). Never reuse or decrement IDs.
 
 ---
 
@@ -250,8 +287,9 @@ git commit -m "fix(brain): issues maintenance — {brief description of what was
 
 1. **Never delete an issue file without understanding why it exists** — if an
    ID appears in both folders, one is wrong, not both
-2. **INDEX.md is the source of truth for counts** — if the INDEX and reality
-   disagree, trust what you observe in the files and fix INDEX to match
+2. **INDEX.md is the source of truth for the ID ledger and intended issue state.**
+   If counts disagree, reconcile INDEX.md with actual files.
+   If ID allocation disagrees, preserve the highest ID found anywhere and never reuse IDs.
 3. **Always commit completed issue file moves separately** from code fixes so
    the brain/ history is clean and reviewable
 4. **Do not touch open issue files** — the maintenance skill only moves,

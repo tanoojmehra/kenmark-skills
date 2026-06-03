@@ -1,6 +1,6 @@
 ---
 name: kenmark-issues-scan
-version: 1.1.0
+version: 1.2.0
 category: issues
 scope: universal
 phase: discover
@@ -33,19 +33,65 @@ evidence, and optionally update INDEX.md.
 
 ---
 
-## Step 1 — Read existing issues to avoid duplicates
+## Hard Rules
+
+1. Never create an issue without reading `brain/issues/INDEX.md`.
+2. Never calculate the next ID from `brain/issues/` alone.
+3. Always include completed issues when calculating the next ID.
+4. Always include IDs already listed in `INDEX.md`, even if files are missing.
+5. Never reuse an ID.
+6. Never renumber issues.
+7. If `INDEX.md` and folders disagree, stop and run `kenmark-issues-maintain` before creating new issues.
+
+---
+
+## Step 1 — Collect all known IDs and compute next ID
+
+## Hard ID rule
+
+Issue IDs are global and immutable.
+
+Never reuse an ID.
+
+Before creating a new issue, collect IDs from:
+
+1. `brain/issues/INDEX.md`
+2. `brain/issues/[0-9]*.md`
+3. `brain/issues/completed/[0-9]*.md`
+
+The next ID is:
+
+```text
+max(all IDs found anywhere) + 1
+```
+
+Do not use only the active `brain/issues/` folder to determine the next ID.
+Completed issues still reserve their IDs forever.
 
 ```bash
 ISSUES_DIR="$(git rev-parse --show-toplevel 2>/dev/null)/brain/issues"
-echo "=== Existing issue IDs ==="
-find "$ISSUES_DIR" -maxdepth 1 -name "*.md" -not -name "INDEX.md" -not -path "*/completed/*" | \
- sed 's/.*\///' | sed 's/-.*//' | sort -n
-echo "=== Highest ID ==="
-find "$ISSUES_DIR" -maxdepth 1 -name "*.md" -not -name "INDEX.md" -not -path "*/completed/*" | \
-  sed 's/.*\///' | sed 's/-.*//' | sort -n | tail -1
+
+{
+  # IDs from active files
+  find "$ISSUES_DIR" -maxdepth 1 -type f -name "[0-9][0-9][0-9]-*.md" \
+    -exec basename {} \; 2>/dev/null | sed 's/-.*//'
+
+  # IDs from completed files
+  find "$ISSUES_DIR/completed" -maxdepth 1 -type f -name "[0-9][0-9][0-9]-*.md" \
+    -exec basename {} \; 2>/dev/null | sed 's/-.*//'
+
+  # IDs from INDEX links/tables
+  grep -Eo '\b[0-9]{3}\b' "$ISSUES_DIR/INDEX.md" 2>/dev/null
+} | grep -E '^[0-9]{3}$' | sort -n | uniq > /tmp/kenmark_all_issue_ids.txt
+
+LAST_ID="$(tail -1 /tmp/kenmark_all_issue_ids.txt 2>/dev/null || echo 000)"
+NEXT_ID="$(printf "%03d" "$((10#$LAST_ID + 1))")"
+
+echo "LAST_ID=$LAST_ID"
+echo "NEXT_ID=$NEXT_ID"
 ```
 
-The next ID is the highest existing ID + 1, zero-padded to 3 digits.
+Read `INDEX.md` **ID Ledger** (`Last Assigned ID`, `Next ID`) and reconcile with the command output. If they disagree, run `kenmark-issues-maintain` before creating issues.
 
 ---
 
@@ -173,6 +219,16 @@ If a finding matches an existing issue (same file, same bug pattern), skip it.
 
 ## Step 5 — Create new issue files
 
+Before writing each new issue file, confirm the ID is not already taken:
+
+```bash
+ISSUES_DIR="$(git rev-parse --show-toplevel 2>/dev/null)/brain/issues"
+if find "$ISSUES_DIR" "$ISSUES_DIR/completed" -name "${NEXT_ID}-*.md" 2>/dev/null | grep -q .; then
+  echo "ERROR: ID collision for $NEXT_ID. Recompute from INDEX + active + completed."
+  exit 1
+fi
+```
+
 For each unique finding, create a file at `brain/issues/{id}-{slug}.md`:
 
 ```markdown
@@ -239,10 +295,13 @@ Then update `brain/issues/INDEX.md`:
 
 After creating new issues or closing completed ones, update `brain/issues/INDEX.md`:
 
-1. Increment "Active issues" count (new issues) or decrement (closed issues)
-2. Add new issues to the correct priority table (P0/P1/P2)
-3. Move closed issues to the Completed table with today's date
-4. Re-sort by ID within each priority section
+1. Update **ID Ledger**: set `Last Assigned ID` to the highest ID assigned this run; set `Next ID` to `Last Assigned ID + 1` (3-digit zero-padded)
+2. Increment "Active issues" count (new issues) or decrement (closed issues)
+3. Add new issues to the correct priority table (P0/P1/P2)
+4. Move closed issues to the Completed table with today's date
+5. Re-sort by ID within each priority section
+
+Never decrement `Last Assigned ID` when closing issues.
 
 ---
 

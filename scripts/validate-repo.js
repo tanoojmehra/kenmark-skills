@@ -857,6 +857,14 @@ const INIT_BRAIN_KB_MARKERS = [
 
 const COMMIT_PUSH_KB_MARKERS = ["Brain KB check before commit", "brain/kb/"];
 
+/** kenmark-issues-scan must enforce global ID ledger (regression guard). */
+const ISSUES_SCAN_ID_MARKERS = [
+  "INDEX.md",
+  "completed",
+  "Last Assigned ID",
+  "Never reuse an ID"
+];
+
 /** Core OS workflow skills — must appear in README routing tables (regression guard). */
 const CORE_WORKFLOW_ROUTING_MARKERS = [
   "kenmark-plan",
@@ -939,6 +947,29 @@ function validateInitBrainKb() {
       fail(`kenmark-commit/SKILL.md: missing required KB marker "${marker}"`);
     }
   }
+}
+
+function validateIssuesIdLedger() {
+  const scanPath = path.join(userSkillsDir, "kenmark-issues-scan", "SKILL.md");
+  if (!fs.existsSync(scanPath)) {
+    fail("skills/user-skills/kenmark-issues-scan/SKILL.md missing (ID ledger validation skipped)");
+    return;
+  }
+  let text;
+  try {
+    text = fs.readFileSync(scanPath, "utf8");
+  } catch (err) {
+    fail(`kenmark-issues-scan/SKILL.md: unreadable (${err.message})`);
+    return;
+  }
+  for (const marker of ISSUES_SCAN_ID_MARKERS) {
+    if (!text.includes(marker)) {
+      fail(`kenmark-issues-scan/SKILL.md: missing required ID ledger marker "${marker}"`);
+    }
+  }
+  console.log(
+    "  ✓ issues ID ledger — kenmark-issues-scan documents global ID rules (INDEX, completed, Last Assigned ID, never reuse)"
+  );
 }
 
 function validatePackageJson() {
@@ -1314,6 +1345,7 @@ function main() {
   validateCatalog();
   validateCatalogBehavior();
   validateInitBrainKb();
+  validateIssuesIdLedger();
   validatePackageJson();
   validateClaudeWrapperPolicy();
   findLegacySkillNameReferences();

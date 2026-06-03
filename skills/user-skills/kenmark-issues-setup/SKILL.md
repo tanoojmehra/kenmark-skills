@@ -1,6 +1,6 @@
 ---
 name: kenmark-issues-setup
-version: 1.1.0
+version: 1.2.0
 category: issues
 scope: universal
 phase: setup
@@ -58,6 +58,21 @@ Write `brain/issues/INDEX.md` with this exact structure:
 
 ```markdown
 # Issues Index
+
+## ID Ledger
+
+| Field | Value |
+|------|-------|
+| Last Assigned ID | 000 |
+| Next ID | 001 |
+
+## Ledger Rules
+
+- Issue IDs are global and immutable.
+- IDs are never reused.
+- Completed issues reserve their IDs forever.
+- New issue IDs must be calculated from `INDEX.md`, active files, and completed files.
+- Do not calculate next ID from `brain/issues/` alone.
 
 ## Overview
 
