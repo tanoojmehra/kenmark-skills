@@ -71,7 +71,8 @@ function printUsage() {
   console.log("  --symlink           Force symlinks on Windows instead of copy (adopt relink)");
   console.log("  --prefer-copy-on-windows     Copy on Windows during adopt relink (default)");
   console.log("  --no-prefer-copy-on-windows  Symlink/junction on Windows during adopt relink");
-  console.log("  --adopt-overwrite   Overwrite store when IDE copy differs (--force alias)");
+  console.log("  --force             Re-run pack installers even when verify passes");
+  console.log("  --adopt-overwrite   Overwrite store when IDE copy differs");
   console.log("  --dry-run           Show commands without running");
   console.log("  -y, --yes           Skip confirmation prompts");
   console.log("  -h, --help          Show help");
@@ -190,8 +191,11 @@ function parseArgs(argv) {
       args.preferCopyOnWindows = false;
       continue;
     }
-    if (t === "--force" || t === "--adopt-overwrite") {
+    if (t === "--force") {
       args.force = true;
+      continue;
+    }
+    if (t === "--adopt-overwrite") {
       args.adoptOverwrite = true;
       continue;
     }
@@ -468,6 +472,20 @@ async function run() {
     if (pack.warning) {
       console.log(`Warning: ${pack.warning}`);
     }
+
+    const verifyCmd = resolveVerifyCommand(pack, scope, entry);
+    const alreadyInstalled =
+      !args.force &&
+      !args.dryRun &&
+      verifyCmd &&
+      verifyPack(pack, scope, entry);
+
+    if (alreadyInstalled) {
+      console.log("Verify: already installed");
+      console.log("Skipping install. Use --force to reinstall.");
+      continue;
+    }
+
     const commands = resolveInstallCommands(entry, scope, catalog);
     if (!commands.length) {
       console.error(`No ${scope} install command defined for ${pack.id}.`);
@@ -502,7 +520,7 @@ async function run() {
         break;
       }
     }
-    if (!args.dryRun && resolveVerifyCommand(pack, scope, entry)) {
+    if (!args.dryRun && verifyCmd) {
       const okVerify = verifyPack(pack, scope, entry);
       const verifyHint =
         entry.seoSkills?.length > 1

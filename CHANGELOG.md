@@ -12,6 +12,15 @@
 - **kenmark-hub.js:** Legacy skill and Claude command cleanup requires ownership proof (symlink to `~/.kenmark/store`, `.kenmark-managed` parent, Kenmark markers in `SKILL.md`, or `manifest.json` `source: kenmark-package`). Unproven same-name paths are skipped with `legacy-candidate-review-required`; proven removals are backed up under `~/.kenmark/backups/legacy-cleanup/<timestamp>/`.
 - **setup-skills.js / kenmark-hub.js:** Stop generating Claude slash-command wrappers on install; install and uninstall remove stale `~/.claude/commands/kenmark-*.md` (legacy unprefixed wrapper names included). Namespaced skills under `~/.claude/skills/` are the supported entry point.
 
+## v2.0.3 — Optional pack verify-before-install
+
+### Perf
+
+- **kenmark-packs.js:** Verify-before-install skips upstream pack installers when verify already passes; `--force` reinstalls without tying to `--adopt-overwrite`.
+- **recommended-catalog.js:** Prefer local `skills` CLI over `npx --yes skills` when available on PATH.
+- **test-packs-verify-skip.js:** Regression tests for skip and `--force` reinstall.
+- **test-cli-smoke.js / validate-repo.js:** Wire verify-skip tests into `npm test`; assert update `--both` uses `--ids`, not `--all`.
+
 ## v2.0.2 — Update flow safe defaults
 
 ### Fix
