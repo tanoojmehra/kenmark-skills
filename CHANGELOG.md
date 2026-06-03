@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v1.5.0 — Quality gates, catalog profiles, and validation
+
 ### repo-quality-gates
 
 - **repo-quality-gates (1.2.0):** Step 2b — discover CI configs (`find` on workflows/GitLab/Bitbucket/Circle) and grep workflow commands so `ci-parity` mode prefers real CI commands over guessed package scripts.
@@ -16,12 +18,14 @@
 
 - **README / script headers:** Document two equivalent paths — `npm run validate` / `npm test` → `scripts/validate-repo.js`; `kenmark-skills validate` → `scripts/validate.js` → `validate-repo.js`. Both files remain in `package.json` `files`.
 - **validate-repo.js:** Regression check that `cli.js` spawns `validate.js`, not `validate-repo.js` directly.
+- **validate-repo.js:** Enforce bundled skill count consistency across `package.json`, `README.md`, and `skills/README.md` vs `skills/user-skills/*/SKILL.md`.
 
 ### Repo skill routing
 
 - **repo-hygiene:** Clutter-only scope; removed broad `sanitize repo` trigger; expanded handoff table for public-readiness and secrets phrases.
 - **repo-public-readiness:** Added public-readiness trigger phrases (`public repository readiness`, `prepare repo for public`, `sanitize before public`, etc.); clarified not for clutter-only audits.
 - **skills-router:** Tie-break and ambiguity note — public/open-source/sanitize-before-public → `repo-public-readiness`, not `repo-hygiene`.
+- **repo-release-readiness (1.0.1):** Ship vs verify boundary with `repo-quality-gates`; smoke-only quality-gates step; hand off failing build/type/lint/test/runtime checks to `repo-quality-gates`.
 
 ### Init, recommended packs, and catalog
 
