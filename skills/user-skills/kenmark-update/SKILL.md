@@ -17,7 +17,7 @@ risk: shell
 disable-model-invocation: true
 ---
 
-# Skills Update
+# Kenmark Update
 
 Refresh **Kenmark first-party skills** and optionally **reinstall recommended third-party packs** via npx. No git clone.
 
@@ -70,8 +70,8 @@ Prompts (in order):
 # Full refresh (Kenmark + default recommended packs), global
 npx kenmark-skills update --both --global -y
 
-# Kenmark skills only, all IDEs
-npx kenmark-skills update --kenmark-only --global --ide all -y
+# Kenmark skills only, global
+npx kenmark-skills update --kenmark-only --global -y
 
 # Project-local Kenmark sync in current repo
 npx kenmark-skills update --kenmark-only --project -y
@@ -89,7 +89,7 @@ npx kenmark-skills update --dry-run -y
 npx kenmark-skills update --both --global --skip-adopt -y
 
 # Adopt only (store + relink)
-npx kenmark-skills adopt --global --ide all -y
+npx kenmark-skills adopt --global -y
 ```
 
 From a **local checkout** of this repo:
@@ -104,14 +104,14 @@ If the CLI is unavailable, run the underlying commands:
 
 ```bash
 npm update -g kenmark-skills
-npx kenmark-skills setup --global --ide all
+npx kenmark-skills setup --global -y
 npx kenmark-skills install-recommended --all --global -y
 ```
 
 Project scope:
 
 ```bash
-npx kenmark-skills setup --project --ide all
+npx kenmark-skills setup --project -y
 npx kenmark-skills install-recommended --all --project -y
 ```
 

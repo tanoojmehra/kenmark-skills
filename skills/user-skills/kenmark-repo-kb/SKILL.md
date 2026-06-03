@@ -24,7 +24,7 @@ risk: write-files
 disable-model-invocation: false
 ---
 
-# Repo KB Sync — Keep brain/kb/ Aligned With Code
+# Kenmark Repo KB
 
 ## Purpose
 

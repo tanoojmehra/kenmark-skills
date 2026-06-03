@@ -22,7 +22,7 @@ risk: write-files
 disable-model-invocation: false
 ---
 
-# Issues Setup — Bootstrap brain/issues/ Directory
+# Kenmark Issues Setup
 
 ## Purpose
 

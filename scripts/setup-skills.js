@@ -89,13 +89,15 @@ function printUsage() {
   console.log("");
   console.log("Examples:");
   console.log("  npx kenmark-skills setup");
-  console.log("  npx kenmark-skills setup --global --ide all -y");
+  console.log("  npx kenmark-skills setup --global -y");
+  console.log("  npx kenmark-skills setup --global --ide cursor,claude,codex -y");
   console.log("  npx kenmark-skills setup --skip-adopt --global --ide cursor -y");
   console.log("  npx kenmark-skills setup --mcp-profile web --global --ide cursor -y");
-  console.log("  npx kenmark-skills setup --with-mcp --global --ide all -y");
+  console.log("  npx kenmark-skills setup --with-mcp --global --ide cursor,claude,codex -y");
   console.log("  npx kenmark-skills uninstall --global --ide claude");
   console.log("  npx kenmark-skills uninstall --mcp-only --global --ide cursor -y");
-  console.log("  npx kenmark-skills mcp uninstall --global --ide all -y");
+  console.log("  npx kenmark-skills mcp uninstall --global --ide cursor -y");
+  console.log("  npx kenmark-skills setup --global --ide all -y   # advanced: every detected IDE path");
 }
 
 function parseArgs(argv) {

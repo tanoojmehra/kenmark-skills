@@ -22,7 +22,7 @@ risk: read-only
 disable-model-invocation: false
 ---
 
-# Repo Structure Audit — Layout and Boundaries (Read-Only)
+# Kenmark Repo Structure
 
 ## Purpose
 

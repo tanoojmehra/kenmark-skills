@@ -24,7 +24,7 @@ risk: read-only
 disable-model-invocation: false
 ---
 
-# Repo Secrets Audit — Deep Credential Scan (Read-Only)
+# Kenmark Repo Secrets
 
 ## Purpose
 

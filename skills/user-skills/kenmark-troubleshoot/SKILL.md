@@ -34,7 +34,9 @@ risk: write-files
 disable-model-invocation: false
 ---
 
-# Troubleshoot — Universal Root-Cause & Action Planning Skill
+# Kenmark Troubleshoot
+
+Universal root-cause analysis and action planning for failures, slowdowns, and ambiguous problems.
 
 ## Purpose
 

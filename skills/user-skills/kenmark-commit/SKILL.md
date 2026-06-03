@@ -23,7 +23,7 @@ risk: git-write
 disable-model-invocation: false
 ---
 
-# Commit & Push — Feature-Grouped, Meaningful Commits
+# Kenmark Commit
 
 ## Purpose
 

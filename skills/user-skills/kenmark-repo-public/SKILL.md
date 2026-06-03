@@ -31,7 +31,7 @@ risk: read-only
 disable-model-invocation: false
 ---
 
-# Repo Public Readiness — Publish Safety Gate (Read-Only)
+# Kenmark Repo Public
 
 ## Purpose
 

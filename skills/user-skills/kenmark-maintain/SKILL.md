@@ -18,7 +18,7 @@ risk: shell
 disable-model-invocation: true
 ---
 
-# Skills Maintain
+# Kenmark Maintain
 
 Audit **all installed skills** on this machine: list them, group by name and category, flag duplicates and vendored mirrors (e.g. gstack copies under `.cursor/`, `.factory/`, plugins cache), and recommend **keep**, **dedupe**, **review**, or **remove-candidate**.
 
@@ -99,7 +99,7 @@ Help the user pick **caps** (e.g. "keep at most 3 SEO audit skills") if they wan
 When the report shows **adopt-candidate** for Kenmark bundled or catalog skills (e.g. `impeccable`):
 
 ```bash
-npx kenmark-skills adopt --global --ide all -y
+npx kenmark-skills adopt --global -y
 ```
 
 This copies adoptable skills into `~/.kenmark/store/skills` and relinks IDE paths. It does **not** auto-merge arbitrary duplicate trees (e.g. multiple distinct `issues-*` copies).
@@ -126,7 +126,7 @@ rm -rf ~/.claude/skills/gstack/.cursor/skills/gstack-browse
 
 1. Re-run inventory to confirm counts dropped
 2. Suggest **kenmark-packs** if they want a minimal curated set
-3. Remind: `npx kenmark-skills update` refreshes Kenmark skills and optional recommended packs; `npx kenmark-skills setup --ide all` syncs Kenmark only
+3. Remind: `npx kenmark-skills update` refreshes Kenmark skills and optional recommended packs; `npx kenmark-skills setup --global -y` syncs Kenmark only (`--ide all` only when every detected harness path is needed)
 
 ## Maintenance
 
