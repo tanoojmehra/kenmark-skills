@@ -46,7 +46,7 @@ function printUsage() {
   console.log("Usage: node scripts/kenmark-packs.js [options]");
   console.log("");
   console.log("Interactive: checklist of optional installs with repo-aware suggestions.");
-  console.log("Agents: pass --ids or --profile (preset) + -y.");
+  console.log("Agents: pass --ids or --preset (or --profile alias) + -y.");
   console.log("");
   console.log("Runs each pack's install command, then adopts into ~/.kenmark/store and relinks IDEs.");
   console.log("Use --skip-adopt to disable the consolidation pass.");
@@ -57,7 +57,8 @@ function printUsage() {
   console.log("  --explain [id]      Detailed explain for one pack or entire catalog");
   console.log("  --list-profiles     List presets (legacy alias; same as --list-presets)");
   console.log("  --list-presets      List advanced presets (CI / power users)");
-  console.log("  --profile <id>      Install a preset (lean, core-next, growth-seo, …)");
+  console.log("  --preset <id>       Install a preset (lean, core-next, growth-seo, …)");
+  console.log("  --profile <id>      Alias for --preset (backward compatible)");
   console.log("  --all               Install every pack (legacy)");
   console.log("  --ids a,b           Install specific pack ids");
   console.log("  --global            Install to user home (default)");
@@ -82,6 +83,7 @@ function parseArgs(argv) {
     dryRun: false,
     scope: null,
     eccProfile: null,
+    preset: null,
     profile: null,
     ide: null,
     explicitIde: false,
@@ -120,8 +122,10 @@ function parseArgs(argv) {
       args.listPresets = true;
       continue;
     }
-    if (t === "--profile") {
-      args.profile = (argv[i + 1] || "").trim();
+    if (t === "--preset" || t === "--profile") {
+      const id = (argv[i + 1] || "").trim();
+      args.preset = id;
+      args.profile = id;
       i += 1;
       continue;
     }
@@ -210,7 +214,7 @@ function printPresets(catalog) {
     if (p.requiresConfirmation) console.log("    ⚠ requires confirmation (high bloat)");
     console.log("");
   }
-  console.log("Install: npx kenmark-skills install-recommended --profile <id> --global -y");
+  console.log("Install: npx kenmark-skills install-recommended --preset <id> --global -y");
 }
 
 function applyEccOverride(installPlan, eccProfileOverride) {
@@ -320,10 +324,13 @@ async function run() {
   let resolved = null;
   let selectedIds = args.ids || [];
 
-  if (args.profile) {
-    resolved = resolvePresetPlan(args.profile, catalog) || resolveProfilePlan(args.profile, catalog);
+  const requestedPresetId = args.preset || args.profile;
+  if (requestedPresetId) {
+    resolved =
+      resolvePresetPlan(requestedPresetId, catalog) ||
+      resolveProfilePlan(requestedPresetId, catalog);
     if (!resolved) {
-      console.error(`Unknown preset: ${args.profile}`);
+      console.error(`Unknown preset: ${requestedPresetId}`);
       console.error(
         `Use --list-presets. Available: ${listPresets(catalog).map((p) => p.id).join(", ")}`
       );
@@ -342,7 +349,7 @@ async function run() {
 
   const interactive =
     wantsInteractive(args) &&
-    !args.profile &&
+    !requestedPresetId &&
     selectedIds.length === 0 &&
     !args.all;
 
@@ -372,7 +379,7 @@ async function run() {
   }
 
   if (!resolved) {
-    console.log("No packs selected. Use --ids, --profile (preset), --suggest, or run interactively.");
+    console.log("No packs selected. Use --ids, --preset, --suggest, or run interactively.");
     process.exit(0);
   }
 

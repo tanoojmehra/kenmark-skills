@@ -18,8 +18,18 @@ const COMMANDS = [
   ["install-recommended", "--list"],
   [
     "install-recommended",
-    "--profile",
+    "--preset",
     "core-next",
+    "--dry-run",
+    "--global",
+    "--ide",
+    "claude",
+    "-y"
+  ],
+  [
+    "install-recommended",
+    "--profile",
+    "lean",
     "--dry-run",
     "--global",
     "--ide",
