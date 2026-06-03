@@ -9,14 +9,14 @@ Use **frontmatter** for logical grouping instead:
 
 | Field | Values |
 | --- | --- |
-| `category` | `onboarding`, `workflow`, `git`, `issues`, `admin` |
+| `category` | `onboarding`, `workflow`, `git`, `issues`, `admin`, `testing` |
 | `scope` | `universal` (default install via `setup`) or `project-specific` (excluded from `setup`; maintain in the target repo) |
 | `project` | Optional when `scope: project-specific` — target repo or product id |
 
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (26)
+skills/user-skills/          ← bundled universal skills (33)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow
@@ -33,6 +33,13 @@ skills/user-skills/          ← bundled universal skills (26)
   kenmark-repo-deps/     category: workflow (phase: verify)
   kenmark-repo-quality/        category: workflow (phase: verify)
   kenmark-repo-release/    category: workflow (phase: ship)
+  kenmark-test-plan/             category: testing (phase: plan)
+  kenmark-test-unit/             category: testing (phase: implement)
+  kenmark-test-integration/      category: testing (phase: implement)
+  kenmark-test-e2e/              category: testing (phase: implement)
+  kenmark-test-mocks/            category: testing (phase: support)
+  kenmark-test-coverage/         category: testing (phase: audit)
+  kenmark-test-ci/               category: testing (phase: ship)
   kenmark-commit/               category: git
   kenmark-issues-setup/              category: issues
   kenmark-issues-list/
@@ -65,6 +72,20 @@ not in this package.
 | Dependency bloat / unused packages | `kenmark-repo-deps` |
 | Dev/build/type/lint/format errors | `kenmark-repo-quality` |
 
+## Testing suite (routing)
+
+| User says | Skill |
+| --- | --- |
+| Need test strategy? | `kenmark-test-plan` |
+| Need unit tests? | `kenmark-test-unit` |
+| Need API/service/db tests? | `kenmark-test-integration` |
+| Need browser/user-flow tests? | `kenmark-test-e2e` |
+| Need mocks/fixtures/factories? | `kenmark-test-mocks` |
+| Need coverage audit? | `kenmark-test-coverage` |
+| Need CI test pipeline? | `kenmark-test-ci` |
+
+`kenmark-repo-quality` **runs/checks** test commands (and build/lint/type gates). The `kenmark-test-*` skills **create/improve** the test suite.
+
 ## Bundled skills (reference)
 
 | Skill | Purpose |
@@ -81,6 +102,13 @@ not in this package.
 | `kenmark-repo-deps` | Package health, duplicates, lockfile consistency |
 | `kenmark-repo-quality` | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
 | `kenmark-repo-release` | Pre-release version, changelog, tests, meta consistency |
+| `kenmark-test-plan` | Test strategy: layers, tools, ROI, CI gates before writing tests |
+| `kenmark-test-unit` | Unit tests for functions, components, hooks, utilities |
+| `kenmark-test-integration` | API, DB, service, and module boundary tests |
+| `kenmark-test-e2e` | Browser/user-journey tests (Playwright, Cypress, etc.) |
+| `kenmark-test-mocks` | Fixtures, factories, MSW handlers, fake adapters |
+| `kenmark-test-coverage` | Coverage and risk-gap audit (read-only) |
+| `kenmark-test-ci` | Wire tests into CI/CD and release gates |
 
 See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [README](../README.md) lists all bundled skills.
 
@@ -95,6 +123,7 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Need issue tracking? | `kenmark-issues-setup` / `kenmark-issues-scan` |
 | Need skill choice? | `kenmark-router` |
 | Repo health (see table above) | `kenmark-repo-*` family |
+| Testing (see testing table above) | `kenmark-test-*` family |
 | Installed skills inventory? | `kenmark-maintain` |
 | Need commit? | `kenmark-commit` |
 

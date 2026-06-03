@@ -26,11 +26,11 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 ## Overview
 
-`kenmark-skills` ships **26 first-party skills**, an **11-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
+`kenmark-skills` ships **33 first-party skills**, an **11-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
 
 | Asset | Count | Notes |
 | --- | ---: | --- |
-| Kenmark skills | 26 | Bundled in `skills/user-skills/` |
+| Kenmark skills | 33 | Bundled in `skills/user-skills/` |
 | CLI commands | 11 | See [CLI reference](#cli-reference) |
 | Bundled sub-agents | 0 | Inventory/maintain skills only |
 | Recommended packs | 6 | Impeccable, code review, Graphify, SEO selected/full, ECC |
@@ -131,6 +131,20 @@ Skills are grouped by use case. Open each `SKILL.md` for full workflows and trig
 | [`kenmark-repo-quality`](skills/user-skills/kenmark-repo-quality/SKILL.md) | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
 | [`kenmark-repo-release`](skills/user-skills/kenmark-repo-release/SKILL.md) | Pre-release version, changelog, tests, meta consistency |
 
+### Testing (`kenmark-test-*`)
+
+| Skill | Purpose |
+| --- | --- |
+| [`kenmark-test-plan`](skills/user-skills/kenmark-test-plan/SKILL.md) | Test strategy: layers, tools, ROI, CI gates before writing tests |
+| [`kenmark-test-unit`](skills/user-skills/kenmark-test-unit/SKILL.md) | Unit tests for functions, components, hooks, utilities |
+| [`kenmark-test-integration`](skills/user-skills/kenmark-test-integration/SKILL.md) | API, DB, service, and module boundary tests |
+| [`kenmark-test-e2e`](skills/user-skills/kenmark-test-e2e/SKILL.md) | Browser/user-journey tests (Playwright, Cypress, etc.) |
+| [`kenmark-test-mocks`](skills/user-skills/kenmark-test-mocks/SKILL.md) | Fixtures, factories, MSW handlers, fake adapters |
+| [`kenmark-test-coverage`](skills/user-skills/kenmark-test-coverage/SKILL.md) | Coverage and risk-gap audit (read-only) |
+| [`kenmark-test-ci`](skills/user-skills/kenmark-test-ci/SKILL.md) | Wire tests into CI/CD and release gates |
+
+`kenmark-repo-quality` runs/checks test commands; `kenmark-test-*` skills create/improve the test suite.
+
 ### Ship
 
 | Skill | Purpose |
@@ -173,7 +187,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | Command | Description |
 | --- | --- |
 | `init` | First-time wizard: runs `setup` + optional `install-recommended` |
-| `setup` | Install 26 Kenmark skills → `~/.kenmark/store` + IDE symlinks |
+| `setup` | Install 33 Kenmark skills → `~/.kenmark/store` + IDE symlinks |
 | `uninstall` | Remove Kenmark links from IDE paths (`--keep-store` optional); also removes Kenmark MCP if installed |
 | `mcp` | MCP management (`mcp uninstall` removes Kenmark MCP from IDE configs + `~/.kenmark/store/mcp.json`; skills unchanged) |
 | `install-recommended` | Install packs from [`recommended-catalog.json`](skills/user-skills/recommended-catalog.json) |
@@ -201,7 +215,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | | `init` | `setup` |
 | --- | --- | --- |
 | **Use when** | First install; want optional curated packs | Kenmark skills only; re-link IDEs |
-| **Installs** | Kenmark + optional catalog packs | 26 Kenmark skills |
+| **Installs** | Kenmark + optional catalog packs | 33 Kenmark skills |
 | **Implementation** | `setup` → `install-recommended` | `setup-skills.js` |
 | **Later refreshes** | Use `update`, not `init` again | `update` or `setup --force` |
 
@@ -524,7 +538,7 @@ kenmark-skills/
 │   └── setup-skills.js     # kenmark-skills-setup
 └── skills/
     ├── README.md           # logical categories vs flat on-disk layout
-    └── user-skills/        # 26 universal skills + recommended-catalog.json
+    └── user-skills/        # 33 universal skills + recommended-catalog.json
 ```
 
 **Not committed here:** `.claude/`, `.cursor/`, `.agents/` (local IDE installs), `brain/` (optional dev workspace). Edit `skills/user-skills/<name>/SKILL.md` for bundled skills.
@@ -547,7 +561,7 @@ Equivalent: `npm run validate` is the same repo checks as the first step of `npm
 ## Contributing
 
 1. Change skills under `skills/user-skills/<skill-name>/SKILL.md`.
-2. Use the shared frontmatter schema on every skill: `name`, `version`, `category`, `scope`, `phase`, `description`, `triggers`, `allowed-tools`, `risk`, `disable-model-invocation` (plus `project` when `scope: project-specific`). Categories: `onboarding`, `workflow`, `git`, `issues`, `admin`. Bundled skills use `scope: universal`. See [`skills/README.md`](skills/README.md) for the logical folder map — on-disk skill dirs stay flat under `skills/user-skills/`.
+2. Use the shared frontmatter schema on every skill: `name`, `version`, `category`, `scope`, `phase`, `description`, `triggers`, `allowed-tools`, `risk`, `disable-model-invocation` (plus `project` when `scope: project-specific`). Categories: `onboarding`, `workflow`, `git`, `issues`, `admin`, `testing`. Bundled skills use `scope: universal`. See [`skills/README.md`](skills/README.md) for the logical folder map — on-disk skill dirs stay flat under `skills/user-skills/`.
 3. Add a dated entry to [`CHANGELOG.md`](CHANGELOG.md).
 4. Open a PR describing skill changes and new trigger phrases.
 

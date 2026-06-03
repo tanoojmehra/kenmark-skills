@@ -56,7 +56,23 @@ When several bundled skills could apply, prefer this order:
 | Inventory or cleanup of installed skills | **`kenmark-maintain`** |
 | Grouped commits and push | **`kenmark-commit`** |
 
-**Complex work order:** **`kenmark-plan`** → **`kenmark-subagents`** (if parallel tracks help) → implementation / audit / troubleshoot / `repo-*` → **`kenmark-output`** before the final response.
+### Testing suite (`kenmark-test-*`)
+
+| Situation | Skill |
+| --- | --- |
+| Need testing strategy? | **`kenmark-test-plan`** |
+| Need unit tests? | **`kenmark-test-unit`** |
+| Need API/service/db tests? | **`kenmark-test-integration`** |
+| Need browser/user-flow tests? | **`kenmark-test-e2e`** |
+| Need mocks/fixtures/factories? | **`kenmark-test-mocks`** |
+| Need coverage audit? | **`kenmark-test-coverage`** |
+| Need CI test pipeline? | **`kenmark-test-ci`** |
+| Build/lint/type errors? | **`kenmark-repo-quality`** |
+| Release gate? | **`kenmark-repo-release`** |
+
+**Boundary:** **`kenmark-repo-quality`** runs/checks test commands (and build/lint/type gates). **`kenmark-test-*`** skills create/improve the test suite.
+
+**Complex work order:** **`kenmark-plan`** → **`kenmark-test-plan`** (when tests matter) → **`kenmark-subagents`** (if parallel tracks help) → implementation / **`kenmark-test-unit`** / **`kenmark-test-integration`** / **`kenmark-test-e2e`** as needed → **`kenmark-repo-quality`** → **`kenmark-test-coverage`** → **`kenmark-output`** before the final response.
 
 Do **not** use this router for open-ended diagnosis (“kenmark-troubleshoot this bug”, “find root cause”, “why is this failing”) — use **`kenmark-troubleshoot`** first. Use **`kenmark-router`** when the problem domain is clear but the right specialist skill is not.
 
@@ -84,10 +100,10 @@ Each skill in the registry includes:
 | `name` | Skill directory name |
 | `description` | Frontmatter `description` |
 | `triggers` | Frontmatter `triggers` list (explicit invocation phrases) |
-| `category` | Kenmark: `onboarding`, `workflow`, `git`, `issues`, `admin`. Third-party skills may use broader inferred labels. |
+| `category` | Kenmark: `onboarding`, `workflow`, `git`, `issues`, `admin`, `testing`. Third-party skills may use broader inferred labels. |
 | `scope` | `universal` (Kenmark store / default setup) or `project-specific` (repo-local copy) |
 | `project` | When `scope` is `project-specific`, target repo or product id |
-| `phase` | Workflow phase: `setup`, `ship`, `maintain`, `verify`, `discover`, `plan`, `diagnose`, `audit`, `orchestrate` |
+| `phase` | Workflow phase: `setup`, `ship`, `maintain`, `verify`, `discover`, `plan`, `diagnose`, `audit`, `orchestrate`, `implement`, `support` |
 | `risk` | Side-effect level: `read-only`, `write-files`, `shell`, `git-write`, `destructive-possible` |
 | `stack` | Stack fit, e.g. `["any"]`, `["django"]`, `["react", "typescript"]` |
 | `allowedTools` | Frontmatter `allowed-tools` list |
@@ -212,6 +228,8 @@ def infer_category(name: str, description: str, triggers: list[str]) -> str:
         return "git"
     if name.startswith("kenmark-issues-"):
         return "issues"
+    if name.startswith("kenmark-test-"):
+        return "testing"
     if name in ("kenmark-packs", "kenmark-update", "kenmark-maintain", "kenmark-agents"):
         return "admin"
     text = " ".join([name, description, " ".join(triggers)]).lower()
@@ -522,7 +540,7 @@ Do **not** use this skill for first-time Kenmark setup; use **`kenmark-setup`** 
 | Search, rankings, metadata, structured data | `seo` | `seo-audit`, `seo-technical`, `seo-schema` |
 | UI polish, layout, visual design, MUI | `design` | `impeccable`, `design-taste-frontend` |
 | APIs, services, frameworks, languages | `backend` | `backend-patterns`, `django-patterns` |
-| Tests, QA, verification, evals | `testing` | `tdd-workflow`, `verification-loop` |
+| Tests, QA, verification, evals | `testing` | `kenmark-test-plan`, `kenmark-test-unit`, `kenmark-test-integration`, `kenmark-test-e2e`, `kenmark-test-mocks`, `kenmark-test-coverage`, `kenmark-test-ci` |
 | Skill install, update, inventory | `admin` | `kenmark-setup`, `kenmark-maintain`, `kenmark-update` |
 | Agent workflow, discovery, learning | `workflow` | `find-skills`, `continuous-learning`, `kenmark-router` |
 | Plan before implementation | `workflow` | `kenmark-plan` |
@@ -538,6 +556,13 @@ Do **not** use this skill for first-time Kenmark setup; use **`kenmark-setup`** 
 | Package / dependency health | `workflow` | `kenmark-repo-deps` |
 | Dev/build/type/lint/format errors | `workflow` | `kenmark-repo-quality` |
 | Release, publish, handoff | `workflow` | `kenmark-repo-release` |
+| Test strategy before writing tests | `testing` | `kenmark-test-plan` |
+| Unit tests | `testing` | `kenmark-test-unit` |
+| API/service/db integration tests | `testing` | `kenmark-test-integration` |
+| Browser/user-flow E2E tests | `testing` | `kenmark-test-e2e` |
+| Mocks, fixtures, factories | `testing` | `kenmark-test-mocks` |
+| Coverage audit | `testing` | `kenmark-test-coverage` |
+| CI test pipeline | `testing` | `kenmark-test-ci` |
 
 ## Output format
 

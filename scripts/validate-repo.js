@@ -58,7 +58,8 @@ const VALID_CATEGORIES = new Set([
   "workflow",
   "git",
   "issues",
-  "admin"
+  "admin",
+  "testing"
 ]);
 const VALID_RISKS = new Set([
   "read-only",
