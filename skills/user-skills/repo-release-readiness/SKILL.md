@@ -1,10 +1,10 @@
 ---
 name: repo-release-readiness
-version: 1.0.0
+version: 1.0.1
 category: workflow
 scope: universal
 phase: ship
-description: "Read-only pre-release checklist: version, changelog, README, license, tests, build, lint, package exports, clean git status, tag readiness, and metadata consistency. Use before npm publish, GitHub release, client handoff, or production deploy."
+description: "Can we publish / deploy / tag / hand off this repo? Read-only pre-release checklist for version, changelog, tags, package metadata, docs/legal, git cleanliness, and meta consistency. If build/type/lint/runtime is the main blocker, use repo-quality-gates first."
 triggers:
   - release readiness
   - ready to publish
@@ -25,6 +25,8 @@ disable-model-invocation: false
 
 # Repo Release Readiness — Pre-Ship Checklist (Read-Only)
 
+**One-liner:** Can we publish / deploy / tag / hand off this repo?
+
 ## Purpose
 
 Use before:
@@ -34,6 +36,15 @@ Use before:
 - Client handoff
 - Production deploy
 - Public repo push (also run **`repo-public-readiness`** when exposure is public)
+
+### Boundary vs `repo-quality-gates`
+
+| This skill (`repo-release-readiness`) | `repo-quality-gates` |
+| --- | --- |
+| Version, changelog, tags, publish metadata, LICENSE, README accuracy, git/tag policy, handoff checklist | Typecheck, lint, format, build, tests, dev/runtime diagnosis |
+| **Can we publish / deploy / tag / hand off this repo?** | **Are the code quality gates passing right now?** |
+
+If the main blocker is build, typecheck, lint, format, test, or runtime failure, use **`repo-quality-gates`** first for discovery, classification, and a fix plan. Re-run this skill once those gates pass.
 
 ---
 
@@ -104,7 +115,9 @@ console.log('bin:',p.bin);
 
 ---
 
-## Step 5 — Quality gates (run if scripts exist)
+## Step 5 — Quality gates (smoke only)
+
+Confirm gates **pass** for release; do not deep-diagnose failures here.
 
 ```bash
 npm run 2>/dev/null | head -30
@@ -116,7 +129,7 @@ npm run 2>/dev/null | head -30
 | `build` | `npm run build` |
 | `lint` | `npm run lint` |
 
-Record pass/fail; do not fix automatically in this skill.
+Record pass/fail; do not fix automatically in this skill. If any gate fails, stop and hand off to **`repo-quality-gates`** for root-cause classification and a fix plan, then re-run this checklist.
 
 ---
 
@@ -202,6 +215,7 @@ Do not hardcode these checks into other repos — use as a template for meta con
 
 | Situation | Prefer |
 | --- | --- |
+| Failing build / type / lint / test / runtime | `repo-quality-gates` (first) |
 | Public open-source gate | `repo-public-readiness` |
 | Secrets | `repo-secrets-audit` |
 | Docs drift | `repo-docs-audit` |

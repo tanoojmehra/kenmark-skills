@@ -1,10 +1,10 @@
 ---
 name: repo-quality-gates
-version: 1.1.0
+version: 1.1.1
 category: workflow
 scope: universal
 phase: verify
-description: "Detect and run repo quality gates for dev/runtime/build/typecheck/TSX/lint/format errors. Discovers available scripts, runs safe checks in order, classifies failures, and produces a fix plan without auto-editing."
+description: "Are the code quality gates passing right now? Detect and run dev/runtime/build/typecheck/TSX/lint/format/test checks; classify failures and produce a fix plan. For publish/version/changelog/package metadata, use repo-release-readiness after gates pass."
 triggers:
   - repo quality gates
   - check build errors
@@ -32,6 +32,8 @@ disable-model-invocation: false
 
 # Repo Quality Gates — Dev / Runtime / Build / Type / Lint / Format Check Skill
 
+**One-liner:** Are the code quality gates passing right now?
+
 ## Purpose
 
 Use this skill when the user wants to check a repository for quality-gate failures, including:
@@ -48,6 +50,15 @@ Use this skill when the user wants to check a repository for quality-gate failur
 This skill is universal. It must not assume a specific framework, package manager, language, or repo layout.
 
 Default behavior is **diagnose and report**. Do not edit files unless the user explicitly asks for fixes after the report.
+
+### Boundary vs `repo-release-readiness`
+
+| This skill (`repo-quality-gates`) | `repo-release-readiness` |
+| --- | --- |
+| Typecheck, lint, format, build, tests, dev/runtime smoke | Version, changelog, tags, publish metadata, LICENSE, handoff/deploy checklist |
+| **Is the codebase healthy to develop and verify?** | **Can we publish / deploy / tag / hand off this repo?** |
+
+For publish, version bumps, changelog, package `files`/`exports`/`private`, tag policy, and release-state checks, use **`repo-release-readiness`** after quality gates pass (or when the user only needs ship metadata, not gate diagnosis).
 
 ---
 
