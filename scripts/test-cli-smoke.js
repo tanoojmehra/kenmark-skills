@@ -36,6 +36,15 @@ const COMMANDS = [
     "claude",
     "-y"
   ],
+  [
+    "install-recommended",
+    "--ids",
+    "impeccable",
+    "--dry-run",
+    "--global",
+    "--skip-adopt",
+    "-y"
+  ],
   ["update", "--kenmark-only", "--global", "--ide", "auto", "-y", "--dry-run"],
   ["update", "--both", "--global", "--ide", "auto", "--dry-run", "-y"],
   ["doctor", "--soft", "--no-fail"]
@@ -58,6 +67,19 @@ const ASSERTIONS = [
       /kenmark-packs\.js --global -y --ids /
     ],
     rejectStdout: [/--all/]
+  },
+  {
+    args: [
+      "install-recommended",
+      "--ids",
+      "impeccable",
+      "--dry-run",
+      "--global",
+      "--skip-adopt",
+      "-y"
+    ],
+    expectStdout: [/skills add pbakaus\/impeccable|pbakaus\/impeccable/],
+    rejectStdout: [/Skipping install/]
   }
 ];
 

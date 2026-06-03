@@ -319,6 +319,21 @@ function runGitSyncInstall({ repoUrl, targetPath, cwd, dryRun }) {
   });
 }
 
+function commandExists(cmd) {
+  const result = spawnSync(`command -v ${cmd}`, {
+    shell: true,
+    encoding: "utf8",
+    stdio: "ignore"
+  });
+  return result.status === 0;
+}
+
+function preferLocalSkillsCli(command) {
+  if (!command || !/\bnpx\b.*\bskills\b/.test(command)) return command;
+  if (!commandExists("skills")) return command;
+  return command.replace(/\bnpx\s+(--yes\s+)?skills\b/, "skills");
+}
+
 function resolveInstallCommands(entry, scope, catalog) {
   const pack = entry.pack;
   if (!pack) return [];
@@ -360,7 +375,9 @@ function resolveInstallCommands(entry, scope, catalog) {
     if (entry.seoSkills.length > 1 && batchBlock?.command) {
       const cwd =
         batchBlock.cwd === "project" ? process.cwd() : undefined;
-      const cmd = batchBlock.command.replace(/\{\{skills\}\}/g, skillsArgv);
+      const cmd = preferLocalSkillsCli(
+        batchBlock.command.replace(/\{\{skills\}\}/g, skillsArgv)
+      );
       return [
         {
           command: cmd,
@@ -378,7 +395,7 @@ function resolveInstallCommands(entry, scope, catalog) {
       let cmd =
         skillBlock?.command ||
         `npx --yes skills add aaron-he-zhu/seo-geo-claude-skills ${scope === "global" ? "-g " : ""}-y -s {{skill}}`;
-      cmd = cmd.replace(/\{\{skill\}\}/g, skill);
+      cmd = preferLocalSkillsCli(cmd.replace(/\{\{skill\}\}/g, skill));
       return { command: cmd, cwd, label: skill, seoSelected: true };
     });
   }
@@ -396,7 +413,7 @@ function resolveInstallCommands(entry, scope, catalog) {
     cmd = cmd.replace(/\{\{profile\}\}/g, profile);
   }
   const cwd = block.cwd === "project" ? process.cwd() : undefined;
-  return [{ command: cmd, cwd }];
+  return [{ command: preferLocalSkillsCli(cmd), cwd }];
 }
 
 function formatInstallPlanLine(cmdEntry, packId) {

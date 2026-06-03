@@ -96,6 +96,7 @@ const REQUIRED_PACKAGE_SCRIPTS = [
   "validate",
   "test",
   "test:cli",
+  "test:packs-verify",
   "test:install",
   "test:pack",
   "test:all",
@@ -124,6 +125,7 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/subagents-inventory.js",
   "scripts/interactive.js",
   "scripts/test-cli-smoke.js",
+  "scripts/test-packs-verify-skip.js",
   "scripts/test-install-temp-home.js",
   "scripts/test-pack.js"
 ];
@@ -991,11 +993,18 @@ function validatePackageJson() {
   if (scripts.validate !== "node scripts/validate-repo.js") {
     fail('package.json: scripts.validate must be "node scripts/validate-repo.js"');
   }
-  if (scripts.test !== "npm run validate && npm run test:cli") {
-    fail('package.json: scripts.test must be "npm run validate && npm run test:cli"');
+  if (scripts.test !== "npm run validate && npm run test:cli && npm run test:packs-verify") {
+    fail(
+      'package.json: scripts.test must be "npm run validate && npm run test:cli && npm run test:packs-verify"'
+    );
   }
   if (scripts["test:cli"] !== "node scripts/test-cli-smoke.js") {
     fail('package.json: scripts["test:cli"] must be "node scripts/test-cli-smoke.js"');
+  }
+  if (scripts["test:packs-verify"] !== "node scripts/test-packs-verify-skip.js") {
+    fail(
+      'package.json: scripts["test:packs-verify"] must be "node scripts/test-packs-verify-skip.js"'
+    );
   }
   if (scripts["test:install"] !== "node scripts/test-install-temp-home.js") {
     fail(
