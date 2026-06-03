@@ -16,6 +16,7 @@ const {
   resolveProfilePackRefs,
   listProfiles
 } = require("./recommended-catalog");
+const { LEGACY_SKILL_RENAMES } = require("./kenmark-hub");
 
 const repoRoot = path.resolve(__dirname, "..");
 const userSkillsDir = path.join(repoRoot, "skills", "user-skills");
@@ -128,8 +129,28 @@ const FORBIDDEN_SCAN_RELATIVE = [
 
 const FORBIDDEN_SCAN_EXCLUDE_RELATIVE = new Set([
   "CHANGELOG.md",
-  "scripts/validate-repo.js" // defines FORBIDDEN_* lists and path-pattern labels
+  "scripts/validate-repo.js", // defines FORBIDDEN_* lists and path-pattern labels
+  "scripts/kenmark-hub.js" // LEGACY_SKILL_RENAMES map and cleanup paths
 ]);
+
+/** Former Kenmark skill ids — must not appear in user-facing docs (see findLegacySkillNameReferences). */
+const LEGACY_SKILL_NAMES = Object.keys(LEGACY_SKILL_RENAMES);
+
+const LEGACY_NAME_DOC_SCAN_RELATIVE = [
+  "README.md",
+  "skills/README.md",
+  "skills/user-skills",
+  "scripts",
+  "config",
+  "package.json"
+];
+
+const LEGACY_NAME_DOC_SCAN_EXCLUDE = new Set([
+  ...FORBIDDEN_SCAN_EXCLUDE_RELATIVE,
+  "skills/user-skills/recommended-catalog.json"
+]);
+
+const SETUP_INSTALL_SCRIPTS = ["scripts/setup-skills.js", "scripts/kenmark-hub.js"];
 
 const FORBIDDEN_SCAN_EXTENSIONS = new Set([".md", ".json", ".js"]);
 
@@ -395,6 +416,12 @@ function validateSkillFrontmatter(skillDir, skillMdPath) {
   }
 
   const name = String(fm.name || "").trim();
+  if (!skillDir.startsWith("kenmark-")) {
+    fail(`${rel}: bundled skill directory must start with "kenmark-"`);
+  }
+  if (name && !name.startsWith("kenmark-")) {
+    fail(`${rel}: bundled skill frontmatter name must start with "kenmark-"`);
+  }
   if (name && name !== skillDir) {
     fail(`${rel}: frontmatter name "${name}" does not match directory "${skillDir}"`);
   }
@@ -419,6 +446,11 @@ function validateSkills() {
   }
 
   for (const skillDir of allDirs.sort()) {
+    if (!skillDir.startsWith("kenmark-")) {
+      fail(
+        `skills/user-skills/${skillDir}/: active first-party skill folder must start with "kenmark-"`
+      );
+    }
     if (!skillDirs.includes(skillDir)) {
       fail(`skills/user-skills/${skillDir}/SKILL.md missing`);
     }
@@ -717,6 +749,202 @@ function collectFilesRecursive(dir, acc = []) {
   return acc;
 }
 
+function stripInitBrainMarkerSyntax(text) {
+  return text
+    .replace(/<!--\s*init-brain:[\s\S]*?-->/g, "")
+    .replace(/init-brain:(START|END)/g, "")
+    .replace(/`init-brain`/g, "");
+}
+
+function textReferencesLegacyInitBrainSkill(text) {
+  return (
+    /user-skills\/init-brain\b/i.test(text) ||
+    /skills\/init-brain\b/i.test(text) ||
+    /\brun\s+init-brain\b/i.test(text) ||
+    /\/init-brain\b/.test(text)
+  );
+}
+
+function textReferencesLegacyTroubleshootSkill(text) {
+  return (
+    /user-skills\/troubleshoot\b/i.test(text) ||
+    /skills\/troubleshoot\b/i.test(text) ||
+    /`troubleshoot`/i.test(text) ||
+    /\/troubleshoot\b/.test(text)
+  );
+}
+
+/** Legacy skill id appears without the kenmark- namespace prefix. */
+function textReferencesUnprefixedLegacySkill(text, legacyName) {
+  const escaped = legacyName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(?<!kenmark-)${escaped}`).test(text);
+}
+
+function findLegacySkillNameReferences() {
+  const filesToScan = new Set();
+
+  for (const rel of LEGACY_NAME_DOC_SCAN_RELATIVE) {
+    const abs = path.join(repoRoot, rel);
+    if (!fs.existsSync(abs)) continue;
+    if (fs.statSync(abs).isDirectory()) {
+      for (const f of collectFilesRecursive(abs)) {
+        filesToScan.add(f);
+      }
+    } else {
+      filesToScan.add(abs);
+    }
+  }
+
+  for (const abs of filesToScan) {
+    const rel = path.relative(repoRoot, abs);
+    if (LEGACY_NAME_DOC_SCAN_EXCLUDE.has(rel)) continue;
+    if (!FORBIDDEN_SCAN_EXTENSIONS.has(path.extname(abs))) continue;
+
+    let text;
+    try {
+      text = fs.readFileSync(abs, "utf8");
+    } catch {
+      continue;
+    }
+
+    for (const legacyName of LEGACY_SKILL_NAMES) {
+      if (legacyName === "init-brain") {
+        const checkText =
+          rel === path.join("skills", "user-skills", "kenmark-init", "SKILL.md")
+            ? stripInitBrainMarkerSyntax(text)
+            : text;
+        if (textReferencesLegacyInitBrainSkill(checkText)) {
+          fail(
+            `${rel}: references legacy skill name "init-brain" (use kenmark-init)`
+          );
+        }
+        continue;
+      }
+
+      if (legacyName === "troubleshoot") {
+        if (textReferencesLegacyTroubleshootSkill(text)) {
+          fail(
+            `${rel}: references legacy skill name "troubleshoot" (use kenmark-troubleshoot)`
+          );
+        }
+        continue;
+      }
+
+      if (textReferencesUnprefixedLegacySkill(text, legacyName)) {
+        fail(
+          `${rel}: references legacy skill name "${legacyName}" (use ${LEGACY_SKILL_RENAMES[legacyName]})`
+        );
+      }
+    }
+  }
+}
+
+function validateClaudeWrapperPolicy() {
+  const setupPath = path.join(repoRoot, "scripts", "setup-skills.js");
+  let setupSrc = "";
+  try {
+    setupSrc = fs.readFileSync(setupPath, "utf8");
+  } catch (err) {
+    fail(`scripts/setup-skills.js: unreadable (${err.message})`);
+    return;
+  }
+
+  if (!setupSrc.includes("installKenmarkSkillsToStoreWithLegacyCleanup")) {
+    fail(
+      "scripts/setup-skills.js: must install Kenmark skills via installKenmarkSkillsToStoreWithLegacyCleanup (removes legacy paths and Claude wrappers)"
+    );
+  }
+  if (
+    /createKenmarkClaudeCommand|writeClaudeCommandWrapper|syncClaudeCommandWrappers/i.test(
+      setupSrc
+    )
+  ) {
+    fail(
+      "scripts/setup-skills.js: must not create Claude slash-command wrappers (use kenmark-* skills under ~/.claude/skills/)"
+    );
+  }
+
+  const hubPath = path.join(repoRoot, "scripts", "kenmark-hub.js");
+  let hubSrc = "";
+  try {
+    hubSrc = fs.readFileSync(hubPath, "utf8");
+  } catch (err) {
+    fail(`scripts/kenmark-hub.js: unreadable (${err.message})`);
+    return;
+  }
+
+  const wrapperFn = hubSrc.match(
+    /function removeKenmarkClaudeCommandWrappers\([\s\S]*?\n\}/
+  );
+  if (!wrapperFn) {
+    fail("scripts/kenmark-hub.js: removeKenmarkClaudeCommandWrappers missing");
+    return;
+  }
+  if (wrapperFn[0].includes("writeFileSync")) {
+    fail(
+      "scripts/kenmark-hub.js: removeKenmarkClaudeCommandWrappers must only remove wrappers, not write ~/.claude/commands/*.md"
+    );
+  }
+  if (/function createKenmarkClaudeCommand/i.test(hubSrc)) {
+    fail(
+      "scripts/kenmark-hub.js: must not define Claude slash-command wrapper generators"
+    );
+  }
+
+  const legacyFn = hubSrc.match(
+    /function removeLegacyKenmarkInstalls\([\s\S]*?\n\}/
+  );
+  if (!legacyFn) {
+    fail("scripts/kenmark-hub.js: removeLegacyKenmarkInstalls missing");
+    return;
+  }
+  if (!legacyFn[0].includes("collectKenmarkLegacyOwnershipProofs")) {
+    fail(
+      "scripts/kenmark-hub.js: removeLegacyKenmarkInstalls must verify Kenmark ownership before deleting legacy paths"
+    );
+  }
+  if (!legacyFn[0].includes("legacy-candidate-review-required")) {
+    fail(
+      "scripts/kenmark-hub.js: removeLegacyKenmarkInstalls must skip unproven legacy paths (legacy-candidate-review-required)"
+    );
+  }
+  if (!hubSrc.includes("backupLegacyCleanupPath") || !hubSrc.includes('"legacy-cleanup"')) {
+    fail(
+      "scripts/kenmark-hub.js: legacy cleanup must back up proven removals under ~/.kenmark/backups/legacy-cleanup/"
+    );
+  }
+  if (!wrapperFn[0].includes("collectKenmarkCommandOwnershipProofs")) {
+    fail(
+      "scripts/kenmark-hub.js: removeKenmarkClaudeCommandWrappers must verify ownership before deleting command files"
+    );
+  }
+  if (!wrapperFn[0].includes("legacy-candidate-review-required")) {
+    fail(
+      "scripts/kenmark-hub.js: removeKenmarkClaudeCommandWrappers must skip unproven command files (legacy-candidate-review-required)"
+    );
+  }
+
+  for (const rel of SETUP_INSTALL_SCRIPTS) {
+    const abs = path.join(repoRoot, rel);
+    let src = "";
+    try {
+      src = fs.readFileSync(abs, "utf8");
+    } catch (err) {
+      fail(`${rel}: unreadable (${err.message})`);
+      continue;
+    }
+    if (/writeFileSync\s*\([^)]*["']commands["']|writeFileSync\s*\([^)]*\/commands\//.test(src)) {
+      fail(
+        `${rel}: must not write Kenmark slash-command wrappers under ~/.claude/commands/`
+      );
+    }
+  }
+
+  console.log(
+    "  ✓ namespace — bundled skills kenmark-*; setup removes Claude command wrappers (none generated)"
+  );
+}
+
 function findForbiddenTerms() {
   const filesToScan = new Set();
 
@@ -776,6 +1004,8 @@ function main() {
   validateCatalog();
   validateInitBrainKb();
   validatePackageJson();
+  validateClaudeWrapperPolicy();
+  findLegacySkillNameReferences();
   findForbiddenTerms();
 
   if (warnings.length) {
