@@ -95,10 +95,10 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/doctor.js",
   "scripts/validate.js",
   "scripts/validate-repo.js",
-  "scripts/skills-init.js",
+  "scripts/kenmark-setup.js",
   "scripts/skills-inventory.js",
-  "scripts/skills-install-recommended.js",
-  "scripts/skills-update.js",
+  "scripts/kenmark-packs.js",
+  "scripts/kenmark-update.js",
   "scripts/skills-adopt.js",
   "scripts/subagents-inventory.js",
   "scripts/interactive.js"
@@ -567,7 +567,7 @@ function validateCatalog() {
   }
 }
 
-/** init-brain must document the numbered KB scaffold (regression guard). */
+/** kenmark-init must document the numbered KB scaffold (regression guard). */
 const INIT_BRAIN_KB_MARKERS = [
   "brain/kb",
   "00-project-overview.md",
@@ -579,38 +579,38 @@ const INIT_BRAIN_KB_MARKERS = [
 const COMMIT_PUSH_KB_MARKERS = ["Brain KB check before commit", "brain/kb/"];
 
 function validateInitBrainKb() {
-  const initBrainPath = path.join(userSkillsDir, "init-brain", "SKILL.md");
+  const initBrainPath = path.join(userSkillsDir, "kenmark-init", "SKILL.md");
   if (!fs.existsSync(initBrainPath)) {
-    fail("skills/user-skills/init-brain/SKILL.md missing (KB validation skipped)");
+    fail("skills/user-skills/kenmark-init/SKILL.md missing (KB validation skipped)");
     return;
   }
   let text;
   try {
     text = fs.readFileSync(initBrainPath, "utf8");
   } catch (err) {
-    fail(`init-brain/SKILL.md: unreadable (${err.message})`);
+    fail(`kenmark-init/SKILL.md: unreadable (${err.message})`);
     return;
   }
   for (const marker of INIT_BRAIN_KB_MARKERS) {
     if (!text.includes(marker)) {
-      fail(`init-brain/SKILL.md: missing required KB marker "${marker}"`);
+      fail(`kenmark-init/SKILL.md: missing required KB marker "${marker}"`);
     }
   }
 
-  const commitPushPath = path.join(userSkillsDir, "commit-push", "SKILL.md");
+  const commitPushPath = path.join(userSkillsDir, "kenmark-commit", "SKILL.md");
   if (!fs.existsSync(commitPushPath)) {
-    fail("skills/user-skills/commit-push/SKILL.md missing (KB validation skipped)");
+    fail("skills/user-skills/kenmark-commit/SKILL.md missing (KB validation skipped)");
     return;
   }
   try {
     text = fs.readFileSync(commitPushPath, "utf8");
   } catch (err) {
-    fail(`commit-push/SKILL.md: unreadable (${err.message})`);
+    fail(`kenmark-commit/SKILL.md: unreadable (${err.message})`);
     return;
   }
   for (const marker of COMMIT_PUSH_KB_MARKERS) {
     if (!text.includes(marker)) {
-      fail(`commit-push/SKILL.md: missing required KB marker "${marker}"`);
+      fail(`kenmark-commit/SKILL.md: missing required KB marker "${marker}"`);
     }
   }
 }

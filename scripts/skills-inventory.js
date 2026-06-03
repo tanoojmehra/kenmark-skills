@@ -21,29 +21,29 @@ const DEFAULT_ROOTS = buildInventoryRoots(home);
 
 const KEEP_ALWAYS = new Set([
   "impeccable",
-  "skills-router",
+  "kenmark-router",
   "find-skills",
-  "init-brain",
-  "commit-push",
-  "skills-maintain",
-  "skills-install-recommended",
-  "skills-update",
-  "skills-init",
-  "issues-check",
-  "issues-list",
-  "issues-maintenance",
-  "issues-scan",
-  "issues-setup",
-  "troubleshoot",
-  "repo-hygiene",
-  "repo-secrets-audit",
-  "repo-public-readiness",
-  "repo-kb-sync",
-  "repo-docs-audit",
-  "repo-structure-audit",
-  "repo-dependency-audit",
-  "repo-quality-gates",
-  "repo-release-readiness"
+  "kenmark-init",
+  "kenmark-commit",
+  "kenmark-maintain",
+  "kenmark-packs",
+  "kenmark-update",
+  "kenmark-setup",
+  "kenmark-issues-check",
+  "kenmark-issues-list",
+  "kenmark-issues-maintain",
+  "kenmark-issues-scan",
+  "kenmark-issues-setup",
+  "kenmark-troubleshoot",
+  "kenmark-repo-hygiene",
+  "kenmark-repo-secrets",
+  "kenmark-repo-public",
+  "kenmark-repo-kb",
+  "kenmark-repo-docs",
+  "kenmark-repo-structure",
+  "kenmark-repo-deps",
+  "kenmark-repo-quality",
+  "kenmark-repo-release"
 ]);
 
 function printUsage() {
@@ -153,7 +153,7 @@ function inferCategory(name, description) {
   if (text.includes("seo")) return "seo";
   if (/\b(design|ui|ux|frontend|visual|impeccable)\b/.test(text)) return "design";
   if (/\b(test|qa|verification|eval|tdd)\b/.test(text)) return "testing";
-  if (/\b(workflow|router|learning|agent|ecc|gstack|troubleshoot|diagnose|debug|investigate|root.?cause)\b/.test(text)) return "workflow";
+  if (/\b(workflow|router|learning|agent|ecc|gstack|kenmark-troubleshoot|diagnose|debug|investigate|root.?cause)\b/.test(text)) return "workflow";
   if (/\b(api|backend|django|python|database|server|nestjs)\b/.test(text)) return "backend";
   return "general";
 }

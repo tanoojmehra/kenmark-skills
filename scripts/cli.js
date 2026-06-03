@@ -39,7 +39,7 @@ if (!command || command === "help" || command === "--help" || command === "-h") 
 }
 
 if (command === "init") {
-  const scriptPath = path.join(__dirname, "skills-init.js");
+  const scriptPath = path.join(__dirname, "kenmark-setup.js");
   const result = spawnSync(process.execPath, [scriptPath, ...args.slice(1)], {
     stdio: "inherit"
   });
@@ -110,7 +110,7 @@ if (command === "subagents-inventory" || command === "agents-inventory") {
 }
 
 if (command === "install-recommended") {
-  const scriptPath = path.join(__dirname, "skills-install-recommended.js");
+  const scriptPath = path.join(__dirname, "kenmark-packs.js");
   const result = spawnSync(process.execPath, [scriptPath, ...args.slice(1)], {
     stdio: "inherit"
   });
@@ -118,7 +118,7 @@ if (command === "install-recommended") {
 }
 
 if (command === "update") {
-  const scriptPath = path.join(__dirname, "skills-update.js");
+  const scriptPath = path.join(__dirname, "kenmark-update.js");
   const result = spawnSync(process.execPath, [scriptPath, ...args.slice(1)], {
     stdio: "inherit"
   });

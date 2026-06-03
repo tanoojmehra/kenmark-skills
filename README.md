@@ -40,30 +40,30 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 **Setup (once)**
 
 1. **Install** — `npx kenmark-skills init` (or `setup` for Kenmark-only).
-2. **Onboard a repo** — run **`init-brain`** in the agent.
+2. **Onboard a repo** — run **`kenmark-init`** in the agent.
 
 **Day-to-day (pick the first row that fits)**
 
 | Situation | Skill |
 | --- | --- |
-| Problem unclear? | **`troubleshoot`** |
-| Need issue tracking? | **`issues-setup`** / **`issues-scan`** |
-| Need skill choice? | **`skills-router`** |
-| Repo clutter / scattered docs? | **`repo-hygiene`** |
-| Secrets / keys / tokens? | **`repo-secrets-audit`** |
-| Make repo public? | **`repo-public-readiness`** |
-| Update brain after code change? | **`repo-kb-sync`** |
-| Docs quality? | **`repo-docs-audit`** |
-| Release / npm publish? | **`repo-release-readiness`** |
-| Build/type/lint/format/dev errors? | **`repo-quality-gates`** |
-| Installed skills inventory? | **`skills-maintain`** |
-| Need commit? | **`commit-push`** |
+| Problem unclear? | **`kenmark-troubleshoot`** |
+| Need issue tracking? | **`kenmark-issues-setup`** / **`kenmark-issues-scan`** |
+| Need skill choice? | **`kenmark-router`** |
+| Repo clutter / scattered docs? | **`kenmark-repo-hygiene`** |
+| Secrets / keys / tokens? | **`kenmark-repo-secrets`** |
+| Make repo public? | **`kenmark-repo-public`** |
+| Update brain after code change? | **`kenmark-repo-kb`** |
+| Docs quality? | **`kenmark-repo-docs`** |
+| Release / npm publish? | **`kenmark-repo-release`** |
+| Build/type/lint/format/dev errors? | **`kenmark-repo-quality`** |
+| Installed skills inventory? | **`kenmark-maintain`** |
+| Need commit? | **`kenmark-commit`** |
 
-**Maintain** — periodic **`skills-update`**, **`skills-maintain`**, **`subagents-maintain`**.
+**Maintain** — periodic **`kenmark-update`**, **`kenmark-maintain`**, **`kenmark-agents`**.
 
-**Troubleshoot trigger examples:** "troubleshoot my Cursor slowdown", "diagnose this production issue", "find root cause of this deployment failure", "build a test plan before fixing".
+**Troubleshoot trigger examples:** "kenmark-troubleshoot my Cursor slowdown", "diagnose this production issue", "find root cause of this deployment failure", "build a test plan before fixing".
 
-Many skills expect a project **`brain/`** directory (standards, numbered **KB** under **`brain/kb/`**, changelog, optional issues). That layout is created in *your* repos via **`init-brain`**, which inspects the codebase and seeds `brain/kb/00`–`11` plus optional `features/` and `decisions/` — not shipped inside this package. Rules live under **`brain/rules/`** (lean **`standards.md`** plus optional **`stack.md`**, **`workflow.md`**, etc.); IDE entry files get a short **Read-first stub** by default (multi-IDE, no hooks). **`commit-push`** enforces KB updates alongside behavioral code changes.
+Many skills expect a project **`brain/`** directory (standards, numbered **KB** under **`brain/kb/`**, changelog, optional issues). That layout is created in *your* repos via **`kenmark-init`**, which inspects the codebase and seeds `brain/kb/00`–`11` plus optional `features/` and `decisions/` — not shipped inside this package. Rules live under **`brain/rules/`** (lean **`standards.md`** plus optional **`stack.md`**, **`workflow.md`**, etc.); IDE entry files get a short **Read-first stub** by default (multi-IDE, no hooks). **`kenmark-commit`** enforces KB updates alongside behavioral code changes.
 
 ---
 
@@ -79,7 +79,7 @@ npx kenmark-skills init
 npx kenmark-skills setup --global --ide all -y
 
 # In a project repo (agent chat)
-# "Run init-brain on this repo"
+# "Run kenmark-init on this repo"
 ```
 
 Optional: `npm install -g kenmark-skills` if you want the shorter `kenmark-skills` command without `npx`.
@@ -103,53 +103,53 @@ Skills are grouped by use case. Open each `SKILL.md` for full workflows and trig
 
 | Skill | Purpose |
 | --- | --- |
-| [`init-brain`](skills/user-skills/init-brain/SKILL.md) | Bootstrap `brain/` + numbered `brain/kb/` from repo inspection; install cross-IDE pointer stubs (optional full embed) |
-| [`skills-init`](skills/user-skills/skills-init/SKILL.md) | First-time CLI wizard (`npx kenmark-skills init`) |
+| [`kenmark-init`](skills/user-skills/kenmark-init/SKILL.md) | Bootstrap `brain/` + numbered `brain/kb/` from repo inspection; install cross-IDE pointer stubs (optional full embed) |
+| [`kenmark-setup`](skills/user-skills/kenmark-setup/SKILL.md) | First-time CLI wizard (`npx kenmark-skills init`) |
 
 ### While coding
 
 | Skill | Purpose |
 | --- | --- |
-| [`skills-router`](skills/user-skills/skills-router/SKILL.md) | Search installed skills and auto-assign the best match for the current task |
-| [`troubleshoot`](skills/user-skills/troubleshoot/SKILL.md) | Universal diagnosis: evidence, hypotheses, ranked action plan (read-only first) |
-| [`repo-hygiene`](skills/user-skills/repo-hygiene/SKILL.md) | Audit clutter, scattered docs, orphan assets, dumps; cleanup only after approval |
-| [`repo-secrets-audit`](skills/user-skills/repo-secrets-audit/SKILL.md) | Deep read-only scan for secrets and credentials (redacted report) |
-| [`repo-public-readiness`](skills/user-skills/repo-public-readiness/SKILL.md) | Safe-to-publish checklist before open-sourcing |
-| [`repo-kb-sync`](skills/user-skills/repo-kb-sync/SKILL.md) | Update `brain/kb/` and changelog after code changes |
-| [`repo-docs-audit`](skills/user-skills/repo-docs-audit/SKILL.md) | Documentation quality, README/env accuracy, broken links |
-| [`repo-structure-audit`](skills/user-skills/repo-structure-audit/SKILL.md) | Folder layout, naming, module boundaries |
-| [`repo-dependency-audit`](skills/user-skills/repo-dependency-audit/SKILL.md) | Package bloat, unused deps, lockfile consistency |
-| [`repo-quality-gates`](skills/user-skills/repo-quality-gates/SKILL.md) | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
-| [`repo-release-readiness`](skills/user-skills/repo-release-readiness/SKILL.md) | Pre-release version, changelog, tests, meta consistency |
+| [`kenmark-router`](skills/user-skills/kenmark-router/SKILL.md) | Search installed skills and auto-assign the best match for the current task |
+| [`kenmark-troubleshoot`](skills/user-skills/kenmark-troubleshoot/SKILL.md) | Universal diagnosis: evidence, hypotheses, ranked action plan (read-only first) |
+| [`kenmark-repo-hygiene`](skills/user-skills/kenmark-repo-hygiene/SKILL.md) | Audit clutter, scattered docs, orphan assets, dumps; cleanup only after approval |
+| [`kenmark-repo-secrets`](skills/user-skills/kenmark-repo-secrets/SKILL.md) | Deep read-only scan for secrets and credentials (redacted report) |
+| [`kenmark-repo-public`](skills/user-skills/kenmark-repo-public/SKILL.md) | Safe-to-publish checklist before open-sourcing |
+| [`kenmark-repo-kb`](skills/user-skills/kenmark-repo-kb/SKILL.md) | Update `brain/kb/` and changelog after code changes |
+| [`kenmark-repo-docs`](skills/user-skills/kenmark-repo-docs/SKILL.md) | Documentation quality, README/env accuracy, broken links |
+| [`kenmark-repo-structure`](skills/user-skills/kenmark-repo-structure/SKILL.md) | Folder layout, naming, module boundaries |
+| [`kenmark-repo-deps`](skills/user-skills/kenmark-repo-deps/SKILL.md) | Package bloat, unused deps, lockfile consistency |
+| [`kenmark-repo-quality`](skills/user-skills/kenmark-repo-quality/SKILL.md) | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
+| [`kenmark-repo-release`](skills/user-skills/kenmark-repo-release/SKILL.md) | Pre-release version, changelog, tests, meta consistency |
 
 ### Ship
 
 | Skill | Purpose |
 | --- | --- |
-| [`commit-push`](skills/user-skills/commit-push/SKILL.md) | Feature-grouped conventional commits and push (no co-author trailers) |
+| [`kenmark-commit`](skills/user-skills/kenmark-commit/SKILL.md) | Feature-grouped conventional commits and push (no co-author trailers) |
 
-### Issue tracking (`issues-*`)
+### Issue tracking (`kenmark-issues-*`)
 
-Requires **`init-brain`** or at least `brain/issues/` from **`issues-setup`**.
+Requires **`kenmark-init`** or at least `brain/issues/` from **`kenmark-issues-setup`**.
 
 | Skill | Purpose |
 | --- | --- |
-| [`issues-setup`](skills/user-skills/issues-setup/SKILL.md) | Create `brain/issues/` layout and `INDEX.md` |
-| [`issues-list`](skills/user-skills/issues-list/SKILL.md) | Dashboard of open issues by area and priority |
-| [`issues-check`](skills/user-skills/issues-check/SKILL.md) | Move resolved issues to `completed/`; refresh index |
-| [`issues-scan`](skills/user-skills/issues-scan/SKILL.md) | Discover and file new issues under `brain/issues/` |
-| [`issues-maintenance`](skills/user-skills/issues-maintenance/SKILL.md) | Audit tracker health (duplicates, stale index, missing files) |
+| [`kenmark-issues-setup`](skills/user-skills/kenmark-issues-setup/SKILL.md) | Create `brain/issues/` layout and `INDEX.md` |
+| [`kenmark-issues-list`](skills/user-skills/kenmark-issues-list/SKILL.md) | Dashboard of open issues by area and priority |
+| [`kenmark-issues-check`](skills/user-skills/kenmark-issues-check/SKILL.md) | Move resolved issues to `completed/`; refresh index |
+| [`kenmark-issues-scan`](skills/user-skills/kenmark-issues-scan/SKILL.md) | Discover and file new issues under `brain/issues/` |
+| [`kenmark-issues-maintain`](skills/user-skills/kenmark-issues-maintain/SKILL.md) | Audit tracker health (duplicates, stale index, missing files) |
 
-### Skills library (`skills-*`)
+### Skills library (admin)
 
 Pairs with **`npx kenmark-skills`** commands below.
 
 | Skill | Purpose |
 | --- | --- |
-| [`skills-install-recommended`](skills/user-skills/skills-install-recommended/SKILL.md) | Install curated third-party packs from the catalog |
-| [`skills-update`](skills/user-skills/skills-update/SKILL.md) | Refresh Kenmark skills and optional recommended packs |
-| [`skills-maintain`](skills/user-skills/skills-maintain/SKILL.md) | Inventory installed skills; recommend keep vs remove (no auto-delete) |
-| [`subagents-maintain`](skills/user-skills/subagents-maintain/SKILL.md) | Same for sub-agents across IDEs (no auto-delete) |
+| [`kenmark-packs`](skills/user-skills/kenmark-packs/SKILL.md) | Install curated third-party packs from the catalog |
+| [`kenmark-update`](skills/user-skills/kenmark-update/SKILL.md) | Refresh Kenmark skills and optional recommended packs |
+| [`kenmark-maintain`](skills/user-skills/kenmark-maintain/SKILL.md) | Inventory installed skills; recommend keep vs remove (no auto-delete) |
+| [`kenmark-agents`](skills/user-skills/kenmark-agents/SKILL.md) | Same for sub-agents across IDEs (no auto-delete) |
 
 ---
 
@@ -354,7 +354,7 @@ Full `uninstall` still removes Kenmark MCP entries when they were installed via 
 | Qoder | `~/.qoder/skills` |
 | MiniMax Code | `~/.minimax/skills` |
 
-**Claude Code** also gets slash commands under `~/.claude/commands/` (e.g. `/kenmark-init-brain`, `/kenmark-commit-push`, one per shipped skill).
+**Claude Code** also gets slash commands under `~/.claude/commands/` (e.g. `/kenmark-init`, `/kenmark-commit`, one per shipped skill).
 
 ---
 
@@ -373,7 +373,7 @@ npx kenmark-skills install-recommended --profile growth-seo --global -y
 npx kenmark-skills install-recommended --ids impeccable --global -y  # custom
 ```
 
-In chat: **`skills-install-recommended`** (guided), **`skills-maintain`** (cleanup, no auto-delete).
+In chat: **`kenmark-packs`** (guided), **`kenmark-maintain`** (cleanup, no auto-delete).
 
 ### Update
 
@@ -403,7 +403,7 @@ npx kenmark-skills subagents-inventory
 npx kenmark-skills subagents-inventory --markdown ./agents-report.md --include-marketplaces
 ```
 
-Pair CLI output with **`skills-maintain`** and **`subagents-maintain`** in chat for guided cleanup.
+Pair CLI output with **`kenmark-maintain`** and **`kenmark-agents`** in chat for guided cleanup.
 
 ### On-demand adopt
 
@@ -469,7 +469,7 @@ npm cache clean --force   # if npx still serves an old version
 **Manual fallback (Claude global)**
 
 ```bash
-rm -rf ~/.claude/skills/{init-brain,commit-push,skills-router,troubleshoot,skills-init,skills-install-recommended,skills-update,skills-maintain,issues-setup,issues-list,issues-check,issues-scan,issues-maintenance}
+rm -rf ~/.claude/skills/{kenmark-init,kenmark-commit,kenmark-router,kenmark-troubleshoot,kenmark-setup,kenmark-packs,kenmark-update,kenmark-maintain,kenmark-issues-setup,kenmark-issues-list,kenmark-issues-check,kenmark-issues-scan,kenmark-issues-maintain}
 rm -f ~/.claude/commands/kenmark-*.md
 ```
 
@@ -478,14 +478,14 @@ rm -f ~/.claude/commands/kenmark-*.md
 ## Using skills in chat
 
 1. Confirm the skill folder is on the agent’s skill search path (after `setup` / `init`).
-2. Name the skill or its trigger phrase — e.g. “Run **init-brain**”, “Use **commit-push**”, “**issues-list**”.
+2. Name the skill or its trigger phrase — e.g. “Run **kenmark-init**”, “Use **kenmark-commit**”, “**kenmark-issues-list**”.
 3. The agent must **read and follow** the full `SKILL.md`, not improvise from the description.
 
-When the problem is unclear, start with **`troubleshoot`** (evidence, hypotheses, ranked plan) — not **`skills-router`**. Use the router when the task domain is clear but the right specialist skill is not.
+When the problem is unclear, start with **`kenmark-troubleshoot`** (evidence, hypotheses, ranked plan) — not **`kenmark-router`**. Use the router when the task domain is clear but the right specialist skill is not.
 
-**Troubleshoot examples:** “troubleshoot my Cursor slowdown”, “diagnose this production issue”, “find root cause of this deployment failure”, “build a test plan before fixing”.
+**Troubleshoot examples:** “kenmark-troubleshoot my Cursor slowdown”, “diagnose this production issue”, “find root cause of this deployment failure”, “build a test plan before fixing”.
 
-**`skills-router` cache:** the router writes `~/.kenmark/cache/skills-registry.json` at runtime (user-wide, outside the repo).
+**`kenmark-router` cache:** the router writes `~/.kenmark/cache/skills-registry.json` at runtime (user-wide, outside the repo).
 
 ---
 

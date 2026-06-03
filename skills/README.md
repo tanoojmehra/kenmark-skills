@@ -17,29 +17,29 @@ Use **frontmatter** for logical grouping instead:
 
 ```
 skills/user-skills/          ← bundled universal skills (23)
-  init-brain/                category: onboarding
-  skills-init/
-  skills-router/             category: workflow
-  troubleshoot/              category: workflow (phase: diagnose)
-  repo-hygiene/              category: workflow (phase: audit)
-  repo-secrets-audit/
-  repo-public-readiness/
-  repo-kb-sync/              category: workflow (phase: maintain)
-  repo-docs-audit/
-  repo-structure-audit/
-  repo-dependency-audit/     category: workflow (phase: verify)
-  repo-quality-gates/        category: workflow (phase: verify)
-  repo-release-readiness/    category: workflow (phase: ship)
-  commit-push/               category: git
-  issues-setup/              category: issues
-  issues-list/
-  issues-check/
-  issues-scan/
-  issues-maintenance/
-  skills-install-recommended/ category: admin
-  skills-update/
-  skills-maintain/
-  subagents-maintain/
+  kenmark-init/                category: onboarding
+  kenmark-setup/
+  kenmark-router/             category: workflow
+  kenmark-troubleshoot/              category: workflow (phase: diagnose)
+  kenmark-repo-hygiene/              category: workflow (phase: audit)
+  kenmark-repo-secrets/
+  kenmark-repo-public/
+  kenmark-repo-kb/              category: workflow (phase: maintain)
+  kenmark-repo-docs/
+  kenmark-repo-structure/
+  kenmark-repo-deps/     category: workflow (phase: verify)
+  kenmark-repo-quality/        category: workflow (phase: verify)
+  kenmark-repo-release/    category: workflow (phase: ship)
+  kenmark-commit/               category: git
+  kenmark-issues-setup/              category: issues
+  kenmark-issues-list/
+  kenmark-issues-check/
+  kenmark-issues-scan/
+  kenmark-issues-maintain/
+  kenmark-packs/ category: admin
+  kenmark-update/
+  kenmark-maintain/
+  kenmark-agents/
   recommended-catalog.json
 ```
 
@@ -52,29 +52,29 @@ not in this package.
 
 | User says | Skill |
 | --- | --- |
-| Repo is dirty, scattered docs, dumps | `repo-hygiene` |
-| Can I make this public? | `repo-public-readiness` |
-| Check for keys/secrets | `repo-secrets-audit` |
-| Update brain after this feature | `repo-kb-sync` |
-| Are docs good? | `repo-docs-audit` |
-| Is this ready to publish/release? | `repo-release-readiness` |
-| Repo layout is confusing | `repo-structure-audit` |
-| Dependency bloat / unused packages | `repo-dependency-audit` |
-| Dev/build/type/lint/format errors | `repo-quality-gates` |
+| Repo is dirty, scattered docs, dumps | `kenmark-repo-hygiene` |
+| Can I make this public? | `kenmark-repo-public` |
+| Check for keys/secrets | `kenmark-repo-secrets` |
+| Update brain after this feature | `kenmark-repo-kb` |
+| Are docs good? | `kenmark-repo-docs` |
+| Is this ready to publish/release? | `kenmark-repo-release` |
+| Repo layout is confusing | `kenmark-repo-structure` |
+| Dependency bloat / unused packages | `kenmark-repo-deps` |
+| Dev/build/type/lint/format errors | `kenmark-repo-quality` |
 
 ## Bundled skills (reference)
 
 | Skill | Purpose |
 | --- | --- |
-| `repo-hygiene` | Audit clutter, scattered docs, orphan assets, dumps; cleanup after approval |
-| `repo-secrets-audit` | Deep read-only secret/key/token scan with redaction |
-| `repo-public-readiness` | Safe-to-publish gate before open-sourcing |
-| `repo-kb-sync` | Update `brain/kb/` after code changes |
-| `repo-docs-audit` | README, setup, env docs, KB freshness, broken links |
-| `repo-structure-audit` | Folder layout and module boundaries |
-| `repo-dependency-audit` | Package health, duplicates, lockfile consistency |
-| `repo-quality-gates` | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
-| `repo-release-readiness` | Pre-release version, changelog, tests, meta consistency |
+| `kenmark-repo-hygiene` | Audit clutter, scattered docs, orphan assets, dumps; cleanup after approval |
+| `kenmark-repo-secrets` | Deep read-only secret/key/token scan with redaction |
+| `kenmark-repo-public` | Safe-to-publish gate before open-sourcing |
+| `kenmark-repo-kb` | Update `brain/kb/` after code changes |
+| `kenmark-repo-docs` | README, setup, env docs, KB freshness, broken links |
+| `kenmark-repo-structure` | Folder layout and module boundaries |
+| `kenmark-repo-deps` | Package health, duplicates, lockfile consistency |
+| `kenmark-repo-quality` | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
+| `kenmark-repo-release` | Pre-release version, changelog, tests, meta consistency |
 
 See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [README](../README.md) lists all bundled skills.
 
@@ -82,11 +82,11 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 
 | Situation | Skill |
 | --- | --- |
-| Problem unclear? | `troubleshoot` |
-| Need issue tracking? | `issues-setup` / `issues-scan` |
-| Need skill choice? | `skills-router` |
+| Problem unclear? | `kenmark-troubleshoot` |
+| Need issue tracking? | `kenmark-issues-setup` / `kenmark-issues-scan` |
+| Need skill choice? | `kenmark-router` |
 | Repo health (see table above) | `repo-*` family |
-| Installed skills inventory? | `skills-maintain` |
-| Need commit? | `commit-push` |
+| Installed skills inventory? | `kenmark-maintain` |
+| Need commit? | `kenmark-commit` |
 
 See the root [README](../README.md) for trigger examples and setup steps.

@@ -20,7 +20,9 @@ const {
   getMcpStorePath,
   getBundledMcpPath,
   listKenmarkBundledSkillNames,
-  installKenmarkSkillsToStore,
+  installKenmarkSkillsToStoreWithLegacyCleanup,
+  kenmarkClaudeCommandBasename,
+  removeLegacyClaudeCommandWrappers,
   relinkSkillsToIdes,
   adoptCatalogSkills,
   uninstallKenmarkFromIdes,
@@ -241,15 +243,15 @@ function createClaudeCommandWrappers(basePath, dryRun) {
   }
 
   for (const skillName of skills) {
-    const commandFile = path.join(commandsDir, `kenmark-${skillName}.md`);
+    const commandBase = kenmarkClaudeCommandBasename(skillName);
+    const commandFile = path.join(commandsDir, `${commandBase}.md`);
     const commandBody = [
-      `# Kenmark ${skillName}`,
+      `# ${commandBase}`,
       "",
-      `Use the \`${skillName}\` skill from installed user skills.`,
+      `Use the \`${skillName}\` skill (Kenmark).`,
       "",
       "Instructions:",
-      `- Invoke and follow the \`${skillName}\` skill from the user skills directory.`,
-      "- Execute the skill workflow end-to-end for the current request.",
+      `- Read and follow \`${skillName}/SKILL.md\` from installed user skills end-to-end.`,
       "- If required context is missing, ask concise clarifying questions first."
     ].join("\n");
     ensureParentDir(commandFile);
@@ -263,9 +265,12 @@ function removeClaudeCommandWrappers(basePath, dryRun) {
   const commandsDir = path.join(path.dirname(basePath), "commands");
   const skills = listKenmarkBundledSkillNames(sourceDir);
 
-  let removed = 0;
+  let removed = removeLegacyClaudeCommandWrappers(basePath, { dryRun }).length;
   for (const skillName of skills) {
-    const commandFile = path.join(commandsDir, `kenmark-${skillName}.md`);
+    const commandFile = path.join(
+      commandsDir,
+      `${kenmarkClaudeCommandBasename(skillName)}.md`
+    );
     if (fs.existsSync(commandFile)) {
       if (!dryRun) {
         fs.rmSync(commandFile, { force: true });
@@ -345,10 +350,11 @@ function executeInstall(targetMap, targetIdes, action, options) {
     plan,
     run: () => {
       if (action === "install") {
-        const storeResult = installKenmarkSkillsToStore(sourceDir, {
-          force,
-          dryRun
-        });
+        const storeResult = installKenmarkSkillsToStoreWithLegacyCleanup(
+          sourceDir,
+          targetMap,
+          { force, dryRun }
+        );
         if (!dryRun) {
           console.log(`Kenmark store: ${storeDir}`);
           for (const r of storeResult.results) {

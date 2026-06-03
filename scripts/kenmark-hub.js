@@ -337,6 +337,107 @@ function hashDirectory(dirPath) {
 
 const KENMARK_MANAGED_MARKER = ".kenmark-managed";
 
+/** Unprefixed Kenmark skill folder names → current kenmark-* names (setup/update cleanup). */
+const LEGACY_SKILL_RENAMES = {
+  "init-brain": "kenmark-init",
+  "skills-init": "kenmark-setup",
+  "skills-router": "kenmark-router",
+  troubleshoot: "kenmark-troubleshoot",
+  "repo-hygiene": "kenmark-repo-hygiene",
+  "repo-secrets-audit": "kenmark-repo-secrets",
+  "repo-public-readiness": "kenmark-repo-public",
+  "repo-kb-sync": "kenmark-repo-kb",
+  "repo-docs-audit": "kenmark-repo-docs",
+  "repo-structure-audit": "kenmark-repo-structure",
+  "repo-dependency-audit": "kenmark-repo-deps",
+  "repo-quality-gates": "kenmark-repo-quality",
+  "repo-release-readiness": "kenmark-repo-release",
+  "commit-push": "kenmark-commit",
+  "issues-setup": "kenmark-issues-setup",
+  "issues-list": "kenmark-issues-list",
+  "issues-check": "kenmark-issues-check",
+  "issues-scan": "kenmark-issues-scan",
+  "issues-maintenance": "kenmark-issues-maintain",
+  "skills-install-recommended": "kenmark-packs",
+  "skills-update": "kenmark-update",
+  "skills-maintain": "kenmark-maintain",
+  "subagents-maintain": "kenmark-agents"
+};
+
+function kenmarkClaudeCommandBasename(skillName) {
+  return skillName.startsWith("kenmark-") ? skillName : `kenmark-${skillName}`;
+}
+
+function listLegacyKenmarkSkillPaths() {
+  return [
+    ...Object.keys(LEGACY_SKILL_RENAMES),
+    ...Object.keys(LEGACY_SKILL_RENAMES).map((old) => `kenmark-${old}`)
+  ];
+}
+
+/**
+ * Remove unprefixed Kenmark folders and old kenmark-<legacy> paths from store + IDE skill dirs.
+ * Also drops stale manifest entries for removed names.
+ */
+function removeLegacyKenmarkInstalls(
+  targetMap,
+  { dryRun = false, includeStore = true } = {}
+) {
+  const legacyPaths = listLegacyKenmarkSkillPaths();
+  const storeDir = getStoreDir();
+  const manifest = readManifest();
+  const results = [];
+
+  const roots = new Set();
+  if (includeStore && fs.existsSync(storeDir)) {
+    roots.add(storeDir);
+  }
+  for (const targetPath of Object.values(targetMap || {})) {
+    if (targetPath) roots.add(targetPath);
+  }
+
+  for (const root of roots) {
+    for (const legacyName of legacyPaths) {
+      const fullPath = path.join(root, legacyName);
+      if (!fs.existsSync(fullPath)) continue;
+      if (dryRun) {
+        results.push({ path: fullPath, action: "would-remove" });
+        continue;
+      }
+      removePathIfExists(fullPath);
+      results.push({ path: fullPath, action: "removed" });
+      if (manifest.skills && manifest.skills[legacyName]) {
+        delete manifest.skills[legacyName];
+      }
+    }
+  }
+
+  if (!dryRun && includeStore) {
+    writeManifest(manifest);
+  }
+
+  return results;
+}
+
+function removeLegacyClaudeCommandWrappers(claudeSkillsPath, { dryRun = false } = {}) {
+  const commandsDir = path.join(path.dirname(claudeSkillsPath), "commands");
+  const legacyCommandNames = listLegacyKenmarkSkillPaths();
+  const results = [];
+
+  for (const base of legacyCommandNames) {
+    const commandFile = path.join(commandsDir, `${base}.md`);
+    if (!fs.existsSync(commandFile)) continue;
+    if (dryRun) {
+      results.push({ path: commandFile, action: "would-remove" });
+      continue;
+    }
+    fs.rmSync(commandFile, { force: true });
+    results.push({ path: commandFile, action: "removed" });
+  }
+
+  return results;
+}
+
 /** Parent-dir entries ignored when inferring a real IDE install (Kenmark only creates `skills/`). */
 const IDE_PARENT_IGNORED_ENTRIES = new Set(["skills"]);
 
@@ -863,6 +964,29 @@ function installKenmarkSkillsToStore(sourceUserSkillsDir, { force = false, dryRu
   }
 
   return { names, results };
+}
+
+function installKenmarkSkillsToStoreWithLegacyCleanup(
+  sourceUserSkillsDir,
+  targetMap,
+  options = {}
+) {
+  const { dryRun = false, force = false } = options;
+  const cleanup = removeLegacyKenmarkInstalls(targetMap, {
+    dryRun,
+    includeStore: true
+  });
+  const install = installKenmarkSkillsToStore(sourceUserSkillsDir, {
+    force,
+    dryRun
+  });
+  let commandCleanup = [];
+  if (targetMap?.claude) {
+    commandCleanup = removeLegacyClaudeCommandWrappers(targetMap.claude, {
+      dryRun
+    });
+  }
+  return { ...install, legacyCleanup: cleanup, legacyCommandCleanup: commandCleanup };
 }
 
 function relinkSkillsToIdes(
@@ -1626,6 +1750,12 @@ module.exports = {
   getBackupsDir,
   backupSkillDir,
   KENMARK_MANAGED_MARKER,
+  LEGACY_SKILL_RENAMES,
+  kenmarkClaudeCommandBasename,
+  listLegacyKenmarkSkillPaths,
+  removeLegacyKenmarkInstalls,
+  removeLegacyClaudeCommandWrappers,
+  installKenmarkSkillsToStoreWithLegacyCleanup,
   detectInstalledIdes,
   detectManagedIdes,
   resolveExplicitTargetIdes,

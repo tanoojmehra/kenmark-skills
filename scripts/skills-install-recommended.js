@@ -38,7 +38,7 @@ const sourceDir = path.join(repoRoot, "skills", "user-skills");
 const catalogPath = path.join(sourceDir, "recommended-catalog.json");
 
 function printUsage() {
-  console.log("Usage: node scripts/skills-install-recommended.js [options]");
+  console.log("Usage: node scripts/kenmark-packs.js [options]");
   console.log("");
   console.log("Interactive by default in a terminal. Agents: pass --profile or --ids + -y.");
   console.log("");

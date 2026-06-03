@@ -13,11 +13,11 @@ const readline = require("readline");
 
 const repoRoot = path.resolve(__dirname, "..");
 const setupScript = path.join(__dirname, "setup-skills.js");
-const recommendedScript = path.join(__dirname, "skills-install-recommended.js");
+const recommendedScript = path.join(__dirname, "kenmark-packs.js");
 const packageJsonPath = path.join(repoRoot, "package.json");
 
 function printUsage() {
-  console.log("Usage: node scripts/skills-update.js [options]");
+  console.log("Usage: node scripts/kenmark-update.js [options]");
   console.log("");
   console.log("Refresh Kenmark skills and/or curated recommended packs (npx, no git clone).");
   console.log("Interactive by default in a terminal. Agents: pass --both + flags + -y.");

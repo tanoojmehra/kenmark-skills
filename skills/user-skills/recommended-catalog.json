@@ -1,7 +1,7 @@
 {
   "version": 4,
   "updatedAt": "2026-06-03",
-  "notes": "Profile-based curated skill packs. Default profile is lean; core-next is recommended for Next.js full-stack work (no ECC until installer verified). skills-install-recommended reads this at runtime.",
+  "notes": "Profile-based curated skill packs. Default profile is lean; core-next is recommended for Next.js full-stack work (no ECC until installer verified). kenmark-packs reads this at runtime.",
   "defaults": {
     "scope": "global",
     "profile": "lean"

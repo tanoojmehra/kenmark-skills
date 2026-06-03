@@ -31,10 +31,10 @@ const {
 
 const repoRoot = path.resolve(__dirname, "..");
 const setupScript = path.join(__dirname, "setup-skills.js");
-const recommendedScript = path.join(__dirname, "skills-install-recommended.js");
+const recommendedScript = path.join(__dirname, "kenmark-packs.js");
 
 function printUsage() {
-  console.log("Usage: node scripts/skills-init.js [options]");
+  console.log("Usage: node scripts/kenmark-setup.js [options]");
   console.log("");
   console.log("Interactive first-time setup: Kenmark skills + optional recommended packs.");
   console.log("");
@@ -142,7 +142,7 @@ async function run() {
 
   if (interactive) {
     installKenmark = await promptYesNo(
-      "Install Kenmark skills (init-brain, commit-push, issues, …)?",
+      "Install Kenmark skills (kenmark-init, kenmark-commit, issues, …)?",
       false
     );
     installRecommended = await promptYesNo(
@@ -247,7 +247,7 @@ async function run() {
       if (eccProfile) plan.push(`  ECC profile: ${eccProfile}`);
     }
   }
-  plan.push("Tip: run init-brain in your agent chat to bootstrap brain/ in a repo");
+  plan.push("Tip: run kenmark-init in your agent chat to bootstrap brain/ in a repo");
 
   if (!installKenmark && !installRecommended) {
     console.log("Nothing selected to install.");
@@ -291,7 +291,7 @@ async function run() {
   }
 
   console.log("\n✓ Init complete.");
-  console.log("Next: open your IDE, start a new agent chat, and try /kenmark-skills-router or init-brain.");
+  console.log("Next: open your IDE, start a new agent chat, and try /kenmark-router or kenmark-init.");
   console.log("Restart the IDE if skills do not appear immediately.");
 }
 

@@ -58,7 +58,7 @@ const KEEP_ALWAYS = new Set([
   "refactor-cleaner",
   "research-problem-solver",
   "security-reviewer",
-  "senior-dev-troubleshooter",
+  "senior-dev-kenmark-troubleshooter",
   "tdd-guide"
 ]);
 
@@ -227,7 +227,7 @@ function inferCategory(name, description) {
   if (/\b(planner|architect|design|system)\b/.test(text)) return "planning";
   if (/\b(research|problem|search|deep)\b/.test(text)) return "research";
   if (/\b(security|scan|vulnerab|threat)\b/.test(text)) return "security";
-  if (/\b(optim|harness|build|fix|debug|troubleshoot)\b/.test(text)) return "ops";
+  if (/\b(optim|harness|build|fix|debug|kenmark-troubleshoot)\b/.test(text)) return "ops";
   if (/\b(doc|write|article|content)\b/.test(text)) return "docs";
   return "general";
 }

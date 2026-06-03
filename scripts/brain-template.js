@@ -2,10 +2,10 @@
  * Brain artifact templates for Kenmark CLI (scaffolding — not wired to cli.js yet).
  *
  * Planned command:
- *   npx kenmark-skills troubleshoot-template --title "cursor slowdown"
+ *   npx kenmark-skills kenmark-troubleshoot-template --title "cursor slowdown"
  *
  * Creates (in cwd, when brain/ exists or --mkdir):
- *   brain/troubleshooting/2026-06-03-cursor-slowdown.md
+ *   brain/kenmark-troubleshooting/2026-06-03-cursor-slowdown.md
  *
  * Future home for other templates (e.g. issues) under the same module.
  */
@@ -37,12 +37,12 @@ function formatDate(date = new Date()) {
  * @param {{ title: string, cwd?: string, date?: Date }} opts
  * @returns {{ relativePath: string, absolutePath: string, slug: string, date: string }}
  */
-function troubleshootingArtifactPaths(opts) {
+function kenmark-troubleshootingArtifactPaths(opts) {
   const { title, cwd = process.cwd(), date = new Date() } = opts;
   const slug = slugifyTitle(title);
   const dateStr = formatDate(date);
   const filename = `${dateStr}-${slug}.md`;
-  const relativePath = path.join("brain", "troubleshooting", filename);
+  const relativePath = path.join("brain", "kenmark-troubleshooting", filename);
   return {
     relativePath,
     absolutePath: path.join(cwd, relativePath),
@@ -52,11 +52,11 @@ function troubleshootingArtifactPaths(opts) {
 }
 
 /**
- * Markdown body aligned with skills/user-skills/troubleshoot/SKILL.md Step 10.
+ * Markdown body aligned with skills/user-skills/kenmark-troubleshoot/SKILL.md Step 10.
  * @param {{ title: string, date?: Date }} opts
  * @returns {string}
  */
-function troubleshootingArtifactContent(opts) {
+function kenmark-troubleshootingArtifactContent(opts) {
   const { title, date = new Date() } = opts;
   const dateStr = formatDate(date);
   const displayTitle = String(title).trim() || "Investigation";
@@ -97,6 +97,6 @@ Owner:
 module.exports = {
   slugifyTitle,
   formatDate,
-  troubleshootingArtifactPaths,
-  troubleshootingArtifactContent,
+  kenmark-troubleshootingArtifactPaths,
+  kenmark-troubleshootingArtifactContent,
 };
