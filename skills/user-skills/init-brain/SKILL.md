@@ -1,10 +1,10 @@
 ---
 name: init-brain
-version: 1.0.0
+version: 1.1.0
 category: onboarding
 scope: universal
 phase: setup
-description: "Initialize brain/ and optionally install cross-IDE pointer stubs (or full embed) in CLAUDE.md, AGENTS.md, .cursorrules, .cursor/rules/, GEMINI.md. Canonical rules live under brain/rules/ (lean standards.md plus optional stack, workflow, testing, ui, deployment). Use when applying workspace rules, creating project standards, or enforcing team conventions."
+description: "Initialize brain/ (numbered KB under brain/kb/, modular rules) and optionally install cross-IDE pointer stubs (or full embed) in CLAUDE.md, AGENTS.md, .cursorrules, .cursor/rules/, GEMINI.md. On init, inspect the repo and document confirmed facts in brain/kb/. Use when applying workspace rules, creating project standards, or enforcing team conventions."
 triggers:
   - init brain
   - initialize brain
@@ -35,6 +35,7 @@ Bootstrap the project **brain** knowledge base, then **ask the user** which agen
 | --- | --- | --- |
 | **Canonical (core)** | `brain/rules/standards.md` | Lean universal rules — read every session |
 | **Canonical (modular)** | `brain/rules/stack.md`, `workflow.md`, `testing.md`, `ui.md`, `deployment.md` | Read only when the task needs them |
+| **Knowledge base** | `brain/kb/` (numbered `00`–`11`, `features/`, `decisions/`) | Project documentation — facts, assumptions, unknowns |
 | **Entry stubs** | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.cursor/rules/project-standards.mdc`, `.cursorrules` | Same short pointer block per harness (default) |
 | **Optional embed** | Same files, `sync-full` mode | Paste `standards.md` inside markers — use only when Read is unreliable |
 
@@ -77,7 +78,7 @@ Before writing, read only the agent files the user selected (if they already exi
 ## Step 1 — Create brain scaffold
 
 ```bash
-mkdir -p brain/rules brain/issues/completed temp
+mkdir -p brain/rules brain/kb/features brain/kb/decisions brain/issues/completed temp
 touch temp/.gitkeep
 ```
 
@@ -98,12 +99,24 @@ Project knowledge base for humans and AI agents.
 | [rules/testing.md](rules/testing.md) | Testing policy |
 | [rules/ui.md](rules/ui.md) | UI / design guidance |
 | [rules/deployment.md](rules/deployment.md) | Deployment notes (optional; customize per project) |
-| [CHANGELOG.md](CHANGELOG.md) | Versioned log of brain and standards changes |
+| [kb/00-project-overview.md](kb/00-project-overview.md) | Project summary, purpose, users, major modules |
+| [kb/01-architecture.md](kb/01-architecture.md) | App architecture, boundaries, folders, data flow |
+| [kb/02-stack-and-dependencies.md](kb/02-stack-and-dependencies.md) | Frameworks, packages, runtime, tooling |
+| [kb/03-data-model.md](kb/03-data-model.md) | DB models, schemas, migrations, persistence |
+| [kb/04-auth-and-permissions.md](kb/04-auth-and-permissions.md) | Auth, roles, sessions, access control |
+| [kb/05-api-and-integrations.md](kb/05-api-and-integrations.md) | APIs, webhooks, third-party integrations |
+| [kb/06-ui-and-routes.md](kb/06-ui-and-routes.md) | Pages, routes, layouts, components |
+| [kb/07-features.md](kb/07-features.md) | Feature index linking to `kb/features/` |
+| [kb/08-flows-and-workflows.md](kb/08-flows-and-workflows.md) | User journeys and business workflows |
+| [kb/09-infra-and-deployment.md](kb/09-infra-and-deployment.md) | Hosting, CI/CD, env vars, deployment notes |
+| [kb/10-testing-and-quality.md](kb/10-testing-and-quality.md) | Test strategy and quality gates |
+| [kb/11-known-risks-and-decisions.md](kb/11-known-risks-and-decisions.md) | Risks, tradeoffs, architecture decisions |
+| [CHANGELOG.md](CHANGELOG.md) | Versioned log of brain, KB, and standards changes |
 | [issues/INDEX.md](issues/INDEX.md) | Active/completed issue tracker (optional; use `issues-setup` skill) |
 
 ## Maintenance
 
-- Update `brain/` after every meaningful code change.
+- **Code and KB move together** — update `brain/kb/` after every meaningful feature, API, schema, auth, UI, workflow, deploy, or test-strategy change.
 - Edit rules under `brain/rules/` — keep `standards.md` lean; put stack/workflow/testing detail in the modular files.
 - Re-run **init-brain** to refresh IDE pointer stubs (or `sync-full` embeds) after changing standards or stub template.
 - Never delete the `brain/` folder.
@@ -134,6 +147,96 @@ Ensure `temp/` exists for scratch scripts and downloads. Add to `.gitignore` if 
 # init-brain
 /temp/
 ```
+
+---
+
+## Step 1.5 — Inspect project and create numbered KB (required)
+
+After the scaffold exists, **inspect the repository** and create or refresh `brain/kb/`. Document only **confirmed facts** from files you actually read. Put guesses in **Assumptions** and gaps in **Unknowns / documentation gaps**. Never invent architecture you did not inspect.
+
+### Detection signals (read what exists)
+
+| Signal | Typical paths |
+| --- | --- |
+| Node / package manager | `package.json`, `pnpm-lock.yaml`, `yarn.lock`, `package-lock.json` |
+| Next.js | `next.config.*`, `app/`, `src/app/`, `pages/` |
+| Data layer | `prisma/schema.prisma`, `drizzle/`, `migrations/`, `supabase/` |
+| API / server | `app/api/`, `pages/api/`, `api/`, `server/`, `routes/` |
+| UI | `components/`, `src/components/`, `styles/` |
+| Auth | middleware, `auth.ts`, NextAuth, Clerk, Supabase auth config |
+| Infra | `Dockerfile`, `docker-compose.*`, `.github/workflows/`, `vercel.json`, `fly.toml` |
+| Tests | `vitest.config.*`, `jest.config.*`, `playwright.config.*`, `**/*.test.*`, `e2e/` |
+
+Use **Read**, **Grep**, and **Glob** on the repo root (`$REPO_ROOT`). If a numbered KB file already exists, **merge** new findings; do not wipe user-written content unless the user asked to reset the KB.
+
+### Files to create if missing
+
+- `brain/kb/00-project-overview.md`
+- `brain/kb/01-architecture.md`
+- `brain/kb/02-stack-and-dependencies.md`
+- `brain/kb/03-data-model.md`
+- `brain/kb/04-auth-and-permissions.md`
+- `brain/kb/05-api-and-integrations.md`
+- `brain/kb/06-ui-and-routes.md`
+- `brain/kb/07-features.md`
+- `brain/kb/08-flows-and-workflows.md`
+- `brain/kb/09-infra-and-deployment.md`
+- `brain/kb/10-testing-and-quality.md`
+- `brain/kb/11-known-risks-and-decisions.md`
+
+Ensure directories exist: `brain/kb/features/`, `brain/kb/decisions/`.
+
+### Per-file template
+
+Use this structure for each numbered KB file (adjust the `#` title):
+
+```markdown
+# <Title>
+
+Last updated: YYYY-MM-DD
+Status: draft|reviewed|needs-update
+
+## Confirmed facts
+
+(Bullet facts backed by files you read — cite paths where helpful.)
+
+## Important files inspected
+
+- `path/to/file` — one-line note
+
+## Assumptions
+
+(Reasonable inferences not directly verified.)
+
+## Unknowns / documentation gaps
+
+(Open questions, areas not yet read.)
+
+## Maintenance notes
+
+(What to update when this area of the product changes.)
+```
+
+### Feature and decision files
+
+- When the repo has distinct product features, add `brain/kb/features/NNN-short-name.md` (e.g. `001-authentication.md`) and link them from `brain/kb/07-features.md`.
+- For significant architecture choices discovered during inspection, add `brain/kb/decisions/NNN-short-name.md` and link from `11-known-risks-and-decisions.md`.
+
+### `brain/kb/07-features.md` minimum content
+
+Include a **Feature index** table:
+
+```markdown
+| ID | Feature | Doc |
+| --- | --- | --- |
+| 001 | (name) | [features/001-name.md](features/001-name.md) |
+```
+
+If no features are documented yet, list discovered modules from the codebase and mark rows as `draft` or `TODO`.
+
+### Rule (non-negotiable)
+
+When initializing brain, inspect the current repository and document the project as a numbered KB under `brain/kb/`. Separate confirmed facts from assumptions and unknowns.
 
 ---
 
@@ -197,7 +300,9 @@ Use this **exact** markdown inside `<!-- init-brain:START -->` / `<!-- init-brai
 - **Canonical:** `brain/rules/` (edit rules there only)
 - **Index:** `brain/INDEX.md`
 
-**Required — start of every new conversation:** Before non-trivial work, **Read** `brain/rules/standards.md` first. **Read** additional rule files (`stack.md`, `workflow.md`, `testing.md`, `ui.md`, `deployment.md`) only when relevant to the task.
+**Required — start of every new conversation:** Before non-trivial work, **Read** `brain/rules/standards.md` first. **Read** relevant `brain/kb/` files for the task (numbered `00`–`11` and any `kb/features/` entry). **Read** additional rule files (`stack.md`, `workflow.md`, `testing.md`, `ui.md`, `deployment.md`) only when relevant.
+
+**After meaningful changes:** Update the matching `brain/kb/` files and `brain/CHANGELOG.md` — code and KB move together.
 ```
 
 ---
@@ -292,19 +397,20 @@ Canonical rules: `brain/rules/`
 ## Step 4 — Verify
 
 ```bash
-test -f brain/rules/standards.md && test -f brain/rules/stack.md && test -f brain/rules/workflow.md && test -f brain/rules/testing.md && test -f brain/rules/ui.md && test -f brain/INDEX.md && echo "brain ok"
+test -f brain/rules/standards.md && test -f brain/rules/stack.md && test -f brain/rules/workflow.md && test -f brain/rules/testing.md && test -f brain/rules/ui.md && test -f brain/INDEX.md && test -f brain/kb/00-project-overview.md && test -f brain/kb/07-features.md && echo "brain ok"
 ```
 
 For each **selected** target, confirm `init-brain:START` exists (e.g. `grep -l "init-brain:START" AGENTS.md`).
 
 Report to the user:
 
-- Brain paths created vs updated
+- Brain paths created vs updated (including `brain/kb/` files created or refreshed)
+- KB inspection summary: files read, major gaps, feature docs created
 - Sync mode (`stub` or `sync-full`)
 - Which agent files were updated (selected targets only)
 - Skipped targets
 - Whether `brain/issues/` was left untouched
-- Reminder: edit rules under `brain/rules/`; re-run init-brain to refresh stubs/embeds
+- Reminder: edit rules under `brain/rules/` and KB under `brain/kb/`; re-run init-brain to refresh stubs/embeds
 
 ---
 
@@ -327,7 +433,8 @@ Append to `brain/CHANGELOG.md`:
 
 ```markdown
 ## vYYYY.MM.DD-HHMM-init-brain
-- Initialized or refreshed brain/ scaffold (INDEX, modular rules/).
+- Initialized or refreshed brain/ scaffold (INDEX, modular rules/, numbered kb/).
+- KB: <created | refreshed> — list key `brain/kb/` files touched.
 - Sync mode: <stub | sync-full>.
 - Updated entry files: <comma-separated list, or "none (brain only)">.
 ```
@@ -360,6 +467,17 @@ Universal rules for this repo. Stack, workflow, testing, UI, and deploy details 
 - Never delete the `brain/` folder — project knowledge base.
 - Use `temp/` for scratch scripts and downloads (gitignored).
 - Update `brain/` and `brain/CHANGELOG.md` after meaningful changes; version changelog entries.
+
+## Brain KB maintenance
+
+- The project knowledge base lives under `brain/kb/` (numbered `00`–`11`, plus `features/` and `decisions/`).
+- Before starting a non-trivial task, read the relevant KB files.
+- After every meaningful feature, bug fix, refactor, workflow change, API change, DB change, UI change, or deployment/config change, update the relevant KB file.
+- If the change adds a new feature, create or update `brain/kb/features/NNN-feature-name.md` and link it from `brain/kb/07-features.md`.
+- If the change affects architecture, data model, auth, API, UI routes, deployment, or testing, update the matching numbered KB file.
+- Update `brain/CHANGELOG.md` with what changed in the KB.
+- **Code and KB move together** — undocumented feature changes are incomplete work.
+- If unsure which file to update, update `brain/kb/07-features.md` and add a TODO under “Documentation gaps.”
 
 ## Packages and docs
 
@@ -419,6 +537,16 @@ Customize for this repo. Default template assumes Next.js + Tailwind + shadcn/ui
 
 - Before starting a dev server, check if one is already running and reuse it.
 - On port conflict, stop the existing process on that port rather than spawning endless new ports.
+
+## KB update requirement
+
+For every meaningful change:
+
+1. Identify impacted KB areas: feature behavior, route/page/component, API/integration, database/schema, auth/permissions, workflow/business logic, deployment/config, testing/quality.
+2. Update existing KB files when the concept already exists.
+3. Create a new feature file under `brain/kb/features/` when the feature is new.
+4. Add a short entry to `brain/CHANGELOG.md`.
+5. In the final response, mention: code files changed, KB files changed, tests/checks run.
 ```
 
 ### `brain/rules/testing.md`

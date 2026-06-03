@@ -56,7 +56,7 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 **Troubleshoot trigger examples:** "troubleshoot my Cursor slowdown", "diagnose this production issue", "find root cause of this deployment failure", "build a test plan before fixing".
 
-Many skills expect a project **`brain/`** directory (standards, changelog, optional issues). That layout is created in *your* repos via **`init-brain`**, not shipped inside this package. Rules live under **`brain/rules/`** (lean **`standards.md`** plus optional **`stack.md`**, **`workflow.md`**, etc.); IDE entry files get a short **Read-first stub** by default (multi-IDE, no hooks).
+Many skills expect a project **`brain/`** directory (standards, numbered **KB** under **`brain/kb/`**, changelog, optional issues). That layout is created in *your* repos via **`init-brain`**, which inspects the codebase and seeds `brain/kb/00`–`11` plus optional `features/` and `decisions/` — not shipped inside this package. Rules live under **`brain/rules/`** (lean **`standards.md`** plus optional **`stack.md`**, **`workflow.md`**, etc.); IDE entry files get a short **Read-first stub** by default (multi-IDE, no hooks). **`commit-push`** enforces KB updates alongside behavioral code changes.
 
 ---
 
@@ -96,7 +96,7 @@ Skills are grouped by use case. Open each `SKILL.md` for full workflows and trig
 
 | Skill | Purpose |
 | --- | --- |
-| [`init-brain`](skills/user-skills/init-brain/SKILL.md) | Bootstrap `brain/`; install cross-IDE pointer stubs in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, etc. (optional full embed) |
+| [`init-brain`](skills/user-skills/init-brain/SKILL.md) | Bootstrap `brain/` + numbered `brain/kb/` from repo inspection; install cross-IDE pointer stubs (optional full embed) |
 | [`skills-init`](skills/user-skills/skills-init/SKILL.md) | First-time CLI wizard (`npx kenmark-skills init`) |
 
 ### While coding

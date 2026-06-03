@@ -1,10 +1,24 @@
 # CHANGELOG
 
+## Unreleased
+
+### Brain KB (init-brain + commit-push)
+
+- **init-brain (1.1.0):** Step 1.5 inspects the repo and creates numbered `brain/kb/` (`00`–`11`, `features/`, `decisions/`); INDEX and pointer stub reference KB; `standards.md` / `workflow.md` templates add KB maintenance and update requirements.
+- **commit-push (1.1.0):** Pre-commit Brain KB check — behavioral code changes should update `brain/kb/` or `brain/CHANGELOG.md`.
+- **validate-repo.js:** Regression checks that `init-brain` and `commit-push` retain KB markers.
+
 ## Planned
 
 - **`troubleshoot-template` (CLI)** — `npx kenmark-skills troubleshoot-template --title "cursor slowdown"` writes `brain/troubleshooting/YYYY-MM-DD-<slug>.md` via `scripts/brain-template.js` (scaffolding exists; not registered in `cli.js` yet). Extend the same module for other `brain/` artifacts later. Referenced from the **troubleshoot** skill docs.
 
 ## v1.3.0 — Universal troubleshoot, validation, MCP profiles
+
+### IDE detection
+
+- **`detectInstalledIdes`:** No longer treats a parent folder as “installed” when it only contains `skills/` (avoids false positives after `setup --ide all`). Also treats `~/.claude.json` as Claude install evidence.
+- **Kenmark-managed markers:** `setup` writes `.kenmark-managed` under each IDE skills directory it creates; **`detectManagedIdes`** lists those paths separately from real installs.
+- **Interactive setup/init/doctor:** Prompts and doctor output show **Detected** vs **Kenmark-managed**; auto-detect / `--ide` omission uses detected IDEs only (defaults to `cursor`, `claude`, `codex` when none detected).
 
 ### Polish
 

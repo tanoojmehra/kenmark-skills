@@ -1,6 +1,6 @@
 ---
 name: commit-push
-version: 1.0.0
+version: 1.1.0
 category: git
 scope: universal
 phase: ship
@@ -160,6 +160,43 @@ stakes are high (e.g., half-finished feature vs ready-to-ship).
 
 ---
 
+## Brain KB check before commit
+
+Before committing, check whether the code change required a KB update. Read
+`brain/rules/standards.md` and `brain/rules/workflow.md` when present — they
+define KB maintenance for this repo.
+
+```bash
+git diff --name-only
+git diff --cached --name-only
+```
+
+If changed files affect behavior, verify at least one relevant file under
+`brain/kb/` or `brain/CHANGELOG.md` was updated in the same batch. If no KB
+update is needed, state why in the commit body or plan (typo-only, formatting-only,
+or internal refactor with no behavior/API/workflow impact).
+
+**Requires KB update (examples):**
+
+- New feature or changed feature behavior
+- New or changed API route / integration
+- Schema / model change
+- Auth or permission change
+- UI route / page change
+- Deployment / config / env change
+- Testing strategy change
+
+**Usually does not require KB update:**
+
+- Typo-only or formatting-only edits
+- Comment-only changes
+- Internal refactor with no behavior, API, or workflow impact
+
+When KB updates are required, include `brain/kb/` paths in the same commit (or a
+dedicated `docs(brain):` commit in the push batch). **Code and KB move together.**
+
+---
+
 ## Step 3 — Message convention
 
 Priority:
@@ -246,12 +283,13 @@ Report: branch name, commit SHAs + subjects, remote URL if useful, push result.
 
 ## Step 6 — Post-commit hygiene
 
-If the repo uses a knowledge base or changelog under project rules:
+If the repo uses `brain/` (standards + KB):
 
-- When `brain/CHANGELOG.md` (or equivalent) is required after code changes, include
-  it in the relevant commit or add a small follow-up `docs(brain): …` commit in
-  the same push batch.
-- When no such convention exists, skip this step.
+- Confirm the [Brain KB check](#brain-kb-check-before-commit) was satisfied for
+  each commit that touched behavioral code.
+- Include `brain/kb/` and/or `brain/CHANGELOG.md` updates in the same push batch
+  when required.
+- When no `brain/` convention exists, skip this step.
 
 ---
 
