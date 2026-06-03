@@ -82,7 +82,7 @@ node scripts/skills-init.js
 
 1. Restart the IDE if skills do not appear
 2. In a project repo, run **`init-brain`** to create `brain/` and install IDE pointer stubs (standards in `brain/rules/standards.md`)
-3. While coding, use **`skills-router`** or `/kenmark-skills-router` when you're unsure which skill fits a task
+3. While coding: **`troubleshoot`** when the problem is unclear; **`skills-router`** (or `/kenmark-skills-router`) when the domain is clear but the right skill is not
 
 ## Related skills
 

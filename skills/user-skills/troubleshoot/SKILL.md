@@ -16,6 +16,10 @@ triggers:
   - why is this happening
   - best way to tackle this
   - analyze the issue
+  - troubleshoot my Cursor slowdown
+  - diagnose this production issue
+  - find root cause of this deployment failure
+  - build a test plan before fixing
 allowed-tools:
   - Bash
   - Read
@@ -26,7 +30,7 @@ allowed-tools:
   - WebSearch
   - WebFetch
   - AskUserQuestion
-risk: read-only
+risk: write-files
 disable-model-invocation: false
 ---
 
@@ -44,6 +48,8 @@ Use this skill when the user has a problem, failure, slowdown, ambiguity, or com
 6. **What tradeoffs, risks, and fallback options exist**
 
 This skill is universal. It must not assume a specific stack, product, company, repository, framework, tool, or domain.
+
+**Trigger examples:** “troubleshoot my Cursor slowdown”, “diagnose this production issue”, “find root cause of this deployment failure”, “build a test plan before fixing”.
 
 It applies to:
 
@@ -92,6 +98,13 @@ If the user asks to “think deeply,” “use sub-agents,” “research,” �
 ---
 
 ## Safety and boundaries
+
+**Default mode is read-only.** Investigation, commands, and the final report should not modify the repo or environment unless the user approves a specific change.
+
+**File writes** (`brain/troubleshooting/…`, `TodoWrite` task lists, or other artifacts) are allowed only when:
+
+* the user explicitly approves creating or updating files, or
+* you are already operating in an explicit repo documentation workflow (e.g. the user asked to record findings in `brain/`, or `init-brain` / issues tracking is active and they want a durable artifact).
 
 * Prefer read-only investigation first.
 * Do not delete, reset, reinstall, wipe, rotate secrets, migrate data, or make irreversible changes unless the user explicitly asks and the risk is explained.
@@ -201,6 +214,32 @@ For AI tooling / skill bloat issues, inspect:
 
 Do not assume bloat is the cause. Compare against CPU, memory, disk, network, and project size evidence.
 
+### Evidence bundle (compact ledger)
+
+After collecting facts, maintain a **single evidence bundle** instead of repeating long excerpts in every section. Assign stable IDs **`E1`, `E2`, …** as you add rows (append only; do not renumber mid-investigation).
+
+Use for non-trivial and deep-investigation modes. For **`quick-triage`**, a 3–5 row bundle is enough; skip duplicating the same facts in prose.
+
+```markdown
+## Evidence bundle
+
+| ID | Evidence | Source | Supports | Confidence |
+| --- | --- | --- | --- | --- |
+| E1 | <one-line fact> | log / config / file / user report / web source / command / test | H1 | High/Med/Low |
+| E2 | ... | ... | H1, H2 | Med |
+| E3 | ... | ... | weakens H2 | Low |
+```
+
+| Column | Rules |
+| --- | --- |
+| **ID** | `E1`, `E2`, … — cite these everywhere else |
+| **Evidence** | One line per row; quote or path only when needed for action |
+| **Source** | Where it came from (file path, command, URL, user quote, timestamp) |
+| **Supports** | `H1`, `H2`, `H1, H2`, `weakens H2`, or `—` if not yet mapped |
+| **Confidence** | How strongly this fact is established (not hypothesis confidence) |
+
+Update the bundle as new facts appear. Later steps (hypotheses, tests, final report) **reference IDs only** — do not paste full logs twice.
+
 ---
 
 ## Step 4 — Build a hypothesis tree
@@ -210,11 +249,12 @@ Do not assume bloat is the cause. Compare against CPU, memory, disk, network, an
 
 | # | Hypothesis | Why plausible | Evidence for | Evidence against | Confidence | Test |
 | --- | --- | --- | --- | --- | --- | --- |
-| H1 | ... | ... | ... | ... | Low/Med/High | ... |
+| H1 | ... | ... | E1, E2 | E3 | Low/Med/High | T1 |
 ```
 
 Rules:
 
+* **Evidence for / against** — use evidence bundle IDs (`E1`, `E2`) only, not long quotes.
 * Include at least 3 hypotheses for non-trivial problems.
 * Include one “boring/simple” hypothesis.
 * Include one “recent change/regression” hypothesis.
@@ -259,8 +299,8 @@ Constraints:
 
 Output:
 1. Key findings
-2. Evidence
-3. Hypotheses or risks
+2. New or updated evidence bundle rows (`E#` — one line each)
+3. Hypotheses or risks (cite `E#` / `H#`)
 4. Recommended next step
 5. Confidence
 ```
@@ -315,8 +355,10 @@ Do not let web research override local evidence. Local logs and reproduction res
 
 | Test | Purpose | Command / action | Expected result | Risk | Interprets |
 | --- | --- | --- | --- | --- | --- |
-| T1 | ... | ... | ... | Low/Med/High | Confirms/refutes H1 |
+| T1 | ... | ... | ... | Low/Med/High | Confirms/refutes H1; may add E4 |
 ```
+
+New test results become new bundle rows (`E4`, `E5`, …) before updating hypothesis confidence.
 
 Prefer tests that are:
 
@@ -350,8 +392,23 @@ Ranking rules:
 
 ## Step 9 — Final troubleshooting report
 
+Lead with the **evidence bundle**, then cite IDs in causes and actions — keeps complex cases readable.
+
 ```markdown
 # Troubleshooting Report
+
+## Evidence bundle
+
+| ID | Evidence | Source | Supports | Confidence |
+| --- | --- | --- | --- | --- |
+| E1 | ... | ... | H1 | High |
+| E2 | ... | ... | H1, H2 | Med |
+
+## Evidence ↔ hypotheses
+
+- E1, E2 support H1
+- E3 weakens H2
+- E4 inconclusive for H2 (needs T2)
 
 ## Current understanding
 
@@ -359,9 +416,9 @@ Ranking rules:
 
 ## Most likely causes
 
-1. **Cause** — confidence: High/Medium/Low
+1. **H1 — <cause>** — confidence: High/Medium/Low
    - Why:
-   - Evidence:
+   - Evidence: E1, E2 support H1; E3 weakens H2
    - What would confirm/refute it:
 
 ## What I would check first
@@ -418,7 +475,15 @@ Owner:
 
 ## Timeline
 
-## Evidence collected
+## Evidence bundle
+
+| ID | Evidence | Source | Supports | Confidence |
+| --- | --- | --- | --- | --- |
+
+## Evidence ↔ hypotheses
+
+- E1, E2 support H1
+- ...
 
 ## Hypotheses
 
@@ -433,7 +498,18 @@ Owner:
 ## Follow-up prevention
 ```
 
-Only create the file if the user asks or if durable tracking is clearly useful.
+Only create the file after user approval, or when already in an explicit repo documentation workflow where durable tracking is expected.
+
+### Future CLI helper (not shipped yet)
+
+Planned Kenmark command (implementation target: `scripts/brain-template.js`, wired later as `troubleshoot-template`):
+
+```bash
+npx kenmark-skills troubleshoot-template --title "cursor slowdown"
+# → brain/troubleshooting/2026-06-03-cursor-slowdown.md
+```
+
+Optional flags (planned): `--date YYYY-MM-DD`, `--cwd <repo>`, `--dry-run`, `--force` (overwrite). Until the CLI exists, create the path manually or ask the agent to write the Step 10 template after approval.
 
 ---
 
@@ -449,6 +525,7 @@ Only create the file if the user asks or if durable tracking is clearly useful.
 * Hiding uncertainty
 * Using sub-agents as theater
 * Researching endlessly without converting findings into tests
+* Repeating full log excerpts instead of adding one bundle row and citing `E#`
 
 ---
 
@@ -486,7 +563,7 @@ If not, next branch:
 
 | Track | Question | Output |
 | --- | --- | --- |
-| Evidence | What facts do we already have? | ... |
+| Evidence | What facts do we already have? | Evidence bundle (`E1`…) |
 | Hypotheses | What could explain this? | ... |
 | Research | Are there known/current issues? | ... |
 | Risk | What should we avoid breaking? | ... |
