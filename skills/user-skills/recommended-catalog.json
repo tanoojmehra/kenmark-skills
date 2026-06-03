@@ -33,21 +33,33 @@
       ]
     },
     {
-      "id": "core-next",
-      "name": "Core Next.js Full-Stack",
-      "description": "Best default for Next.js, Tailwind, ShadCN, Prisma, MongoDB, and agency/client projects.",
-      "kenmarkRecommended": true,
+      "id": "core-next-lite",
+      "name": "Core Next.js Lite",
+      "description": "Next.js full-stack essentials without Graphify — for smaller sites and faster harnesses.",
       "recommendedFor": [
-        "Next.js apps",
-        "full-stack projects",
-        "agency/client projects"
+        "small Next.js sites",
+        "marketing pages",
+        "when Graphify feels heavy"
       ],
       "packs": [
         { "id": "impeccable" },
         { "id": "code-review-skill" },
-        { "id": "graphify" },
         { "id": "ecc", "profile": "minimal" }
       ]
+    },
+    {
+      "id": "core-next",
+      "name": "Core Next.js Full-Stack",
+      "description": "Best default for Next.js, Tailwind, ShadCN, Prisma, MongoDB, and agency/client projects (core-next-lite + Graphify).",
+      "kenmarkRecommended": true,
+      "recommendedFor": [
+        "Next.js apps",
+        "full-stack projects",
+        "agency/client projects",
+        "medium/large repos"
+      ],
+      "extends": "core-next-lite",
+      "packs": [{ "id": "graphify" }]
     },
     {
       "id": "growth-seo",
@@ -91,9 +103,9 @@
       ]
     },
     {
-      "id": "power-user",
-      "name": "Power User",
-      "description": "Large install for experimentation — not recommended as a daily default.",
+      "id": "experimental-heavy",
+      "name": "Experimental Heavy",
+      "description": "Large experimental install — high bloat, not for daily defaults.",
       "risk": "high-bloat",
       "requiresConfirmation": true,
       "recommendedFor": [
@@ -215,6 +227,7 @@
       "category": "seo",
       "weight": "heavy",
       "bloatScore": 5,
+      "selectedBloatScore": 2,
       "recommendedByDefault": false,
       "installModes": ["selected-skills", "full"],
       "defaultMode": "selected-skills",

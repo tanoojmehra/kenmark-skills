@@ -6,7 +6,7 @@ const { runDoctor } = require("./kenmark-hub");
 function printUsage() {
   console.log("Usage: kenmark-skills doctor [options]");
   console.log("");
-  console.log("Diagnose Kenmark skills install: store, manifest, IDE links, and catalog.");
+  console.log("Diagnose Kenmark skills install: store, manifest, MCP, IDE links, and catalog.");
   console.log("");
   console.log("Options:");
   console.log("  --json <path>   Write full report as JSON");
@@ -47,6 +47,43 @@ function run() {
   console.log(`Manifest: ${report.manifestPath} (${report.manifestReadable ? "readable" : "missing/unreadable"})`);
   console.log(`Catalog: ${report.catalogPath} (${report.catalogReadable ? "readable" : "missing/unreadable"})`);
   console.log(`Backups: ${report.backupCount} skill backup(s) on disk`);
+  console.log("");
+
+  const mcp = report.mcp;
+  console.log("MCP:");
+  if (!mcp.installed) {
+    console.log("  Not installed (opt-in via setup --mcp-profile or --with-mcp)");
+  } else {
+    console.log(
+      `  Store: ${mcp.mcpStorePath} (${mcp.mcpStoreExists ? "present" : "missing"})`
+    );
+    console.log(`  Profile: ${mcp.profile || "(not recorded in manifest)"}`);
+    console.log(
+      `  Servers: ${mcp.servers.length ? mcp.servers.join(", ") : "(none in store/manifest)"}`
+    );
+    const touched = mcp.targets.filter((t) => t.touched);
+    if (touched.length) {
+      console.log("  IDE configs (Kenmark servers present):");
+      for (const t of touched) {
+        console.log(`    ${t.ide}: ${t.path} — ${t.serversPresent.join(", ")}`);
+      }
+    } else if (mcp.targets.length) {
+      console.log("  IDE configs: none of the recorded targets contain Kenmark MCP servers");
+      for (const t of mcp.targets) {
+        const note = t.configExists ? "exists, no Kenmark servers" : "missing";
+        console.log(`    ${t.ide}: ${t.path} (${note})`);
+      }
+    }
+    if (mcp.commandsNeeded.length) {
+      const pathStatus = mcp.commandsNeeded
+        .map((cmd) => `${cmd}: ${mcp.commandsOnPath[cmd] ? "on PATH" : "not found"}`)
+        .join("; ");
+      console.log(`  Launcher commands: ${pathStatus}`);
+    }
+    if (mcp.missingCommands.length) {
+      console.log(`  Missing on PATH: ${mcp.missingCommands.join(", ")}`);
+    }
+  }
   console.log("");
 
   if (report.installedIdeRoots.length) {

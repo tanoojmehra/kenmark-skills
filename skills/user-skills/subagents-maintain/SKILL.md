@@ -114,7 +114,7 @@ Example (after approval):
 
 ```bash
 # Example only — replace with paths from the report
-rm -f /Users/tsmehra/.claude/plugins/marketplaces/everything-claude-code/agents/coder.md
+rm -f "$HOME/.claude/plugins/marketplaces/everything-claude-code/agents/coder.md"
 ```
 
 ## Step 5 — Nested overlay agents (Mavis / MiniMax)

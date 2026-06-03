@@ -27,6 +27,22 @@ While **coding**, when you're not sure which skill applies, search the installed
 
 This is a day-to-day programming tool — not part of project onboarding (`init-brain`, `skills-init`).
 
+## Recommended Kenmark workflows
+
+When several bundled skills could apply, prefer this order:
+
+| Situation | Skill |
+| --- | --- |
+| Problem unclear — need evidence, hypotheses, ranked plan | **`troubleshoot`** |
+| Need issue tracking in `brain/issues/` | **`issues-setup`** / **`issues-scan`** |
+| Need to pick which installed skill fits the task | **`skills-router`** (this skill) |
+| Inventory or cleanup of installed skills | **`skills-maintain`** |
+| Grouped commits and push | **`commit-push`** |
+
+Do **not** use this router for open-ended diagnosis (“troubleshoot this bug”, “find root cause”, “why is this failing”) — use **`troubleshoot`** first. Use **`skills-router`** when the problem domain is clear but the right specialist skill is not.
+
+**Troubleshoot trigger examples:** “troubleshoot my Cursor slowdown”, “diagnose this production issue”, “find root cause of this deployment failure”, “build a test plan before fixing”.
+
 ## Canonical skill store
 
 **Kenmark-managed skills** (bundled + adopted catalog) live in `~/.kenmark/store/skills/`. IDE paths typically symlink there after `kenmark-skills setup` or `adopt`.
@@ -393,9 +409,9 @@ PY
 
 ## When to run
 
-Run this skill **while coding** — before other specialized skills — when:
+Run this skill **while coding** — after **`troubleshoot`** when the problem is still unclear — when:
 
-- You're implementing or debugging and the right skill isn't obvious
+- You're implementing or debugging and the right skill isn't obvious (not the root cause itself)
 - The user's request spans multiple domains (backend vs SEO vs design, etc.)
 - No skill was auto-selected but specialized guidance would help
 - The user says `/skills-router`, "pick the right skill", or "which skill should we use?"

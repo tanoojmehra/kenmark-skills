@@ -180,7 +180,11 @@ function printCatalog(catalog) {
   }
   for (const pack of catalog.packs) {
     console.log(`  ${pack.id}`);
-    console.log(`    ${pack.name} — ${pack.category} (weight: ${pack.weight || "?"}, bloat: ${pack.bloatScore ?? "?"})`);
+    const bloatLine =
+      pack.selectedBloatScore != null
+        ? `bloat: ${pack.bloatScore ?? "?"} (selected: ${pack.selectedBloatScore})`
+        : `bloat: ${pack.bloatScore ?? "?"}`;
+    console.log(`    ${pack.name} — ${pack.category} (weight: ${pack.weight || "?"}, ${bloatLine})`);
     console.log(`    ${pack.description}`);
     console.log(`    ${pack.url}`);
     if (pack.bestFor?.length) {
@@ -222,7 +226,9 @@ function printProfiles(catalog) {
     const summary = summarizeProfile(p.id, catalog);
     if (summary?.installLines?.length) {
       console.log(`    installs: ${summary.installLines.join(", ")}`);
-      console.log(`    weight: ${summary.weight} · bloat risk: ${summary.bloatRisk}`);
+      console.log(
+        `    weight: ${summary.weight} · bloat score: ${summary.bloatTotal} · risk: ${summary.bloatRisk}`
+      );
     }
     if (p.extends) console.log(`    extends: ${p.extends}`);
     if (p.requiresConfirmation) console.log("    ⚠ requires confirmation (high bloat)");

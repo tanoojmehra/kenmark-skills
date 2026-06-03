@@ -38,3 +38,15 @@ All bundled skills use `scope: universal`. Skills marked `scope: project-specifi
 in frontmatter are skipped by `kenmark-skills setup` if they ever appear under
 `user-skills/`; project-only skills should live in that repo’s IDE skills folder,
 not in this package.
+
+## Recommended day-to-day order
+
+| Situation | Skill |
+| --- | --- |
+| Problem unclear? | `troubleshoot` |
+| Need issue tracking? | `issues-setup` / `issues-scan` |
+| Need skill choice? | `skills-router` |
+| Need cleanup? | `skills-maintain` |
+| Need commit? | `commit-push` |
+
+See the root [README](../README.md) for trigger examples and setup steps.

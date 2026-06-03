@@ -76,6 +76,7 @@ function printUsage() {
   console.log("  --with-mcp                Install all bundled MCP servers (profile: all)");
   console.log("  --mcp-profile <name>      MCP profile: none, web, research, deep, all");
   console.log("  --skip-mcp                Skip MCP even if --with-mcp / --mcp-profile is set");
+  console.log("  --mcp-only                Uninstall only Kenmark MCP (IDE configs + mcp store); keep skills");
   console.log("  --ecc-profile core        ECC profile (core, developer, …) when adopting");
   console.log("  --dry-run                 Show plan only");
   console.log("  -y, --yes                 Skip prompts");
@@ -88,6 +89,8 @@ function printUsage() {
   console.log("  npx kenmark-skills setup --mcp-profile web --global --ide cursor -y");
   console.log("  npx kenmark-skills setup --with-mcp --global --ide all -y");
   console.log("  npx kenmark-skills uninstall --global --ide claude");
+  console.log("  npx kenmark-skills uninstall --mcp-only --global --ide cursor -y");
+  console.log("  npx kenmark-skills mcp uninstall --global --ide all -y");
 }
 
 function parseArgs(argv) {
@@ -105,6 +108,7 @@ function parseArgs(argv) {
     keepStore: true,
     skipAdopt: false,
     skipMcp: false,
+    mcpOnly: false,
     withMcp: false,
     mcpProfile: null,
     eccProfile: null,
@@ -182,6 +186,10 @@ function parseArgs(argv) {
     }
     if (token === "--skip-mcp") {
       args.skipMcp = true;
+      continue;
+    }
+    if (token === "--mcp-only") {
+      args.mcpOnly = true;
       continue;
     }
     if (token === "--with-mcp") {
@@ -298,6 +306,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
     keepStore,
     skipAdopt,
     mcpInstall,
+    mcpOnly,
     eccProfile,
     mcpTargetMap
   } = options;
@@ -322,6 +331,17 @@ function executeInstall(targetMap, targetIdes, action, options) {
       plan.push(
         `Merge MCP profile "${mcpProfile}" (${serverNames.join(", ") || "none"}) → ${mcpIdes.join(", ")} (${getMcpStorePath()})`
       );
+    }
+  } else if (mcpOnly) {
+    if (!mcpIdes.length) {
+      plan.push(
+        "No MCP-capable IDE in target list (use --ide cursor, claude, or all)"
+      );
+    } else {
+      for (const ide of mcpIdes) {
+        plan.push(`Remove Kenmark MCP entries (if installed) → ${ide}: ${mcpTargetMap[ide]}`);
+      }
+      plan.push(`Remove Kenmark MCP store → ${getMcpStorePath()}`);
     }
   } else {
     for (const ide of targetIdes) {
@@ -464,6 +484,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
         if (dryRun) {
           console.log("[dry-run] would remove Kenmark MCP server entries from IDE configs");
         } else {
+          console.log("\n━━━ MCP uninstall ━━━");
           const mcpUninstall = uninstallMcpFromIdes(mcpTargetMap, mcpIdes, {
             dryRun: false
           });
@@ -471,8 +492,30 @@ function executeInstall(targetMap, targetIdes, action, options) {
             console.log(
               `Removed Kenmark MCP servers (${mcpUninstall.serverNames.join(", ")}) from IDE configs.`
             );
+            for (const r of mcpUninstall.results) {
+              if (r.action === "removed-servers") {
+                console.log(`  ${r.ide}: ${r.targetPath}`);
+              }
+            }
+          } else {
+            console.log(
+              "No Kenmark MCP installation found (manifest has no MCP servers). Skills were not changed."
+            );
           }
         }
+      } else if (mcpOnly) {
+        console.log(
+          "No MCP-capable IDE in target list. Use --ide cursor, claude, or all."
+        );
+      }
+
+      if (mcpOnly) {
+        if (dryRun) {
+          console.log("[dry-run] MCP uninstall complete (no files changed)");
+        } else {
+          console.log("Done (MCP only — Kenmark skills unchanged).");
+        }
+        return;
       }
 
       const uninstallResults = uninstallKenmarkFromIdes(skillNames, targetMap, {
@@ -547,6 +590,14 @@ async function run() {
   action = action || "install";
   mode = mode || "global";
 
+  if (args.mcpOnly && action !== "uninstall") {
+    console.error("--mcp-only is only valid with uninstall (e.g. npx kenmark-skills mcp uninstall -y)");
+    process.exit(1);
+  }
+  if (args.mcpOnly) {
+    action = "uninstall";
+  }
+
   const targetMap = mode === "project" ? projectTargets : globalTargets;
   const mcpTargetMap = mode === "project" ? projectMcpTargets : globalMcpTargets;
 
@@ -583,12 +634,13 @@ async function run() {
     keepStore: args.keepStore,
     skipAdopt: args.skipAdopt,
     mcpInstall,
+    mcpOnly: args.mcpOnly,
     eccProfile: args.eccProfile,
     mcpTargetMap
   });
 
   console.log(`Operating system: ${process.platform}`);
-  console.log(`Action: ${action}`);
+  console.log(`Action: ${action}${args.mcpOnly ? " (MCP only)" : ""}`);
   console.log(`Install mode: ${mode}`);
   if (action === "install") {
     console.log(`Skills source: ${sourceDir}`);
