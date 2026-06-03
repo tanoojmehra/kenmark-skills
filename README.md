@@ -37,11 +37,24 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 **Suggested workflow**
 
+**Setup (once)**
+
 1. **Install** — `npx kenmark-skills init` (or `setup` for Kenmark-only).
-2. **Onboard a repo** — run **`init-brain`** in the agent; add **`issues-setup`** if you track work in `brain/issues/`.
-3. **While coding** — use **`skills-router`** when the right skill is unclear.
-4. **Ship** — **`commit-push`** for grouped commits and push.
-5. **Maintain** — periodic **`skills-update`**, **`skills-maintain`**, **`subagents-maintain`**.
+2. **Onboard a repo** — run **`init-brain`** in the agent.
+
+**Day-to-day (pick the first row that fits)**
+
+| Situation | Skill |
+| --- | --- |
+| Problem unclear? | **`troubleshoot`** |
+| Need issue tracking? | **`issues-setup`** / **`issues-scan`** |
+| Need skill choice? | **`skills-router`** |
+| Need cleanup? | **`skills-maintain`** |
+| Need commit? | **`commit-push`** |
+
+**Maintain** — periodic **`skills-update`**, **`skills-maintain`**, **`subagents-maintain`**.
+
+**Troubleshoot trigger examples:** "troubleshoot my Cursor slowdown", "diagnose this production issue", "find root cause of this deployment failure", "build a test plan before fixing".
 
 Many skills expect a project **`brain/`** directory (standards, changelog, optional issues). That layout is created in *your* repos via **`init-brain`**, not shipped inside this package. Rules live under **`brain/rules/`** (lean **`standards.md`** plus optional **`stack.md`**, **`workflow.md`**, etc.); IDE entry files get a short **Read-first stub** by default (multi-IDE, no hooks).
 
@@ -136,11 +149,12 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | --- | --- |
 | `init` | First-time wizard: runs `setup` + optional `install-recommended` |
 | `setup` | Install 14 Kenmark skills → `~/.kenmark/store` + IDE symlinks |
-| `uninstall` | Remove Kenmark links from IDE paths (`--keep-store` optional) |
+| `uninstall` | Remove Kenmark links from IDE paths (`--keep-store` optional); also removes Kenmark MCP if installed |
+| `mcp uninstall` | Remove only Kenmark MCP from IDE configs + `~/.kenmark/store/mcp.json` (skills unchanged) |
 | `install-recommended` | Install packs from [`recommended-catalog.json`](skills/user-skills/recommended-catalog.json) |
 | `update` | Refresh Kenmark and/or recommended installs |
 | `adopt` | Consolidate catalog skills on disk into the store + relink |
-| `doctor` | Diagnose store, manifest, IDE links, and catalog health |
+| `doctor` | Diagnose store, manifest, MCP install (`npx`/`uvx` on PATH), IDE links, and catalog health |
 | `inventory` | Report on installed skills (keep / dedupe / remove) |
 | `subagents-inventory` | Same for sub-agents (alias: `agents-inventory`) |
 
@@ -206,6 +220,7 @@ When store content already exists but differs from an IDE copy, adopt reports **
 | `--force` | setup, adopt, install-recommended | Overwrite store entries / adopt from IDE when hashes differ |
 | `--adopt-overwrite` | adopt, install-recommended | Alias for `--force` on adopt |
 | `--keep-store` | uninstall | Remove IDE links; keep `~/.kenmark` |
+| `--mcp-only` | uninstall | Remove Kenmark MCP only; leave skill links and store skills intact |
 | `--json <path>` | doctor, inventory | Write full JSON report |
 
 ---
@@ -296,6 +311,15 @@ npx kenmark-skills setup --with-mcp --global --ide all -y   # profile: all
 
 Restart Cursor or Claude Code after setup if MCP tools do not show up. Other IDEs in `--ide all` are unchanged (no standard MCP path in this package yet).
 
+**Remove MCP only** (keeps Kenmark skills installed):
+
+```bash
+npx kenmark-skills mcp uninstall --global --ide cursor -y
+npx kenmark-skills uninstall --mcp-only --global --ide all -y   # same behavior
+```
+
+Full `uninstall` still removes Kenmark MCP entries when they were installed via `setup --with-mcp` / `--mcp-profile`.
+
 ### IDE skill directories
 
 | IDE / runtime | Global skills path |
@@ -319,7 +343,7 @@ Restart Cursor or Claude Code after setup if MCP tools do not show up. Other IDE
 
 ### Recommended packs
 
-Catalog: [`skills/user-skills/recommended-catalog.json`](skills/user-skills/recommended-catalog.json) (v4 **profiles**: `lean`, `core-next`, `growth-seo`, `audit-review`, `power-user`). Default profile is **lean**; **core-next** is the recommended Next.js full-stack profile.
+Catalog: [`skills/user-skills/recommended-catalog.json`](skills/user-skills/recommended-catalog.json) (v4 **profiles**: `lean`, `core-next-lite`, `core-next`, `growth-seo`, `audit-review`, `experimental-heavy`). Default profile is **lean**; **core-next** is the recommended Next.js full-stack profile (`core-next-lite` + Graphify).
 
 ```bash
 npx kenmark-skills install-recommended --list-profiles
@@ -371,7 +395,7 @@ npx kenmark-skills adopt --global --adopt-overwrite -y   # when setup reported r
 
 ### Doctor
 
-Checks Node (≥18), `~/.kenmark/store`, manifest, recommended catalog, detected IDE roots, per-IDE skill counts, broken symlinks, and store/IDE hash mismatches. Exits non-zero when issues are found.
+Checks Node (≥18), `~/.kenmark/store`, manifest, recommended catalog, MCP store/profile/servers/IDE configs, launcher commands (`npx`, `uvx` — warns when `fetch` needs `uvx`), detected IDE roots, per-IDE skill counts, broken symlinks, and store/IDE hash mismatches. Exits non-zero when issues are found.
 
 ```bash
 npx kenmark-skills doctor
@@ -391,6 +415,9 @@ npx kenmark-skills uninstall --global --ide claude
 
 # Project-local
 npx kenmark-skills uninstall --project --ide all
+
+# MCP only (Cursor / Claude configs + ~/.kenmark/store/mcp.json)
+npx kenmark-skills mcp uninstall --global --ide cursor -y
 ```
 
 **Troubleshooting `Unknown command: uninstall`**
@@ -403,7 +430,7 @@ npm cache clean --force   # if npx still serves an old version
 **Manual fallback (Claude global)**
 
 ```bash
-rm -rf ~/.claude/skills/{init-brain,commit-push,skills-router,skills-init,skills-install-recommended,skills-update,skills-maintain,issues-setup,issues-list,issues-check,issues-scan,issues-maintenance}
+rm -rf ~/.claude/skills/{init-brain,commit-push,skills-router,troubleshoot,skills-init,skills-install-recommended,skills-update,skills-maintain,issues-setup,issues-list,issues-check,issues-scan,issues-maintenance}
 rm -f ~/.claude/commands/kenmark-*.md
 ```
 
@@ -414,6 +441,10 @@ rm -f ~/.claude/commands/kenmark-*.md
 1. Confirm the skill folder is on the agent’s skill search path (after `setup` / `init`).
 2. Name the skill or its trigger phrase — e.g. “Run **init-brain**”, “Use **commit-push**”, “**issues-list**”.
 3. The agent must **read and follow** the full `SKILL.md`, not improvise from the description.
+
+When the problem is unclear, start with **`troubleshoot`** (evidence, hypotheses, ranked plan) — not **`skills-router`**. Use the router when the task domain is clear but the right specialist skill is not.
+
+**Troubleshoot examples:** “troubleshoot my Cursor slowdown”, “diagnose this production issue”, “find root cause of this deployment failure”, “build a test plan before fixing”.
 
 **`skills-router` cache:** the router writes `~/.kenmark/cache/skills-registry.json` at runtime (user-wide, outside the repo).
 
@@ -436,7 +467,7 @@ kenmark-skills/
 
 **Not committed here:** `.claude/`, `.cursor/`, `.agents/` (local IDE installs), `brain/` (optional dev workspace). Edit `skills/user-skills/<name>/SKILL.md` for bundled skills.
 
-**Maintainers:** `npm run pack:check` · `npm run publish:public`
+**Maintainers:** `npm run validate` · `npm test` · `npm run pack:check` · `npm run publish:public`
 
 ---
 
