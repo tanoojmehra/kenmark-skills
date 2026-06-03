@@ -21,7 +21,8 @@ function printUsage() {
   console.log("  kenmark-skills install-recommended [--list-profiles] [--profile lean|core-next|…] [--ids a,b] [--global|--project] [-y]");
   console.log("  kenmark-skills update [--kenmark-only|--recommended-only|--both] [--global|--project] [-y]");
   console.log("  kenmark-skills adopt [--global|--project] [--ide <target>] [--dry-run] [-y]");
-  console.log("  kenmark-skills doctor [--json path]");
+  console.log("  kenmark-skills validate");
+  console.log("  kenmark-skills doctor [--soft] [--no-fail] [--json path]");
   console.log("  kenmark-skills help");
   console.log("");
   console.log("Examples:");
@@ -126,6 +127,14 @@ if (command === "update") {
 
 if (command === "adopt") {
   const scriptPath = path.join(__dirname, "skills-adopt.js");
+  const result = spawnSync(process.execPath, [scriptPath, ...args.slice(1)], {
+    stdio: "inherit"
+  });
+  process.exit(result.status === null ? 1 : result.status);
+}
+
+if (command === "validate") {
+  const scriptPath = path.join(__dirname, "validate.js");
   const result = spawnSync(process.execPath, [scriptPath, ...args.slice(1)], {
     stdio: "inherit"
   });

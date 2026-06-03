@@ -1170,7 +1170,10 @@ function installMcpToIdes(mcpTargetMap, targetIdes, options = {}) {
 function uninstallMcpFromIdes(mcpTargetMap, targetIdes, options = {}) {
   const { dryRun = false } = options;
   const manifest = readManifest();
-  const serverNames = manifest.mcp?.servers || [];
+  const storeDoc = readMcpDocument(getMcpStorePath());
+  const serverNames = manifest.mcp?.servers?.length
+    ? manifest.mcp.servers
+    : Object.keys(storeDoc.mcpServers || {});
   const results = [];
   const mcpIdes = targetIdes.filter((ide) => mcpTargetMap[ide]);
 
@@ -1381,32 +1384,41 @@ function runDoctor(options = {}) {
   const {
     repoRoot = path.resolve(__dirname, ".."),
     homeDir = os.homedir(),
-    jsonPath = null
+    jsonPath = null,
+    soft = false
   } = options;
 
-  const catalogPath = path.join(repoRoot, "skills", "user-skills", "recommended-catalog.json");
   const storeDir = getStoreDir();
   const manifestPath = getManifestPath();
   const targetMap = buildGlobalTargets(homeDir);
   const issues = [];
+  const warnings = [];
+
+  function recordProblem(msg) {
+    if (soft) {
+      warnings.push(msg);
+    } else {
+      issues.push(msg);
+    }
+  }
 
   let packageVersion = null;
   try {
     const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
     packageVersion = pkg.version;
   } catch {
-    issues.push("Could not read package.json version");
+    /* informational only — repo health is `kenmark-skills validate` */
   }
 
   const nodeOk = process.version;
   const nodeMajor = parseInt(process.version.slice(1).split(".")[0], 10);
   if (nodeMajor < 18) {
-    issues.push(`Node ${nodeOk} is below required >=18`);
+    recordProblem(`Node ${nodeOk} is below required >=18`);
   }
 
   const storeExists = fs.existsSync(storeDir);
   if (!storeExists) {
-    issues.push("Kenmark store directory missing (~/.kenmark/store/skills)");
+    recordProblem("Kenmark store directory missing (~/.kenmark/store/skills)");
   }
 
   let manifest = null;
@@ -1415,7 +1427,7 @@ function runDoctor(options = {}) {
     manifest = readManifest();
     manifestReadable = fs.existsSync(manifestPath);
   } catch (err) {
-    issues.push(`Manifest unreadable: ${err.message}`);
+    recordProblem(`Manifest unreadable: ${err.message}`);
   }
 
   const installedIdeRoots = detectInstalledIdes(targetMap);
@@ -1427,7 +1439,7 @@ function runDoctor(options = {}) {
     skillCountsByIde[ide] = countSkillsInDir(idePath);
     brokenSymlinksByIde[ide] = findBrokenSymlinks(idePath);
     if (brokenSymlinksByIde[ide].length) {
-      issues.push(`Broken symlinks in ${ide}: ${brokenSymlinksByIde[ide].length}`);
+      recordProblem(`Broken symlinks in ${ide}: ${brokenSymlinksByIde[ide].length}`);
     }
   }
 
@@ -1451,34 +1463,24 @@ function runDoctor(options = {}) {
     }
   }
   if (hashMismatches.length) {
-    issues.push(`Store/IDE content hash mismatches: ${hashMismatches.length}`);
-  }
-
-  let catalogReadable = false;
-  try {
-    if (fs.existsSync(catalogPath)) {
-      readRecommendedCatalog(catalogPath);
-      catalogReadable = true;
-    } else {
-      issues.push("Recommended catalog missing");
-    }
-  } catch (err) {
-    issues.push(`Recommended catalog unreadable: ${err.message}`);
+    recordProblem(`Store/IDE content hash mismatches: ${hashMismatches.length}`);
   }
 
   const backupCount = countBackupDirs();
 
   const mcp = inspectMcpForDoctor({ homeDir, manifest });
   for (const w of mcp.warnings) {
-    issues.push(w);
+    warnings.push(w);
   }
   for (const issue of mcp.issues) {
-    issues.push(issue);
+    recordProblem(issue);
   }
 
   const report = {
     ok: issues.length === 0,
+    soft,
     issues,
+    warnings,
     node: nodeOk,
     platform: process.platform,
     packageVersion,
@@ -1494,8 +1496,6 @@ function runDoctor(options = {}) {
     brokenSymlinksByIde,
     hashMismatches,
     backupCount,
-    catalogPath,
-    catalogReadable,
     mcp,
     checkedAt: new Date().toISOString()
   };
