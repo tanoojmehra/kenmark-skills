@@ -81,6 +81,90 @@ function getBundledMcpPath(repoRoot) {
   return path.join(repoRoot, "config", "mcp-servers.json");
 }
 
+function getMcpProfilesPath(repoRoot) {
+  return path.join(repoRoot, "config", "mcp-profiles.json");
+}
+
+function readMcpProfiles(repoRoot) {
+  const profilesPath = getMcpProfilesPath(repoRoot);
+  if (!fs.existsSync(profilesPath)) {
+    return { profiles: { none: [], all: [] } };
+  }
+  try {
+    const doc = JSON.parse(fs.readFileSync(profilesPath, "utf8"));
+    if (!doc.profiles || typeof doc.profiles !== "object") {
+      return { profiles: { none: [], all: [] } };
+    }
+    return doc;
+  } catch {
+    return { profiles: { none: [], all: [] } };
+  }
+}
+
+function listMcpProfileNames(repoRoot) {
+  return Object.keys(readMcpProfiles(repoRoot).profiles).sort();
+}
+
+function resolveMcpProfileName(rawProfile, repoRoot) {
+  const name = String(rawProfile || "none")
+    .trim()
+    .toLowerCase();
+  const profiles = readMcpProfiles(repoRoot).profiles;
+  if (!Object.prototype.hasOwnProperty.call(profiles, name)) {
+    const known = Object.keys(profiles).sort().join(", ");
+    throw new Error(`Unknown MCP profile "${rawProfile}". Known profiles: ${known}`);
+  }
+  return name;
+}
+
+function filterMcpDocumentByServers(bundledDoc, serverNames) {
+  const incoming = bundledDoc.mcpServers || {};
+  const filtered = {};
+  const missing = [];
+  for (const name of serverNames) {
+    if (incoming[name]) {
+      filtered[name] = incoming[name];
+    } else {
+      missing.push(name);
+    }
+  }
+  if (missing.length) {
+    throw new Error(
+      `MCP profile references missing bundled server(s): ${missing.join(", ")}`
+    );
+  }
+  return { mcpServers: filtered };
+}
+
+function buildMcpDocumentForProfile(repoRoot, profileName) {
+  const profile = resolveMcpProfileName(profileName, repoRoot);
+  const serverNames = readMcpProfiles(repoRoot).profiles[profile] || [];
+  if (!serverNames.length) {
+    return { profile, serverNames: [], doc: { mcpServers: {} } };
+  }
+  const bundledPath = getBundledMcpPath(repoRoot);
+  const bundled = readMcpDocument(bundledPath);
+  const doc = filterMcpDocumentByServers(bundled, serverNames);
+  return { profile, serverNames: Object.keys(doc.mcpServers).sort(), doc };
+}
+
+function shouldInstallMcp({ skipMcp, withMcp, mcpProfile }) {
+  if (skipMcp) {
+    return { enabled: false, profile: "none" };
+  }
+  if (mcpProfile) {
+    const profile = String(mcpProfile).trim().toLowerCase();
+    if (profile === "none") {
+      return { enabled: false, profile: "none" };
+    }
+    return { enabled: true, profile };
+  }
+  if (withMcp) {
+    return { enabled: true, profile: "all" };
+  }
+  return { enabled: false, profile: "none" };
+}
+
 function buildMcpGlobalTargets(homeDir = os.homedir()) {
   return {
     cursor: path.join(homeDir, ".cursor", "mcp.json"),
@@ -959,8 +1043,8 @@ function mergeMcpServerEntries(existing, incoming, { force = false } = {}) {
   return { merged, added, updated, skipped };
 }
 
-function installMcpToStore(bundledMcpPath, { force = false, dryRun = false } = {}) {
-  const bundled = readMcpDocument(bundledMcpPath);
+function installMcpToStore(bundledMcpPath, { force = false, dryRun = false, mcpDoc = null, profile = null } = {}) {
+  const bundled = mcpDoc || readMcpDocument(bundledMcpPath);
   const storePath = getMcpStorePath();
   const manifest = readManifest();
   const serverNames = Object.keys(bundled.mcpServers || {}).sort();
@@ -991,6 +1075,7 @@ function installMcpToStore(bundledMcpPath, { force = false, dryRun = false } = {
   manifest.mcp = {
     ...(manifest.mcp || {}),
     source: "kenmark-package",
+    profile: profile || manifest.mcp?.profile || null,
     servers: serverNames,
     storePath,
     updatedAt: new Date().toISOString()
@@ -1067,6 +1152,7 @@ function installMcpToIdes(mcpTargetMap, targetIdes, options = {}) {
     manifest.mcp = {
       ...(manifest.mcp || {}),
       source: manifest.mcp?.source || "kenmark-package",
+      profile: manifest.mcp?.profile || null,
       servers: serverNames,
       storePath,
       targets: Object.fromEntries(
@@ -1304,6 +1390,12 @@ module.exports = {
   getStoreDir,
   getMcpStorePath,
   getBundledMcpPath,
+  getMcpProfilesPath,
+  readMcpProfiles,
+  listMcpProfileNames,
+  resolveMcpProfileName,
+  buildMcpDocumentForProfile,
+  shouldInstallMcp,
   buildMcpGlobalTargets,
   buildMcpProjectTargets,
   getAgentStoreDir,

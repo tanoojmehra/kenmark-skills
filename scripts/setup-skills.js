@@ -27,6 +27,10 @@ const {
   installMcpToStore,
   installMcpToIdes,
   uninstallMcpFromIdes,
+  shouldInstallMcp,
+  resolveMcpProfileName,
+  buildMcpDocumentForProfile,
+  listMcpProfileNames,
   detectInstalledIdes,
   resolveFallbackTargetIdes,
   resolveLinkModeLabel
@@ -54,9 +58,9 @@ function printUsage() {
   console.log("Kenmark skills install to ~/.kenmark/store/skills, then link into each IDE.");
   console.log("After install, catalog skills already present in any IDE root are adopted");
   console.log("into ~/.kenmark/store and relinked (use --skip-adopt to disable).");
-  console.log("Bundled MCP servers install to ~/.kenmark/store/mcp.json and merge into");
-  console.log("Cursor (~/.cursor/mcp.json) and Claude (~/.claude.json or .mcp.json).");
-  console.log("Use --skip-mcp to disable MCP setup.");
+  console.log("MCP is opt-in. Pass --with-mcp or --mcp-profile <name> to install bundled servers");
+  console.log("into ~/.kenmark/store/mcp.json and merge into Cursor / Claude MCP configs.");
+  console.log(`Profiles: ${listMcpProfileNames(repoRoot).join(", ")} (default: none).`);
   console.log("");
   console.log("Options:");
   console.log("  --install | --uninstall   Action (default: install)");
@@ -69,7 +73,9 @@ function printUsage() {
   console.log("  --force                   Overwrite store even if present");
   console.log("  --keep-store              On uninstall, leave ~/.kenmark/store intact");
   console.log("  --skip-adopt              Skip post-install catalog adoption (advanced)");
-  console.log("  --skip-mcp                Skip bundled MCP server install/merge");
+  console.log("  --with-mcp                Install all bundled MCP servers (profile: all)");
+  console.log("  --mcp-profile <name>      MCP profile: none, web, research, deep, all");
+  console.log("  --skip-mcp                Skip MCP even if --with-mcp / --mcp-profile is set");
   console.log("  --ecc-profile core        ECC profile (core, developer, …) when adopting");
   console.log("  --dry-run                 Show plan only");
   console.log("  -y, --yes                 Skip prompts");
@@ -79,6 +85,8 @@ function printUsage() {
   console.log("  npx kenmark-skills setup");
   console.log("  npx kenmark-skills setup --global --ide all -y");
   console.log("  npx kenmark-skills setup --skip-adopt --global --ide cursor -y");
+  console.log("  npx kenmark-skills setup --mcp-profile web --global --ide cursor -y");
+  console.log("  npx kenmark-skills setup --with-mcp --global --ide all -y");
   console.log("  npx kenmark-skills uninstall --global --ide claude");
 }
 
@@ -97,6 +105,8 @@ function parseArgs(argv) {
     keepStore: true,
     skipAdopt: false,
     skipMcp: false,
+    withMcp: false,
+    mcpProfile: null,
     eccProfile: null,
     explicitMode: false,
     explicitAction: false,
@@ -172,6 +182,15 @@ function parseArgs(argv) {
     }
     if (token === "--skip-mcp") {
       args.skipMcp = true;
+      continue;
+    }
+    if (token === "--with-mcp") {
+      args.withMcp = true;
+      continue;
+    }
+    if (token === "--mcp-profile") {
+      args.mcpProfile = (argv[i + 1] || "").trim() || null;
+      i += 1;
       continue;
     }
     if (token === "--ecc-profile") {
@@ -278,11 +297,13 @@ function executeInstall(targetMap, targetIdes, action, options) {
     force,
     keepStore,
     skipAdopt,
-    skipMcp,
+    mcpInstall,
     eccProfile,
     mcpTargetMap
   } = options;
   const mcpIdes = filterMcpIdes(targetIdes);
+  const installMcp = mcpInstall.enabled;
+  const mcpProfile = mcpInstall.profile;
   const skillNames = listKenmarkBundledSkillNames(sourceDir);
   const storeDir = getStoreDir();
   const linkMode = resolveLinkModeLabel({ forceCopy, forceSymlink, preferCopyOnWindows });
@@ -296,8 +317,11 @@ function executeInstall(targetMap, targetIdes, action, options) {
     if (!skipAdopt) {
       plan.push("Adopt catalog skills (Impeccable, ECC, …) found in any IDE root → store + relink");
     }
-    if (!skipMcp && mcpIdes.length && fs.existsSync(bundledMcpPath)) {
-      plan.push(`Merge bundled MCP servers → ${mcpIdes.join(", ")} (${getMcpStorePath()})`);
+    if (installMcp && mcpIdes.length && fs.existsSync(bundledMcpPath)) {
+      const { serverNames } = buildMcpDocumentForProfile(repoRoot, mcpProfile);
+      plan.push(
+        `Merge MCP profile "${mcpProfile}" (${serverNames.join(", ") || "none"}) → ${mcpIdes.join(", ")} (${getMcpStorePath()})`
+      );
     }
   } else {
     for (const ide of targetIdes) {
@@ -306,9 +330,9 @@ function executeInstall(targetMap, targetIdes, action, options) {
     if (!keepStore) {
       plan.push(`Remove Kenmark store → ${storeDir}`);
     }
-    if (!skipMcp && mcpIdes.length) {
+    if (mcpIdes.length) {
       for (const ide of mcpIdes) {
-        plan.push(`Remove Kenmark MCP entries → ${ide}: ${mcpTargetMap[ide]}`);
+        plan.push(`Remove Kenmark MCP entries (if installed) → ${ide}: ${mcpTargetMap[ide]}`);
       }
     }
   }
@@ -398,12 +422,22 @@ function executeInstall(targetMap, targetIdes, action, options) {
           }
         }
 
-        if (!skipMcp && mcpIdes.length && fs.existsSync(bundledMcpPath)) {
+        if (installMcp && mcpIdes.length && fs.existsSync(bundledMcpPath)) {
+          const resolvedProfile = resolveMcpProfileName(mcpProfile, repoRoot);
+          const { doc, serverNames } = buildMcpDocumentForProfile(repoRoot, resolvedProfile);
           if (dryRun) {
-            console.log("\n[dry-run] would install MCP servers to store + merge into IDEs");
+            console.log(
+              `\n[dry-run] would install MCP profile "${resolvedProfile}" (${serverNames.join(", ")})`
+            );
           } else {
             console.log("\n━━━ MCP servers ━━━");
-            const storeMcp = installMcpToStore(bundledMcpPath, { force, dryRun: false });
+            console.log(`Profile: ${resolvedProfile}`);
+            const storeMcp = installMcpToStore(bundledMcpPath, {
+              force,
+              dryRun: false,
+              mcpDoc: doc,
+              profile: resolvedProfile
+            });
             console.log(`MCP store: ${getMcpStorePath()} (${storeMcp.action})`);
             const mcpResults = installMcpToIdes(mcpTargetMap, mcpIdes, {
               force,
@@ -426,7 +460,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
         return;
       }
 
-      if (!skipMcp && mcpIdes.length) {
+      if (mcpIdes.length) {
         if (dryRun) {
           console.log("[dry-run] would remove Kenmark MCP server entries from IDE configs");
         } else {
@@ -531,6 +565,15 @@ async function run() {
     }
   }
 
+  const mcpInstall = shouldInstallMcp({
+    skipMcp: args.skipMcp,
+    withMcp: args.withMcp,
+    mcpProfile: args.mcpProfile
+  });
+  if (mcpInstall.enabled) {
+    resolveMcpProfileName(mcpInstall.profile, repoRoot);
+  }
+
   const { plan, run: runAction } = executeInstall(targetMap, targetIdes, action, {
     dryRun: args.dryRun,
     forceCopy: args.forceCopy,
@@ -539,7 +582,7 @@ async function run() {
     force: args.force,
     keepStore: args.keepStore,
     skipAdopt: args.skipAdopt,
-    skipMcp: args.skipMcp,
+    mcpInstall,
     eccProfile: args.eccProfile,
     mcpTargetMap
   });
