@@ -45,6 +45,7 @@ When several bundled skills could apply, prefer this order:
 | Docs quality, README accuracy | **`repo-docs-audit`** |
 | Confusing folder layout | **`repo-structure-audit`** |
 | Dependency bloat, unused packages | **`repo-dependency-audit`** |
+| Dev/build/type/lint/format errors | **`repo-quality-gates`** |
 | npm publish, release, handoff | **`repo-release-readiness`** |
 | Inventory or cleanup of installed skills | **`skills-maintain`** |
 | Grouped commits and push | **`commit-push`** |
@@ -524,6 +525,7 @@ Do **not** use this skill for first-time Kenmark setup; use **`skills-init`** or
 | Documentation quality | `workflow` | `repo-docs-audit` |
 | Folder layout / structure | `workflow` | `repo-structure-audit` |
 | Package / dependency health | `workflow` | `repo-dependency-audit` |
+| Dev/build/type/lint/format errors | `workflow` | `repo-quality-gates` |
 | Release, publish, handoff | `workflow` | `repo-release-readiness` |
 
 ## Output format
