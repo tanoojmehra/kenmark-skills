@@ -21,8 +21,7 @@ const {
   getBundledMcpPath,
   listKenmarkBundledSkillNames,
   installKenmarkSkillsToStoreWithLegacyCleanup,
-  kenmarkClaudeCommandBasename,
-  removeLegacyClaudeCommandWrappers,
+  removeKenmarkClaudeCommandWrappers,
   relinkSkillsToIdes,
   adoptCatalogSkills,
   uninstallKenmarkFromIdes,
@@ -61,6 +60,7 @@ function printUsage() {
   console.log("Interactive by default in a terminal. Agents: pass flags + -y.");
   console.log("");
   console.log("Kenmark skills install to ~/.kenmark/store/skills, then link into each IDE.");
+  console.log("Claude: namespaced kenmark-* skills only (no slash-command wrappers created).");
   console.log("After install, catalog skills already present in any IDE root are adopted");
   console.log("into ~/.kenmark/store and relinked (use --skip-adopt to disable).");
   console.log("MCP is opt-in. Pass --with-mcp or --mcp-profile <name> to install bundled servers");
@@ -230,57 +230,6 @@ function resolveTargetIdes(args, targetMap) {
   return null;
 }
 
-function ensureParentDir(filePath) {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-}
-
-function createClaudeCommandWrappers(basePath, dryRun) {
-  const commandsDir = path.join(path.dirname(basePath), "commands");
-  const skills = listKenmarkBundledSkillNames(sourceDir);
-
-  if (dryRun) {
-    return { commandsDir, count: skills.length };
-  }
-
-  for (const skillName of skills) {
-    const commandBase = kenmarkClaudeCommandBasename(skillName);
-    const commandFile = path.join(commandsDir, `${commandBase}.md`);
-    const commandBody = [
-      `# ${commandBase}`,
-      "",
-      `Use the \`${skillName}\` skill (Kenmark).`,
-      "",
-      "Instructions:",
-      `- Read and follow \`${skillName}/SKILL.md\` from installed user skills end-to-end.`,
-      "- If required context is missing, ask concise clarifying questions first."
-    ].join("\n");
-    ensureParentDir(commandFile);
-    fs.writeFileSync(commandFile, `${commandBody}\n`, "utf8");
-  }
-
-  return { commandsDir, count: skills.length };
-}
-
-function removeClaudeCommandWrappers(basePath, dryRun) {
-  const commandsDir = path.join(path.dirname(basePath), "commands");
-  const skills = listKenmarkBundledSkillNames(sourceDir);
-
-  let removed = removeLegacyClaudeCommandWrappers(basePath, { dryRun }).length;
-  for (const skillName of skills) {
-    const commandFile = path.join(
-      commandsDir,
-      `${kenmarkClaudeCommandBasename(skillName)}.md`
-    );
-    if (fs.existsSync(commandFile)) {
-      if (!dryRun) {
-        fs.rmSync(commandFile, { force: true });
-      }
-      removed += 1;
-    }
-  }
-  return { commandsDir, removed };
-}
-
 function filterMcpIdes(targetIdes) {
   return targetIdes.filter((ide) => MCP_CAPABLE_IDES.has(ide));
 }
@@ -311,6 +260,11 @@ function executeInstall(targetMap, targetIdes, action, options) {
     plan.push(`Populate Kenmark store → ${storeDir}`);
     for (const ide of targetIdes) {
       plan.push(`Link Kenmark skills (${linkMode}) → ${ide}: ${targetMap[ide]}`);
+    }
+    if (targetIdes.includes("claude")) {
+      plan.push(
+        `Remove stale Claude command wrappers → ${path.join(path.dirname(targetMap.claude), "commands")}`
+      );
     }
     if (!skipAdopt) {
       plan.push("Adopt catalog skills (Impeccable, ECC, …) found in any IDE root → store + relink");
@@ -366,15 +320,56 @@ function executeInstall(targetMap, targetIdes, action, options) {
           console.log(`[dry-run] would populate store at ${storeDir}`);
         }
 
+        const legacyRemoved =
+          storeResult.legacyCleanup?.filter((r) => r.action === "removed") || [];
+        const legacyReview =
+          storeResult.legacyCleanup?.filter(
+            (r) => r.action === "legacy-candidate-review-required"
+          ) || [];
+        if (!dryRun && legacyRemoved.length) {
+          console.log(
+            `Removed legacy Kenmark skill paths (${legacyRemoved.length}) (backed up under ~/.kenmark/backups/legacy-cleanup/)`
+          );
+        }
+        if (!dryRun && legacyReview.length) {
+          console.log(
+            `Legacy skill name(s) left in place — ownership unclear (${legacyReview.length}). Review paths or remove manually.`
+          );
+          for (const r of legacyReview) {
+            console.log(`  review: ${r.path}`);
+          }
+        }
+
+        if (!dryRun && targetIdes.includes("claude")) {
+          const commandRemoved =
+            storeResult.legacyCommandCleanup?.filter((r) => r.action === "removed") ||
+            [];
+          const commandReview =
+            storeResult.legacyCommandCleanup?.filter(
+              (r) => r.action === "legacy-candidate-review-required"
+            ) || [];
+          if (commandRemoved.length) {
+            const commandsDir = path.join(path.dirname(targetMap.claude), "commands");
+            console.log(
+              `Removed stale Claude command wrappers (${commandRemoved.length}): ${commandsDir}`
+            );
+          }
+          if (commandReview.length) {
+            console.log(
+              `Claude command file(s) left in place — ownership unclear (${commandReview.length})`
+            );
+            for (const r of commandReview) {
+              console.log(`  review: ${r.path}`);
+            }
+          }
+        }
+
         for (const ide of targetIdes) {
           const targetPath = targetMap[ide];
           if (dryRun) {
             console.log(
               `[dry-run] would link ${skillNames.length} skills to ${targetPath}`
             );
-            if (ide === "claude") {
-              console.log(`[dry-run] would create Claude command wrappers`);
-            }
             continue;
           }
           ensureKenmarkTargetPath(targetPath);
@@ -388,12 +383,6 @@ function executeInstall(targetMap, targetIdes, action, options) {
           const modes = [...new Set(linkResults.map((r) => r.mode).filter(Boolean))];
           if (modes.length) {
             console.log(`  link mode(s): ${modes.join(", ")}`);
-          }
-          if (ide === "claude") {
-            const result = createClaudeCommandWrappers(targetPath, false);
-            console.log(
-              `Installed Claude command wrappers (${result.count}): ${result.commandsDir}`
-            );
           }
         }
 
@@ -525,10 +514,29 @@ function executeInstall(targetMap, targetIdes, action, options) {
 
       if (targetIdes.includes("claude")) {
         const claudePath = targetMap.claude;
-        const wrapperResult = removeClaudeCommandWrappers(claudePath, false);
-        console.log(
-          `Removed Claude command wrappers (${wrapperResult.removed}): ${wrapperResult.commandsDir}`
+        const commandResults = removeKenmarkClaudeCommandWrappers(
+          claudePath,
+          skillNames,
+          { dryRun: false }
         );
+        const removed = commandResults.filter((r) => r.action === "removed").length;
+        const commandsDir = path.join(path.dirname(claudePath), "commands");
+        if (removed) {
+          console.log(
+            `Removed Claude command wrappers (${removed}): ${commandsDir}`
+          );
+        }
+        const review = commandResults.filter(
+          (r) => r.action === "legacy-candidate-review-required"
+        );
+        if (review.length) {
+          console.log(
+            `Claude command file(s) left in place — ownership unclear (${review.length})`
+          );
+          for (const r of review) {
+            console.log(`  review: ${r.path}`);
+          }
+        }
       }
 
       if (!keepStore) {

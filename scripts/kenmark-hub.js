@@ -375,9 +375,116 @@ function listLegacyKenmarkSkillPaths() {
   ];
 }
 
+const KENMARK_PACKAGE_SOURCE = "kenmark-package";
+
+/** Substrings in SKILL.md that indicate a Kenmark-shipped skill (not name alone). */
+const KENMARK_SKILL_OWNERSHIP_MARKERS = [
+  "kenmark-skills",
+  "~/.kenmark/store",
+  "Kenmark skills",
+  "Kenmark first-party",
+  "Kenmark bundled",
+  "Kenmark's curated",
+  "Brain KB check before commit"
+];
+
+/** Substrings in generated Claude slash-command wrappers. */
+const KENMARK_COMMAND_OWNERSHIP_MARKERS = [
+  "from installed user skills",
+  "# Kenmark ",
+  "kenmark-skills"
+];
+
+function pathIsWithinDir(childPath, dirPath) {
+  const child = safeRealpath(childPath);
+  const dir = safeRealpath(dirPath);
+  if (child === dir) return true;
+  const rel = path.relative(dir, child);
+  return Boolean(rel) && !rel.startsWith("..") && !path.isAbsolute(rel);
+}
+
+function isSymlinkToKenmarkStore(skillPath, storeDir) {
+  if (!fs.existsSync(skillPath)) return false;
+  try {
+    const stat = fs.lstatSync(skillPath);
+    if (!stat.isSymbolicLink()) return false;
+    return pathIsWithinDir(skillPath, storeDir);
+  } catch {
+    return false;
+  }
+}
+
+function hasKenmarkManagedSkillsRoot(skillPath) {
+  const skillsRoot = path.dirname(skillPath);
+  return fs.existsSync(path.join(skillsRoot, KENMARK_MANAGED_MARKER));
+}
+
+function readSkillMdText(skillPath) {
+  const skillMd = path.join(skillPath, "SKILL.md");
+  if (!fs.existsSync(skillMd)) return null;
+  try {
+    return fs.readFileSync(skillMd, "utf8");
+  } catch {
+    return null;
+  }
+}
+
+function hasKenmarkSkillMdMarkers(skillPath) {
+  const text = readSkillMdText(skillPath);
+  if (!text) return false;
+  if (KENMARK_SKILL_OWNERSHIP_MARKERS.some((marker) => text.includes(marker))) {
+    return true;
+  }
+  const nameMatch = text.match(/^name:\s*(\S+)/m);
+  return Boolean(nameMatch && nameMatch[1].startsWith("kenmark-"));
+}
+
+function isManifestKenmarkSkill(manifest, skillName) {
+  const entry = manifest?.skills?.[skillName];
+  if (!entry) return false;
+  const src = String(entry.source || "");
+  return src === KENMARK_PACKAGE_SOURCE || src.startsWith(`${KENMARK_PACKAGE_SOURCE}:`);
+}
+
+function collectKenmarkLegacyOwnershipProofs(skillPath, { storeDir, manifest, skillName }) {
+  const proofs = [];
+  if (isSymlinkToKenmarkStore(skillPath, storeDir)) proofs.push("symlink-to-store");
+  if (hasKenmarkManagedSkillsRoot(skillPath)) proofs.push("kenmark-managed-root");
+  if (hasKenmarkSkillMdMarkers(skillPath)) proofs.push("skill-md-marker");
+  if (isManifestKenmarkSkill(manifest, skillName)) proofs.push("manifest-kenmark-package");
+  return proofs;
+}
+
+function isProvenKenmarkLegacyPath(skillPath, context) {
+  return collectKenmarkLegacyOwnershipProofs(skillPath, context).length > 0;
+}
+
+function backupLegacyCleanupPath(skillName, skillPath) {
+  if (!fs.existsSync(skillPath)) return null;
+
+  const backupRoot = path.join(
+    getBackupsDir(),
+    "legacy-cleanup",
+    timestampForPath(),
+    skillName
+  );
+  fs.mkdirSync(path.dirname(backupRoot), { recursive: true });
+  fs.cpSync(skillPath, backupRoot, { recursive: true });
+
+  return {
+    skillName,
+    source: skillPath,
+    backupPath: backupRoot,
+    reason: "legacy-cleanup",
+    createdAt: new Date().toISOString()
+  };
+}
+
 /**
- * Remove unprefixed Kenmark folders and old kenmark-<legacy> paths from store + IDE skill dirs.
- * Also drops stale manifest entries for removed names.
+ * Remove unprefixed Kenmark folders and old kenmark-<legacy> paths from store + IDE skill dirs
+ * when ownership is proven (symlink to store, .kenmark-managed parent, SKILL.md markers, or manifest).
+ * Unproven same-name paths are left in place with action legacy-candidate-review-required.
+ * Proven removals are backed up under ~/.kenmark/backups/legacy-cleanup/<timestamp>/<skill-name>.
  */
 function removeLegacyKenmarkInstalls(
   targetMap,
@@ -387,6 +494,7 @@ function removeLegacyKenmarkInstalls(
   const storeDir = getStoreDir();
   const manifest = readManifest();
   const results = [];
+  const ownershipContext = { storeDir, manifest };
 
   const roots = new Set();
   if (includeStore && fs.existsSync(storeDir)) {
@@ -396,43 +504,166 @@ function removeLegacyKenmarkInstalls(
     if (targetPath) roots.add(targetPath);
   }
 
+  let manifestChanged = false;
+
   for (const root of roots) {
     for (const legacyName of legacyPaths) {
       const fullPath = path.join(root, legacyName);
       if (!fs.existsSync(fullPath)) continue;
-      if (dryRun) {
-        results.push({ path: fullPath, action: "would-remove" });
+
+      const proofs = collectKenmarkLegacyOwnershipProofs(fullPath, {
+        ...ownershipContext,
+        skillName: legacyName
+      });
+
+      if (!proofs.length) {
+        results.push({
+          path: fullPath,
+          skillName: legacyName,
+          action: "legacy-candidate-review-required",
+          proofs: []
+        });
         continue;
       }
+
+      if (dryRun) {
+        results.push({
+          path: fullPath,
+          skillName: legacyName,
+          action: "would-remove",
+          proofs
+        });
+        continue;
+      }
+
+      const backup = backupLegacyCleanupPath(legacyName, fullPath);
       removePathIfExists(fullPath);
-      results.push({ path: fullPath, action: "removed" });
+      results.push({
+        path: fullPath,
+        skillName: legacyName,
+        action: "removed",
+        proofs,
+        backup
+      });
       if (manifest.skills && manifest.skills[legacyName]) {
         delete manifest.skills[legacyName];
+        manifestChanged = true;
       }
     }
   }
 
-  if (!dryRun && includeStore) {
+  if (!dryRun && includeStore && manifestChanged) {
     writeManifest(manifest);
   }
 
   return results;
 }
 
+/** @deprecated Use removeKenmarkClaudeCommandWrappers */
 function removeLegacyClaudeCommandWrappers(claudeSkillsPath, { dryRun = false } = {}) {
+  return removeKenmarkClaudeCommandWrappers(claudeSkillsPath, [], { dryRun });
+}
+
+function collectKenmarkCommandOwnershipProofs(commandFile, { claudeSkillsPath, manifest }) {
+  const proofs = [];
+  const base = path.basename(commandFile, ".md");
+
+  if (fs.existsSync(path.join(claudeSkillsPath, KENMARK_MANAGED_MARKER))) {
+    proofs.push("kenmark-managed-root");
+  }
+  if (isManifestKenmarkSkill(manifest, base)) {
+    proofs.push("manifest-kenmark-package");
+  }
+
+  try {
+    const text = fs.readFileSync(commandFile, "utf8");
+    if (KENMARK_COMMAND_OWNERSHIP_MARKERS.some((marker) => text.includes(marker))) {
+      proofs.push("command-content-marker");
+    }
+  } catch {
+    /* unreadable — no content proof */
+  }
+
+  return proofs;
+}
+
+function backupLegacyCleanupFile(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+
+  const base = path.basename(filePath);
+  const backupRoot = path.join(
+    getBackupsDir(),
+    "legacy-cleanup",
+    timestampForPath(),
+    base
+  );
+  fs.mkdirSync(path.dirname(backupRoot), { recursive: true });
+  fs.cpSync(filePath, backupRoot);
+  return {
+    skillName: base,
+    source: filePath,
+    backupPath: backupRoot,
+    reason: "legacy-cleanup",
+    createdAt: new Date().toISOString()
+  };
+}
+
+/**
+ * Remove generated Kenmark slash-command wrappers from ~/.claude/commands.
+ * Namespaced kenmark-* skills are invoked directly; wrappers duplicate skill names.
+ * Only removes files with proven Kenmark ownership (same proofs as legacy skill dirs).
+ */
+function removeKenmarkClaudeCommandWrappers(
+  claudeSkillsPath,
+  bundledSkillNames,
+  { dryRun = false } = {}
+) {
   const commandsDir = path.join(path.dirname(claudeSkillsPath), "commands");
-  const legacyCommandNames = listLegacyKenmarkSkillPaths();
+  const manifest = readManifest();
+  const basenames = new Set(listLegacyKenmarkSkillPaths());
+  for (const skillName of bundledSkillNames || []) {
+    basenames.add(kenmarkClaudeCommandBasename(skillName));
+  }
   const results = [];
 
-  for (const base of legacyCommandNames) {
+  for (const base of basenames) {
     const commandFile = path.join(commandsDir, `${base}.md`);
     if (!fs.existsSync(commandFile)) continue;
-    if (dryRun) {
-      results.push({ path: commandFile, action: "would-remove" });
+
+    const proofs = collectKenmarkCommandOwnershipProofs(commandFile, {
+      claudeSkillsPath,
+      manifest
+    });
+
+    if (!proofs.length) {
+      results.push({
+        path: commandFile,
+        skillName: base,
+        action: "legacy-candidate-review-required",
+        proofs: []
+      });
       continue;
     }
+
+    if (dryRun) {
+      results.push({
+        path: commandFile,
+        skillName: base,
+        action: "would-remove",
+        proofs
+      });
+      continue;
+    }
+
+    const backup = backupLegacyCleanupFile(commandFile);
     fs.rmSync(commandFile, { force: true });
-    results.push({ path: commandFile, action: "removed" });
+    results.push({
+      path: commandFile,
+      skillName: base,
+      action: "removed",
+      proofs,
+      backup
+    });
   }
 
   return results;
@@ -982,7 +1213,8 @@ function installKenmarkSkillsToStoreWithLegacyCleanup(
   });
   let commandCleanup = [];
   if (targetMap?.claude) {
-    commandCleanup = removeLegacyClaudeCommandWrappers(targetMap.claude, {
+    const bundledNames = listKenmarkBundledSkillNames(sourceUserSkillsDir);
+    commandCleanup = removeKenmarkClaudeCommandWrappers(targetMap.claude, bundledNames, {
       dryRun
     });
   }
@@ -1753,8 +1985,11 @@ module.exports = {
   LEGACY_SKILL_RENAMES,
   kenmarkClaudeCommandBasename,
   listLegacyKenmarkSkillPaths,
+  collectKenmarkLegacyOwnershipProofs,
+  isProvenKenmarkLegacyPath,
   removeLegacyKenmarkInstalls,
   removeLegacyClaudeCommandWrappers,
+  removeKenmarkClaudeCommandWrappers,
   installKenmarkSkillsToStoreWithLegacyCleanup,
   detectInstalledIdes,
   detectManagedIdes,
