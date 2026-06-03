@@ -26,11 +26,11 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 ## Overview
 
-`kenmark-skills` ships **15 first-party skills**, a **10-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
+`kenmark-skills` ships **22 first-party skills**, a **10-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
 
 | Asset | Count | Notes |
 | --- | ---: | --- |
-| Kenmark skills | 15 | Bundled in `skills/user-skills/` |
+| Kenmark skills | 22 | Bundled in `skills/user-skills/` |
 | CLI commands | 10 | See [CLI reference](#cli-reference) |
 | Bundled sub-agents | 0 | Inventory/maintain skills only |
 | Recommended packs | 5 | Impeccable, ECC, Graphify, code review, SEO/GEO |
@@ -49,7 +49,12 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 | Problem unclear? | **`troubleshoot`** |
 | Need issue tracking? | **`issues-setup`** / **`issues-scan`** |
 | Need skill choice? | **`skills-router`** |
-| Repo clutter / secrets / public push? | **`repo-hygiene`** |
+| Repo clutter / scattered docs? | **`repo-hygiene`** |
+| Secrets / keys / tokens? | **`repo-secrets-audit`** |
+| Make repo public? | **`repo-public-readiness`** |
+| Update brain after code change? | **`repo-kb-sync`** |
+| Docs quality? | **`repo-docs-audit`** |
+| Release / npm publish? | **`repo-release-readiness`** |
 | Installed skills inventory? | **`skills-maintain`** |
 | Need commit? | **`commit-push`** |
 
@@ -106,7 +111,14 @@ Skills are grouped by use case. Open each `SKILL.md` for full workflows and trig
 | --- | --- |
 | [`skills-router`](skills/user-skills/skills-router/SKILL.md) | Search installed skills and auto-assign the best match for the current task |
 | [`troubleshoot`](skills/user-skills/troubleshoot/SKILL.md) | Universal diagnosis: evidence, hypotheses, ranked action plan (read-only first) |
-| [`repo-hygiene`](skills/user-skills/repo-hygiene/SKILL.md) | Audit scattered docs, orphan assets, dumps, backups, and secret risks; cleanup only after approval |
+| [`repo-hygiene`](skills/user-skills/repo-hygiene/SKILL.md) | Audit clutter, scattered docs, orphan assets, dumps; cleanup only after approval |
+| [`repo-secrets-audit`](skills/user-skills/repo-secrets-audit/SKILL.md) | Deep read-only scan for secrets and credentials (redacted report) |
+| [`repo-public-readiness`](skills/user-skills/repo-public-readiness/SKILL.md) | Safe-to-publish checklist before open-sourcing |
+| [`repo-kb-sync`](skills/user-skills/repo-kb-sync/SKILL.md) | Update `brain/kb/` and changelog after code changes |
+| [`repo-docs-audit`](skills/user-skills/repo-docs-audit/SKILL.md) | Documentation quality, README/env accuracy, broken links |
+| [`repo-structure-audit`](skills/user-skills/repo-structure-audit/SKILL.md) | Folder layout, naming, module boundaries |
+| [`repo-dependency-audit`](skills/user-skills/repo-dependency-audit/SKILL.md) | Package bloat, unused deps, lockfile consistency |
+| [`repo-release-readiness`](skills/user-skills/repo-release-readiness/SKILL.md) | Pre-release version, changelog, tests, meta consistency |
 
 ### Ship
 
@@ -150,7 +162,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | Command | Description |
 | --- | --- |
 | `init` | First-time wizard: runs `setup` + optional `install-recommended` |
-| `setup` | Install 15 Kenmark skills → `~/.kenmark/store` + IDE symlinks |
+| `setup` | Install 22 Kenmark skills → `~/.kenmark/store` + IDE symlinks |
 | `uninstall` | Remove Kenmark links from IDE paths (`--keep-store` optional); also removes Kenmark MCP if installed |
 | `mcp` | MCP management (`mcp uninstall` removes Kenmark MCP from IDE configs + `~/.kenmark/store/mcp.json`; skills unchanged) |
 | `install-recommended` | Install packs from [`recommended-catalog.json`](skills/user-skills/recommended-catalog.json) |
@@ -177,7 +189,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | | `init` | `setup` |
 | --- | --- | --- |
 | **Use when** | First install; want optional curated packs | Kenmark skills only; re-link IDEs |
-| **Installs** | Kenmark + optional catalog packs | 15 Kenmark skills |
+| **Installs** | Kenmark + optional catalog packs | 22 Kenmark skills |
 | **Implementation** | `setup` → `install-recommended` | `setup-skills.js` |
 | **Later refreshes** | Use `update`, not `init` again | `update` or `setup --force` |
 
@@ -476,7 +488,7 @@ kenmark-skills/
 │   └── setup-skills.js     # kenmark-skills-setup
 └── skills/
     ├── README.md           # logical categories vs flat on-disk layout
-    └── user-skills/        # 15 universal skills + recommended-catalog.json
+    └── user-skills/        # 22 universal skills + recommended-catalog.json
 ```
 
 **Not committed here:** `.claude/`, `.cursor/`, `.agents/` (local IDE installs), `brain/` (optional dev workspace). Edit `skills/user-skills/<name>/SKILL.md` for bundled skills.

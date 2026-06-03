@@ -2,11 +2,19 @@
 
 ## Unreleased
 
-### Repo hygiene
+### Repo skill family
 
-- **repo-hygiene:** New bundled workflow skill (`phase: audit`, `risk: write-files`) — audit-first scan for scattered Markdown, orphan assets, dumps/backups, generated clutter, and secret risks; cleanup only after explicit approval; public-repo readiness checklist.
-- **skills-router:** Routes repo hygiene / sanitize / public-push / find-secrets triggers to `repo-hygiene`; `audit` phase documented; category quick map updated.
-- **README / package.json / skills/README.md:** Kenmark skill count 14 → 15.
+- **repo-hygiene (1.1.0):** Clutter-focused audit; delegates deep secrets to `repo-secrets-audit` and publish gate to `repo-public-readiness`.
+- **repo-secrets-audit:** Read-only deep credential scan with mandatory redaction and history-cleanup guidance.
+- **repo-public-readiness:** Read-only safe-to-publish verdict (Yes / No / Conditional), blockers, and history-rewrite flag.
+- **repo-kb-sync:** Incremental `brain/kb/` and `brain/CHANGELOG.md` updates after code changes.
+- **repo-docs-audit:** Documentation quality audit (README, env, scripts, KB freshness, links).
+- **repo-structure-audit:** Read-only folder layout and module-boundary recommendations.
+- **repo-dependency-audit:** Read-only package health (unused/duplicate deps, lockfile consistency).
+- **repo-release-readiness:** Pre-ship checklist (version, changelog, tests, build, meta consistency).
+- **skills-router / troubleshoot / skills-init / skills-maintain:** Repo family routing table; specialist tie-break over `repo-hygiene`.
+- **scripts/skills-inventory.js:** `KEEP_ALWAYS` includes all `repo-*` skills.
+- **README / package.json / skills/README.md:** Kenmark skill count 15 → 22.
 
 ### Init, recommended packs, and catalog
 
