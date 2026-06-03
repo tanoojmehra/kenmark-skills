@@ -913,8 +913,24 @@ function validatePackageJson() {
   if (scripts.validate !== "node scripts/validate-repo.js") {
     fail('package.json: scripts.validate must be "node scripts/validate-repo.js"');
   }
-  if (scripts.test !== "node scripts/validate-repo.js") {
-    fail('package.json: scripts.test must be "node scripts/validate-repo.js"');
+  if (scripts.test !== "npm run validate && npm run test:cli") {
+    fail('package.json: scripts.test must be "npm run validate && npm run test:cli"');
+  }
+  if (scripts["test:cli"] !== "node scripts/test-cli-smoke.js") {
+    fail('package.json: scripts["test:cli"] must be "node scripts/test-cli-smoke.js"');
+  }
+  if (scripts["test:install"] !== "node scripts/test-install-temp-home.js") {
+    fail(
+      'package.json: scripts["test:install"] must be "node scripts/test-install-temp-home.js"'
+    );
+  }
+  if (scripts["test:pack"] !== "node scripts/test-pack.js") {
+    fail('package.json: scripts["test:pack"] must be "node scripts/test-pack.js"');
+  }
+  if (scripts["test:all"] !== "npm run test && npm run test:install && npm run test:pack") {
+    fail(
+      'package.json: scripts["test:all"] must be "npm run test && npm run test:install && npm run test:pack"'
+    );
   }
   if (scripts["doctor:local"] !== "node scripts/cli.js doctor") {
     fail('package.json: scripts["doctor:local"] must be "node scripts/cli.js doctor"');
@@ -939,14 +955,21 @@ function validatePackageJson() {
     if (!files.includes(entry)) {
       fail(`package.json: files must include "${entry}"`);
     }
+  }
 
+  for (const entry of files) {
+    if (!entry || entry.includes("*")) continue;
     const abs = path.join(repoRoot, entry);
-    if (!entry.includes("*") && !fs.existsSync(abs)) {
-      fail(`package.json: files includes missing path "${entry}"`);
+    if (!fs.existsSync(abs)) {
+      fail(`package.json: files includes missing path on disk "${entry}"`);
     }
   }
 
-  for (const rel of CLI_SPAWNED_SCRIPTS) {
+  const spawned = parseCliSpawnedScripts(cliSrc);
+  if (!spawned.length) {
+    fail("scripts/cli.js: could not parse any spawned script paths");
+  }
+  for (const rel of spawned) {
     if (!fs.existsSync(path.join(repoRoot, rel))) {
       fail(`scripts/cli.js references missing script: ${rel}`);
     }
@@ -1236,6 +1259,7 @@ function main() {
   validateSkills();
   validateSkillCountConsistency();
   validateCatalog();
+  validateCatalogBehavior();
   validateInitBrainKb();
   validatePackageJson();
   validateClaudeWrapperPolicy();
