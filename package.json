@@ -21,6 +21,8 @@
     "install-recommended": "node scripts/cli.js install-recommended",
     "doctor": "node scripts/cli.js doctor",
     "check": "node scripts/cli.js doctor",
+    "validate": "node scripts/validate-repo.js",
+    "test": "node scripts/validate-repo.js && node scripts/cli.js doctor",
     "setup:skills": "node scripts/setup-skills.js",
     "pack:check": "npm pack --dry-run",
     "publish:public": "npm publish --access public"
@@ -40,6 +42,7 @@
     "scripts/setup-skills.js",
     "scripts/skills-adopt.js",
     "scripts/doctor.js",
+    "scripts/validate-repo.js",
     "scripts/skills-init.js",
     "scripts/skills-inventory.js",
     "scripts/skills-install-recommended.js",
