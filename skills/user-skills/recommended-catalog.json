@@ -1,10 +1,11 @@
 {
-  "version": 4,
+  "version": 5,
+  "mode": "selectable",
   "updatedAt": "2026-06-03",
-  "notes": "Profile-based curated skill packs. Default profile is lean; core-next is recommended for Next.js full-stack work (no ECC until installer verified). kenmark-packs reads this at runtime.",
+  "notes": "Selectable optional third-party installs with repo-aware suggestions. Presets are power-user/CI shortcuts only.",
   "defaults": {
     "scope": "global",
-    "profile": "lean"
+    "selectedIds": ["impeccable", "code-review-skill"]
   },
   "installRules": {
     "guidance": "Do not install multiple overlapping packs for the same purpose unless the user explicitly asks.",
@@ -16,117 +17,58 @@
       { "category": "navigation", "maxPrimary": 1, "note": "Graphify for medium/large repos only" }
     ]
   },
-  "profiles": [
+  "presets": [
     {
       "id": "lean",
       "name": "Lean Daily Coding",
-      "description": "Fast default for everyday coding with UI polish and code review.",
-      "default": true,
-      "recommendedFor": [
-        "small projects",
-        "daily coding",
-        "slow Cursor or Claude Code setups"
-      ],
-      "packs": [
-        { "id": "impeccable" },
-        { "id": "code-review-skill" }
-      ]
+      "description": "Impeccable + code review — same as default selection.",
+      "packIds": ["impeccable", "code-review-skill"]
     },
     {
       "id": "core-next-lite",
       "name": "Core Next.js Lite",
-      "description": "Next.js essentials without Graphify or ECC — Impeccable + code review for smaller sites and faster harnesses.",
-      "recommendedFor": [
-        "small Next.js sites",
-        "marketing pages",
-        "when Graphify feels heavy"
-      ],
-      "packs": [
-        { "id": "impeccable" },
-        { "id": "code-review-skill" }
-      ]
+      "description": "Next.js essentials without Graphify or ECC.",
+      "packIds": ["impeccable", "code-review-skill"]
     },
     {
       "id": "core-next",
       "name": "Core Next.js Full-Stack",
-      "description": "Best default for Next.js, Tailwind, ShadCN, Prisma, MongoDB, and agency/client projects (core-next-lite + Graphify).",
-      "kenmarkRecommended": true,
-      "recommendedFor": [
-        "Next.js apps",
-        "full-stack projects",
-        "agency/client projects",
-        "medium/large repos"
-      ],
+      "description": "core-next-lite + Graphify for medium/large Next.js repos.",
       "extends": "core-next-lite",
-      "packs": [{ "id": "graphify" }]
+      "packIds": ["graphify"]
     },
     {
       "id": "core-next-agentic",
       "name": "Core Next.js Agentic",
-      "description": "core-next plus ECC minimal — explicit opt-in; ECC uses manual/plugin install until the npm installer is verified.",
-      "recommendedFor": [
-        "structured agent workflows",
-        "when you already use or want ECC via plugin"
-      ],
+      "description": "core-next plus ECC minimal (manual install).",
       "extends": "core-next",
-      "packs": [{ "id": "ecc", "profile": "minimal" }]
+      "packIds": [{ "id": "ecc", "profile": "minimal" }]
     },
     {
       "id": "growth-seo",
       "name": "Growth + SEO/GEO",
-      "description": "Public websites and content-driven apps without installing the full 20-skill SEO suite.",
-      "recommendedFor": [
-        "client websites",
-        "landing pages",
-        "SEO-heavy marketing sites"
-      ],
+      "description": "core-next + selected SEO/GEO skills (not the full 20-skill suite).",
       "extends": "core-next",
-      "packs": [
-        {
-          "id": "seo-geo-claude-skills",
-          "mode": "selected-skills",
-          "skills": [
-            "keyword-research",
-            "technical-seo-checker",
-            "schema-markup-generator",
-            "on-page-seo-auditor",
-            "seo-content-writer",
-            "geo-content-optimizer"
-          ]
-        }
-      ]
+      "packIds": [{ "id": "seo-geo-selected" }]
     },
     {
       "id": "audit-review",
       "name": "Audit / Review",
-      "description": "Codebase cleanup, refactors, and security reviews without default UI design skills.",
-      "recommendedFor": [
-        "inherited repos",
-        "refactors",
-        "bug hunts",
-        "security reviews"
-      ],
-      "packs": [
-        { "id": "code-review-skill" },
-        { "id": "graphify" }
-      ]
+      "description": "Code review + Graphify without default UI design skills.",
+      "packIds": ["code-review-skill", "graphify"]
     },
     {
       "id": "experimental-heavy",
       "name": "Experimental Heavy",
-      "description": "Large experimental install — high bloat, not for daily defaults.",
+      "description": "Large experimental install — high bloat, explicit opt-in only.",
       "risk": "high-bloat",
       "requiresConfirmation": true,
-      "recommendedFor": [
-        "experimentation",
-        "large agentic workflows"
-      ],
-      "packs": [
-        { "id": "impeccable" },
-        { "id": "code-review-skill" },
-        { "id": "graphify" },
+      "packIds": [
+        "impeccable",
+        "code-review-skill",
+        "graphify",
         { "id": "ecc", "profile": "core" },
-        { "id": "seo-geo-claude-skills", "mode": "full" }
+        "seo-geo-full"
       ]
     }
   ],
@@ -137,9 +79,17 @@
       "category": "design",
       "weight": "light",
       "bloatScore": 1,
-      "recommendedByDefault": true,
+      "recommended": true,
+      "defaultSelected": true,
+      "helpsWith": ["UI polish", "design systems", "frontend taste"],
       "bestFor": ["UI polish", "frontend taste", "design systems"],
       "avoidWhen": ["backend-only scripts", "non-UI refactors"],
+      "suggestiveTest": {
+        "question": "Does this project have a user-facing UI?",
+        "signals": ["next.config", "ui-app-router", "ui-src-components", "ui-pages-dir", "tailwind.config", "shadcn-ui", "css-modules"],
+        "recommendWhen": "any",
+        "recommendation": "recommended"
+      },
       "url": "https://github.com/pbakaus/impeccable",
       "description": "Design language for agent harnesses — UI/UX quality, anti-slop patterns, frontend polish workflows.",
       "warning": "The upstream skills CLI may report partial failures for unsupported harnesses (e.g. PromptScript). If Verify is OK, Impeccable is installed for supported agents.",
@@ -163,52 +113,26 @@
       }
     },
     {
-      "id": "graphify",
-      "name": "Graphify",
-      "category": "navigation",
-      "weight": "medium",
-      "bloatScore": 2,
-      "recommendedByDefault": false,
-      "requires": ["uv or pipx"],
-      "bestFor": ["large repos", "architecture understanding", "full-stack navigation"],
-      "avoidWhen": ["small repos", "simple one-file edits"],
-      "url": "https://github.com/safishamsi/graphify",
-      "description": "Turns any folder of code, schemas, scripts, docs, papers, images, or video into a queryable knowledge graph for project navigation (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, and more).",
-      "warning": "Python-based. The PyPI package is graphifyy (double-y). Requires uv, pipx, or pip; uv/pipx are preferred so the package lives in its own env and `graphify` resolves Python at runtime.",
-      "install": {
-        "global": {
-          "command": "uv tool install graphifyy && graphify install",
-          "summary": "Install the graphifyy Python package via uv, then register the skill with global agents"
-        },
-        "project": {
-          "command": "uv tool install graphifyy && graphify install --project",
-          "cwd": "project",
-          "summary": "Install the package globally, then register the skill into the current project"
-        },
-        "alternatives": [
-          "pipx install graphifyy && graphify install",
-          "pip install --user graphifyy && graphify install (add ~/.local/bin or ~/Library/Python/<ver>/bin to PATH if needed)",
-          "Per-IDE project install: graphify claude install --project, graphify codex install --project"
-        ],
-        "verify": {
-          "global": "test -f \"$HOME/.claude/skills/graphify/SKILL.md\" || test -f \"$HOME/.agents/skills/graphify/SKILL.md\"",
-          "project": "test -f \".claude/skills/graphify/SKILL.md\" || test -f \".agents/skills/graphify/SKILL.md\""
-        }
-      }
-    },
-    {
       "id": "code-review-skill",
       "name": "Awesome Code Review",
       "category": "review",
       "weight": "light",
       "bloatScore": 1,
-      "recommendedByDefault": true,
-      "installStrategy": "git-sync",
+      "recommended": true,
+      "defaultSelected": true,
+      "helpsWith": ["PR review", "correctness", "multi-language review"],
       "bestFor": ["PR review", "correctness", "multi-language codebases"],
       "avoidWhen": [],
+      "suggestiveTest": {
+        "question": "Will agents review or refactor code in this repo?",
+        "signals": ["git-repo", "typescript-project", "multi-language-src"],
+        "recommendWhen": "any",
+        "recommendation": "recommended"
+      },
       "url": "https://github.com/awesome-skills/code-review-skill",
-      "description": "Modular code-review skill for Claude Code — 19+ languages/frameworks (React 19, Vue 3, Rust, Go, TypeScript, TanStack Query v5, …) loaded progressively with a four-phase review process and six-level severity scale.",
-      "warning": "Git-based install (not npx). Syncs the repo into ~/.claude/skills/code-review-skill/ (or ./.claude/skills/ for project scope). Re-runs clone once, then `git pull --ff-only`. Fails if the target path exists but is not a git repository.",
+      "description": "Modular code-review skill for Claude Code — 19+ languages/frameworks loaded progressively with a four-phase review process.",
+      "warning": "Git-based install (not npx). Re-runs clone once, then `git pull --ff-only`.",
+      "installStrategy": "git-sync",
       "install": {
         "repoUrl": "https://github.com/awesome-skills/code-review-skill.git",
         "global": {
@@ -221,9 +145,7 @@
           "summary": "Sync the repo into the current project's .claude/skills/ directory"
         },
         "alternatives": [
-          "Windows (PowerShell): git clone https://github.com/awesome-skills/code-review-skill.git \"$env:USERPROFILE\\.claude\\skills\\code-review-skill\"",
-          "Add to an existing plugin: cp -r code-review-skill ~/.claude/plugins/<your-plugin>/skills/code-review/",
-          "Fetch the tarball instead of cloning: curl -L https://github.com/awesome-skills/code-review-skill/archive/refs/heads/main.tar.gz | tar -xz -C \"$HOME/.claude/skills/\" && mv \"$HOME/.claude/skills/code-review-skill-main\" \"$HOME/.claude/skills/code-review-skill\""
+          "Windows (PowerShell): git clone https://github.com/awesome-skills/code-review-skill.git \"$env:USERPROFILE\\.claude\\skills\\code-review-skill\""
         ],
         "verify": {
           "global": "test -f \"$HOME/.claude/skills/code-review-skill/SKILL.md\"",
@@ -232,29 +154,84 @@
       }
     },
     {
-      "id": "seo-geo-claude-skills",
-      "name": "SEO & GEO Skills",
+      "id": "graphify",
+      "name": "Graphify",
+      "category": "navigation",
+      "weight": "medium",
+      "bloatScore": 2,
+      "recommended": false,
+      "defaultSelected": false,
+      "helpsWith": ["large-repo navigation", "architecture maps", "cross-file reasoning"],
+      "bestFor": ["large repos", "architecture understanding", "full-stack navigation"],
+      "avoidWhen": ["small repos", "simple one-file edits"],
+      "suggestiveTest": {
+        "question": "Is this repo large enough to benefit from a knowledge graph?",
+        "signals": ["repo-file-count-high", "monorepo-workspace", "next.config"],
+        "recommendWhen": ">=2",
+        "recommendation": "optional"
+      },
+      "url": "https://github.com/safishamsi/graphify",
+      "description": "Turns code, schemas, docs, and media into a queryable knowledge graph for project navigation.",
+      "warning": "Python-based (graphifyy on PyPI). Requires uv, pipx, or pip.",
+      "install": {
+        "global": {
+          "command": "uv tool install graphifyy && graphify install",
+          "summary": "Install graphifyy via uv, then register the skill with global agents"
+        },
+        "project": {
+          "command": "uv tool install graphifyy && graphify install --project",
+          "cwd": "project",
+          "summary": "Install the package globally, then register into the current project"
+        },
+        "alternatives": [
+          "pipx install graphifyy && graphify install"
+        ],
+        "verify": {
+          "global": "test -f \"$HOME/.claude/skills/graphify/SKILL.md\" || test -f \"$HOME/.agents/skills/graphify/SKILL.md\"",
+          "project": "test -f \".claude/skills/graphify/SKILL.md\" || test -f \".agents/skills/graphify/SKILL.md\""
+        }
+      }
+    },
+    {
+      "id": "seo-geo-selected",
+      "aliases": ["seo-geo-claude-skills"],
+      "name": "SEO & GEO (selected skills)",
       "category": "seo",
-      "weight": "heavy",
-      "bloatScore": 5,
+      "weight": "medium",
+      "bloatScore": 2,
       "selectedBloatScore": 2,
-      "recommendedByDefault": false,
-      "installModes": ["selected-skills", "full"],
-      "defaultMode": "selected-skills",
-      "bestFor": ["public websites", "content marketing", "GEO optimization"],
+      "recommended": false,
+      "defaultSelected": false,
+      "seoMode": "selected-skills",
+      "defaultSeoSkills": [
+        "keyword-research",
+        "technical-seo-checker",
+        "schema-markup-generator",
+        "on-page-seo-auditor",
+        "seo-content-writer",
+        "geo-content-optimizer"
+      ],
+      "helpsWith": ["public websites", "content marketing", "GEO optimization"],
+      "bestFor": ["client websites", "landing pages", "SEO-heavy marketing sites"],
       "avoidWhen": ["private apps", "admin dashboards", "non-public tools"],
+      "suggestiveTest": {
+        "question": "Is this a public marketing or content site?",
+        "signals": ["seo-marketing-deps", "public-static-site", "sitemap-or-robots"],
+        "recommendWhen": ">=1",
+        "recommendation": "optional"
+      },
       "url": "https://github.com/aaron-he-zhu/seo-geo-claude-skills",
-      "description": "Suite of 20 SEO and Generative Engine Optimization (GEO) skills for Claude Code, Cursor, Codex, and 35+ AI agents — keyword research, competitor analysis, content writing, technical audits, schema markup, rank tracking, and more.",
-      "warning": "Full pack installs 20 skills + 20 slash commands. Profiles install only selected skills unless mode is full. Append -s <name> per skill for manual installs.",
+      "description": "Six high-value SEO/GEO skills (keyword research, technical audit, schema, on-page, content, GEO) — not the full 20-skill suite.",
+      "warning": "Installs selected skills only. For all 20 skills use seo-geo-full.",
       "install": {
         "global": {
           "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -g -y",
-          "summary": "Install all 20 SEO/GEO skills to the user's global agent skills directory"
+          "summary": "Full pack command (use batch selected-skills install at runtime)"
         },
         "project": {
           "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -y",
           "cwd": "project",
-          "summary": "Install all 20 SEO/GEO skills into the current project"
+          "summary": "Full pack command (use batch selected-skills install at runtime)"
         },
         "skillInstall": {
           "global": {
@@ -270,22 +247,60 @@
         "batchSkillInstall": {
           "global": {
             "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -g -y -s {{skills}}",
-            "summary": "Install selected SEO/GEO skills globally in one skills CLI run (space-separated after -s)"
+            "summary": "Install selected SEO/GEO skills globally in one run"
           },
           "project": {
             "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -y -s {{skills}}",
             "cwd": "project",
-            "summary": "Install selected SEO/GEO skills into the current project in one skills CLI run"
+            "summary": "Install selected SEO/GEO skills into the current project in one run"
           }
         },
         "alternatives": [
-          "Claude plugin: /plugin marketplace add aaron-he-zhu/seo-geo-claude-skills (then /plugin install aaron-seo-geo)",
-          "Gemini CLI: gemini extensions install https://github.com/aaron-he-zhu/seo-geo-claude-skills",
-          "Qwen Code: qwen extensions install https://github.com/aaron-he-zhu/seo-geo-claude-skills"
+          "Claude plugin: /plugin marketplace add aaron-he-zhu/seo-geo-claude-skills"
         ],
         "verify": {
-          "global": "test -d \"$HOME/.agents/skills/seo-geo-claude-skills\" || test -d \"$HOME/.claude/skills/seo-geo-claude-skills\" || test -f \"$HOME/.agents/skills/keyword-research/SKILL.md\" || test -f \"$HOME/.claude/skills/keyword-research/SKILL.md\"",
-          "project": "test -d \".agents/skills/seo-geo-claude-skills\" || test -d \".claude/skills/seo-geo-claude-skills\" || test -f \".agents/skills/keyword-research/SKILL.md\" || test -f \".claude/skills/keyword-research/SKILL.md\""
+          "global": "test -f \"$HOME/.agents/skills/keyword-research/SKILL.md\" || test -f \"$HOME/.claude/skills/keyword-research/SKILL.md\"",
+          "project": "test -f \".agents/skills/keyword-research/SKILL.md\" || test -f \".claude/skills/keyword-research/SKILL.md\""
+        }
+      }
+    },
+    {
+      "id": "seo-geo-full",
+      "name": "SEO & GEO (full pack)",
+      "category": "seo",
+      "weight": "heavy",
+      "bloatScore": 5,
+      "recommended": false,
+      "defaultSelected": false,
+      "seoMode": "full",
+      "helpsWith": ["full SEO/GEO suite", "rank tracking", "competitor analysis"],
+      "bestFor": ["SEO agencies", "content teams needing every skill"],
+      "avoidWhen": ["daily coding", "private/internal apps", "minimal harnesses"],
+      "suggestiveTest": {
+        "question": "Do you need the entire 20-skill SEO/GEO suite?",
+        "signals": ["seo-marketing-deps", "seo-heavy-package-scripts"],
+        "recommendWhen": ">=2",
+        "recommendation": "avoid"
+      },
+      "url": "https://github.com/aaron-he-zhu/seo-geo-claude-skills",
+      "description": "All 20 SEO and GEO skills plus slash commands — high bloat; prefer seo-geo-selected for most sites.",
+      "warning": "Full pack installs 20 skills + 20 slash commands. Explicit opt-in only.",
+      "install": {
+        "global": {
+          "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -g -y",
+          "summary": "Install all 20 SEO/GEO skills globally"
+        },
+        "project": {
+          "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -y",
+          "cwd": "project",
+          "summary": "Install all 20 SEO/GEO skills into the current project"
+        },
+        "alternatives": [
+          "Claude plugin: /plugin marketplace add aaron-he-zhu/seo-geo-claude-skills"
+        ],
+        "verify": {
+          "global": "test -d \"$HOME/.agents/skills/seo-geo-claude-skills\" || test -d \"$HOME/.claude/skills/seo-geo-claude-skills\"",
+          "project": "test -d \".agents/skills/seo-geo-claude-skills\" || test -d \".claude/skills/seo-geo-claude-skills\""
         }
       }
     },
@@ -296,26 +311,33 @@
       "weight": "heavy-variable",
       "bloatScore": 3,
       "installStrategy": "manual",
-      "recommendedByDefault": false,
+      "recommended": false,
+      "defaultSelected": false,
+      "helpsWith": ["structured agent workflows", "security scanning patterns"],
+      "bestFor": ["structured agent workflows", "security scanning patterns"],
+      "avoidWhen": ["already using ECC plugin", "minimal daily coding only"],
+      "suggestiveTest": {
+        "question": "Do you want a large agent harness overlay?",
+        "signals": ["claude-project-config", "ecc-already-present"],
+        "recommendWhen": "ecc-already-present",
+        "recommendation": "avoid"
+      },
       "defaultProfile": "minimal",
       "allowedProfiles": ["minimal", "core", "full"],
       "recommendedProfile": "minimal",
-      "avoidProfilesByDefault": ["full"],
-      "bestFor": ["structured agent workflows", "security scanning patterns"],
-      "avoidWhen": ["already using ECC plugin", "minimal daily coding only"],
       "url": "https://github.com/affaan-m/ECC",
-      "description": "Agent-harness performance optimization system — skills, agents, hooks, rules, and commands for Claude Code, Codex, Cursor, OpenCode. Minimal profile ships ~3–5 agents and ~10–15 skills; full is much larger.",
-      "warning": "ECC npm installer (npx ecc-install) is not verified on npm. Kenmark prints manual/plugin steps instead of running it. Do not stack install methods — if you've already added ECC via /plugin install, do not also run a shell installer (and vice versa).",
+      "description": "Agent-harness performance system — skills, agents, hooks, rules. Manual install until npm installer is verified.",
+      "warning": "ECC npm installer is not verified. Kenmark prints manual/plugin steps. Do not stack with plugin install.",
       "install": {
         "defaultProfile": "minimal",
         "profiles": [
-          { "id": "minimal", "description": "Minimal: rules, agents, commands, core workflow skills; no hooks-runtime (~3-5 agents, ~10-15 skills). Recommended." },
+          { "id": "minimal", "description": "Minimal: rules, agents, commands, core workflow skills (~3-5 agents, ~10-15 skills)." },
           { "id": "core", "description": "Core: standard install. Pair with --without baseline:hooks to keep hooks off" },
           { "id": "full", "description": "Full: complete installer (28 agents, 119 skills). Explicit opt-in only" }
         ],
         "global": {
           "manual": true,
-          "summary": "Install ECC with the selected profile into the user's global Claude config"
+          "summary": "Install ECC with the selected profile into global Claude config"
         },
         "project": {
           "manual": true,
@@ -323,13 +345,12 @@
           "summary": "Install ECC with the selected profile for the current project"
         },
         "alternatives": [
-          "Per-platform shell installer: ./install.sh --profile minimal --target claude (Linux/macOS)",
-          "Plugin path: /plugin marketplace add https://github.com/affaan-m/ECC && /plugin install ecc@ecc",
-          "Override profile: --ecc-profile minimal|core|full on npx kenmark-skills install-recommended"
+          "Plugin: /plugin marketplace add https://github.com/affaan-m/ECC && /plugin install ecc@ecc",
+          "Override: --ecc-profile minimal|core|full on install-recommended"
         ],
         "verify": {
-          "global": "{ ls \"$HOME/.claude/agents\"/ecc-*.md 2>/dev/null; ls -d \"$HOME/.claude/skills\"/ecc-*/ 2>/dev/null; ls -d \"$HOME/.claude/rules\"/ecc/ 2>/dev/null; } | grep -q .",
-          "project": "{ ls .claude/agents/ecc-*.md 2>/dev/null; ls -d .claude/skills/ecc-*/ 2>/dev/null; ls -d .claude/rules/ecc/ 2>/dev/null; } | grep -q ."
+          "global": "{ ls \"$HOME/.claude/agents\"/ecc-*.md 2>/dev/null; ls -d \"$HOME/.claude/skills\"/ecc-*/ 2>/dev/null; } | grep -q .",
+          "project": "{ ls .claude/agents/ecc-*.md 2>/dev/null; ls -d .claude/skills/ecc-*/ 2>/dev/null; } | grep -q ."
         }
       }
     }

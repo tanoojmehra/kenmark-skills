@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking (UX)
+
+- **recommended-catalog.json (v5):** Primary mental model is **selectable optional installs** with repo-aware suggestions (`mode: selectable`), not profile-first setup. `profiles` renamed to **`presets`** (advanced/CI shortcuts). Default install selection is only **impeccable** + **code-review-skill** via `defaults.selectedIds`. SEO split into **`seo-geo-selected`** and **`seo-geo-full`** packs.
+- **install-recommended / init:** Interactive flow is a **checklist** with `--suggest`, `--list`, `--explain`; `--list-profiles` aliases `--list-presets`. `--profile` still works for presets (`lean`, `core-next`, …).
+
 ### Fix
 
 - **kenmark-hub.js:** Legacy skill and Claude command cleanup requires ownership proof (symlink to `~/.kenmark/store`, `.kenmark-managed` parent, Kenmark markers in `SKILL.md`, or `manifest.json` `source: kenmark-package`). Unproven same-name paths are skipped with `legacy-candidate-review-required`; proven removals are backed up under `~/.kenmark/backups/legacy-cleanup/<timestamp>/`.
@@ -24,7 +29,7 @@ All Kenmark bundled skills now use the `kenmark-<domain>` namespace (e.g. `kenma
 - **setup-skills.js:** Claude command wrappers removed on install/uninstall; no longer created (use `kenmark-*` skills directly).
 - **Docs / router / inventory:** References and registry inference updated for `kenmark-*` names.
 
-Run `npx kenmark-skills setup --global --ide all --force -y` after upgrading to migrate local installs.
+Run `npx kenmark-skills setup --global --force -y` after upgrading to migrate local installs (or `--ide cursor,claude,codex` to target specific harnesses; use `--ide all` only when you need every detected IDE path).
 
 ## v1.5.0 — Quality gates, catalog profiles, and validation
 

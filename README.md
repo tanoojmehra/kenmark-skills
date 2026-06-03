@@ -33,7 +33,7 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 | Kenmark skills | 23 | Bundled in `skills/user-skills/` |
 | CLI commands | 11 | See [CLI reference](#cli-reference) |
 | Bundled sub-agents | 0 | Inventory/maintain skills only |
-| Recommended packs | 5 | Impeccable, ECC, Graphify, code review, SEO/GEO |
+| Recommended packs | 6 | Impeccable, code review, Graphify, SEO selected/full, ECC |
 
 **Suggested workflow**
 
@@ -185,7 +185,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | Human | `npx kenmark-skills init` |
 | Agent | `npx kenmark-skills init --global --skip-recommended -y` |
 | Agent | `npx kenmark-skills setup --global --ide cursor -y` |
-| Agent | `npx kenmark-skills install-recommended --profile core-next --global -y` |
+| Agent | `npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y` |
 | Agent | `npx kenmark-skills update --both --global -y` |
 | Agent | `npx kenmark-skills inventory --markdown ./report.md -y` |
 | Agent | `npx kenmark-skills doctor --json ./doctor.json` |
@@ -314,8 +314,11 @@ Source: [`config/mcp-servers.json`](config/mcp-servers.json). Profiles: [`config
 
 ```bash
 npx kenmark-skills setup --mcp-profile web --global --ide cursor -y
-npx kenmark-skills setup --mcp-profile research --global --ide all -y
-npx kenmark-skills setup --with-mcp --global --ide all -y   # profile: all
+npx kenmark-skills setup --mcp-profile research --global -y
+npx kenmark-skills setup --with-mcp --global -y   # profile: all (default IDEs: cursor, claude, codex)
+# Advanced — every detected harness path (may create clutter):
+# npx kenmark-skills setup --mcp-profile research --global --ide all -y
+# npx kenmark-skills setup --with-mcp --global --ide all -y
 ```
 
 | Profile | Servers |
@@ -345,7 +348,8 @@ Restart Cursor or Claude Code after setup if MCP tools do not show up. Other IDE
 
 ```bash
 npx kenmark-skills mcp uninstall --global --ide cursor -y
-npx kenmark-skills uninstall --mcp-only --global --ide all -y   # same behavior
+npx kenmark-skills uninstall --mcp-only --global -y
+# npx kenmark-skills uninstall --mcp-only --global --ide all -y   # advanced: all IDE paths
 ```
 
 Full `uninstall` still removes Kenmark MCP entries when they were installed via `setup --with-mcp` / `--mcp-profile`.
@@ -373,15 +377,14 @@ Full `uninstall` still removes Kenmark MCP entries when they were installed via 
 
 ### Recommended packs
 
-Catalog: [`skills/user-skills/recommended-catalog.json`](skills/user-skills/recommended-catalog.json) (v4 **profiles**: `lean`, `core-next-lite`, `core-next`, `core-next-agentic`, `growth-seo`, `audit-review`, `experimental-heavy`). Default profile is **lean**; **core-next** is the recommended Next.js full-stack profile (`core-next-lite` + Graphify). ECC is **manual** until the npm installer is verified — use **`core-next-agentic`** when you want ECC steps in the plan.
+Catalog: [`skills/user-skills/recommended-catalog.json`](skills/user-skills/recommended-catalog.json) (v5 **selectable optional installs** with repo-aware suggestions). Default selection is **Impeccable** + **Awesome Code Review** only; heavy packs (Graphify, SEO full, ECC) are opt-in. **Presets** (`lean`, `core-next`, `growth-seo`, …) remain for agents/CI via `--profile` but are not the primary UX.
 
 ```bash
-npx kenmark-skills install-recommended --list-profiles
-npx kenmark-skills install-recommended                              # interactive profile picker
-npx kenmark-skills install-recommended --profile lean --global -y
-npx kenmark-skills install-recommended --profile core-next --global -y
-npx kenmark-skills install-recommended --profile growth-seo --global -y
-npx kenmark-skills install-recommended --ids impeccable --global -y  # custom
+npx kenmark-skills install-recommended --suggest          # recommendations only
+npx kenmark-skills install-recommended --list             # all optional installs + metadata
+npx kenmark-skills install-recommended                    # interactive checklist
+npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y
+npx kenmark-skills install-recommended --profile core-next --global -y   # preset (advanced)
 ```
 
 In chat: **`kenmark-packs`** (guided), **`kenmark-maintain`** (cleanup, no auto-delete).
@@ -391,7 +394,7 @@ In chat: **`kenmark-packs`** (guided), **`kenmark-maintain`** (cleanup, no auto-
 ```bash
 npx kenmark-skills update
 npx kenmark-skills update --both --global -y
-npx kenmark-skills update --kenmark-only --global --ide all -y
+npx kenmark-skills update --kenmark-only --global -y
 npx kenmark-skills update --recommended-only --global --ids impeccable -y
 npx kenmark-skills update --npm-only -y
 npx kenmark-skills update --skip-adopt
@@ -419,7 +422,7 @@ Pair CLI output with **`kenmark-maintain`** and **`kenmark-agents`** in chat for
 ### On-demand adopt
 
 ```bash
-npx kenmark-skills adopt --global --ide all -y
+npx kenmark-skills adopt --global -y
 npx kenmark-skills adopt --global --adopt-overwrite -y   # when setup reported review-required
 ```
 
@@ -464,7 +467,8 @@ npx kenmark-skills uninstall --global
 npx kenmark-skills uninstall --global --ide claude
 
 # Project-local
-npx kenmark-skills uninstall --project --ide all
+npx kenmark-skills uninstall --project -y
+# npx kenmark-skills uninstall --project --ide all   # advanced: all IDE paths in this repo
 
 # MCP only (Cursor / Claude configs + ~/.kenmark/store/mcp.json)
 npx kenmark-skills mcp uninstall --global --ide cursor -y

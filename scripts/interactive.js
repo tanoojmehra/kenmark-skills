@@ -218,29 +218,89 @@ async function confirmPlan(lines, dryRun = false, opts = {}) {
  * @param {Array<{id: string, name: string, defaultSelected?: boolean}>} packs
  * @returns {Promise<string[]>} selected pack ids
  */
+/**
+ * Checklist UX with repo-aware suggestions (selectable catalog mode).
+ * @param {Array<object>} packs
+ * @param {Array<{packId: string, tier: string, why: string, matchedSignals: string[]}>} suggestions
+ * @param {{ defaultIds?: string[] }} opts
+ */
+async function promptSelectOptionalPacks(packs, suggestions, opts = {}) {
+  const defaultIds = opts.defaultIds || packs.filter((p) => p.defaultSelected).map((p) => p.id);
+  const sugById = new Map((suggestions || []).map((s) => [s.packId, s]));
+
+  console.log("\nOptional recommended installs:\n");
+  packs.forEach((p, i) => {
+    const sug = sugById.get(p.id);
+    const helps = (p.helpsWith || p.bestFor || []).join(", ");
+    const weight =
+      p.weight === "light"
+        ? "Light"
+        : p.weight === "medium"
+          ? "Medium"
+          : p.weight === "heavy"
+            ? "Heavy"
+            : p.weight || "?";
+    const bloat = p.bloatScore ?? "?";
+    const def = p.defaultSelected ? " [default-on]" : "";
+    console.log(
+      `  ${i + 1}) ${p.name}${def} — helps with: ${helps || "—"} · Weight: ${weight} · Bloat: ${bloat}`
+    );
+    if (sug?.why && sug.tier === "recommended") {
+      console.log(`     Suggested: ${sug.why}`);
+    }
+  });
+
+  const stack = (suggestions || []).filter(
+    (s) => s.tier === "recommended" || (s.tier === "optional" && s.matchedSignals?.length)
+  );
+  if (stack.length) {
+    console.log("\nRecommended based on this repo:\n");
+    for (const s of stack) {
+      const pack = packs.find((p) => p.id === s.packId);
+      const checked =
+        s.tier === "recommended" || pack?.defaultSelected ? "[x]" : "[ ]";
+      const name = pack?.name || s.packId;
+      console.log(`  ${checked} ${name.padEnd(22)} ${s.why}`);
+    }
+  }
+
+  console.log(
+    "\nEnter: number(s) 1,2 · ids impeccable,graphify · all · defaults · Enter for defaults · empty cancels\n"
+  );
+
+  return promptSelectPacks(packs, { defaultIds, quietList: true });
+}
+
 async function promptSelectPacks(packs, opts = {}) {
   const noDefaults = opts.noDefaults === true;
+  const defaultIds =
+    opts.defaultIds ||
+    (noDefaults ? [] : packs.filter((p) => p.defaultSelected).map((p) => p.id));
   const rl = createRl();
-  console.log("\nSelect packs to install:\n");
-  packs.forEach((p, i) => {
-    const mark = !noDefaults && p.defaultSelected ? " [default]" : "";
-    console.log(`  ${i + 1}) ${p.id}${mark} — ${p.name}`);
-  });
-  if (noDefaults) {
-    console.log("\nEnter: number(s) 1,2 · ids impeccable,ecc · all · (empty cancels)\n");
-  } else {
-    console.log("\nEnter: number(s) 1,2 · ids impeccable,ecc · all · defaults · Enter for defaults\n");
+  if (!opts.quietList) {
+    console.log("\nSelect packs to install:\n");
+    packs.forEach((p, i) => {
+      const mark = defaultIds.includes(p.id) ? " [default]" : "";
+      console.log(`  ${i + 1}) ${p.id}${mark} — ${p.name}`);
+    });
+    if (noDefaults) {
+      console.log("\nEnter: number(s) 1,2 · ids impeccable,ecc · all · (empty cancels)\n");
+    } else {
+      console.log("\nEnter: number(s) 1,2 · ids impeccable,ecc · all · defaults · Enter for defaults\n");
+    }
   }
   const answer = await ask(rl, "Choice> ");
   rl.close();
   if (!answer) {
     if (noDefaults) return [];
-    return packs.filter((p) => p.defaultSelected).map((p) => p.id);
+    return defaultIds.length ? defaultIds : packs.filter((p) => p.defaultSelected).map((p) => p.id);
   }
   const lower = answer.toLowerCase();
   if (lower === "all") return packs.map((p) => p.id);
   if (!noDefaults && (lower === "defaults" || lower === "default" || lower === "d")) {
-    return packs.filter((p) => p.defaultSelected).map((p) => p.id);
+    return defaultIds.length
+      ? defaultIds
+      : packs.filter((p) => p.defaultSelected).map((p) => p.id);
   }
   const nums = lower.split(/[\s,]+/).filter(Boolean);
   const byNum = [];
@@ -390,6 +450,7 @@ module.exports = {
   promptAction,
   promptIde,
   promptSelectPacks,
+  promptSelectOptionalPacks,
   promptSelectProfile,
   printProfileSummary,
   promptHighBloatConfirm,

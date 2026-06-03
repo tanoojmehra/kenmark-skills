@@ -6,10 +6,7 @@ const os = require("os");
 const {
   wantsInteractive,
   promptScope,
-  promptSelectPacks,
-  promptSelectProfile,
-  printProfileSummary,
-  promptHighBloatConfirm,
+  promptSelectOptionalPacks,
   promptEccProfile,
   confirmPlan,
   banner
@@ -17,14 +14,21 @@ const {
 const {
   loadCatalog,
   getPack,
+  resolvePresetPlan,
   resolveProfilePlan,
-  summarizeProfile,
   resolveInstallCommands,
   formatInstallPlanLine,
   resolveVerifyCommand,
   runGitSyncInstall,
-  listProfiles,
-  defaultProfileId
+  listPresets,
+  defaultSelectedIds,
+  planFromPackIds,
+  resolvePresetPackRefs,
+  printSuggest,
+  explainPack,
+  printOptionalList,
+  suggestPacks,
+  weightLabel
 } = require("./recommended-catalog");
 const {
   buildGlobalTargets,
@@ -41,17 +45,21 @@ const catalogPath = path.join(sourceDir, "recommended-catalog.json");
 function printUsage() {
   console.log("Usage: node scripts/kenmark-packs.js [options]");
   console.log("");
-  console.log("Interactive by default in a terminal. Agents: pass --profile or --ids + -y.");
+  console.log("Interactive: checklist of optional installs with repo-aware suggestions.");
+  console.log("Agents: pass --ids or --profile (preset) + -y.");
   console.log("");
   console.log("Runs each pack's install command, then adopts into ~/.kenmark/store and relinks IDEs.");
   console.log("Use --skip-adopt to disable the consolidation pass.");
   console.log("");
   console.log("Options:");
-  console.log("  --list              Print catalog packs and exit");
-  console.log("  --list-profiles     Print setup profiles and exit");
-  console.log("  --profile <id>      Install a catalog profile (lean, core-next, growth-seo, …)");
-  console.log("  --all               Install every pack in the catalog (legacy; prefer --profile)");
-  console.log("  --ids a,b           Install specific pack ids (custom selection)");
+  console.log("  --list              List all optional installs with metadata");
+  console.log("  --suggest           Print repo-aware recommendations (no install)");
+  console.log("  --explain [id]      Detailed explain for one pack or entire catalog");
+  console.log("  --list-profiles     List presets (legacy alias; same as --list-presets)");
+  console.log("  --list-presets      List advanced presets (CI / power users)");
+  console.log("  --profile <id>      Install a preset (lean, core-next, growth-seo, …)");
+  console.log("  --all               Install every pack (legacy)");
+  console.log("  --ids a,b           Install specific pack ids");
   console.log("  --global            Install to user home (default)");
   console.log("  --project           Install into current project directory");
   console.log("  --scope global|project");
@@ -94,8 +102,22 @@ function parseArgs(argv) {
       args.list = true;
       continue;
     }
-    if (t === "--list-profiles") {
-      args.listProfiles = true;
+    if (t === "--suggest") {
+      args.suggest = true;
+      continue;
+    }
+    if (t === "--explain") {
+      const next = (argv[i + 1] || "").trim();
+      if (next && !next.startsWith("-")) {
+        args.explain = next;
+        i += 1;
+      } else {
+        args.explain = true;
+      }
+      continue;
+    }
+    if (t === "--list-profiles" || t === "--list-presets") {
+      args.listPresets = true;
       continue;
     }
     if (t === "--profile") {
@@ -173,103 +195,22 @@ function parseArgs(argv) {
   return args;
 }
 
-function printCatalog(catalog) {
-  const defaultScope = catalog.defaults?.scope || "global";
-  const defaultProfile = defaultProfileId(catalog);
+function printPresets(catalog) {
+  const presets = listPresets(catalog);
   console.log(
-    `Recommended skill packs (catalog v${catalog.version}, default scope: ${defaultScope}, default profile: ${defaultProfile})\n`
+    `Presets — advanced / CI shortcuts (catalog v${catalog.version}; not the primary UX)\n`
   );
-  if (catalog.installRules?.guidance) {
-    console.log(`Install rule: ${catalog.installRules.guidance}\n`);
-  }
-  for (const pack of catalog.packs) {
-    console.log(`  ${pack.id}`);
-    const bloatLine =
-      pack.selectedBloatScore != null
-        ? `bloat: ${pack.bloatScore ?? "?"} (selected: ${pack.selectedBloatScore})`
-        : `bloat: ${pack.bloatScore ?? "?"}`;
-    console.log(`    ${pack.name} — ${pack.category} (weight: ${pack.weight || "?"}, ${bloatLine})`);
-    console.log(`    ${pack.description}`);
-    console.log(`    ${pack.url}`);
-    if (pack.bestFor?.length) {
-      console.log(`    best for: ${pack.bestFor.join(", ")}`);
-    }
-    if (pack.avoidWhen?.length) {
-      console.log(`    avoid when: ${pack.avoidWhen.join(", ")}`);
-    }
-    if (pack.installStrategy === "manual") {
-      if (pack.install?.global?.summary) {
-        console.log(`    global:  ${pack.install.global.summary} (manual)`);
-      }
-      if (pack.install?.project?.summary) {
-        console.log(`    project: ${pack.install.project.summary} (manual)`);
-      }
-    } else if (pack.install?.global?.command) {
-      console.log(`    global:  ${pack.install.global.command}`);
-    }
-    if (pack.install?.profiles?.length) {
-      const names = pack.install.profiles.map((p) => p.id).join(", ");
-      console.log(`    ECC profiles: ${names} (recommended: ${pack.recommendedProfile || pack.install.defaultProfile})`);
-    }
-    if (pack.installModes?.length) {
-      console.log(`    install modes: ${pack.installModes.join(", ")} (default: ${pack.defaultMode})`);
-    }
-    if (pack.warning) {
-      console.log(`    ⚠ ${pack.warning}`);
-    }
-    console.log("");
-  }
-}
-
-function printProfiles(catalog) {
-  const defaultProfile = defaultProfileId(catalog);
-  console.log(`Setup profiles (catalog v${catalog.version}, default: ${defaultProfile})\n`);
-  for (const p of listProfiles(catalog)) {
-    const tags = [];
-    if (p.id === defaultProfile || p.default) tags.push("default");
-    if (p.kenmarkRecommended) tags.push("Kenmark stack");
+  for (const p of presets) {
+    const refs = resolvePresetPackRefs(p.id, catalog) || [];
     console.log(`  ${p.id}`);
     console.log(`    ${p.name}`);
-    console.log(`    ${p.description}`);
-    if (p.recommendedFor?.length) {
-      console.log(`    for: ${p.recommendedFor.join(", ")}`);
-    }
-    const summary = summarizeProfile(p.id, catalog);
-    if (summary?.installLines?.length) {
-      console.log(`    installs: ${summary.installLines.join(", ")}`);
-      console.log(
-        `    weight: ${summary.weight} · bloat score: ${summary.bloatTotal} · risk: ${summary.bloatRisk}`
-      );
-    }
+    console.log(`    ${p.description || ""}`);
+    console.log(`    packs: ${refs.map((r) => r.id).join(", ")}`);
     if (p.extends) console.log(`    extends: ${p.extends}`);
     if (p.requiresConfirmation) console.log("    ⚠ requires confirmation (high bloat)");
     console.log("");
   }
   console.log("Install: npx kenmark-skills install-recommended --profile <id> --global -y");
-}
-
-function planFromPackIds(packIds, catalog, eccProfileOverride) {
-  const refs = packIds.map((id) => ({ id }));
-  const installPlan = refs.map((ref) => {
-    const pack = getPack(catalog, ref.id);
-    if (!pack) return { packId: ref.id, missing: true, ref };
-    const eccProfile =
-      ref.id === "ecc"
-        ? eccProfileOverride ||
-          pack.recommendedProfile ||
-          pack.install?.defaultProfile ||
-          "minimal"
-        : null;
-    return {
-      packId: ref.id,
-      pack,
-      ref,
-      eccProfile,
-      seoSkills: null,
-      seoMode: ref.id === "seo-geo-claude-skills" ? pack.defaultMode || "full" : null
-    };
-  });
-  return { profileId: null, profile: null, packRefs: refs, installPlan };
 }
 
 function applyEccOverride(installPlan, eccProfileOverride) {
@@ -339,12 +280,34 @@ async function run() {
   const packs = catalog.packs || [];
 
   if (args.list) {
-    printCatalog(catalog);
+    printOptionalList(catalog);
     process.exit(0);
   }
 
-  if (args.listProfiles) {
-    printProfiles(catalog);
+  if (args.suggest) {
+    printSuggest(catalog, process.cwd());
+    process.exit(0);
+  }
+
+  if (args.explain) {
+    if (args.explain === true) {
+      for (const pack of packs) {
+        explainPack(pack, catalog, process.cwd());
+        console.log("");
+      }
+    } else {
+      const pack = getPack(catalog, args.explain);
+      if (!pack) {
+        console.error(`Unknown pack id: ${args.explain}`);
+        process.exit(1);
+      }
+      explainPack(pack, catalog, process.cwd());
+    }
+    process.exit(0);
+  }
+
+  if (args.listPresets) {
+    printPresets(catalog);
     process.exit(0);
   }
 
@@ -358,11 +321,19 @@ async function run() {
   let selectedIds = args.ids || [];
 
   if (args.profile) {
-    resolved = resolveProfilePlan(args.profile, catalog);
+    resolved = resolvePresetPlan(args.profile, catalog) || resolveProfilePlan(args.profile, catalog);
     if (!resolved) {
-      console.error(`Unknown profile: ${args.profile}`);
-      console.error(`Use --list-profiles. Available: ${listProfiles(catalog).map((p) => p.id).join(", ")}`);
+      console.error(`Unknown preset: ${args.profile}`);
+      console.error(
+        `Use --list-presets. Available: ${listPresets(catalog).map((p) => p.id).join(", ")}`
+      );
       process.exit(1);
+    }
+    const preset = resolved.preset || resolved.profile;
+    if (preset?.requiresConfirmation && !args.yes) {
+      const { promptHighBloatConfirm } = require("./interactive");
+      const ok = await promptHighBloatConfirm();
+      if (!ok) process.exit(0);
     }
   } else if (args.all) {
     selectedIds = packs.map((p) => p.id);
@@ -376,29 +347,22 @@ async function run() {
     !args.all;
 
   if (interactive) {
-    banner("kenmark-skills install-recommended", "Curated packs by profile — lean default");
-    scope = await promptScope(catalog.defaults?.scope || "global", { required: true });
-    const profiles = listProfiles(catalog);
-    const choice = await promptSelectProfile(
-      profiles,
-      defaultProfileId(catalog)
+    banner(
+      "kenmark-skills install-recommended",
+      "Optional third-party installs — select what you want"
     );
-    if (!choice) {
-      console.log("Cancelled.");
+    scope = await promptScope(catalog.defaults?.scope || "global", { required: true });
+    const suggestions = suggestPacks(catalog, process.cwd());
+    selectedIds = await promptSelectOptionalPacks(packs, suggestions, {
+      defaultIds: defaultSelectedIds(catalog)
+    });
+    if (selectedIds.length === 0) {
+      console.log("No packs selected. Exiting.");
       process.exit(0);
     }
-    if (choice === "custom") {
-      selectedIds = await promptSelectPacks(packs, { noDefaults: true });
-      if (selectedIds.length === 0) {
-        console.log("No packs selected. Exiting.");
-        process.exit(0);
-      }
-      resolved = planFromPackIds(selectedIds, catalog, null);
-    } else {
-      resolved = resolveProfilePlan(choice, catalog);
-      const summary = summarizeProfile(choice, catalog);
-      printProfileSummary(summary);
-    }
+    resolved = planFromPackIds(selectedIds, catalog, null);
+    const w = weightLabel(resolved.installPlan);
+    console.log(`\nSelected ${selectedIds.length} pack(s) · estimated weight: ${w.label} (bloat ${w.total})`);
   } else if (!scope) {
     scope = catalog.defaults?.scope || "global";
   }
@@ -408,11 +372,12 @@ async function run() {
   }
 
   if (!resolved) {
-    console.log("No profile or packs selected. Use --profile, --ids, or run interactively.");
+    console.log("No packs selected. Use --ids, --profile (preset), --suggest, or run interactively.");
     process.exit(0);
   }
 
-  let { installPlan, profile } = resolved;
+  let { installPlan, preset, profile } = resolved;
+  const presetMeta = preset || profile;
   installPlan = applyEccOverride(installPlan, args.eccProfile);
 
   const missing = installPlan.filter((e) => e.missing);
@@ -421,17 +386,9 @@ async function run() {
     process.exit(1);
   }
 
-  if (profile?.requiresConfirmation && !args.yes) {
-    const okBloat = await promptHighBloatConfirm();
-    if (!okBloat) {
-      console.log("Cancelled.");
-      process.exit(0);
-    }
-  }
-
   const eccEntry = installPlan.find((e) => e.pack?.id === "ecc");
   let eccProfile = eccEntry?.eccProfile || args.eccProfile || "minimal";
-  if (eccEntry && interactive && !args.eccProfile && !resolved.profileId) {
+  if (eccEntry && interactive && !args.eccProfile) {
     eccProfile = await promptEccProfile(eccEntry.pack, eccProfile, { required: true });
     installPlan = installPlan.map((e) =>
       e.pack?.id === "ecc" ? { ...e, eccProfile } : e
@@ -459,10 +416,11 @@ async function run() {
     return label;
   });
 
+  const presetId = resolved.presetId || resolved.profileId;
   const planLines = [
-    resolved.profileId
-      ? `Profile "${resolved.profileId}" (${profile?.name || resolved.profileId}) · scope ${scope}`
-      : `Custom packs · scope ${scope}`,
+    presetId
+      ? `Preset "${presetId}" (${presetMeta?.name || presetId}) · scope ${scope}`
+      : `Selected packs · scope ${scope}`,
     `Packs: ${packLabels.join(", ")}`,
     ...installPlan.flatMap((entry) =>
       resolveInstallCommands(entry, scope, catalog).map((c) =>
@@ -489,7 +447,7 @@ async function run() {
   }
 
   console.log(
-    `\nInstalling ${installPlan.length} pack(s) · scope "${scope}"${resolved.profileId ? ` · profile ${resolved.profileId}` : ""}`
+    `\nInstalling ${installPlan.length} pack(s) · scope "${scope}"${presetId ? ` · preset ${presetId}` : ""}`
   );
   if (eccEntry) console.log(`ECC profile: ${eccProfile}`);
   if (scope === "project") {
