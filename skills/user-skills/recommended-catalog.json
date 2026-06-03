@@ -1,7 +1,7 @@
 {
   "version": 4,
   "updatedAt": "2026-06-03",
-  "notes": "Profile-based curated skill packs. Default profile is lean; core-next is recommended for Kenmark Next.js full-stack work. skills-install-recommended reads this at runtime.",
+  "notes": "Profile-based curated skill packs. Default profile is lean; core-next is recommended for Next.js full-stack work. skills-install-recommended reads this at runtime.",
   "defaults": {
     "scope": "global",
     "profile": "lean"
@@ -35,12 +35,12 @@
     {
       "id": "core-next",
       "name": "Core Next.js Full-Stack",
-      "description": "Best default for Next.js, Tailwind, ShadCN, Prisma, MongoDB, and Kenmark client projects.",
+      "description": "Best default for Next.js, Tailwind, ShadCN, Prisma, MongoDB, and agency/client projects.",
       "kenmarkRecommended": true,
       "recommendedFor": [
         "Next.js apps",
         "full-stack projects",
-        "Kenmark client projects"
+        "agency/client projects"
       ],
       "packs": [
         { "id": "impeccable" },
@@ -181,20 +181,22 @@
       "weight": "light",
       "bloatScore": 1,
       "recommendedByDefault": true,
+      "installStrategy": "git-sync",
       "bestFor": ["PR review", "correctness", "multi-language codebases"],
       "avoidWhen": [],
       "url": "https://github.com/awesome-skills/code-review-skill",
       "description": "Modular code-review skill for Claude Code — 19+ languages/frameworks (React 19, Vue 3, Rust, Go, TypeScript, TanStack Query v5, …) loaded progressively with a four-phase review process and six-level severity scale.",
-      "warning": "Git-based install (not npx). Clones the repo into ~/.claude/skills/code-review-skill/ (or ./.claude/skills/ for project scope). If the target directory already exists, the clone will fail — remove it first or pick a different name.",
+      "warning": "Git-based install (not npx). Syncs the repo into ~/.claude/skills/code-review-skill/ (or ./.claude/skills/ for project scope). Re-runs clone once, then `git pull --ff-only`. Fails if the target path exists but is not a git repository.",
       "install": {
+        "repoUrl": "https://github.com/awesome-skills/code-review-skill.git",
         "global": {
-          "command": "git clone https://github.com/awesome-skills/code-review-skill.git \"$HOME/.claude/skills/code-review-skill\"",
-          "summary": "Clone the repo into the user's global Claude skills directory"
+          "target": "$HOME/.claude/skills/code-review-skill",
+          "summary": "Sync the repo into the user's global Claude skills directory"
         },
         "project": {
-          "command": "git clone https://github.com/awesome-skills/code-review-skill.git .claude/skills/code-review-skill",
+          "target": ".claude/skills/code-review-skill",
           "cwd": "project",
-          "summary": "Clone the repo into the current project's .claude/skills/ directory"
+          "summary": "Sync the repo into the current project's .claude/skills/ directory"
         },
         "alternatives": [
           "Windows (PowerShell): git clone https://github.com/awesome-skills/code-review-skill.git \"$env:USERPROFILE\\.claude\\skills\\code-review-skill\"",
@@ -240,6 +242,17 @@
             "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -y -s {{skill}}",
             "cwd": "project",
             "summary": "Install one SEO/GEO skill into the current project"
+          }
+        },
+        "batchSkillInstall": {
+          "global": {
+            "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -g -y -s {{skills}}",
+            "summary": "Install selected SEO/GEO skills globally in one skills CLI run (space-separated after -s)"
+          },
+          "project": {
+            "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -y -s {{skills}}",
+            "cwd": "project",
+            "summary": "Install selected SEO/GEO skills into the current project in one skills CLI run"
           }
         },
         "alternatives": [

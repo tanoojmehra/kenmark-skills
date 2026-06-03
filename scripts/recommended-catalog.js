@@ -2,6 +2,8 @@
 
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
+const { spawnSync } = require("child_process");
 
 const catalogPath = path.join(
   path.resolve(__dirname, ".."),
@@ -169,11 +171,93 @@ function summarizeProfile(profileId, catalog) {
   };
 }
 
+function expandInstallPath(rawPath) {
+  if (!rawPath || typeof rawPath !== "string") return rawPath;
+  const home = os.homedir();
+  return rawPath.replace(/\$HOME\b/g, home).replace(/^~(?=\/|$)/, home);
+}
+
+function resolveInstallTarget(rawTarget, cwd) {
+  const expanded = expandInstallPath(rawTarget);
+  return cwd ? path.resolve(cwd, expanded) : path.resolve(expanded);
+}
+
+function formatGitSyncCommand(repoUrl, rawTarget) {
+  return `git-sync ${repoUrl} → ${rawTarget}`;
+}
+
+/**
+ * Idempotent git install: clone if missing, ff-only pull if .git exists.
+ */
+function runGitSyncInstall({ repoUrl, targetPath, cwd, dryRun }) {
+  const target = resolveInstallTarget(targetPath, cwd);
+  const display = formatGitSyncCommand(repoUrl, target);
+  console.log(`\n$ ${display}`);
+  if (dryRun) return { status: 0 };
+
+  const gitDir = path.join(target, ".git");
+  const parent = path.dirname(target);
+  if (!fs.existsSync(parent)) {
+    fs.mkdirSync(parent, { recursive: true });
+  }
+
+  if (fs.existsSync(gitDir)) {
+    return spawnSync("git", ["-C", target, "pull", "--ff-only"], {
+      stdio: "inherit",
+      env: process.env
+    });
+  }
+
+  if (fs.existsSync(target)) {
+    console.error(`Target exists but is not a git repo: ${target}`);
+    return { status: 1 };
+  }
+
+  return spawnSync("git", ["clone", repoUrl, target], {
+    stdio: "inherit",
+    env: process.env
+  });
+}
+
 function resolveInstallCommands(entry, scope, catalog) {
   const pack = entry.pack;
   if (!pack) return [];
 
+  const installStrategy = pack.installStrategy || pack.install?.strategy;
+  if (installStrategy === "git-sync") {
+    const block = pack.install?.[scope];
+    const repoUrl = pack.install?.repoUrl;
+    if (!repoUrl || !block?.target) return [];
+    const cwd = block.cwd === "project" ? process.cwd() : undefined;
+    const command = formatGitSyncCommand(repoUrl, block.target);
+    return [
+      {
+        strategy: "git-sync",
+        command,
+        repoUrl,
+        targetPath: block.target,
+        cwd
+      }
+    ];
+  }
+
   if (pack.id === "seo-geo-claude-skills" && entry.seoSkills?.length) {
+    const skillsArgv = entry.seoSkills.join(" ");
+    const batchBlock = pack.install?.batchSkillInstall?.[scope];
+    if (entry.seoSkills.length > 1 && batchBlock?.command) {
+      const cwd =
+        batchBlock.cwd === "project" ? process.cwd() : undefined;
+      const cmd = batchBlock.command.replace(/\{\{skills\}\}/g, skillsArgv);
+      return [
+        {
+          command: cmd,
+          cwd,
+          batch: true,
+          skillCount: entry.seoSkills.length,
+          label: entry.seoSkills.join(", ")
+        }
+      ];
+    }
     const skillBlock = pack.install?.skillInstall?.[scope];
     const cwd =
       skillBlock?.cwd === "project" ? process.cwd() : undefined;
@@ -182,7 +266,7 @@ function resolveInstallCommands(entry, scope, catalog) {
         skillBlock?.command ||
         `npx --yes skills add aaron-he-zhu/seo-geo-claude-skills ${scope === "global" ? "-g " : ""}-y -s {{skill}}`;
       cmd = cmd.replace(/\{\{skill\}\}/g, skill);
-      return { command: cmd, cwd, label: skill };
+      return { command: cmd, cwd, label: skill, seoSelected: true };
     });
   }
 
@@ -222,6 +306,9 @@ module.exports = {
   summarizeProfile,
   weightLabel,
   resolveInstallCommands,
+  runGitSyncInstall,
+  expandInstallPath,
+  resolveInstallTarget,
   listProfiles,
   defaultProfileId
 };

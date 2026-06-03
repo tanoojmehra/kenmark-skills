@@ -20,6 +20,7 @@ const {
   resolveProfilePlan,
   summarizeProfile,
   resolveInstallCommands,
+  runGitSyncInstall,
   listProfiles,
   defaultProfileId
 } = require("./recommended-catalog");
@@ -53,6 +54,11 @@ function printUsage() {
   console.log("  --ecc-profile <id>  Override ECC profile (minimal, core, full)");
   console.log("  --ide <target>      Limit adopt/relink to one IDE: cursor, claude, all, …");
   console.log("  --skip-adopt        Skip post-install catalog adoption");
+  console.log("  --copy              Copy into IDE paths instead of symlinks (adopt relink)");
+  console.log("  --symlink           Force symlinks on Windows instead of copy (adopt relink)");
+  console.log("  --prefer-copy-on-windows     Copy on Windows during adopt relink (default)");
+  console.log("  --no-prefer-copy-on-windows  Symlink/junction on Windows during adopt relink");
+  console.log("  --adopt-overwrite   Overwrite store when IDE copy differs (--force alias)");
   console.log("  --dry-run           Show commands without running");
   console.log("  -y, --yes           Skip confirmation prompts");
   console.log("  -h, --help          Show help");
@@ -67,7 +73,12 @@ function parseArgs(argv) {
     profile: null,
     ide: null,
     explicitIde: false,
-    skipAdopt: false
+    skipAdopt: false,
+    forceCopy: false,
+    forceSymlink: false,
+    preferCopyOnWindows: true,
+    force: false,
+    adoptOverwrite: false
   };
   for (let i = 0; i < argv.length; i += 1) {
     const t = argv[i];
@@ -131,6 +142,27 @@ function parseArgs(argv) {
     }
     if (t === "--skip-adopt") {
       args.skipAdopt = true;
+      continue;
+    }
+    if (t === "--copy") {
+      args.forceCopy = true;
+      continue;
+    }
+    if (t === "--symlink") {
+      args.forceSymlink = true;
+      continue;
+    }
+    if (t === "--prefer-copy-on-windows") {
+      args.preferCopyOnWindows = true;
+      continue;
+    }
+    if (t === "--no-prefer-copy-on-windows") {
+      args.preferCopyOnWindows = false;
+      continue;
+    }
+    if (t === "--force" || t === "--adopt-overwrite") {
+      args.force = true;
+      args.adoptOverwrite = true;
       continue;
     }
   }
@@ -240,6 +272,18 @@ function runShell(command, dryRun, cwd) {
     env: process.env,
     cwd: cwd || process.cwd()
   });
+}
+
+function runInstallCommand(cmdEntry, dryRun) {
+  if (cmdEntry.strategy === "git-sync") {
+    return runGitSyncInstall({
+      repoUrl: cmdEntry.repoUrl,
+      targetPath: cmdEntry.targetPath,
+      cwd: cmdEntry.cwd,
+      dryRun
+    });
+  }
+  return runShell(cmdEntry.command, dryRun, cmdEntry.cwd);
 }
 
 function verifyPack(pack, scope) {
@@ -433,11 +477,24 @@ async function run() {
       console.error(`No ${scope} install command defined for ${pack.id}.`);
       continue;
     }
-    for (const cmdEntry of commands) {
-      if (cmdEntry.label) {
+    for (let skillIndex = 0; skillIndex < commands.length; skillIndex += 1) {
+      const cmdEntry = commands[skillIndex];
+      if (entry.seoSkills?.length) {
+        if (cmdEntry.batch) {
+          console.log(
+            `Installing SEO/GEO selected skills (${cmdEntry.skillCount} in one run): ${cmdEntry.label}`
+          );
+        } else if (commands.length > 1) {
+          console.log(
+            `Installing SEO/GEO selected skills: ${skillIndex + 1}/${commands.length} ${cmdEntry.label}`
+          );
+        } else if (cmdEntry.label) {
+          console.log(`Installing SEO/GEO selected skill: ${cmdEntry.label}`);
+        }
+      } else if (cmdEntry.label) {
         console.log(`Skill: ${cmdEntry.label}`);
       }
-      const result = runShell(cmdEntry.command, args.dryRun, cmdEntry.cwd);
+      const result = runInstallCommand(cmdEntry, args.dryRun);
       if (!args.dryRun && result.status !== 0) {
         console.error(`Install failed for ${pack.id} (exit ${result.status})`);
         if (pack.install?.alternatives?.length) {
@@ -468,17 +525,28 @@ async function run() {
         targetMap,
         eccProfile,
         homeDir: os.homedir(),
-        force: false,
-        forceCopy: false,
+        force: args.force,
+        adoptOverwrite: args.adoptOverwrite,
+        forceCopy: args.forceCopy,
+        forceSymlink: args.forceSymlink,
+        preferCopyOnWindows: args.preferCopyOnWindows,
         dryRun: false
       });
       const adopted = adoptResult.results.filter(
         (r) => r.action === "adopted"
       ).length;
+      const reviewRequired = adoptResult.results.filter(
+        (r) => r.action === "review-required"
+      ).length;
       const total = adoptResult.results.length;
       console.log(
         `Adopt pass: ${adopted} adopted/updated of ${total} candidate(s)`
       );
+      if (reviewRequired) {
+        console.log(
+          `  ${reviewRequired} skill(s) need review (store differs from IDE copy). Re-run with --adopt-overwrite to overwrite.`
+        );
+      }
     }
   }
 
