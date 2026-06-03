@@ -59,6 +59,10 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 | Docs quality? | **`kenmark-repo-docs`** |
 | Release / npm publish? | **`kenmark-repo-release`** |
 | Build/type/lint/format/dev errors? | **`kenmark-repo-quality`** |
+| Need test strategy? | **`kenmark-test-plan`** |
+| Need unit/API/E2E tests? | **`kenmark-test-unit`** / **`kenmark-test-integration`** / **`kenmark-test-e2e`** |
+| Need test fixtures/mocks? | **`kenmark-test-mocks`** |
+| Need coverage or CI test gates? | **`kenmark-test-coverage`** / **`kenmark-test-ci`** |
 | Installed skills inventory? | **`kenmark-maintain`** |
 | Need commit? | **`kenmark-commit`** |
 

@@ -12,6 +12,19 @@
 - **kenmark-hub.js:** Legacy skill and Claude command cleanup requires ownership proof (symlink to `~/.kenmark/store`, `.kenmark-managed` parent, Kenmark markers in `SKILL.md`, or `manifest.json` `source: kenmark-package`). Unproven same-name paths are skipped with `legacy-candidate-review-required`; proven removals are backed up under `~/.kenmark/backups/legacy-cleanup/<timestamp>/`.
 - **setup-skills.js / kenmark-hub.js:** Stop generating Claude slash-command wrappers on install; install and uninstall remove stale `~/.claude/commands/kenmark-*.md` (legacy unprefixed wrapper names included). Namespaced skills under `~/.claude/skills/` are the supported entry point.
 
+## v2.1.0 — Testing suite skills
+
+### New skills
+
+- **kenmark-test-plan:** Test strategy — layers, tools, ROI, CI gates before writing tests.
+- **kenmark-test-unit:** Unit tests for functions, components, hooks, utilities.
+- **kenmark-test-integration:** API, DB, service, and module boundary tests.
+- **kenmark-test-e2e:** Browser/user-journey tests (Playwright, Cypress, etc.).
+- **kenmark-test-mocks:** Fixtures, factories, MSW handlers, fake adapters.
+- **kenmark-test-coverage:** Coverage and risk-gap audit (read-only).
+- **kenmark-test-ci:** Wire tests into CI/CD and release gates.
+- **kenmark-router / README / skills/README.md / validate-repo.js:** Routing table, docs, and bundled skill count 26 → 33.
+
 ## v2.0.3 — Optional pack verify-before-install
 
 ### Perf
