@@ -36,8 +36,6 @@
   "files": [
     "CHANGELOG.md",
     "skills/README.md",
-    "skills/COPIED_SKILLS.md",
-    "skills/user-skills-manifest.md",
     "skills/user-skills/**/*",
     "skills/user-skills/recommended-catalog.json",
     "config/mcp-servers.json",
