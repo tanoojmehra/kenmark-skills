@@ -256,8 +256,10 @@ On macOS where `timeout` may not exist:
 ```bash
 mkdir -p temp
 (pnpm dev > temp/repo-quality-dev.log 2>&1 & echo $! > temp/repo-quality-dev.pid)
+PID="$(cat temp/repo-quality-dev.pid)"
+trap 'kill "$PID" 2>/dev/null || true' EXIT
 sleep 20
-kill "$(cat temp/repo-quality-dev.pid)" 2>/dev/null || true
+kill "$PID" 2>/dev/null || true
 cat temp/repo-quality-dev.log | tail -120
 ```
 
