@@ -46,27 +46,6 @@ Good targets:
 
 ---
 
-## Core principle
-
-```text
-E2E tests should cover critical journeys, not every small component.
-```
-
----
-
-## Preferred tools
-
-Use existing framework first.
-
-If none exists:
-
-```text
-Playwright for modern web apps
-Cypress only if repo already uses it or team prefers it
-```
-
----
-
 ## Package manager rule
 
 Detect package manager from lockfile:
@@ -95,6 +74,27 @@ Do not use `npx` to fetch tools unless:
 - Run the smallest relevant test first.
 - Document any env vars or setup needed.
 - Update `brain/kb/` when testing setup changes materially.
+
+---
+
+## Core principle
+
+```text
+E2E tests should cover critical journeys, not every small component.
+```
+
+---
+
+## Preferred tools
+
+Use existing framework first.
+
+If none exists:
+
+```text
+Playwright for modern web apps
+Cypress only if repo already uses it or team prefers it
+```
 
 ---
 
@@ -180,6 +180,8 @@ $PM run test:e2e
 ./node_modules/.bin/cypress run
 ```
 
+Replace `$PM` with `npm`, `pnpm`, `yarn`, or `bun` based on lockfile.
+
 If a server is required, use the framework's webServer config when possible.
 
 ---
@@ -208,7 +210,7 @@ If a server is required, use the framework's webServer config when possible.
 
 **Verify gates:** After creating/changing tests, run **`kenmark-repo-quality`** to verify test/type/lint/build gates.
 
-**KB updates:** If this changes the test framework, commands, CI gates, fixtures, env vars, or coverage policy, update `brain/kb/10-testing-and-quality.md` via **`kenmark-repo-kb`**.
+**KB updates:** If this changes the test framework, scripts, CI gates, fixtures, env vars, coverage policy, or setup instructions, update `brain/kb/10-testing-and-quality.md` via **`kenmark-repo-kb`**.
 
 ---
 

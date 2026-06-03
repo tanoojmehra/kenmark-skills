@@ -65,6 +65,18 @@ Do not use `npx` to fetch tools unless:
 
 ---
 
+## Testing safety contract
+
+- Do not use production data or production credentials.
+- Do not hit paid/external services unless explicitly approved.
+- Do not add new frameworks when the repo already has a good one.
+- Prefer existing scripts and conventions.
+- Run the smallest relevant test first.
+- Document any env vars or setup needed.
+- Update `brain/kb/` when testing setup changes materially.
+
+---
+
 ## Core principle
 
 ```text
@@ -255,7 +267,7 @@ Suggest implementation sequence:
 
 **Verify gates:** After creating/changing tests, run **`kenmark-repo-quality`** to verify test/type/lint/build gates.
 
-**KB updates:** If this changes the test framework, commands, CI gates, fixtures, env vars, or coverage policy, update `brain/kb/10-testing-and-quality.md` via **`kenmark-repo-kb`**.
+**KB updates:** If this changes the test framework, scripts, CI gates, fixtures, env vars, coverage policy, or setup instructions, update `brain/kb/10-testing-and-quality.md` via **`kenmark-repo-kb`**.
 
 ---
 
