@@ -42,6 +42,7 @@ const KEEP_ALWAYS = new Set([
   "repo-docs-audit",
   "repo-structure-audit",
   "repo-dependency-audit",
+  "repo-quality-gates",
   "repo-release-readiness"
 ]);
 
