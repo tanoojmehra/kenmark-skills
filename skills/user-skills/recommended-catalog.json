@@ -221,7 +221,7 @@
         "recommendation": "optional"
       },
       "url": "https://github.com/aaron-he-zhu/seo-geo-claude-skills",
-      "description": "Six high-value SEO/GEO skills (keyword research, technical audit, schema, on-page, content, GEO) — not the full 20-skill suite.",
+      "description": "Six high-value SEO/GEO skills (keyword research, technical audit, schema, on-page, content, GEO) — not the full 20-skill suite. Install verify for all defaultSeoSkills is built at runtime; catalog verify is a single-skill sample.",
       "warning": "Installs selected skills only. For all 20 skills use seo-geo-full.",
       "install": {
         "global": {

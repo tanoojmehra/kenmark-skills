@@ -16,10 +16,13 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (23)
+skills/user-skills/          ← bundled universal skills (26)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow
+  kenmark-plan/               category: workflow (phase: plan)
+  kenmark-subagents/          category: workflow (phase: orchestrate)
+  kenmark-output/             category: workflow (phase: verify)
   kenmark-troubleshoot/              category: workflow (phase: diagnose)
   kenmark-repo-hygiene/              category: workflow (phase: audit)
   kenmark-repo-secrets/
@@ -66,6 +69,9 @@ not in this package.
 
 | Skill | Purpose |
 | --- | --- |
+| `kenmark-plan` | Plan complex work before implementation |
+| `kenmark-output` | Enforce complete final outputs and deliverables |
+| `kenmark-subagents` | Split complex work into specialist investigation tracks |
 | `kenmark-repo-hygiene` | Audit clutter, scattered docs, orphan assets, dumps; cleanup after approval |
 | `kenmark-repo-secrets` | Deep read-only secret/key/token scan with redaction |
 | `kenmark-repo-public` | Safe-to-publish gate before open-sourcing |
@@ -83,6 +89,9 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Situation | Skill |
 | --- | --- |
 | Problem unclear? | `kenmark-troubleshoot` |
+| Need a plan before work? | `kenmark-plan` |
+| Need parallel/specialist tracks? | `kenmark-subagents` |
+| Need complete final deliverable? | `kenmark-output` |
 | Need issue tracking? | `kenmark-issues-setup` / `kenmark-issues-scan` |
 | Need skill choice? | `kenmark-router` |
 | Repo health (see table above) | `repo-*` family |

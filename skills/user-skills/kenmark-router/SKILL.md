@@ -34,6 +34,9 @@ When several bundled skills could apply, prefer this order:
 | Situation | Skill |
 | --- | --- |
 | Problem unclear — need evidence, hypotheses, ranked plan | **`kenmark-troubleshoot`** |
+| Need a plan before doing work | **`kenmark-plan`** |
+| Need complete/no-missing-output enforcement | **`kenmark-output`** |
+| Need specialist/parallel investigation | **`kenmark-subagents`** |
 | Need issue tracking in `brain/issues/` | **`kenmark-issues-setup`** / **`kenmark-issues-scan`** |
 | Need to pick which installed skill fits the task | **`kenmark-router`** (this skill) |
 | Repo clutter, scattered docs, dumps | **`kenmark-repo-hygiene`** |
@@ -52,6 +55,8 @@ When several bundled skills could apply, prefer this order:
 | npm publish, release, handoff | **`kenmark-repo-release`** |
 | Inventory or cleanup of installed skills | **`kenmark-maintain`** |
 | Grouped commits and push | **`kenmark-commit`** |
+
+**Complex work order:** **`kenmark-plan`** → **`kenmark-subagents`** (if parallel tracks help) → implementation / audit / troubleshoot / `repo-*` → **`kenmark-output`** before the final response.
 
 Do **not** use this router for open-ended diagnosis (“kenmark-troubleshoot this bug”, “find root cause”, “why is this failing”) — use **`kenmark-troubleshoot`** first. Use **`kenmark-router`** when the problem domain is clear but the right specialist skill is not.
 
@@ -82,7 +87,7 @@ Each skill in the registry includes:
 | `category` | Kenmark: `onboarding`, `workflow`, `git`, `issues`, `admin`. Third-party skills may use broader inferred labels. |
 | `scope` | `universal` (Kenmark store / default setup) or `project-specific` (repo-local copy) |
 | `project` | When `scope` is `project-specific`, target repo or product id |
-| `phase` | Workflow phase: `setup`, `ship`, `maintain`, `verify`, `discover`, `plan`, `diagnose`, `audit` |
+| `phase` | Workflow phase: `setup`, `ship`, `maintain`, `verify`, `discover`, `plan`, `diagnose`, `audit`, `orchestrate` |
 | `risk` | Side-effect level: `read-only`, `write-files`, `shell`, `git-write`, `destructive-possible` |
 | `stack` | Stack fit, e.g. `["any"]`, `["django"]`, `["react", "typescript"]` |
 | `allowedTools` | Frontmatter `allowed-tools` list |
@@ -520,6 +525,9 @@ Do **not** use this skill for first-time Kenmark setup; use **`kenmark-setup`** 
 | Tests, QA, verification, evals | `testing` | `tdd-workflow`, `verification-loop` |
 | Skill install, update, inventory | `admin` | `kenmark-setup`, `kenmark-maintain`, `kenmark-update` |
 | Agent workflow, discovery, learning | `workflow` | `find-skills`, `continuous-learning`, `kenmark-router` |
+| Plan before implementation | `workflow` | `kenmark-plan` |
+| Complete final deliverables / no omissions | `workflow` | `kenmark-output` |
+| Specialist / parallel investigation | `workflow` | `kenmark-subagents` |
 | Troubleshoot, debug, root cause, investigate | `workflow` | `kenmark-troubleshoot` |
 | Repo clutter, scattered docs, dumps | `workflow` | `kenmark-repo-hygiene` |
 | Secrets, keys, tokens | `workflow` | `kenmark-repo-secrets` |

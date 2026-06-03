@@ -857,6 +857,53 @@ const INIT_BRAIN_KB_MARKERS = [
 
 const COMMIT_PUSH_KB_MARKERS = ["Brain KB check before commit", "brain/kb/"];
 
+/** Core OS workflow skills — must appear in README routing tables (regression guard). */
+const CORE_WORKFLOW_ROUTING_MARKERS = [
+  "kenmark-plan",
+  "kenmark-output",
+  "kenmark-subagents"
+];
+
+function validateCoreWorkflowRouting() {
+  const readmePaths = [
+    { file: "README.md", abs: path.join(repoRoot, "README.md") },
+    { file: "skills/README.md", abs: path.join(repoRoot, "skills", "README.md") }
+  ];
+
+  for (const { file, abs } of readmePaths) {
+    if (!fs.existsSync(abs)) {
+      fail(`${file} missing (core workflow routing check skipped)`);
+      continue;
+    }
+    let text;
+    try {
+      text = fs.readFileSync(abs, "utf8");
+    } catch (err) {
+      fail(`${file}: unreadable (${err.message})`);
+      continue;
+    }
+    for (const marker of CORE_WORKFLOW_ROUTING_MARKERS) {
+      if (!text.includes(marker)) {
+        fail(
+          `${file}: missing core workflow skill "${marker}" (routing regression)`
+        );
+      }
+    }
+  }
+
+  const coreDirs = ["kenmark-plan", "kenmark-output", "kenmark-subagents"];
+  for (const dir of coreDirs) {
+    const skillMd = path.join(userSkillsDir, dir, "SKILL.md");
+    if (!fs.existsSync(skillMd)) {
+      fail(`skills/user-skills/${dir}/SKILL.md missing (core workflow skill)`);
+    }
+  }
+
+  console.log(
+    "  ✓ core workflow routing — README.md and skills/README.md mention kenmark-plan, kenmark-output, kenmark-subagents"
+  );
+}
+
 function validateInitBrainKb() {
   const initBrainPath = path.join(userSkillsDir, "kenmark-init", "SKILL.md");
   if (!fs.existsSync(initBrainPath)) {
@@ -930,6 +977,11 @@ function validatePackageJson() {
   if (scripts["test:all"] !== "npm run test && npm run test:install && npm run test:pack") {
     fail(
       'package.json: scripts["test:all"] must be "npm run test && npm run test:install && npm run test:pack"'
+    );
+  }
+  if (scripts.prepublishOnly !== "npm run test:all && npm run pack:check") {
+    fail(
+      'package.json: scripts.prepublishOnly must be "npm run test:all && npm run pack:check"'
     );
   }
   if (scripts["doctor:local"] !== "node scripts/cli.js doctor") {
@@ -1258,6 +1310,7 @@ function main() {
 
   validateSkills();
   validateSkillCountConsistency();
+  validateCoreWorkflowRouting();
   validateCatalog();
   validateCatalogBehavior();
   validateInitBrainKb();
