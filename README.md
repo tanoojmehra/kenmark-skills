@@ -26,12 +26,12 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 ## Overview
 
-`kenmark-skills` ships **14 first-party skills**, a **9-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
+`kenmark-skills` ships **14 first-party skills**, a **10-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
 
 | Asset | Count | Notes |
 | --- | ---: | --- |
 | Kenmark skills | 14 | Bundled in `skills/user-skills/` |
-| CLI commands | 9 | See [CLI reference](#cli-reference) |
+| CLI commands | 10 | See [CLI reference](#cli-reference) |
 | Bundled sub-agents | 0 | Inventory/maintain skills only |
 | Recommended packs | 5 | Impeccable, ECC, Graphify, code review, SEO/GEO |
 
@@ -150,7 +150,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | `init` | First-time wizard: runs `setup` + optional `install-recommended` |
 | `setup` | Install 14 Kenmark skills → `~/.kenmark/store` + IDE symlinks |
 | `uninstall` | Remove Kenmark links from IDE paths (`--keep-store` optional); also removes Kenmark MCP if installed |
-| `mcp uninstall` | Remove only Kenmark MCP from IDE configs + `~/.kenmark/store/mcp.json` (skills unchanged) |
+| `mcp` | MCP management (`mcp uninstall` removes Kenmark MCP from IDE configs + `~/.kenmark/store/mcp.json`; skills unchanged) |
 | `install-recommended` | Install packs from [`recommended-catalog.json`](skills/user-skills/recommended-catalog.json) |
 | `update` | Refresh Kenmark and/or recommended installs |
 | `adopt` | Consolidate catalog skills on disk into the store + relink |
@@ -221,7 +221,9 @@ When store content already exists but differs from an IDE copy, adopt reports **
 | `--adopt-overwrite` | adopt, install-recommended | Alias for `--force` on adopt |
 | `--keep-store` | uninstall | Remove IDE links; keep `~/.kenmark` |
 | `--mcp-only` | uninstall | Remove Kenmark MCP only; leave skill links and store skills intact |
+| `--soft` | doctor | Warnings only; exit 0 (e.g. before first `setup`) |
 | `--json <path>` | doctor, inventory | Write full JSON report |
+| `--no-fail` | doctor | Exit 0 with issues still listed (`ok: false` in `--json`; use `--soft` to downgrade to warnings) |
 
 ---
 
@@ -234,7 +236,7 @@ npx kenmark-skills init
 npx kenmark-skills setup --global --ide all
 ```
 
-`npx` fetches the package from npm when needed. Pin a version with `npx kenmark-skills@1.2.0 init` if you want reproducibility.
+`npx` fetches the package from npm when needed. Pin a version with `npx kenmark-skills@1.3.0 init` for reproducibility, or use `npx kenmark-skills@latest init` for the newest release.
 
 ### Optional: global CLI shorthand
 
@@ -393,13 +395,23 @@ npx kenmark-skills adopt --global --ide all -y
 npx kenmark-skills adopt --global --adopt-overwrite -y   # when setup reported review-required
 ```
 
-### Doctor
+### Validate vs doctor
 
-Checks Node (≥18), `~/.kenmark/store`, manifest, recommended catalog, MCP store/profile/servers/IDE configs, launcher commands (`npx`, `uvx` — warns when `fetch` needs `uvx`), detected IDE roots, per-IDE skill counts, broken symlinks, and store/IDE hash mismatches. Exits non-zero when issues are found.
+| Command | Scope | CI / fresh clone |
+| --- | --- | --- |
+| `validate` | Repo/package invariants (skills, catalog JSON, `package.json`, forbidden terms) | Yes — `npm test` |
+| `doctor` | Local install (`~/.kenmark`, manifest, MCP, IDE links, symlinks, hash drift) | No — run after `setup` |
+| `doctor --soft` | Same as `doctor`, but warnings only (exit 0) | Optional pre-setup check |
+| `doctor --no-fail` | Full issue list; exit 0 (e.g. write `--json` for agents) | Diagnostics / scripting |
 
 ```bash
+npx kenmark-skills validate
+npm test   # same as validate
+
 npx kenmark-skills doctor
+npx kenmark-skills doctor --soft
 npx kenmark-skills doctor --json ./kenmark-doctor.json
+npx kenmark-skills doctor --json ./kenmark-doctor.json --no-fail
 ```
 
 ---
@@ -467,7 +479,7 @@ kenmark-skills/
 
 **Not committed here:** `.claude/`, `.cursor/`, `.agents/` (local IDE installs), `brain/` (optional dev workspace). Edit `skills/user-skills/<name>/SKILL.md` for bundled skills.
 
-**Maintainers:** `npm run validate` · `npm test` · `npm run pack:check` · `npm run publish:public`
+**Maintainers:** `npm run validate` · `npm test` · `npm run doctor:local` (after setup) · `npm run pack:check` · `npm run publish:public`
 
 ---
 

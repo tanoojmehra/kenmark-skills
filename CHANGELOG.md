@@ -1,44 +1,57 @@
 # CHANGELOG
 
-## Unreleased — Profile-based recommended catalog
+## Planned
 
-- **recommended-catalog.json:** `power-user` renamed to `experimental-heavy`; new `core-next-lite` profile (Impeccable + review + ECC minimal); `core-next` extends `core-next-lite` + Graphify. SEO pack adds `selectedBloatScore` (profile totals use selected score when installing subset skills).
-- **recommended-catalog.js / skills-install-recommended.js:** Bloat totals respect `selectedBloatScore` for selected-skills SEO installs; catalog list shows pack + selected bloat.
+- **`troubleshoot-template` (CLI)** — `npx kenmark-skills troubleshoot-template --title "cursor slowdown"` writes `brain/troubleshooting/YYYY-MM-DD-<slug>.md` via `scripts/brain-template.js` (scaffolding exists; not registered in `cli.js` yet). Extend the same module for other `brain/` artifacts later. Referenced from the **troubleshoot** skill docs.
 
-- **validate-repo.js / package.json:** `npm run validate` and `npm test` — automated checks for skill frontmatter, recommended catalog profiles/packs, package `files`/scripts, and forbidden project-specific terms.
+## v1.3.0 — Universal troubleshoot, validation, MCP profiles
+
+### Polish
+
+- **README:** Install pin example updated to `@1.3.0`; documents `@latest` alternative.
+- **package.json:** `npm run mcp:uninstall` → `kenmark-skills mcp uninstall`.
+- **doctor:** `--no-fail` exits 0 with issues still listed in output/JSON (`ok: false`); distinct from `--soft` (warnings-only). Default still non-zero for CI.
+
+### Troubleshoot & workflow
+
 - **troubleshoot:** New bundled workflow skill (`phase: diagnose`) — universal evidence-first diagnosis, hypothesis tree, test plan, and ranked action plan; optional sub-agent tracks for deep investigation.
-- **skills-router:** `infer_category` / `infer_phase` recognize troubleshoot/diagnose triggers; category quick map includes troubleshooting; `diagnose` documented as a workflow phase; **Recommended Kenmark workflows** section (troubleshoot before router).
-- **README / skills/README.md / skills-init:** Documented day-to-day workflow order with `troubleshoot` first; trigger examples for production/debug/test-plan phrasing.
-- **troubleshoot:** Added trigger phrases for Cursor slowdown, production diagnosis, deployment root cause, and test-plan-before-fix requests.
+- **troubleshoot:** Trigger phrases for Cursor slowdown, production diagnosis, deployment root cause, and test-plan-before-fix requests.
 - **troubleshoot:** `risk` set to `write-files` (TodoWrite, optional `brain/troubleshooting/` artifacts); default investigation mode remains read-only until user approval or explicit repo documentation workflow.
 - **troubleshoot:** Evidence bundle (`E1`, `E2`, …) table and **Evidence ↔ hypotheses** citations in hypotheses, tests, final report, and `brain/troubleshooting/` artifacts.
-- **troubleshoot / `scripts/brain-template.js`:** Documented planned `troubleshoot-template --title "…"` CLI (scaffolding module only — not registered in `cli.js` yet).
+- **skills-router:** `infer_category` / `infer_phase` recognize troubleshoot/diagnose triggers; category quick map includes troubleshooting; `diagnose` documented as a workflow phase; **Recommended Kenmark workflows** section (troubleshoot before router).
+- **README / skills/README.md / skills-init:** Documented day-to-day workflow order with `troubleshoot` first; trigger examples for production/debug/test-plan phrasing.
 - **README / package.json / skills/README.md:** Kenmark skill count 13 → 14.
 
-### Planned (CLI)
+### Validation
 
-- **`troubleshoot-template`** — `npx kenmark-skills troubleshoot-template --title "cursor slowdown"` writes `brain/troubleshooting/YYYY-MM-DD-<slug>.md` using `scripts/brain-template.js`; extend same module for other `brain/` artifacts later.
+- **validate / doctor split:** `kenmark-skills validate` (repo/package health; `npm test` / `npm run validate`) vs `kenmark-skills doctor` (local install only: store, manifest, MCP, IDE links, symlinks, hash drift). `doctor --soft` reports warnings and exits 0 (useful before first `setup`). Catalog and package invariants are no longer checked by `doctor`.
+- **validate-repo.js / package.json:** `npm run validate` and `npm test` — automated checks for skill frontmatter, recommended catalog profiles/packs, package `files`/scripts, and forbidden project-specific terms. `npm test` no longer runs `doctor` (missing `~/.kenmark/store` failed CI/fresh clones); use `npm run doctor:local` after setup.
 
+### Recommended catalog (v4)
+
+- **recommended-catalog.json (v4):** Setup profiles `lean` (default), `core-next` (Kenmark stack), `growth-seo`, `audit-review`, `power-user`; overlap install rules; richer pack metadata (`bloatScore`, `weight`, `bestFor`, `avoidWhen`, SEO install modes, ECC profiles).
+- **recommended-catalog.json:** `power-user` renamed to `experimental-heavy`; new `core-next-lite` profile (Impeccable + review + ECC minimal); `core-next` extends `core-next-lite` + Graphify. SEO pack adds `selectedBloatScore` (profile totals use selected score when installing subset skills).
 - **recommended-catalog.json:** `core-next` copy uses universal wording (`agency/client projects`, Next.js full-stack notes) instead of Kenmark-as-workflow assumptions.
+- **recommended-catalog.js:** Profile resolution (`extends`, pack merge), install plan builder, weight/bloat summaries, per-skill SEO installs; bloat totals respect `selectedBloatScore` for selected-skills SEO installs; catalog list shows pack + selected bloat.
+- **recommended-catalog.json / recommended-catalog.js:** SEO selected-skills profiles (e.g. `growth-seo`) use `batchSkillInstall` — one `npx skills add … -s` with space-separated skill names instead of six separate installs; per-skill fallback and `Installing SEO/GEO selected skills: N/M` progress when batch is unavailable.
+- **recommended-catalog.js / skills-install-recommended.js:** When `entry.seoSkills` is set, post-install verify requires every selected skill’s `SKILL.md` (not just `keyword-research` or the full pack directory), so partial batch installs fail verify for `growth-seo`.
+- **recommended-catalog.json / recommended-catalog.js:** `code-review-skill` uses `installStrategy: "git-sync"` — clone on first install, `git pull --ff-only` when the target is already a repo; safe to re-run `install-recommended --profile lean`.
+- **skills-install-recommended.js:** `--profile`, `--list-profiles`; interactive profile picker with install preview; power-user confirmation; ECC default **minimal** (was `core`). Adopt pass forwards `--copy`, `--symlink`, `--prefer-copy-on-windows`, `--adopt-overwrite` (same as `setup` / `adopt`). Runs git-sync installs via Node instead of a bare `git clone` shell command.
+- **interactive.js:** `promptSelectProfile`, `printProfileSummary`, `promptHighBloatConfirm`.
+- **skills-init.js:** Recommended step uses profiles; `--profile` for agents.
+- **skills-install-recommended/SKILL.md, README, cli.js:** Docs updated for profile-first workflow.
+
+### Issues skills
 
 - **issues-setup / issues-scan / issues-list / issues-maintenance:** Expanded default `area` values (`frontend`, `backend`, `auth`, `performance`, `dx`, `docs`, `workflow`, `unknown`, …); `worker` documented as optional when the repo has background jobs; maintenance accepts legacy `maintainability`.
 
-- **recommended-catalog.json / recommended-catalog.js:** SEO selected-skills profiles (e.g. `growth-seo`) use `batchSkillInstall` — one `npx skills add … -s` with space-separated skill names instead of six separate installs; per-skill fallback and `Installing SEO/GEO selected skills: N/M` progress when batch is unavailable.
-- **recommended-catalog.json / recommended-catalog.js:** `code-review-skill` uses `installStrategy: "git-sync"` — clone on first install, `git pull --ff-only` when the target is already a repo; safe to re-run `install-recommended --profile lean`.
-- **skills-install-recommended.js:** Runs git-sync installs via Node instead of a bare `git clone` shell command.
+### MCP
 
 - **MCP opt-in:** `setup` no longer installs bundled MCP by default. Use `--with-mcp` (profile `all`) or `--mcp-profile <name>` (`none`, `web`, `research`, `deep`, `all`). `--skip-mcp` overrides an explicit opt-in. Full `uninstall` removes Kenmark-managed MCP entries when present.
 - **MCP uninstall:** `npx kenmark-skills mcp uninstall` and `uninstall --mcp-only` remove only Kenmark MCP from IDE configs and `~/.kenmark/store/mcp.json`; skill links are unchanged.
 - **doctor / MCP:** Reports MCP store, installed profile, servers, IDE configs touched, and whether `npx` / `uvx` are on PATH; warns when `fetch` (research/deep profiles) needs `uvx` but it is missing.
 - **config/mcp-profiles.json:** Profile → server name mapping for bundled MCP.
 - **kenmark-hub.js / setup-skills.js:** Profile filtering, manifest records `mcp.profile`.
-
-- **recommended-catalog.json (v4):** Setup profiles `lean` (default), `core-next` (Kenmark stack), `growth-seo`, `audit-review`, `power-user`; overlap install rules; richer pack metadata (`bloatScore`, `weight`, `bestFor`, `avoidWhen`, SEO install modes, ECC profiles).
-- **recommended-catalog.js:** Profile resolution (`extends`, pack merge), install plan builder, weight/bloat summaries, per-skill SEO installs.
-- **skills-install-recommended.js:** `--profile`, `--list-profiles`; interactive profile picker with install preview; power-user confirmation; ECC default **minimal** (was `core`). Adopt pass forwards `--copy`, `--symlink`, `--prefer-copy-on-windows`, `--adopt-overwrite` (same as `setup` / `adopt`).
-- **interactive.js:** `promptSelectProfile`, `printProfileSummary`, `promptHighBloatConfirm`.
-- **skills-init.js:** Recommended step uses profiles; `--profile` for agents.
-- **skills-install-recommended/SKILL.md, README, cli.js:** Docs updated for profile-first workflow.
 
 ## v1.2.7 — Doctor command, adopt guards, init hub alignment
 
