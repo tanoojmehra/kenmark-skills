@@ -25,7 +25,8 @@ const {
 const {
   buildGlobalTargets,
   buildProjectTargets,
-  detectInstalledIdes
+  detectInstalledIdes,
+  detectManagedIdes
 } = require("./kenmark-hub");
 
 const repoRoot = path.resolve(__dirname, "..");
@@ -195,7 +196,11 @@ async function run() {
           : buildGlobalTargets(os.homedir());
       const targetKeys = Object.keys(targetMap);
       const detected = detectInstalledIdes(targetMap);
-      const ides = await promptIde(targetKeys, detected, { required: true });
+      const managed = detectManagedIdes(targetMap);
+      const ides = await promptIde(targetKeys, detected, {
+        required: true,
+        managedIdes: managed
+      });
       ideArg = ides.length === targetKeys.length ? "all" : ides.join(",");
     }
   } else {

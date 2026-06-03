@@ -115,6 +115,17 @@ function run() {
   } else {
     console.log("Detected IDE roots: none");
   }
+  const managedOnly = (report.managedIdeRoots || []).filter(
+    (ide) => !report.installedIdeRoots.includes(ide)
+  );
+  if (report.managedIdeRoots?.length) {
+    console.log(`Kenmark-managed targets: ${report.managedIdeRoots.join(", ")}`);
+  }
+  if (managedOnly.length) {
+    console.log(
+      `  (skills path exists from Kenmark only — not counted as installed: ${managedOnly.join(", ")})`
+    );
+  }
 
   console.log("\nSkill counts by IDE:");
   for (const [ide, count] of Object.entries(report.skillCountsByIde)) {

@@ -32,6 +32,8 @@ const {
   buildMcpDocumentForProfile,
   listMcpProfileNames,
   detectInstalledIdes,
+  detectManagedIdes,
+  ensureKenmarkTargetPath,
   resolveFallbackTargetIdes,
   resolveLinkModeLabel
 } = require("./kenmark-hub");
@@ -240,10 +242,6 @@ function resolveTargetIdes(args, targetMap) {
   return null;
 }
 
-function ensureTargetPath(targetPath) {
-  fs.mkdirSync(targetPath, { recursive: true });
-}
-
 function ensureParentDir(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
@@ -387,7 +385,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
             }
             continue;
           }
-          ensureTargetPath(targetPath);
+          ensureKenmarkTargetPath(targetPath);
           const linkResults = relinkSkillsToIdes(skillNames, { [ide]: targetPath }, {
             forceCopy,
             forceSymlink,
@@ -583,7 +581,10 @@ async function run() {
     const targetMapPreview = mode === "project" ? projectTargets : globalTargets;
     if (!args.explicitIde) {
       const detected = detectInstalledIdes(targetMapPreview);
-      targetIdes = await promptIde(Object.keys(targetMapPreview), detected);
+      const managed = detectManagedIdes(targetMapPreview);
+      targetIdes = await promptIde(Object.keys(targetMapPreview), detected, {
+        managedIdes: managed
+      });
     }
   }
 
