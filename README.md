@@ -26,12 +26,12 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 ## Overview
 
-`kenmark-skills` ships **22 first-party skills**, a **10-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
+`kenmark-skills` ships **22 first-party skills**, an **11-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
 
 | Asset | Count | Notes |
 | --- | ---: | --- |
 | Kenmark skills | 22 | Bundled in `skills/user-skills/` |
-| CLI commands | 10 | See [CLI reference](#cli-reference) |
+| CLI commands | 11 | See [CLI reference](#cli-reference) |
 | Bundled sub-agents | 0 | Inventory/maintain skills only |
 | Recommended packs | 5 | Impeccable, ECC, Graphify, code review, SEO/GEO |
 
@@ -168,7 +168,8 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | `install-recommended` | Install packs from [`recommended-catalog.json`](skills/user-skills/recommended-catalog.json) |
 | `update` | Refresh Kenmark and/or recommended installs |
 | `adopt` | Consolidate catalog skills on disk into the store + relink |
-| `doctor` | Diagnose store, manifest, MCP install (`npx`/`uvx` on PATH), IDE links, and catalog health |
+| `validate` | Repo/package invariants (skills, catalog JSON, `package.json`, forbidden terms); same checks as `npm test` |
+| `doctor` | Diagnose local install: store, manifest, MCP (`npx`/`uvx` on PATH), IDE links, symlinks, hash drift |
 | `inventory` | Report on installed skills (keep / dedupe / remove) |
 | `subagents-inventory` | Same for sub-agents (alias: `agents-inventory`) |
 
@@ -418,9 +419,19 @@ npx kenmark-skills adopt --global --adopt-overwrite -y   # when setup reported r
 | `doctor --soft` | Same as `doctor`, but warnings only (exit 0) | Optional pre-setup check |
 | `doctor --no-fail` | Full issue list; exit 0 (e.g. write `--json` for agents) | Diagnostics / scripting |
 
+**Validation entry points** (equivalent checks; both scripts ship in the npm package):
+
+| How you run it | Script chain |
+| --- | --- |
+| `npm run validate` or `npm test` | `scripts/validate-repo.js` |
+| `npx kenmark-skills validate` | `scripts/validate.js` → `scripts/validate-repo.js` |
+
+`validate.js` is a thin wrapper so the CLI command stays next to other `cli.js` dispatches; npm scripts call `validate-repo.js` directly to avoid an extra hop in CI.
+
 ```bash
 npx kenmark-skills validate
-npm test   # same as validate
+npm test   # same checks as validate (direct validate-repo.js)
+npm run validate
 
 npx kenmark-skills doctor
 npx kenmark-skills doctor --soft
@@ -485,6 +496,8 @@ kenmark-skills/
 ├── package.json
 ├── scripts/
 │   ├── cli.js              # kenmark-skills binary
+│   ├── validate.js         # CLI validate → validate-repo.js
+│   ├── validate-repo.js    # npm test / npm run validate; shared implementation
 │   └── setup-skills.js     # kenmark-skills-setup
 └── skills/
     ├── README.md           # logical categories vs flat on-disk layout
@@ -493,7 +506,7 @@ kenmark-skills/
 
 **Not committed here:** `.claude/`, `.cursor/`, `.agents/` (local IDE installs), `brain/` (optional dev workspace). Edit `skills/user-skills/<name>/SKILL.md` for bundled skills.
 
-**Maintainers:** `npm run validate` · `npm test` · `npm run doctor:local` (after setup) · `npm run pack:check` · `npm run publish:public`
+**Maintainers:** `npm run validate` · `npm test` (→ `validate-repo.js`) · `npx kenmark-skills validate` (→ `validate.js`) · `npm run doctor:local` (after setup) · `npm run pack:check` · `npm run publish:public`
 
 ---
 

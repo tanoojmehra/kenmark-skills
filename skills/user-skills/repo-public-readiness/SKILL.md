@@ -8,10 +8,19 @@ description: "Strict read-only checklist before making a repository public: secr
 triggers:
   - make repo public
   - public repo readiness
+  - public repository readiness
+  - prepare repo for public
+  - before making public
+  - before public push
+  - open source readiness
+  - ready to open source
   - safe to publish
   - open source this repo
   - check before public push
   - can I make this public
+  - sanitize before public
+  - publish repo publicly
+  - github public readiness
   - repo-public-readiness
 allowed-tools:
   - Bash
@@ -27,6 +36,8 @@ disable-model-invocation: false
 ## Purpose
 
 Use when the user is **about to make a repository public** (GitHub public, open-source release, external share). Stricter than `repo-hygiene` clutter audit.
+
+**Not** for scattered docs, dumps, or file clutter alone — use **`repo-hygiene`** for organization cleanup after publish blockers are cleared.
 
 Checks:
 

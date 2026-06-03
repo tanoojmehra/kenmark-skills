@@ -8,7 +8,7 @@ description: "Audit a repository for clutter: scattered markdown, orphan assets,
 triggers:
   - repo hygiene
   - clean repo
-  - sanitize repo
+  - sanitize repo clutter
   - audit dirty repo
   - cleanup files
   - find unused files
@@ -53,7 +53,13 @@ Use this skill when the user wants to audit a repository for **file clutter and 
 | Deep secret/key/token scan | **`repo-secrets-audit`** |
 | Safe to make repo public | **`repo-public-readiness`** |
 
+**Scope:** file clutter and organization only — not a public-publish or open-source safety gate.
+
+**Do not use this skill** when the user wants public-repo readiness (even if they say "sanitize repo"). Load **`repo-public-readiness`** instead.
+
 Default behavior is **audit and recommend only**.
+
+In audit mode, do not use Write unless the user asks to create a report file.
 
 Do not delete, move, rewrite, or commit anything unless the user explicitly approves the cleanup plan.
 
@@ -78,7 +84,14 @@ This skill must be safe for production and public-release preparation.
 | `cleanup-plan`     | User wants actions                | Recommend move/delete/convert actions     |
 | `approved-cleanup` | User approved specific actions    | Execute only approved changes             |
 
-If the user asks **"can I make this public?"** or **"check secrets"**, stop and use **`repo-public-readiness`** or **`repo-secrets-audit`** instead of this skill.
+If the user asks about **making the repo public**, **open-sourcing**, **publish safety**, or **secrets**, stop and use the specialist instead of this skill:
+
+| Phrases (examples) | Use |
+| --- | --- |
+| can I make this public, safe to publish, public repo readiness, prepare for public, open source this repo, before public push | **`repo-public-readiness`** |
+| check secrets, find keys, credential scan, secrets audit | **`repo-secrets-audit`** |
+
+If they say **"sanitize repo"** without clutter context, ask whether they mean **clutter cleanup** (this skill) or **public publish prep** (**`repo-public-readiness`**).
 
 ---
 

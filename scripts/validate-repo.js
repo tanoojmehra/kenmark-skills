@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Repo validation for kenmark-skills — run via `npm run validate` or `npm test`.
+ * Repo/package validation implementation for kenmark-skills.
+ *
+ * Entry points (same checks):
+ * - `npm run validate` / `npm test` → this file
+ * - `kenmark-skills validate` → `scripts/validate.js` → this file
  */
 
 const fs = require("fs");
@@ -299,6 +303,14 @@ function packHasInstallMetadata(pack) {
     );
   }
 
+  if (strategy === "manual") {
+    function manualScopeOk(block) {
+      if (!block || typeof block !== "object") return false;
+      return block.manual === true;
+    }
+    return manualScopeOk(inst.global) && manualScopeOk(inst.project);
+  }
+
   function scopeOk(block) {
     if (!block || typeof block !== "object") return false;
     return (
@@ -346,8 +358,18 @@ function validateCatalog() {
     packIds.add(pack.id);
     if (!packHasInstallMetadata(pack)) {
       fail(
-        `recommended-catalog.json: pack "${pack.id}" missing install metadata (global+project command/target or git-sync repoUrl+targets)`
+        `recommended-catalog.json: pack "${pack.id}" missing install metadata (global+project command/target, manual scopes, or git-sync repoUrl+targets)`
       );
+    }
+    const strategy = pack.installStrategy || pack.install?.strategy;
+    if (strategy === "manual") {
+      for (const scope of ["global", "project"]) {
+        if (pack.install?.[scope]?.command) {
+          fail(
+            `recommended-catalog.json: pack "${pack.id}" installStrategy is manual but install.${scope}.command is set`
+          );
+        }
+      }
     }
   }
 
@@ -495,6 +517,9 @@ function validatePackageJson() {
   }
   if (!cliSrc.includes('command === "validate"')) {
     fail('scripts/cli.js must register the "validate" command');
+  }
+  if (!cliSrc.includes('"validate.js"')) {
+    fail('scripts/cli.js validate must spawn scripts/validate.js (not validate-repo.js directly)');
   }
 
   const files = pkg.files || [];

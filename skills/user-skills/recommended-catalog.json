@@ -314,11 +314,11 @@
           { "id": "full", "description": "Full: complete installer (28 agents, 119 skills). Explicit opt-in only" }
         ],
         "global": {
-          "command": "npx --yes ecc-install --profile {{profile}} --target claude",
+          "manual": true,
           "summary": "Install ECC with the selected profile into the user's global Claude config"
         },
         "project": {
-          "command": "npx --yes ecc-install --profile {{profile}} --target claude",
+          "manual": true,
           "cwd": "project",
           "summary": "Install ECC with the selected profile for the current project"
         },

@@ -38,7 +38,9 @@ When several bundled skills could apply, prefer this order:
 | Need to pick which installed skill fits the task | **`skills-router`** (this skill) |
 | Repo clutter, scattered docs, dumps | **`repo-hygiene`** |
 | Keys, secrets, credentials | **`repo-secrets-audit`** |
-| Make repo public / open source | **`repo-public-readiness`** |
+| Make repo public / open source / public repo readiness | **`repo-public-readiness`** |
+
+**Ambiguous:** `sanitize repo` — if the user means **public** or **open-source** prep, use **`repo-public-readiness`** (often with **`repo-secrets-audit`**), not **`repo-hygiene`**. Use **`repo-hygiene`** only for clutter (files, docs, dumps, orphans).
 | Update brain after code change | **`repo-kb-sync`** |
 | Docs quality, README accuracy | **`repo-docs-audit`** |
 | Confusing folder layout | **`repo-structure-audit`** |
@@ -265,7 +267,7 @@ def infer_phase(name: str, description: str, category: str) -> str:
         k in text
         for k in [
             "repo hygiene",
-            "sanitize repo",
+            "sanitize repo clutter",
             "dirty repo",
             "cleanup files",
             "audit dirty repo",
@@ -491,7 +493,8 @@ Do **not** use this skill for first-time Kenmark setup; use **`skills-init`** or
 4. **Tie-break** (in order):
    - Prefer skills with explicit `triggers[]` matches over description-only matches
    - Prefer narrower skills over umbrella skills (`seo-page` over `seo`; `django-tdd` over `coding-standards`)
-   - Among `repo-*` skills, prefer the specialist over `repo-hygiene` (e.g. `repo-secrets-audit` for "find secrets", `repo-public-readiness` for "make public", `repo-release-readiness` for "npm publish")
+   - Among `repo-*` skills, prefer the specialist over `repo-hygiene` (e.g. `repo-secrets-audit` for "find secrets", `repo-public-readiness` for "make public", "public repo readiness", "sanitize before public", `repo-release-readiness` for "npm publish")
+   - If the task mentions **public**, **open source**, **publish**, or **safe to publish**, prefer **`repo-public-readiness`** over **`repo-hygiene`** even when the user also says "sanitize" or "clean"
    - Prefer `source: kenmark` over `catalog` over `user` when scores are equal
    - Prefer `maturity: stable` over `catalog` over `user`
 

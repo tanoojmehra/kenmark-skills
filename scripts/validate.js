@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Repo/package validation — `kenmark-skills validate` (also `npm run validate` / `npm test`).
+ * Thin CLI entry for repo validation — `kenmark-skills validate` only.
+ * npm scripts call `scripts/validate-repo.js` directly (`npm run validate`, `npm test`).
  */
 
 require("./validate-repo.js");

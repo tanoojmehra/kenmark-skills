@@ -196,7 +196,14 @@ function printCatalog(catalog) {
     if (pack.avoidWhen?.length) {
       console.log(`    avoid when: ${pack.avoidWhen.join(", ")}`);
     }
-    if (pack.install?.global?.command) {
+    if (pack.installStrategy === "manual") {
+      if (pack.install?.global?.summary) {
+        console.log(`    global:  ${pack.install.global.summary} (manual)`);
+      }
+      if (pack.install?.project?.summary) {
+        console.log(`    project: ${pack.install.project.summary} (manual)`);
+      }
+    } else if (pack.install?.global?.command) {
       console.log(`    global:  ${pack.install.global.command}`);
     }
     if (pack.install?.profiles?.length) {
@@ -454,7 +461,9 @@ async function run() {
       : `Custom packs · scope ${scope}`,
     `Packs: ${packLabels.join(", ")}`,
     ...installPlan.flatMap((entry) =>
-      resolveInstallCommands(entry, scope, catalog).map((c) => c.command)
+      resolveInstallCommands(entry, scope, catalog).map(
+        (c) => c.command || c.message || `Manual install: ${entry.packId}`
+      )
     )
   ];
   if (!args.skipAdopt) {

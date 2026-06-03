@@ -2,11 +2,23 @@
 
 ## Unreleased
 
+### Validation entry points
+
+- **README / script headers:** Document two equivalent paths — `npm run validate` / `npm test` → `scripts/validate-repo.js`; `kenmark-skills validate` → `scripts/validate.js` → `validate-repo.js`. Both files remain in `package.json` `files`.
+- **validate-repo.js:** Regression check that `cli.js` spawns `validate.js`, not `validate-repo.js` directly.
+
+### Repo skill routing
+
+- **repo-hygiene:** Clutter-only scope; removed broad `sanitize repo` trigger; expanded handoff table for public-readiness and secrets phrases.
+- **repo-public-readiness:** Added public-readiness trigger phrases (`public repository readiness`, `prepare repo for public`, `sanitize before public`, etc.); clarified not for clutter-only audits.
+- **skills-router:** Tie-break and ambiguity note — public/open-source/sanitize-before-public → `repo-public-readiness`, not `repo-hygiene`.
+
 ### Init, recommended packs, and catalog
 
 - **`skills-init.js`:** Single `setup-skills` run with comma-separated `--ide` (no per-IDE loop / repeated adopt passes). Forwards `--ide` to `skills-install-recommended` so curated packs align with the chosen targets.
 - **`skills-install-recommended.js` / `skills-adopt.js`:** `--ide` accepts `cursor,codex,claude` and `all` via shared `resolveExplicitTargetIdes` in the hub.
-- **`recommended-catalog.json`:** `core-next-lite` is Impeccable + code review only; `core-next` unchanged (lite + Graphify). New **`core-next-agentic`** (core-next + ECC minimal). ECC removed from default `core-next-lite` and `audit-review`. ECC pack uses **`installStrategy: manual`** until `ecc-install` is verified on npm.
+- **`recommended-catalog.json`:** `core-next-lite` is Impeccable + code review only; `core-next` unchanged (lite + Graphify). New **`core-next-agentic`** (core-next + ECC minimal). ECC removed from default `core-next-lite` and `audit-review`. ECC pack uses **`installStrategy: manual`** until `ecc-install` is verified on npm; ECC `install.global` / `install.project` use `manual: true` (no dead `ecc-install` commands).
+- **`validate-repo.js`:** Manual-strategy packs require `manual: true` on global/project scopes and must not set `install.*.command`.
 - **Impeccable:** Catalog warning documents upstream partial harness failures when verify passes.
 
 ### Brain KB (init-brain + commit-push)
