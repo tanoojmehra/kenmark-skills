@@ -131,6 +131,134 @@ function warn(msg) {
   warnings.push(msg);
 }
 
+/** Direct children of skills/user-skills/ that contain SKILL.md (source of truth for bundled count). */
+function listBundledSkillDirs() {
+  if (!fs.existsSync(userSkillsDir)) {
+    return [];
+  }
+  return fs
+    .readdirSync(userSkillsDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .filter((name) =>
+      fs.existsSync(path.join(userSkillsDir, name, "SKILL.md"))
+    )
+    .sort();
+}
+
+function parseSkillCountFromText(text, re, label) {
+  const match = text.match(re);
+  if (!match) {
+    return { error: `missing skill count (${label})` };
+  }
+  const n = Number.parseInt(match[1], 10);
+  if (!Number.isFinite(n) || n < 1) {
+    return { error: `invalid skill count (${label}): "${match[1]}"` };
+  }
+  return { count: n };
+}
+
+/**
+ * Documented Kenmark bundled skill counts must match dirs with SKILL.md.
+ * Patterns extract the number so adding skill #24 only requires updating copy once.
+ */
+const SKILL_COUNT_DOC_CHECKS = [
+  {
+    file: "package.json",
+    label: 'description "N universal Kenmark"',
+    getText: () => {
+      const pkg = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+      return String(pkg.description || "");
+    },
+    re: /(\d+)\s+universal\s+Kenmark/i
+  },
+  {
+    file: "README.md",
+    label: "intro **N first-party skills**",
+    getText: () => fs.readFileSync(path.join(repoRoot, "README.md"), "utf8"),
+    re: /\*\*(\d+)\s+first-party skills\*\*/i
+  },
+  {
+    file: "README.md",
+    label: "skills table | Kenmark skills | N |",
+    getText: () => fs.readFileSync(path.join(repoRoot, "README.md"), "utf8"),
+    re: /\|\s*Kenmark skills\s*\|\s*(\d+)\s*\|/i
+  },
+  {
+    file: "README.md",
+    label: "commands table Install N Kenmark skills",
+    getText: () => fs.readFileSync(path.join(repoRoot, "README.md"), "utf8"),
+    re: /Install\s+(\d+)\s+Kenmark skills/i
+  },
+  {
+    file: "README.md",
+    label: "init vs setup table | N Kenmark skills |",
+    getText: () => fs.readFileSync(path.join(repoRoot, "README.md"), "utf8"),
+    re: /\|\s*(\d+)\s+Kenmark skills\s*\|/i
+  },
+  {
+    file: "README.md",
+    label: "repo tree # N universal skills",
+    getText: () => fs.readFileSync(path.join(repoRoot, "README.md"), "utf8"),
+    re: /#\s*(\d+)\s+universal skills/i
+  },
+  {
+    file: "skills/README.md",
+    label: "bundled universal skills (N)",
+    getText: () =>
+      fs.readFileSync(path.join(repoRoot, "skills", "README.md"), "utf8"),
+    re: /bundled universal skills\s*\((\d+)\)/i
+  }
+];
+
+function validateSkillCountConsistency() {
+  const actual = listBundledSkillDirs();
+  const actualCount = actual.length;
+
+  if (actualCount === 0) {
+    fail(
+      "skill count: no bundled skills (skills/user-skills/*/SKILL.md); run validateSkills for details"
+    );
+    return;
+  }
+
+  const declaredByFile = new Map();
+
+  for (const check of SKILL_COUNT_DOC_CHECKS) {
+    let text;
+    try {
+      text = check.getText();
+    } catch (err) {
+      fail(`${check.file}: unreadable for skill count (${err.message})`);
+      continue;
+    }
+
+    const parsed = parseSkillCountFromText(text, check.re, check.label);
+    if (parsed.error) {
+      fail(`${check.file}: ${parsed.error}`);
+      continue;
+    }
+
+    if (parsed.count !== actualCount) {
+      fail(
+        `${check.file}: ${check.label} says ${parsed.count} but skills/user-skills has ${actualCount} SKILL.md dirs (${actual.join(", ")})`
+      );
+    }
+
+    const prev = declaredByFile.get(check.file);
+    if (prev !== undefined && prev !== parsed.count) {
+      fail(
+        `${check.file}: inconsistent documented skill counts (${prev} vs ${parsed.count})`
+      );
+    }
+    declaredByFile.set(check.file, parsed.count);
+  }
+
+  console.log(
+    `  ✓ skill count ${actualCount} — package.json, README.md, skills/README.md match skills/user-skills/*/SKILL.md`
+  );
+}
+
 function unquoteScalar(raw) {
   const value = String(raw || "").trim();
   if (
@@ -270,19 +398,24 @@ function validateSkills() {
   }
 
   const entries = fs.readdirSync(userSkillsDir, { withFileTypes: true });
-  const skillDirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+  const allDirs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
+  const skillDirs = listBundledSkillDirs();
 
   if (skillDirs.length === 0) {
-    fail("no skill directories under skills/user-skills/");
+    fail("no skill directories with SKILL.md under skills/user-skills/");
   }
 
-  for (const skillDir of skillDirs.sort()) {
-    const skillMd = path.join(userSkillsDir, skillDir, "SKILL.md");
-    if (!fs.existsSync(skillMd)) {
+  for (const skillDir of allDirs.sort()) {
+    if (!skillDirs.includes(skillDir)) {
       fail(`skills/user-skills/${skillDir}/SKILL.md missing`);
-      continue;
     }
-    validateSkillFrontmatter(skillDir, skillMd);
+  }
+
+  for (const skillDir of skillDirs) {
+    validateSkillFrontmatter(
+      skillDir,
+      path.join(userSkillsDir, skillDir, "SKILL.md")
+    );
   }
 }
 
@@ -615,6 +748,7 @@ function main() {
   console.log("kenmark-skills validate — checking repo invariants\n");
 
   validateSkills();
+  validateSkillCountConsistency();
   validateCatalog();
   validateInitBrainKb();
   validatePackageJson();
