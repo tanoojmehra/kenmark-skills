@@ -1,7 +1,7 @@
 {
   "name": "kenmark-skills",
   "version": "2.0.0",
-  "description": "23 universal Kenmark agent skills + 11-command CLI for Cursor, Claude Code, Codex, and other SKILL.md-compatible agents. Includes setup, init, update, adopt, validate, doctor, inventory, mcp, profile-based recommended packs, and kenmark-repo-* maintenance skills.",
+  "description": "23 universal Kenmark agent skills + 11-command CLI for Cursor, Claude Code, Codex, and other SKILL.md-compatible agents. Includes setup, init, update, adopt, validate, doctor, inventory, mcp, selectable optional packs with repo-aware suggestions, and kenmark-repo-* maintenance skills.",
   "license": "MIT",
   "private": false,
   "type": "commonjs",
@@ -24,7 +24,11 @@
     "doctor:local": "node scripts/cli.js doctor",
     "check": "node scripts/cli.js doctor",
     "validate": "node scripts/validate-repo.js",
-    "test": "node scripts/validate-repo.js",
+    "test": "npm run validate && npm run test:cli",
+    "test:cli": "node scripts/test-cli-smoke.js",
+    "test:install": "node scripts/test-install-temp-home.js",
+    "test:pack": "node scripts/test-pack.js",
+    "test:all": "npm run test && npm run test:install && npm run test:pack",
     "setup:skills": "node scripts/setup-skills.js",
     "pack:check": "npm pack --dry-run",
     "publish:public": "npm publish --access public"
@@ -51,7 +55,10 @@
     "scripts/skills-inventory.js",
     "scripts/kenmark-packs.js",
     "scripts/kenmark-update.js",
-    "scripts/subagents-inventory.js"
+    "scripts/subagents-inventory.js",
+    "scripts/test-cli-smoke.js",
+    "scripts/test-install-temp-home.js",
+    "scripts/test-pack.js"
   ],
   "engines": {
     "node": ">=18"

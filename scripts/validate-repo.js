@@ -13,8 +13,24 @@ const path = require("path");
 const {
   loadCatalog,
   getPack,
+  resolvePresetPackRefs,
   resolveProfilePackRefs,
-  listProfiles
+  resolvePresetPlan,
+  resolveProfilePlan,
+  summarizePreset,
+  summarizeProfile,
+  resolveInstallCommands,
+  formatInstallPlanLine,
+  buildSeoSkillsVerifyCommand,
+  resolveVerifyCommand,
+  buildInstallPlan,
+  planFromPackIds,
+  defaultSelectedIds,
+  defaultPresetId,
+  listPresets,
+  listProfiles,
+  printOptionalList,
+  isSeoPack
 } = require("./recommended-catalog");
 const { LEGACY_SKILL_RENAMES } = require("./kenmark-hub");
 
@@ -79,6 +95,10 @@ const REQUIRED_PACKAGE_SCRIPTS = [
   "check",
   "validate",
   "test",
+  "test:cli",
+  "test:install",
+  "test:pack",
+  "test:all",
   "pack:check"
 ];
 
@@ -102,20 +122,10 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/kenmark-update.js",
   "scripts/skills-adopt.js",
   "scripts/subagents-inventory.js",
-  "scripts/interactive.js"
-];
-
-/** Scripts spawned by scripts/cli.js — must exist on disk (regression guard for publish). */
-const CLI_SPAWNED_SCRIPTS = [
-  "scripts/kenmark-setup.js",
-  "scripts/setup-skills.js",
-  "scripts/kenmark-packs.js",
-  "scripts/kenmark-update.js",
-  "scripts/skills-adopt.js",
-  "scripts/skills-inventory.js",
-  "scripts/subagents-inventory.js",
-  "scripts/validate.js",
-  "scripts/doctor.js"
+  "scripts/interactive.js",
+  "scripts/test-cli-smoke.js",
+  "scripts/test-install-temp-home.js",
+  "scripts/test-pack.js"
 ];
 
 /** Paths scanned for forbidden literals/patterns. CHANGELOG is historical — excluded. */
@@ -163,6 +173,30 @@ function fail(msg) {
 
 function warn(msg) {
   warnings.push(msg);
+}
+
+/** Extract scripts/*.js paths spawned via path.join(__dirname, ...) in cli.js. */
+function parseCliSpawnedScripts(cliSrc) {
+  const rels = new Set();
+  const re = /path\.join\(__dirname,\s*["']([^"']+\.js)["']\)/g;
+  let match;
+  while ((match = re.exec(cliSrc)) !== null) {
+    rels.add(path.join("scripts", match[1]).split(path.sep).join("/"));
+  }
+  return [...rels].sort();
+}
+
+function stringContainsUndefinedLiteral(value, label) {
+  if (value === undefined) {
+    fail(`${label}: value is undefined`);
+    return true;
+  }
+  const text = String(value);
+  if (text.includes("undefined")) {
+    fail(`${label}: rendered text contains "undefined" (${text.slice(0, 120)})`);
+    return true;
+  }
+  return false;
 }
 
 /** Direct children of skills/user-skills/ that contain SKILL.md (source of truth for bundled count). */
@@ -551,65 +585,265 @@ function validateCatalog() {
     }
   }
 
-  const profiles = catalog.profiles;
-  if (!Array.isArray(profiles) || profiles.length === 0) {
-    fail("recommended-catalog.json: \"profiles\" must be a non-empty array");
+  if (catalog.version >= 5 && catalog.mode !== "selectable") {
+    fail('recommended-catalog.json: v5+ catalogs must set "mode": "selectable"');
+  }
+
+  const requiredPackFields = [
+    "helpsWith",
+    "bestFor",
+    "avoidWhen",
+    "suggestiveTest"
+  ];
+  for (const pack of packs) {
+    for (const field of requiredPackFields) {
+      if (catalog.version >= 5 && pack[field] == null) {
+        fail(`recommended-catalog.json: pack "${pack.id}" missing "${field}"`);
+      }
+    }
+    if (catalog.version >= 5 && pack.suggestiveTest) {
+      const st = pack.suggestiveTest;
+      if (!st.question || !Array.isArray(st.signals) || !st.recommendation) {
+        fail(
+          `recommended-catalog.json: pack "${pack.id}" suggestiveTest needs question, signals[], recommendation`
+        );
+      }
+      const allowed = new Set(["recommended", "optional", "avoid"]);
+      if (!allowed.has(st.recommendation)) {
+        fail(
+          `recommended-catalog.json: pack "${pack.id}" suggestiveTest.recommendation must be recommended|optional|avoid`
+        );
+      }
+    }
+    if (
+      catalog.version >= 5 &&
+      typeof pack.defaultSelected !== "boolean"
+    ) {
+      fail(`recommended-catalog.json: pack "${pack.id}" must set boolean defaultSelected`);
+    }
+  }
+
+  const selected = defaultSelectedIds(catalog);
+  for (const id of selected) {
+    if (!packIds.has(id)) {
+      fail(`recommended-catalog.json: defaults.selectedIds references unknown pack "${id}"`);
+    }
+    const pack = getPack(catalog, id);
+    if (catalog.version >= 5 && pack && !pack.defaultSelected) {
+      fail(
+        `recommended-catalog.json: defaults.selectedIds includes "${id}" but pack.defaultSelected is false`
+      );
+    }
+  }
+
+  const presets = catalog.presets || catalog.profiles;
+  if (!Array.isArray(presets) || presets.length === 0) {
+    fail("recommended-catalog.json: \"presets\" must be a non-empty array");
     return;
   }
 
-  const profileIds = new Set();
-  let defaultCount = 0;
-  for (const profile of profiles) {
-    if (!profile || typeof profile.id !== "string" || !profile.id.trim()) {
-      fail("recommended-catalog.json: every profile needs a non-empty \"id\"");
+  const presetIds = new Set();
+  for (const preset of presets) {
+    if (!preset || typeof preset.id !== "string" || !preset.id.trim()) {
+      fail("recommended-catalog.json: every preset needs a non-empty \"id\"");
       continue;
     }
-    if (profileIds.has(profile.id)) {
-      fail(`recommended-catalog.json: duplicate profile id "${profile.id}"`);
+    if (presetIds.has(preset.id)) {
+      fail(`recommended-catalog.json: duplicate preset id "${preset.id}"`);
     }
-    profileIds.add(profile.id);
-    if (profile.default) defaultCount += 1;
+    presetIds.add(preset.id);
 
-    const refs = resolveProfilePackRefs(profile.id, catalog);
+    const refs =
+      resolvePresetPackRefs(preset.id, catalog) ||
+      resolveProfilePackRefs(preset.id, catalog);
     if (!refs) {
       fail(
-        `recommended-catalog.json: profile "${profile.id}" could not be resolved (check "extends" chain)`
+        `recommended-catalog.json: preset "${preset.id}" could not be resolved (check "extends" chain)`
       );
       continue;
     }
-    if (!Array.isArray(profile.packs) && !profile.extends) {
+    const hasRefs =
+      (preset.packIds && preset.packIds.length) ||
+      (preset.packs && preset.packs.length) ||
+      preset.extends;
+    if (!hasRefs) {
       fail(
-        `recommended-catalog.json: profile "${profile.id}" has no packs and no extends`
+        `recommended-catalog.json: preset "${preset.id}" has no packIds/packs and no extends`
       );
     }
     for (const ref of refs) {
       if (!getPack(catalog, ref.id)) {
         fail(
-          `recommended-catalog.json: profile "${profile.id}" references unknown pack id "${ref.id}"`
+          `recommended-catalog.json: preset "${preset.id}" references unknown pack id "${ref.id}"`
         );
       }
     }
   }
 
-  if (defaultCount !== 1) {
-    fail(
-      `recommended-catalog.json: expected exactly one profile with default: true (found ${defaultCount})`
-    );
-  }
-
   const defaultProfile = catalog.defaults?.profile;
-  if (defaultProfile && !profileIds.has(defaultProfile)) {
+  if (defaultProfile && !presetIds.has(defaultProfile)) {
     fail(
-      `recommended-catalog.json: defaults.profile "${defaultProfile}" does not match any profile id`
+      `recommended-catalog.json: defaults.profile "${defaultProfile}" does not match any preset id`
     );
   }
 
-  const listed = listProfiles(catalog).map((p) => p.id);
+  const listed = listPresets(catalog).map((p) => p.id);
   for (const id of listed) {
-    if (!profileIds.has(id)) {
-      fail(`recommended-catalog.json: listProfiles returned unknown id "${id}"`);
+    if (!presetIds.has(id)) {
+      fail(`recommended-catalog.json: listPresets returned unknown id "${id}"`);
     }
   }
+}
+
+function validateCatalogBehavior() {
+  let catalog;
+  try {
+    catalog = loadCatalog();
+  } catch (err) {
+    fail(`catalog behavior: load failed (${err.message})`);
+    return;
+  }
+
+  if (catalog.mode !== "selectable") {
+    fail(`catalog behavior: expected mode "selectable", got "${catalog.mode}"`);
+  }
+
+  if (defaultPresetId(catalog) !== null) {
+    fail("catalog behavior: selectable mode must not define a default preset");
+  }
+
+  const selectableIds = (catalog.packs || []).map((p) => p.id);
+  if (!selectableIds.length) {
+    fail("catalog behavior: selectable catalog has no packs");
+  }
+  for (const id of selectableIds) {
+    if (!getPack(catalog, id)) {
+      fail(`catalog behavior: pack list missing id "${id}"`);
+    }
+  }
+
+  const defaultPlan = planFromPackIds(defaultSelectedIds(catalog), catalog);
+  if (!defaultPlan.installPlan?.length) {
+    fail("catalog behavior: defaultSelectedIds produced empty install plan");
+  }
+
+  for (const preset of listPresets(catalog)) {
+    const resolved =
+      resolvePresetPlan(preset.id, catalog) ||
+      resolveProfilePlan(preset.id, catalog);
+    if (!resolved) {
+      fail(`catalog behavior: could not resolve preset "${preset.id}"`);
+      continue;
+    }
+    for (const entry of resolved.installPlan || []) {
+      if (entry.missing) {
+        fail(`catalog behavior: preset "${preset.id}" references missing pack "${entry.packId}"`);
+      }
+      for (const scope of ["global", "project"]) {
+        const cmds = resolveInstallCommands(entry, scope, catalog);
+        const strategy =
+          entry.pack?.installStrategy || entry.pack?.install?.strategy;
+        if (strategy === "manual") {
+          for (const cmd of cmds) {
+            if (cmd.command) {
+              fail(
+                `catalog behavior: manual pack "${entry.packId}" must not emit shell command for ${scope}`
+              );
+            }
+          }
+        } else {
+          for (const cmd of cmds) {
+            const line = formatInstallPlanLine(cmd, entry.packId);
+            stringContainsUndefinedLiteral(
+              line,
+              `catalog behavior: install line preset=${preset.id} pack=${entry.packId} scope=${scope}`
+            );
+          }
+        }
+      }
+    }
+
+    const summary = summarizePreset(preset.id, catalog) || summarizeProfile(preset.id, catalog);
+    if (!summary) {
+      fail(`catalog behavior: summarizePreset failed for "${preset.id}"`);
+      continue;
+    }
+    for (const field of [
+      "name",
+      "description",
+      "weight",
+      "bloatRisk",
+      "presetId"
+    ]) {
+      stringContainsUndefinedLiteral(
+        summary[field],
+        `catalog behavior: preset summary ${preset.id}.${field}`
+      );
+    }
+    for (const line of summary.installLines || []) {
+      stringContainsUndefinedLiteral(
+        line,
+        `catalog behavior: preset summary installLines ${preset.id}`
+      );
+    }
+  }
+
+  for (const pack of catalog.packs || []) {
+    if (!isSeoPack(pack) || pack.seoMode !== "selected-skills") continue;
+    const skills = pack.defaultSeoSkills || [];
+    if (!skills.length) continue;
+    const refPlan = buildInstallPlan([{ id: pack.id, skills }], catalog);
+    const entry = refPlan[0];
+    if (!entry?.seoSkills?.length) {
+      fail(`catalog behavior: SEO pack "${pack.id}" did not resolve selected skills`);
+    }
+    for (const skill of skills) {
+      if (!entry.seoSkills.includes(skill)) {
+        fail(
+          `catalog behavior: SEO pack "${pack.id}" missing skill "${skill}" in plan entry`
+        );
+      }
+    }
+    const verify = resolveVerifyCommand(pack, "global", entry);
+    const built = buildSeoSkillsVerifyCommand(entry.seoSkills, "global");
+    const verifyCmd = verify || built;
+    if (!verifyCmd) {
+      fail(`catalog behavior: SEO pack "${pack.id}" has no verify command for selected skills`);
+    }
+    for (const skill of entry.seoSkills) {
+      if (!verifyCmd.includes(skill)) {
+        fail(
+          `catalog behavior: SEO verify for "${pack.id}" does not reference skill "${skill}"`
+        );
+      }
+    }
+    for (const scope of ["global", "project"]) {
+      const cmds = resolveInstallCommands(entry, scope, catalog);
+      for (const cmd of cmds) {
+        if (cmd.command && stringContainsUndefinedLiteral(cmd.command, `SEO install ${pack.id}`)) {
+          /* fail recorded */
+        }
+      }
+    }
+  }
+
+  let listOutput = "";
+  const prevLog = console.log;
+  console.log = (...args) => {
+    listOutput += `${args.join(" ")}\n`;
+  };
+  try {
+    printOptionalList(catalog);
+  } finally {
+    console.log = prevLog;
+  }
+  if (listOutput.includes("undefined")) {
+    fail('catalog behavior: printOptionalList output contains "undefined"');
+  }
+
+  console.log(
+    "  ✓ catalog behavior — selectable mode, presets, manual packs, SEO verify, no undefined in plans"
+  );
 }
 
 /** kenmark-init must document the numbered KB scaffold (regression guard). */

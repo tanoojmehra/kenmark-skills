@@ -8,19 +8,17 @@ const {
   promptScope,
   promptIde,
   promptYesNo,
-  promptSelectProfile,
-  printProfileSummary,
-  promptHighBloatConfirm,
-  promptSelectPacks,
+  promptSelectOptionalPacks,
   promptEccProfile,
   confirmPlan,
   banner
 } = require("./interactive");
 const {
   loadCatalog,
-  listProfiles,
-  defaultProfileId,
-  summarizeProfile
+  defaultSelectedIds,
+  suggestPacks,
+  weightLabel,
+  planFromPackIds
 } = require("./recommended-catalog");
 const {
   buildGlobalTargets,
@@ -44,7 +42,8 @@ function printUsage() {
   console.log("  --ide <target>        IDE: cursor, claude, all, …");
   console.log("  --skip-recommended    Only install Kenmark skills (non-interactive)");
   console.log("  --recommended-only    Only install recommended packs (non-interactive)");
-  console.log("  --profile <id>        Recommended profile (lean, core-next, growth-seo, …)");
+  console.log("  --profile <id>        Preset shortcut (lean, core-next, growth-seo, … — advanced)");
+  console.log("  --suggest             Show repo-aware recommendations only (no install)");
   console.log("  --ids a,b             Recommended pack ids — custom (non-interactive)");
   console.log("  --all                 Install all catalog packs (legacy)");
   console.log("  --dry-run             Show steps without running");
@@ -95,6 +94,10 @@ function parseArgs(argv) {
       i += 1;
       continue;
     }
+    if (t === "--suggest") {
+      args.suggest = true;
+      continue;
+    }
     if (t === "--skip-recommended") {
       args.skipRecommended = true;
       continue;
@@ -136,7 +139,7 @@ async function run() {
   let ideArg = args.ide;
   let installKenmark = false;
   let installRecommended = false;
-  let selectedProfile = null;
+  let selectedPreset = null;
   let selectedPacks = [];
   let eccProfile = null;
 
@@ -146,42 +149,32 @@ async function run() {
       false
     );
     installRecommended = await promptYesNo(
-      "Install curated recommended packs (Impeccable, ECC, Graphify, …)?",
+      "Install optional recommended third-party packs (you choose which)?",
       false
     );
     if (installRecommended) {
       const catalog = loadCatalog();
-      const profiles = listProfiles(catalog);
-      if (profiles.length === 0) {
-        console.log("No curated profiles available; skipping recommended step.");
+      const packs = catalog.packs || [];
+      if (packs.length === 0) {
+        console.log("No optional installs in catalog; skipping recommended step.");
         installRecommended = false;
       } else {
-        const choice = await promptSelectProfile(
-          profiles,
-          defaultProfileId(catalog)
-        );
-        if (!choice) {
+        const suggestions = suggestPacks(catalog, process.cwd());
+        selectedPacks = await promptSelectOptionalPacks(packs, suggestions, {
+          defaultIds: defaultSelectedIds(catalog)
+        });
+        if (selectedPacks.length === 0) {
+          console.log("No packs chosen; skipping recommended step.");
           installRecommended = false;
-        } else if (choice === "custom") {
-          const packs = catalog.packs || [];
-          selectedPacks = await promptSelectPacks(packs, { noDefaults: true });
-          if (selectedPacks.length === 0) {
-            console.log("No packs chosen; skipping recommended step.");
-            installRecommended = false;
-          } else {
-            const eccPack = packs.find((p) => p.id === "ecc");
-            if (eccPack && selectedPacks.includes("ecc")) {
-              eccProfile = await promptEccProfile(eccPack, null, { required: true });
-            }
-          }
         } else {
-          selectedProfile = choice;
-          const summary = summarizeProfile(choice, catalog);
-          printProfileSummary(summary);
-          const profileMeta = profiles.find((p) => p.id === choice);
-          if (profileMeta?.requiresConfirmation) {
-            const ok = await promptHighBloatConfirm();
-            if (!ok) installRecommended = false;
+          const plan = planFromPackIds(selectedPacks, catalog, null);
+          const w = weightLabel(plan.installPlan);
+          console.log(
+            `\nSelected ${selectedPacks.length} pack(s) · estimated weight: ${w.label} (bloat ${w.total})`
+          );
+          const eccPack = packs.find((p) => p.id === "ecc");
+          if (eccPack && selectedPacks.includes("ecc")) {
+            eccProfile = await promptEccProfile(eccPack, null, { required: true });
           }
         }
       }
@@ -217,16 +210,21 @@ async function run() {
     if (args.skipRecommended) {
       installRecommended = false;
     }
+    if (args.suggest) {
+      const { printSuggest } = require("./recommended-catalog");
+      printSuggest(loadCatalog(), process.cwd());
+      process.exit(0);
+    }
     if (installRecommended) {
       if (args.profile) {
-        selectedProfile = args.profile;
+        selectedPreset = args.profile;
       } else if (args.all) {
         selectedPacks = (loadCatalog().packs || []).map((p) => p.id);
       } else if (args.ids?.length) {
         selectedPacks = args.ids;
       } else {
         console.error(
-          "Non-interactive recommended install requires --profile, --ids, or --all (or use interactive init)."
+          "Non-interactive recommended install requires --ids, --profile (preset), or --all (or use interactive init)."
         );
         process.exit(1);
       }
@@ -240,8 +238,8 @@ async function run() {
     plan.push(`Kenmark skills → ${scope} (${ideLabel})`);
   }
   if (installRecommended) {
-    if (selectedProfile) {
-      plan.push(`Recommended profile → ${scope}: ${selectedProfile}`);
+    if (selectedPreset) {
+      plan.push(`Recommended preset → ${scope}: ${selectedPreset}`);
     } else {
       plan.push(`Recommended packs → ${scope}: ${selectedPacks.join(", ")}`);
       if (eccProfile) plan.push(`  ECC profile: ${eccProfile}`);
@@ -277,8 +275,8 @@ async function run() {
 
   if (installRecommended) {
     const recArgs = [scope === "project" ? "--project" : "--global"];
-    if (selectedProfile) {
-      recArgs.push("--profile", selectedProfile);
+    if (selectedPreset) {
+      recArgs.push("--profile", selectedPreset);
     } else {
       recArgs.push("--ids", selectedPacks.join(","));
       if (eccProfile) recArgs.push("--ecc-profile", eccProfile);

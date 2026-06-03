@@ -4,7 +4,7 @@ version: 2.0.0
 category: admin
 scope: universal
 phase: setup
-description: Installs Kenmark's curated recommended skill packs by setup profile (lean, core-next, growth-seo, …) or custom pack selection. Use when installing recommended skills, impeccable, ECC, graphify, or curating a minimal skill set.
+description: Installs optional third-party skill packs from the Kenmark catalog with repo-aware suggestions. Use when installing recommended skills, impeccable, ECC, graphify, SEO/GEO, or curating a minimal skill set.
 triggers:
   - install recommended skills
   - install impeccable
@@ -12,8 +12,8 @@ triggers:
   - install graphify
   - curated skill packs
   - kenmark-packs
-  - setup profile lean
-  - core-next profile
+  - optional installs
+  - suggest packs
 allowed-tools:
   - Bash
   - Read
@@ -24,9 +24,9 @@ risk: shell
 disable-model-invocation: true
 ---
 
-# Skills Install Recommended
+# Kenmark Packs
 
-Install **curated skill packs** from a versioned catalog via **npx** (no git clone). Prefer **setup profiles** over picking individual packs — profiles encode intent and avoid bloat.
+Install **optional third-party skill packs** from a versioned catalog via **npx** (no git clone). Primary UX: **user selects** which packs to install; Kenmark suggests based on repo signals. **Presets** (`lean`, `core-next`, …) are advanced/CI shortcuts via `--profile`.
 
 ## Catalog
 
@@ -34,29 +34,30 @@ Read from:
 
 `skills/user-skills/recommended-catalog.json`
 
-**Default profile:** `lean` (Impeccable + code review — fastest daily setup)
+**Mode:** `selectable` (v5+)
 
-**Kenmark stack default:** `core-next` (`core-next-lite` + Graphify)
+**Default selection:** `impeccable` + `code-review-skill` only — heavy packs are opt-in.
 
-| Profile | Best for |
+| Pack | Role |
 | --- | --- |
-| `lean` | Daily coding, small projects, slow harnesses |
-| `core-next-lite` | Small Next.js sites — Impeccable + review (no Graphify, no ECC) |
-| `core-next` | Next.js + Tailwind + ShadCN + Prisma + agency/client work (+ Graphify) |
-| `core-next-agentic` | core-next + ECC minimal (manual/plugin install steps) |
-| `growth-seo` | Public sites — core-next + 6 selected SEO/GEO skills (not full pack) |
-| `audit-review` | Inherited repos, refactors — review + Graphify + ECC minimal (no Impeccable) |
-| `experimental-heavy` | Explicit opt-in — ECC core + full SEO pack (confirmation required) |
+| `impeccable` | UI/design polish (default-on) |
+| `code-review-skill` | PR/code review (default-on) |
+| `graphify` | Large-repo navigation |
+| `seo-geo-selected` | Six SEO/GEO skills (not full suite) |
+| `seo-geo-full` | Full 20-skill SEO/GEO (explicit opt-in) |
+| `ecc` | Everything Claude Code — manual install |
 
-List profiles:
+**Presets (advanced):** `lean`, `core-next`, `growth-seo`, `audit-review`, `experimental-heavy`, …
 
 ```bash
-npx kenmark-skills install-recommended --list-profiles
+npx kenmark-skills install-recommended --suggest
+npx kenmark-skills install-recommended --list
+npx kenmark-skills install-recommended --list-presets
 ```
 
 ## When to use
 
-- "Install recommended skills", profile-based setup, impeccable, ECC, graphify
+- "Install recommended skills", optional third-party packs, impeccable, ECC, graphify
 - After **kenmark-maintain** cleanup when rebuilding a lean set
 - For refresh only, use **kenmark-update**
 
@@ -74,44 +75,33 @@ Do **not** install multiple overlapping packs for the same purpose unless the us
 
 | Audience | How to run |
 | --- | --- |
-| **Human** | `npx kenmark-skills install-recommended` — profile picker, scope, summary, confirm |
-| **Agent** | `npx kenmark-skills install-recommended --profile core-next --global -y` |
+| **Human** | `npx kenmark-skills install-recommended` — checklist + repo suggestions, scope, confirm |
+| **Agent** | `npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y` or `--profile core-next` |
 
-## Step 1 — Show profiles or catalog
+## Step 1 — Suggest or list
 
 ```bash
-npx kenmark-skills install-recommended --list-profiles
+npx kenmark-skills install-recommended --suggest
 npx kenmark-skills install-recommended --list
+npx kenmark-skills install-recommended --explain graphify
 ```
 
-Interactive flow shows estimated weight, bloat risk, and what will install before confirming.
+Interactive flow shows weight, bloat, and stack-specific suggestions before confirming.
 
-## Step 2 — Install by profile (preferred)
+## Step 2 — Install selected packs (preferred)
 
 ```bash
-# Default lean stack (global)
-npx kenmark-skills install-recommended --profile lean --global -y
+npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y
+npx kenmark-skills install-recommended --ids impeccable,code-review-skill,graphify --global -y
+```
 
-# Next.js full-stack (core-next)
+## Step 3 — Presets (advanced / CI)
+
+```bash
 npx kenmark-skills install-recommended --profile core-next --global -y
-
-# Public website + selected SEO skills (not full 20-skill pack)
 npx kenmark-skills install-recommended --profile growth-seo --global -y
-
-# Codebase audit (no Impeccable)
-npx kenmark-skills install-recommended --profile audit-review --global -y
-
-# Preview
-npx kenmark-skills install-recommended --profile core-next --dry-run --global
+npx kenmark-skills install-recommended --profile lean --global -y
 ```
-
-## Step 3 — Custom packs (advanced)
-
-```bash
-npx kenmark-skills install-recommended --ids impeccable,ecc --ecc-profile minimal --global -y
-```
-
-Empty interactive selection **cancels**. Agents must pass `--profile` or `--ids`.
 
 ## Step 4 — Verify
 
@@ -128,16 +118,17 @@ Run **kenmark-maintain** inventory to catch duplicate explosion.
 Kenmark skills are the **curator OS** (router, maintain, install-recommended, update, kenmark-init, kenmark-commit, issues-*):
 
 ```bash
-npx kenmark-skills setup --global --ide all
+npx kenmark-skills setup --global -y
 ```
 
 ## CLI reference
 
 ```bash
-npx kenmark-skills install-recommended --list-profiles
-npx kenmark-skills install-recommended --profile lean --global -y
-npx kenmark-skills install-recommended --profile growth-seo --project -y
-npx kenmark-skills install-recommended   # interactive profile picker
+npx kenmark-skills install-recommended --suggest
+npx kenmark-skills install-recommended --list
+npx kenmark-skills install-recommended --ids impeccable --global -y
+npx kenmark-skills install-recommended --profile core-next --global -y
+npx kenmark-skills install-recommended   # interactive checklist
 ```
 
 Adopt relink flags (same as `setup` / `adopt`): `--copy`, `--symlink`, `--prefer-copy-on-windows`, `--no-prefer-copy-on-windows`, `--adopt-overwrite` (or `--force`) when store and IDE copies differ.
