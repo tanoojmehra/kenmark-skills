@@ -36,15 +36,16 @@ Read from:
 
 **Default profile:** `lean` (Impeccable + code review — fastest daily setup)
 
-**Kenmark stack default:** `core-next` (lean + Graphify + ECC minimal)
+**Kenmark stack default:** `core-next` (`core-next-lite` + Graphify)
 
 | Profile | Best for |
 | --- | --- |
 | `lean` | Daily coding, small projects, slow harnesses |
+| `core-next-lite` | Small Next.js sites — Impeccable + review + ECC minimal (no Graphify) |
 | `core-next` | Next.js + Tailwind + ShadCN + Prisma + agency/client work |
 | `growth-seo` | Public sites — core-next + 6 selected SEO/GEO skills (not full pack) |
 | `audit-review` | Inherited repos, refactors — review + Graphify + ECC minimal (no Impeccable) |
-| `power-user` | Explicit opt-in — ECC core + full SEO pack (confirmation required) |
+| `experimental-heavy` | Explicit opt-in — ECC core + full SEO pack (confirmation required) |
 
 List profiles:
 

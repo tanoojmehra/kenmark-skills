@@ -340,7 +340,9 @@ function printProfileSummary(summary) {
   for (const line of summary.installLines) {
     console.log(`  - ${line}`);
   }
-  console.log(`\nEstimated weight: ${summary.weight}`);
+  console.log(
+    `\nEstimated weight: ${summary.weight} (bloat score ${summary.bloatTotal})`
+  );
   console.log(`Bloat risk: ${summary.bloatRisk}`);
   if (summary.recommendedFor?.length) {
     console.log(`Recommended for: ${summary.recommendedFor.join(", ")}`);

@@ -112,10 +112,34 @@ function resolveProfilePlan(profileId, catalog) {
   };
 }
 
+/**
+ * Bloat contribution for one install-plan entry (pack-level vs selected-skills SEO).
+ */
+function packBloatContribution(entry) {
+  const pack = entry.pack;
+  if (!pack) return 1;
+
+  if (pack.id === "seo-geo-claude-skills") {
+    const mode =
+      entry.seoMode ||
+      (entry.seoSkills?.length ? "selected-skills" : null) ||
+      pack.defaultMode ||
+      "full";
+    const useSelected =
+      mode === "selected-skills" ||
+      (entry.seoSkills?.length > 0 && mode !== "full");
+    if (useSelected && pack.selectedBloatScore != null) {
+      return pack.selectedBloatScore;
+    }
+  }
+
+  return pack.bloatScore ?? 1;
+}
+
 function weightLabel(plan) {
   const scores = plan
     .filter((e) => !e.missing && e.pack)
-    .map((e) => e.pack.bloatScore ?? 1);
+    .map((e) => packBloatContribution(e));
   const total = scores.reduce((a, b) => a + b, 0);
   if (total <= 3) return { label: "Low", total };
   if (total <= 6) return { label: "Medium", total };
@@ -304,6 +328,7 @@ module.exports = {
   buildInstallPlan,
   resolveProfilePlan,
   summarizeProfile,
+  packBloatContribution,
   weightLabel,
   resolveInstallCommands,
   runGitSyncInstall,
