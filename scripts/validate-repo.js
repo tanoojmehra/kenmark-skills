@@ -104,6 +104,19 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/interactive.js"
 ];
 
+/** Scripts spawned by scripts/cli.js — must exist on disk (regression guard for publish). */
+const CLI_SPAWNED_SCRIPTS = [
+  "scripts/kenmark-setup.js",
+  "scripts/setup-skills.js",
+  "scripts/kenmark-packs.js",
+  "scripts/kenmark-update.js",
+  "scripts/skills-adopt.js",
+  "scripts/skills-inventory.js",
+  "scripts/subagents-inventory.js",
+  "scripts/validate.js",
+  "scripts/doctor.js"
+];
+
 /** Paths scanned for forbidden literals/patterns. CHANGELOG is historical — excluded. */
 const FORBIDDEN_SCAN_RELATIVE = [
   "README.md",
@@ -659,6 +672,17 @@ function validatePackageJson() {
   for (const entry of REQUIRED_PACKAGE_FILES) {
     if (!files.includes(entry)) {
       fail(`package.json: files must include "${entry}"`);
+    }
+
+    const abs = path.join(repoRoot, entry);
+    if (!entry.includes("*") && !fs.existsSync(abs)) {
+      fail(`package.json: files includes missing path "${entry}"`);
+    }
+  }
+
+  for (const rel of CLI_SPAWNED_SCRIPTS) {
+    if (!fs.existsSync(path.join(repoRoot, rel))) {
+      fail(`scripts/cli.js references missing script: ${rel}`);
     }
   }
 

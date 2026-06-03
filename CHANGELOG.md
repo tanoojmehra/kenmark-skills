@@ -5,6 +5,7 @@
 ### Fix
 
 - **CLI scripts:** Renamed `scripts/skills-init.js`, `skills-install-recommended.js`, and `skills-update.js` to `kenmark-setup.js`, `kenmark-packs.js`, and `kenmark-update.js` so `package.json` `files`, `cli.js`, and published tarballs match on-disk paths (`init`, `install-recommended`, `update`).
+- **validate-repo.js:** Assert each required `package.json` `files` entry exists on disk (except globs) and each `cli.js` spawn target is present — catches publish breaks when manifest and filesystem diverge.
 
 ## v1.6.0 — Kenmark-prefixed skill names
 
