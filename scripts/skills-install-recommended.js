@@ -20,6 +20,7 @@ const {
   resolveProfilePlan,
   summarizeProfile,
   resolveInstallCommands,
+  resolveVerifyCommand,
   runGitSyncInstall,
   listProfiles,
   defaultProfileId
@@ -292,9 +293,9 @@ function runInstallCommand(cmdEntry, dryRun) {
   return runShell(cmdEntry.command, dryRun, cmdEntry.cwd);
 }
 
-function verifyPack(pack, scope) {
-  const cmd = pack.install?.verify?.[scope] || pack.install?.verify;
-  if (!cmd || typeof cmd !== "string") return null;
+function verifyPack(pack, scope, entry) {
+  const cmd = resolveVerifyCommand(pack, scope, entry);
+  if (!cmd) return null;
   const cwd = scope === "project" ? process.cwd() : undefined;
   const result = spawnSync(cmd, {
     shell: true,
@@ -512,10 +513,18 @@ async function run() {
         break;
       }
     }
-    if (!args.dryRun && pack.install?.verify) {
-      const okVerify = verifyPack(pack, scope);
+    if (!args.dryRun && resolveVerifyCommand(pack, scope, entry)) {
+      const okVerify = verifyPack(pack, scope, entry);
+      const verifyHint =
+        entry.seoSkills?.length > 1
+          ? ` (${entry.seoSkills.length} SEO/GEO skills)`
+          : entry.seoSkills?.length === 1
+            ? ` (${entry.seoSkills[0]})`
+            : "";
       console.log(
-        okVerify ? "Verify: OK" : "Verify: not detected — check install manually"
+        okVerify
+          ? `Verify: OK${verifyHint}`
+          : `Verify: not detected${verifyHint} — check install manually`
       );
     }
   }
