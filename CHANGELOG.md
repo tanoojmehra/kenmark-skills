@@ -4,6 +4,7 @@
 
 ### repo-quality-gates
 
+- **repo-quality-gates (1.2.0):** Step 2b — discover CI configs (`find` on workflows/GitLab/Bitbucket/Circle) and grep workflow commands so `ci-parity` mode prefers real CI commands over guessed package scripts.
 - **repo-quality-gates (1.1.0):** Prefer `./node_modules/.bin/` for direct typecheck/lint/format invocations; use `npx` only as fallback when local binaries are missing.
 
 ### New skill

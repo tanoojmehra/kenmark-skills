@@ -1,10 +1,10 @@
 ---
 name: repo-quality-gates
-version: 1.1.0
+version: 1.1.1
 category: workflow
 scope: universal
 phase: verify
-description: "Detect and run repo quality gates for dev/runtime/build/typecheck/TSX/lint/format errors. Discovers available scripts, runs safe checks in order, classifies failures, and produces a fix plan without auto-editing."
+description: "Are the code quality gates passing right now? Detect and run dev/runtime/build/typecheck/TSX/lint/format/test checks; classify failures and produce a fix plan. For publish/version/changelog/package metadata, use repo-release-readiness after gates pass."
 triggers:
   - repo quality gates
   - check build errors
@@ -32,6 +32,8 @@ disable-model-invocation: false
 
 # Repo Quality Gates — Dev / Runtime / Build / Type / Lint / Format Check Skill
 
+**One-liner:** Are the code quality gates passing right now?
+
 ## Purpose
 
 Use this skill when the user wants to check a repository for quality-gate failures, including:
@@ -48,6 +50,15 @@ Use this skill when the user wants to check a repository for quality-gate failur
 This skill is universal. It must not assume a specific framework, package manager, language, or repo layout.
 
 Default behavior is **diagnose and report**. Do not edit files unless the user explicitly asks for fixes after the report.
+
+### Boundary vs `repo-release-readiness`
+
+| This skill (`repo-quality-gates`) | `repo-release-readiness` |
+| --- | --- |
+| Typecheck, lint, format, build, tests, dev/runtime smoke | Version, changelog, tags, publish metadata, LICENSE, handoff/deploy checklist |
+| **Is the codebase healthy to develop and verify?** | **Can we publish / deploy / tag / hand off this repo?** |
+
+For publish, version bumps, changelog, package `files`/`exports`/`private`, tag policy, and release-state checks, use **`repo-release-readiness`** after quality gates pass (or when the user only needs ship metadata, not gate diagnosis).
 
 ---
 
@@ -131,6 +142,41 @@ For Node repos, choose package manager by lockfile:
 | `package-lock.json` | `npm`           |
 
 If multiple lockfiles exist, flag this as a warning.
+
+---
+
+## Step 2b — Discover CI configuration (ci-parity)
+
+Run when mode is `ci-parity`, when the user asks to match CI, or before choosing gates when CI files may exist.
+
+**Locate CI config files:**
+
+```bash
+find .github/workflows .gitlab-ci.yml bitbucket-pipelines.yml .circleci config.yml -maxdepth 3 -type f 2>/dev/null
+```
+
+Record every path returned. If nothing is found, say so and fall back to package scripts (Step 3); do not invent CI commands.
+
+**Inspect workflow commands (GitHub Actions):**
+
+```bash
+grep -RInE "npm run|pnpm run|yarn |bun run|tsc|eslint|prettier|vitest|jest|playwright|next build" .github/workflows 2>/dev/null || true
+```
+
+For GitLab (`.gitlab-ci.yml`), Bitbucket (`bitbucket-pipelines.yml`), or Circle (`.circleci/config.yml`), read the file and extract the same kinds of commands (`script:`, `run:`, job steps) when `.github/workflows` is absent or incomplete.
+
+**Map hits to gates** — prefer the exact command CI runs, in CI order when visible:
+
+| Gate      | CI patterns to prefer                            |
+| --------- | ------------------------------------------------ |
+| install   | `npm ci`, `pnpm install --frozen-lockfile`, etc. |
+| typecheck | `tsc`, `typecheck`, `check-types`                |
+| lint      | `eslint`, `lint`                                 |
+| format    | `prettier`, `format:check`                       |
+| build     | `next build`, `build`, `compile`                 |
+| test      | `vitest`, `jest`, `playwright`, `test`           |
+
+In `ci-parity` mode, run gates using these CI commands before falling back to guessed `package.json` script names. If CI and local scripts differ, report both and use CI for verification.
 
 ---
 
