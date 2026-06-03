@@ -18,7 +18,7 @@ function printUsage() {
   console.log("  kenmark-skills mcp uninstall [--global|--project] [--ide <target>] [-y]");
   console.log("  kenmark-skills inventory [--json path] [--markdown path] [--include-plugins]");
   console.log("  kenmark-skills subagents-inventory [--json path] [--markdown path] [--include-plugins] [--include-marketplaces]");
-  console.log("  kenmark-skills install-recommended [--list-profiles] [--profile lean|core-next|…] [--ids a,b] [--global|--project] [-y]");
+  console.log("  kenmark-skills install-recommended [--list] [--suggest] [--explain [id]] [--ids a,b] [--profile preset] [--global|--project] [-y]");
   console.log("  kenmark-skills update [--kenmark-only|--recommended-only|--both] [--global|--project] [-y]");
   console.log("  kenmark-skills adopt [--global|--project] [--ide <target>] [--dry-run] [-y]");
   console.log("  kenmark-skills validate");
@@ -77,7 +77,8 @@ if (command === "mcp") {
     console.log("");
     console.log("Examples:");
     console.log("  npx kenmark-skills mcp uninstall --global --ide cursor -y");
-    console.log("  npx kenmark-skills mcp uninstall --global --ide all -y");
+    console.log("  npx kenmark-skills mcp uninstall --global -y");
+    console.log("  npx kenmark-skills mcp uninstall --global --ide all -y   # advanced: every detected IDE path");
     process.exit(sub && sub !== "help" ? 1 : 0);
   }
   if (sub === "uninstall") {

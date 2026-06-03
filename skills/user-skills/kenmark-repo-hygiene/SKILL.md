@@ -29,7 +29,7 @@ risk: write-files
 disable-model-invocation: false
 ---
 
-# Repo Hygiene — Dirty Repo / Clutter Audit Skill
+# Kenmark Repo Hygiene
 
 ## Purpose
 

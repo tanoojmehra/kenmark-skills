@@ -23,7 +23,7 @@ risk: write-files
 disable-model-invocation: false
 ---
 
-# Issues Check — Verify and Close Resolved Issues
+# Kenmark Issues Check
 
 ## Purpose
 

@@ -30,7 +30,7 @@ risk: shell
 disable-model-invocation: false
 ---
 
-# Repo Quality Gates — Dev / Runtime / Build / Type / Lint / Format Check Skill
+# Kenmark Repo Quality
 
 **One-liner:** Are the code quality gates passing right now?
 

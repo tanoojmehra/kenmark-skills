@@ -22,7 +22,7 @@ risk: read-only
 disable-model-invocation: false
 ---
 
-# Repo Dependency Audit — Package Health (Read-Only)
+# Kenmark Repo Deps
 
 ## Purpose
 

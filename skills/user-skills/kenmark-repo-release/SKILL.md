@@ -23,7 +23,7 @@ risk: read-only
 disable-model-invocation: false
 ---
 
-# Repo Release Readiness — Pre-Ship Checklist (Read-Only)
+# Kenmark Repo Release
 
 **One-liner:** Can we publish / deploy / tag / hand off this repo?
 

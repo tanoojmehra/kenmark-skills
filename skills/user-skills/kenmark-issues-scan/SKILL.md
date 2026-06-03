@@ -23,7 +23,7 @@ risk: write-files
 disable-model-invocation: false
 ---
 
-# Issues Scan — Discover New Issues from Codebase
+# Kenmark Issues Scan
 
 ## Purpose
 

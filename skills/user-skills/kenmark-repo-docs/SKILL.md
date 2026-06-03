@@ -24,7 +24,7 @@ risk: write-files
 disable-model-invocation: false
 ---
 
-# Repo Docs Audit — Documentation Quality (Audit-First)
+# Kenmark Repo Docs
 
 ## Purpose
 

@@ -25,7 +25,7 @@ risk: write-files
 disable-model-invocation: false
 ---
 
-# Init Brain Skill
+# Kenmark Init
 
 Bootstrap the project **brain** knowledge base, then **ask the user** which agent entry files to create or update. Do not create every file by default.
 

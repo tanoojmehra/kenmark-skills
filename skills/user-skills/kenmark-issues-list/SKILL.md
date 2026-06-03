@@ -21,7 +21,7 @@ risk: read-only
 disable-model-invocation: false
 ---
 
-# Issues List — Grouped by Area/Type
+# Kenmark Issues List
 
 ## Purpose
 

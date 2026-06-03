@@ -18,7 +18,7 @@ risk: shell
 disable-model-invocation: true
 ---
 
-# Sub-agents Maintain
+# Kenmark Agents
 
 Audit **all installed sub-agents** on this machine: list them, group by name, flag duplicates and vendored mirrors (gstack copies, plugin marketplace copies), and recommend **keep**, **dedupe**, **review**, or **remove-candidate**.
 
