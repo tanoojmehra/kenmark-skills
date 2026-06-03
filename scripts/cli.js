@@ -14,7 +14,8 @@ function printUsage() {
   console.log("Usage:");
   console.log("  kenmark-skills init [--global|--project] [--ide <target>] [--skip-recommended] [-y]");
   console.log("  kenmark-skills setup [--global|--project] [--ide <target>] [-y]");
-  console.log("  kenmark-skills uninstall [--global|--project] [--ide <target>] [-y]");
+  console.log("  kenmark-skills uninstall [--global|--project] [--ide <target>] [--mcp-only] [-y]");
+  console.log("  kenmark-skills mcp uninstall [--global|--project] [--ide <target>] [-y]");
   console.log("  kenmark-skills inventory [--json path] [--markdown path] [--include-plugins]");
   console.log("  kenmark-skills subagents-inventory [--json path] [--markdown path] [--include-plugins] [--include-marketplaces]");
   console.log("  kenmark-skills install-recommended [--list-profiles] [--profile lean|core-next|…] [--ids a,b] [--global|--project] [-y]");
@@ -28,6 +29,7 @@ function printUsage() {
   console.log("  npx kenmark-skills setup");
   console.log("  npx kenmark-skills setup --project --ide cursor -y");
   console.log("  npx kenmark-skills uninstall --global --ide claude -y");
+  console.log("  npx kenmark-skills mcp uninstall --global --ide cursor -y");
 }
 
 if (!command || command === "help" || command === "--help" || command === "-h") {
@@ -59,6 +61,35 @@ if (command === "uninstall") {
     stdio: "inherit"
   });
   process.exit(result.status === null ? 1 : result.status);
+}
+
+if (command === "mcp") {
+  const sub = args[1];
+  if (!sub || sub === "help" || sub === "--help" || sub === "-h") {
+    console.log("kenmark-skills mcp");
+    console.log("");
+    console.log("Usage:");
+    console.log("  kenmark-skills mcp uninstall [--global|--project] [--ide <target>] [-y]");
+    console.log("");
+    console.log("Removes Kenmark-managed MCP server entries from Cursor / Claude configs");
+    console.log("and clears ~/.kenmark/store/mcp.json. Does not remove skill links.");
+    console.log("");
+    console.log("Examples:");
+    console.log("  npx kenmark-skills mcp uninstall --global --ide cursor -y");
+    console.log("  npx kenmark-skills mcp uninstall --global --ide all -y");
+    process.exit(sub && sub !== "help" ? 1 : 0);
+  }
+  if (sub === "uninstall") {
+    const scriptPath = path.join(__dirname, "setup-skills.js");
+    const forwardedArgs = ["--uninstall", "--mcp-only", ...args.slice(2)];
+    const result = spawnSync(process.execPath, [scriptPath, ...forwardedArgs], {
+      stdio: "inherit"
+    });
+    process.exit(result.status === null ? 1 : result.status);
+  }
+  console.error(`Unknown mcp subcommand: ${sub}`);
+  console.log("Run: kenmark-skills mcp help");
+  process.exit(1);
 }
 
 if (command === "inventory") {

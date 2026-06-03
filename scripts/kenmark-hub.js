@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
+const { spawnSync } = require("child_process");
 
 const DEFAULT_AGENT_IDES = ["cursor", "claude", "codex"];
 
@@ -1259,6 +1260,123 @@ function countBackupDirs() {
   return count;
 }
 
+const MCP_DOCTOR_COMMANDS = ["npx", "uvx"];
+
+function commandOnPath(cmd) {
+  const lookup = process.platform === "win32" ? "where" : "which";
+  const result = spawnSync(lookup, [cmd], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"]
+  });
+  return result.status === 0;
+}
+
+function listKenmarkServersInMcpConfig(targetPath, serverNames, ide) {
+  if (!fs.existsSync(targetPath) || !serverNames.length) {
+    return [];
+  }
+  try {
+    if (ide === "claude" && targetPath.endsWith(".claude.json")) {
+      const doc = JSON.parse(fs.readFileSync(targetPath, "utf8"));
+      const mcp = doc.mcpServers || {};
+      return serverNames.filter((name) => Boolean(mcp[name]));
+    }
+    const doc = readMcpDocument(targetPath);
+    return serverNames.filter((name) => Boolean(doc.mcpServers[name]));
+  } catch {
+    return [];
+  }
+}
+
+function inspectMcpForDoctor({ homeDir, manifest }) {
+  const mcpStorePath = getMcpStorePath();
+  const mcpStoreExists = fs.existsSync(mcpStorePath);
+  const storeDoc = mcpStoreExists ? readMcpDocument(mcpStorePath) : { mcpServers: {} };
+  const mcpMeta = manifest?.mcp || null;
+  const profile = mcpMeta?.profile || null;
+  const serversFromManifest = Array.isArray(mcpMeta?.servers) ? mcpMeta.servers : [];
+  const serversFromStore = Object.keys(storeDoc.mcpServers || {}).sort();
+  const servers = (serversFromManifest.length ? serversFromManifest : serversFromStore).slice().sort();
+  const installed = Boolean(mcpMeta) || mcpStoreExists || servers.length > 0;
+
+  const targetMap =
+    mcpMeta?.targets && typeof mcpMeta.targets === "object"
+      ? mcpMeta.targets
+      : buildMcpGlobalTargets(homeDir);
+
+  const targets = [];
+  for (const [ide, targetPath] of Object.entries(targetMap)) {
+    const configExists = fs.existsSync(targetPath);
+    const serversPresent = listKenmarkServersInMcpConfig(targetPath, servers, ide);
+    targets.push({
+      ide,
+      path: targetPath,
+      configExists,
+      touched: configExists && serversPresent.length > 0,
+      serversPresent
+    });
+  }
+
+  const commandsNeeded = new Set();
+  for (const name of servers) {
+    const cfg = storeDoc.mcpServers[name];
+    if (cfg?.command) {
+      commandsNeeded.add(String(cfg.command).trim());
+    }
+  }
+
+  const commandsOnPath = {};
+  for (const cmd of MCP_DOCTOR_COMMANDS) {
+    commandsOnPath[cmd] = commandOnPath(cmd);
+  }
+
+  const missingCommands = MCP_DOCTOR_COMMANDS.filter(
+    (cmd) => commandsNeeded.has(cmd) && !commandsOnPath[cmd]
+  );
+
+  const warnings = [];
+  const mcpIssues = [];
+
+  if (mcpMeta?.servers?.length && !mcpStoreExists) {
+    mcpIssues.push("MCP manifest lists servers but ~/.kenmark/store/mcp.json is missing");
+  }
+
+  if (servers.includes("fetch")) {
+    const fetchCmd = String(storeDoc.mcpServers?.fetch?.command || "uvx").trim();
+    if (fetchCmd === "uvx" && !commandsOnPath.uvx) {
+      warnings.push("fetch MCP uses uvx, but uvx was not found in PATH");
+    }
+  }
+
+  for (const cmd of missingCommands) {
+    const affected = servers.filter((n) => {
+      const serverCmd = String(storeDoc.mcpServers[n]?.command || "").trim();
+      return serverCmd === cmd;
+    });
+    if (!affected.length) continue;
+    if (cmd === "uvx" && warnings.some((w) => w.includes("fetch MCP uses uvx"))) {
+      continue;
+    }
+    mcpIssues.push(
+      `MCP server(s) ${affected.join(", ")} use ${cmd}, but ${cmd} was not found in PATH`
+    );
+  }
+
+  return {
+    installed,
+    mcpStorePath,
+    mcpStoreExists,
+    profile,
+    servers,
+    targets,
+    commandsNeeded: [...commandsNeeded].sort(),
+    commandsOnPath,
+    missingCommands,
+    warnings,
+    issues: mcpIssues
+  };
+}
+
 function runDoctor(options = {}) {
   const {
     repoRoot = path.resolve(__dirname, ".."),
@@ -1350,6 +1468,14 @@ function runDoctor(options = {}) {
 
   const backupCount = countBackupDirs();
 
+  const mcp = inspectMcpForDoctor({ homeDir, manifest });
+  for (const w of mcp.warnings) {
+    issues.push(w);
+  }
+  for (const issue of mcp.issues) {
+    issues.push(issue);
+  }
+
   const report = {
     ok: issues.length === 0,
     issues,
@@ -1370,6 +1496,7 @@ function runDoctor(options = {}) {
     backupCount,
     catalogPath,
     catalogReadable,
+    mcp,
     checkedAt: new Date().toISOString()
   };
 
