@@ -36,7 +36,14 @@ When several bundled skills could apply, prefer this order:
 | Problem unclear — need evidence, hypotheses, ranked plan | **`troubleshoot`** |
 | Need issue tracking in `brain/issues/` | **`issues-setup`** / **`issues-scan`** |
 | Need to pick which installed skill fits the task | **`skills-router`** (this skill) |
-| Repo file clutter, secrets, public push prep | **`repo-hygiene`** |
+| Repo clutter, scattered docs, dumps | **`repo-hygiene`** |
+| Keys, secrets, credentials | **`repo-secrets-audit`** |
+| Make repo public / open source | **`repo-public-readiness`** |
+| Update brain after code change | **`repo-kb-sync`** |
+| Docs quality, README accuracy | **`repo-docs-audit`** |
+| Confusing folder layout | **`repo-structure-audit`** |
+| Dependency bloat, unused packages | **`repo-dependency-audit`** |
+| npm publish, release, handoff | **`repo-release-readiness`** |
 | Inventory or cleanup of installed skills | **`skills-maintain`** |
 | Grouped commits and push | **`commit-push`** |
 
@@ -183,7 +190,12 @@ def as_string_list(value) -> list[str]:
 def infer_category(name: str, description: str, triggers: list[str]) -> str:
     if name == "init-brain" or name == "skills-init":
         return "onboarding"
-    if name == "skills-router" or name == "troubleshoot" or name == "repo-hygiene":
+    if (
+        name == "skills-router"
+        or name == "troubleshoot"
+        or name == "repo-hygiene"
+        or name.startswith("repo-")
+    ):
         return "workflow"
     if name == "commit-push":
         return "git"
@@ -241,18 +253,31 @@ def infer_phase(name: str, description: str, category: str) -> str:
         return "maintain"
     if any(k in text for k in ["check", "verify", "scan", "test", "validate"]):
         return "verify"
-    if name == "repo-hygiene":
+    if name == "repo-release-readiness":
+        return "ship"
+    if name == "repo-kb-sync":
+        return "maintain"
+    if name == "repo-dependency-audit":
+        return "verify"
+    if name.startswith("repo-"):
         return "audit"
     if any(
         k in text
         for k in [
             "repo hygiene",
             "sanitize repo",
-            "public repo readiness",
             "dirty repo",
-            "find secrets",
             "cleanup files",
             "audit dirty repo",
+            "secrets audit",
+            "public repo",
+            "safe to publish",
+            "dependency audit",
+            "docs audit",
+            "structure audit",
+            "release readiness",
+            "update brain",
+            "sync kb",
         ]
     ):
         return "audit"
@@ -466,6 +491,7 @@ Do **not** use this skill for first-time Kenmark setup; use **`skills-init`** or
 4. **Tie-break** (in order):
    - Prefer skills with explicit `triggers[]` matches over description-only matches
    - Prefer narrower skills over umbrella skills (`seo-page` over `seo`; `django-tdd` over `coding-standards`)
+   - Among `repo-*` skills, prefer the specialist over `repo-hygiene` (e.g. `repo-secrets-audit` for "find secrets", `repo-public-readiness` for "make public", `repo-release-readiness` for "npm publish")
    - Prefer `source: kenmark` over `catalog` over `user` when scores are equal
    - Prefer `maturity: stable` over `catalog` over `user`
 
@@ -488,7 +514,14 @@ Do **not** use this skill for first-time Kenmark setup; use **`skills-init`** or
 | Skill install, update, inventory | `admin` | `skills-init`, `skills-maintain`, `skills-update` |
 | Agent workflow, discovery, learning | `workflow` | `find-skills`, `continuous-learning`, `skills-router` |
 | Troubleshoot, debug, root cause, investigate | `workflow` | `troubleshoot` |
-| Repo clutter, secrets, scattered docs, pre-public push | `workflow` | `repo-hygiene` |
+| Repo clutter, scattered docs, dumps | `workflow` | `repo-hygiene` |
+| Secrets, keys, tokens | `workflow` | `repo-secrets-audit` |
+| Public / open-source safety | `workflow` | `repo-public-readiness` |
+| Brain KB after code change | `workflow` | `repo-kb-sync` |
+| Documentation quality | `workflow` | `repo-docs-audit` |
+| Folder layout / structure | `workflow` | `repo-structure-audit` |
+| Package / dependency health | `workflow` | `repo-dependency-audit` |
+| Release, publish, handoff | `workflow` | `repo-release-readiness` |
 
 ## Output format
 

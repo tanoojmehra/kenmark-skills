@@ -1,23 +1,22 @@
 ---
 name: repo-hygiene
-version: 1.0.0
+version: 1.1.0
 category: workflow
 scope: universal
 phase: audit
-description: "Audit a repository for dirty/unwanted files, scattered markdown, unconnected assets, dumps, backups, generated files, and possible secrets before commit or public push. Produces a cleanup plan and only moves/deletes files after explicit approval."
+description: "Audit a repository for clutter: scattered markdown, orphan assets, dumps, backups, generated files, and gitignore gaps. Produces a cleanup plan; moves/deletes only after explicit approval. For deep secrets use repo-secrets-audit; for public publish gate use repo-public-readiness."
 triggers:
   - repo hygiene
   - clean repo
   - sanitize repo
   - audit dirty repo
-  - public repo readiness
-  - check before public push
   - cleanup files
-  - find secrets
   - find unused files
   - audit markdown files
   - repo cleanup
   - dirty repo
+  - scattered markdown
+  - orphan assets
 allowed-tools:
   - Bash
   - Read
@@ -30,11 +29,11 @@ risk: write-files
 disable-model-invocation: false
 ---
 
-# Repo Hygiene — Dirty Repo / Public Push Audit Skill
+# Repo Hygiene — Dirty Repo / Clutter Audit Skill
 
 ## Purpose
 
-Use this skill when the user wants to audit a repository for:
+Use this skill when the user wants to audit a repository for **file clutter and organization**:
 
 - scattered Markdown files
 - random notes or docs outside the intended docs/brain structure
@@ -45,8 +44,14 @@ Use this skill when the user wants to audit a repository for:
 - build artifacts
 - temporary files
 - old archives
-- certificates, keys, tokens, credentials, or other sensitive material
-- files that should be ignored before pushing to a public repository
+- gitignore gaps for local-only patterns
+
+**Delegate to specialists:**
+
+| User intent | Use instead |
+| --- | --- |
+| Deep secret/key/token scan | **`repo-secrets-audit`** |
+| Safe to make repo public | **`repo-public-readiness`** |
 
 Default behavior is **audit and recommend only**.
 
@@ -68,13 +73,12 @@ This skill must be safe for production and public-release preparation.
 
 | Mode               | Use when                          | Behavior                                  |
 | ------------------ | --------------------------------- | ----------------------------------------- |
-| `quick-audit`      | User wants a fast check           | Check obvious risky files and git status  |
+| `quick-audit`      | User wants a fast check           | Obvious clutter + git status              |
 | `standard-audit`   | Normal repo cleanup               | Full categorized report                   |
-| `public-readiness` | Before public GitHub push/release | Strong secret + dump + ignored-file audit |
 | `cleanup-plan`     | User wants actions                | Recommend move/delete/convert actions     |
 | `approved-cleanup` | User approved specific actions    | Execute only approved changes             |
 
-If the user says "sanitize before public repo", use `public-readiness`.
+If the user asks **"can I make this public?"** or **"check secrets"**, stop and use **`repo-public-readiness`** or **`repo-secrets-audit`** instead of this skill.
 
 ---
 
@@ -86,7 +90,8 @@ If the user says "sanitize before public repo", use `public-readiness`.
 - Never move files without explicit approval.
 - Never alter `.gitignore` without explicit approval.
 - Never rewrite git history unless the user explicitly requests it and understands the risk.
-- If secrets are found in tracked files or git history, tell the user that deleting/moving the file is not enough. Recommend secret rotation and history cleanup.
+- If filename scan suggests secrets, recommend **`repo-secrets-audit`** — do not run full content grep here.
+- If secrets are found in tracked files or git history, recommend rotation and history cleanup (see `repo-secrets-audit`).
 - If unsure whether a file is useful, mark as `review` instead of `delete`.
 
 ---
@@ -288,58 +293,19 @@ Never assume a DB dump is safe. Treat as sensitive until proven otherwise.
 
 ---
 
-## Step 7 — Secret and credential audit
+## Step 7 — Sensitive filename pre-check (light)
 
-Search filenames first:
+Quick filename scan only — **not** a full secrets audit:
 
 ```bash
 find . \
   -path './.git' -prune -o \
   -path './node_modules' -prune -o \
-  \( -iname '.env' -o -iname '.env.*' -o -iname '*.pem' -o -iname '*.key' -o -iname '*.p12' -o -iname '*.pfx' -o -iname '*.crt' -o -iname '*.cer' -o -iname '*.jks' -o -iname '*secret*' -o -iname '*credential*' -o -iname '*token*' -o -iname '*private*' \) \
-  -print
+  \( -iname '.env' -o -iname '.env.*' -o -iname '*.pem' -o -iname '*.key' -o -iname '*.p12' -o -iname '*.pfx' \) \
+  -print 2>/dev/null | head -50
 ```
 
-Then search likely secret patterns, redacting output:
-
-```bash
-grep -RInE \
-  '(BEGIN (RSA |OPENSSH |EC |DSA |PRIVATE )?PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9_]{30,}|github_pat_[A-Za-z0-9_]+|xox[baprs]-[A-Za-z0-9-]+|sk-[A-Za-z0-9]{20,}|AIza[A-Za-z0-9_-]{30,}|mongodb(\+srv)?:\/\/|mysql:\/\/|postgres:\/\/|DATABASE_URL|JWT_SECRET|NEXTAUTH_SECRET|PRIVATE_KEY|CLIENT_SECRET|API_KEY|ACCESS_TOKEN|SECRET_KEY)' \
-  . \
-  --exclude-dir=.git \
-  --exclude-dir=node_modules \
-  --exclude-dir=temp \
-  --exclude='*.lock' \
-  --exclude='package-lock.json' \
-  --exclude='pnpm-lock.yaml' \
-  --exclude='yarn.lock' \
-  2>/dev/null
-```
-
-Do not paste full secret values into the report.
-
-Report as:
-
-```text
-path/to/file.js: possible API key on line 42 — value redacted
-```
-
-### If secrets are found
-
-Classify:
-
-| State                            | Action                                                                                           |
-| -------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Untracked secret                 | move to `temp/` or delete; add `.gitignore`                                                      |
-| Tracked secret in current commit | remove file, rotate secret, add `.gitignore`                                                     |
-| Secret committed in history      | rotate secret, remove from history with `git filter-repo` or BFG, force push only if appropriate |
-| Certificate/private key          | treat as compromised if public or shared                                                         |
-
-Important note:
-
-```text
-Removing the file from the working tree does not remove it from git history.
-```
+If any hits look real (not `.env.example` with placeholders), note in the report and recommend **`repo-secrets-audit`** for deep scan and redacted findings. Do not run full `grep` secret patterns in this skill.
 
 ---
 
@@ -491,7 +457,7 @@ What should I do next?
 4. Convert selected Markdown into brain/kb/
 5. Update .gitignore suggestions
 6. Delete selected files
-7. Prepare public-repo cleanup checklist
+7. Route to repo-public-readiness or repo-secrets-audit (report only)
 ```
 
 Never assume approval.
@@ -529,23 +495,9 @@ Prefer showing exact command list before execution.
 
 ---
 
-## Public repo readiness checklist
+## Before public push
 
-Before pushing public:
-
-```text
-- No private keys, certs, tokens, `.env`, DB URLs, or credentials
-- No production DB dumps
-- No customer/client data
-- No internal screenshots with sensitive info
-- No private infrastructure IPs unless intentionally public
-- No accidental zip/backups
-- No generated build artifacts
-- README is safe for public
-- LICENSE is present if publishing open-source
-- .gitignore covers local/temp/secret patterns
-- Git history checked if secrets were ever committed
-```
+Do not run the full public checklist here. Use **`repo-public-readiness`** (verdict + blockers) and **`repo-secrets-audit`** (credentials).
 
 ---
 
@@ -565,6 +517,13 @@ Before pushing public:
 
 | Situation | Prefer |
 | --- | --- |
+| Deep secrets, keys, tokens | `repo-secrets-audit` |
+| Safe to make repo public | `repo-public-readiness` |
+| Update brain after feature work | `repo-kb-sync` |
+| Docs quality | `repo-docs-audit` |
+| Folder layout / structure | `repo-structure-audit` |
+| Package bloat / deps | `repo-dependency-audit` |
+| npm publish / release | `repo-release-readiness` |
 | Inventory installed agent skills (not repo files) | `skills-maintain` |
 | Pick which skill to run | `skills-router` |
 | Bootstrap `brain/` layout | `init-brain` |

@@ -84,7 +84,7 @@ Use this table format:
 
 Always treat these as **keep** (one canonical copy):
 
-- `impeccable`, `skills-router`, `find-skills`, `init-brain`, `commit-push`, `repo-hygiene`, `troubleshoot`, Kenmark `issues-*` / `skills-*` skills (including `skills-init`)
+- `impeccable`, `skills-router`, `find-skills`, `init-brain`, `commit-push`, `troubleshoot`, Kenmark `repo-*` skills (`repo-hygiene`, `repo-secrets-audit`, `repo-public-readiness`, `repo-kb-sync`, `repo-docs-audit`, `repo-structure-audit`, `repo-dependency-audit`, `repo-release-readiness`), Kenmark `issues-*` / `skills-*` skills (including `skills-init`)
 
 ## Step 3 — Group by category
 

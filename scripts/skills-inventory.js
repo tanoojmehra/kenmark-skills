@@ -35,7 +35,14 @@ const KEEP_ALWAYS = new Set([
   "issues-scan",
   "issues-setup",
   "troubleshoot",
-  "repo-hygiene"
+  "repo-hygiene",
+  "repo-secrets-audit",
+  "repo-public-readiness",
+  "repo-kb-sync",
+  "repo-docs-audit",
+  "repo-structure-audit",
+  "repo-dependency-audit",
+  "repo-release-readiness"
 ]);
 
 function printUsage() {

@@ -82,7 +82,7 @@ node scripts/skills-init.js
 
 1. Restart the IDE if skills do not appear
 2. In a project repo, run **`init-brain`** to create `brain/` and install IDE pointer stubs (standards in `brain/rules/standards.md`)
-3. While coding: **`troubleshoot`** when the problem is unclear; **`skills-router`** (or `/kenmark-skills-router`) when the domain is clear but the right skill is not; **`repo-hygiene`** before a public push or when the repo has scattered docs, dumps, or possible secrets
+3. While coding: **`troubleshoot`** when the problem is unclear; **`skills-router`** when the right skill is not obvious; **`repo-*`** skills for repo health (e.g. **`repo-public-readiness`** + **`repo-secrets-audit`** before a public push, **`repo-hygiene`** for clutter, **`repo-kb-sync`** after features)
 
 ## Related skills
 
