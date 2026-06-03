@@ -16,11 +16,12 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (14)
+skills/user-skills/          ← bundled universal skills (15)
   init-brain/                category: onboarding
   skills-init/
   skills-router/             category: workflow
   troubleshoot/              category: workflow (phase: diagnose)
+  repo-hygiene/              category: workflow (phase: audit)
   commit-push/               category: git
   issues-setup/              category: issues
   issues-list/
@@ -39,6 +40,14 @@ in frontmatter are skipped by `kenmark-skills setup` if they ever appear under
 `user-skills/`; project-only skills should live in that repo’s IDE skills folder,
 not in this package.
 
+## Bundled skills (reference)
+
+| Skill | Purpose |
+| --- | --- |
+| `repo-hygiene` | Audit dirty repos, scattered docs, orphan files, dumps, backups, and secret risks before commit/public push |
+
+See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [README](../README.md) lists all bundled skills.
+
 ## Recommended day-to-day order
 
 | Situation | Skill |
@@ -46,7 +55,8 @@ not in this package.
 | Problem unclear? | `troubleshoot` |
 | Need issue tracking? | `issues-setup` / `issues-scan` |
 | Need skill choice? | `skills-router` |
-| Need cleanup? | `skills-maintain` |
+| Repo clutter, secrets, public push prep? | `repo-hygiene` |
+| Installed skills inventory? | `skills-maintain` |
 | Need commit? | `commit-push` |
 
 See the root [README](../README.md) for trigger examples and setup steps.

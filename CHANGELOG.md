@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Repo hygiene
+
+- **repo-hygiene:** New bundled workflow skill (`phase: audit`, `risk: write-files`) — audit-first scan for scattered Markdown, orphan assets, dumps/backups, generated clutter, and secret risks; cleanup only after explicit approval; public-repo readiness checklist.
+- **skills-router:** Routes repo hygiene / sanitize / public-push / find-secrets triggers to `repo-hygiene`; `audit` phase documented; category quick map updated.
+- **README / package.json / skills/README.md:** Kenmark skill count 14 → 15.
+
 ### Init, recommended packs, and catalog
 
 - **`skills-init.js`:** Single `setup-skills` run with comma-separated `--ide` (no per-IDE loop / repeated adopt passes). Forwards `--ide` to `skills-install-recommended` so curated packs align with the chosen targets.

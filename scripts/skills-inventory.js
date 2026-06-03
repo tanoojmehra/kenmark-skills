@@ -34,7 +34,8 @@ const KEEP_ALWAYS = new Set([
   "issues-maintenance",
   "issues-scan",
   "issues-setup",
-  "troubleshoot"
+  "troubleshoot",
+  "repo-hygiene"
 ]);
 
 function printUsage() {
