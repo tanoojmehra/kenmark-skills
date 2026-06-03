@@ -104,7 +104,8 @@ async function promptAction(defaultAction = "install") {
 
 /**
  * @param {string[]} availableIdes - keys from targetMap
- * @param {string[]} detectedIdes - subset that exist on disk
+ * @param {string[]} detectedIdes - IDEs with real install evidence (not skills-only parents)
+ * @param {{ required?: boolean, managedIdes?: string[] }} opts
  */
 function defaultAgentIdes(availableIdes) {
   const defaults = DEFAULT_AGENT_IDES.filter((ide) => availableIdes.includes(ide));
@@ -141,6 +142,7 @@ function parseIdeChoice(answer, availableIdes, detectedIdes) {
 
 async function promptIde(availableIdes, detectedIdes, opts = {}) {
   const required = opts.required === true;
+  const managedIdes = opts.managedIdes || [];
   const rl = createRl();
   console.log("\nWhich IDE / agent should receive skills?");
   if (required) {
@@ -149,10 +151,23 @@ async function promptIde(availableIdes, detectedIdes, opts = {}) {
     console.log("  0) auto — use detected installs only [default]");
   }
   console.log("  a) all  — every supported IDE path\n");
+  if (detectedIdes.length) {
+    console.log(`  Detected on this machine: ${detectedIdes.join(", ")}`);
+  }
+  const managedOnly = managedIdes.filter((ide) => !detectedIdes.includes(ide));
+  if (managedOnly.length) {
+    console.log(`  Previously managed by Kenmark: ${managedOnly.join(", ")}`);
+  }
+  console.log("");
   const sorted = [...availableIdes].sort();
   sorted.forEach((ide, i) => {
     const label = IDE_LABELS[ide] || ide;
-    const mark = detectedIdes.includes(ide) ? " ✓ detected" : "";
+    let mark = "";
+    if (detectedIdes.includes(ide)) {
+      mark = " ✓ detected";
+    } else if (managedIdes.includes(ide)) {
+      mark = " · Kenmark-managed";
+    }
     console.log(`  ${i + 1}) ${label}${mark}`);
   });
   console.log("");

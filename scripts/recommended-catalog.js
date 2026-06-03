@@ -248,6 +248,19 @@ function resolveInstallCommands(entry, scope, catalog) {
   if (!pack) return [];
 
   const installStrategy = pack.installStrategy || pack.install?.strategy;
+  if (installStrategy === "manual") {
+    const block = pack.install?.[scope];
+    return [
+      {
+        strategy: "manual",
+        message:
+          pack.warning ||
+          block?.summary ||
+          `Manual install required for ${pack.id}`,
+        manualSteps: pack.install?.alternatives || []
+      }
+    ];
+  }
   if (installStrategy === "git-sync") {
     const block = pack.install?.[scope];
     const repoUrl = pack.install?.repoUrl;
@@ -310,6 +323,35 @@ function resolveInstallCommands(entry, scope, catalog) {
   return [{ command: cmd, cwd }];
 }
 
+/** One SEO/GEO skill: SKILL.md under .agents or .claude skills dir. */
+function seoSkillVerifyClause(skill, scope) {
+  const agents =
+    scope === "global"
+      ? `"$HOME/.agents/skills/${skill}/SKILL.md"`
+      : `".agents/skills/${skill}/SKILL.md"`;
+  const claude =
+    scope === "global"
+      ? `"$HOME/.claude/skills/${skill}/SKILL.md"`
+      : `".claude/skills/${skill}/SKILL.md"`;
+  return `(test -f ${agents} || test -f ${claude})`;
+}
+
+/**
+ * Verify every selected SEO skill (batch partial installs cannot pass on one skill alone).
+ */
+function buildSeoSkillsVerifyCommand(seoSkills, scope) {
+  if (!seoSkills?.length) return null;
+  return seoSkills.map((skill) => seoSkillVerifyClause(skill, scope)).join(" && ");
+}
+
+function resolveVerifyCommand(pack, scope, entry) {
+  if (pack?.id === "seo-geo-claude-skills" && entry?.seoSkills?.length) {
+    return buildSeoSkillsVerifyCommand(entry.seoSkills, scope);
+  }
+  const cmd = pack?.install?.verify?.[scope] || pack?.install?.verify;
+  return typeof cmd === "string" ? cmd : null;
+}
+
 function listProfiles(catalog) {
   return catalog.profiles || [];
 }
@@ -331,6 +373,8 @@ module.exports = {
   packBloatContribution,
   weightLabel,
   resolveInstallCommands,
+  resolveVerifyCommand,
+  buildSeoSkillsVerifyCommand,
   runGitSyncInstall,
   expandInstallPath,
   resolveInstallTarget,

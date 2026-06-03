@@ -335,15 +335,96 @@ function hashDirectory(dirPath) {
     .digest("hex");
 }
 
+const KENMARK_MANAGED_MARKER = ".kenmark-managed";
+
+/** Parent-dir entries ignored when inferring a real IDE install (Kenmark only creates `skills/`). */
+const IDE_PARENT_IGNORED_ENTRIES = new Set(["skills"]);
+
+function readDirEntryNames(dirPath) {
+  if (!fs.existsSync(dirPath)) return null;
+  try {
+    return fs.readdirSync(dirPath, { withFileTypes: true }).map((ent) => ent.name);
+  } catch {
+    return null;
+  }
+}
+
+function hasRealIdeInstallEvidence(ide, targetPath) {
+  const parent = path.dirname(targetPath);
+  const configRoot = path.dirname(parent);
+
+  if (ide === "claude" && fs.existsSync(path.join(configRoot, ".claude.json"))) {
+    return true;
+  }
+
+  const entries = readDirEntryNames(parent);
+  if (!entries) return false;
+
+  return entries.some((name) => !IDE_PARENT_IGNORED_ENTRIES.has(name));
+}
+
 function detectInstalledIdes(targetMap) {
   const detected = [];
   for (const [ide, targetPath] of Object.entries(targetMap)) {
-    const parent = path.dirname(targetPath);
-    if (fs.existsSync(parent)) {
+    if (hasRealIdeInstallEvidence(ide, targetPath)) {
       detected.push(ide);
     }
   }
   return detected;
+}
+
+function detectManagedIdes(targetMap) {
+  const managed = [];
+  for (const [ide, targetPath] of Object.entries(targetMap)) {
+    const markerPath = path.join(targetPath, KENMARK_MANAGED_MARKER);
+    if (fs.existsSync(markerPath)) {
+      managed.push(ide);
+    }
+  }
+  return managed;
+}
+
+/** Resolve --ide all | cursor,codex | single from CLI flags. */
+function resolveExplicitTargetIdes(ideArg, targetMap) {
+  const requested = String(ideArg).toLowerCase();
+  if (requested === "all") {
+    return Object.keys(targetMap);
+  }
+  if (requested.includes(",")) {
+    const list = requested.split(",").map((s) => s.trim().toLowerCase());
+    const invalid = list.filter((ide) => !targetMap[ide]);
+    if (invalid.length) {
+      throw new Error(`Unknown --ide value(s): ${invalid.join(", ")}`);
+    }
+    return list;
+  }
+  if (targetMap[requested]) {
+    return [requested];
+  }
+  throw new Error(`Unknown --ide value: ${ideArg}`);
+}
+
+function buildTargetMapForIdes(fullMap, targetIdes) {
+  const filtered = {};
+  for (const ide of targetIdes) {
+    filtered[ide] = fullMap[ide];
+  }
+  return filtered;
+}
+
+function writeKenmarkManagedMarker(targetPath) {
+  fs.mkdirSync(targetPath, { recursive: true });
+  const markerPath = path.join(targetPath, KENMARK_MANAGED_MARKER);
+  const payload = {
+    managedBy: "kenmark-skills",
+    createdAt: new Date().toISOString()
+  };
+  fs.writeFileSync(markerPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+}
+
+function ensureKenmarkTargetPath(targetPath, { dryRun = false } = {}) {
+  if (dryRun) return;
+  writeKenmarkManagedMarker(targetPath);
 }
 
 function resolveFallbackTargetIdes({ targetMap, strictTargets = false, mode = "global" } = {}) {
@@ -799,10 +880,10 @@ function relinkSkillsToIdes(
   const results = [];
 
   // Pre-create IDE target directories so `setup --ide kiro` makes `~/.kiro/skills/`
-  // even when no skills match. Cheap; recursive mkdir is idempotent.
+  // even when no skills match. Marker distinguishes Kenmark-created paths from real IDE installs.
   if (!dryRun) {
     for (const [, targetPath] of Object.entries(targetMap)) {
-      fs.mkdirSync(targetPath, { recursive: true });
+      ensureKenmarkTargetPath(targetPath);
     }
   }
 
@@ -1170,7 +1251,10 @@ function installMcpToIdes(mcpTargetMap, targetIdes, options = {}) {
 function uninstallMcpFromIdes(mcpTargetMap, targetIdes, options = {}) {
   const { dryRun = false } = options;
   const manifest = readManifest();
-  const serverNames = manifest.mcp?.servers || [];
+  const storeDoc = readMcpDocument(getMcpStorePath());
+  const serverNames = manifest.mcp?.servers?.length
+    ? manifest.mcp.servers
+    : Object.keys(storeDoc.mcpServers || {});
   const results = [];
   const mcpIdes = targetIdes.filter((ide) => mcpTargetMap[ide]);
 
@@ -1381,32 +1465,41 @@ function runDoctor(options = {}) {
   const {
     repoRoot = path.resolve(__dirname, ".."),
     homeDir = os.homedir(),
-    jsonPath = null
+    jsonPath = null,
+    soft = false
   } = options;
 
-  const catalogPath = path.join(repoRoot, "skills", "user-skills", "recommended-catalog.json");
   const storeDir = getStoreDir();
   const manifestPath = getManifestPath();
   const targetMap = buildGlobalTargets(homeDir);
   const issues = [];
+  const warnings = [];
+
+  function recordProblem(msg) {
+    if (soft) {
+      warnings.push(msg);
+    } else {
+      issues.push(msg);
+    }
+  }
 
   let packageVersion = null;
   try {
     const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
     packageVersion = pkg.version;
   } catch {
-    issues.push("Could not read package.json version");
+    /* informational only — repo health is `kenmark-skills validate` */
   }
 
   const nodeOk = process.version;
   const nodeMajor = parseInt(process.version.slice(1).split(".")[0], 10);
   if (nodeMajor < 18) {
-    issues.push(`Node ${nodeOk} is below required >=18`);
+    recordProblem(`Node ${nodeOk} is below required >=18`);
   }
 
   const storeExists = fs.existsSync(storeDir);
   if (!storeExists) {
-    issues.push("Kenmark store directory missing (~/.kenmark/store/skills)");
+    recordProblem("Kenmark store directory missing (~/.kenmark/store/skills)");
   }
 
   let manifest = null;
@@ -1415,10 +1508,14 @@ function runDoctor(options = {}) {
     manifest = readManifest();
     manifestReadable = fs.existsSync(manifestPath);
   } catch (err) {
-    issues.push(`Manifest unreadable: ${err.message}`);
+    recordProblem(`Manifest unreadable: ${err.message}`);
   }
 
   const installedIdeRoots = detectInstalledIdes(targetMap);
+  const managedIdeRoots = detectManagedIdes(targetMap);
+  const idesForHashCheck = [
+    ...new Set([...installedIdeRoots, ...managedIdeRoots])
+  ];
   const skillCountsByIde = {};
   const brokenSymlinksByIde = {};
   const hashMismatches = [];
@@ -1427,7 +1524,7 @@ function runDoctor(options = {}) {
     skillCountsByIde[ide] = countSkillsInDir(idePath);
     brokenSymlinksByIde[ide] = findBrokenSymlinks(idePath);
     if (brokenSymlinksByIde[ide].length) {
-      issues.push(`Broken symlinks in ${ide}: ${brokenSymlinksByIde[ide].length}`);
+      recordProblem(`Broken symlinks in ${ide}: ${brokenSymlinksByIde[ide].length}`);
     }
   }
 
@@ -1441,7 +1538,7 @@ function runDoctor(options = {}) {
   for (const name of storeSkillNames) {
     const storePath = path.join(storeDir, name);
     const storeHash = hashDirectory(storePath);
-    for (const ide of installedIdeRoots) {
+    for (const ide of idesForHashCheck) {
       const idePath = path.join(targetMap[ide], name);
       if (!fs.existsSync(idePath)) continue;
       const ideHash = hashDirectory(idePath);
@@ -1451,34 +1548,24 @@ function runDoctor(options = {}) {
     }
   }
   if (hashMismatches.length) {
-    issues.push(`Store/IDE content hash mismatches: ${hashMismatches.length}`);
-  }
-
-  let catalogReadable = false;
-  try {
-    if (fs.existsSync(catalogPath)) {
-      readRecommendedCatalog(catalogPath);
-      catalogReadable = true;
-    } else {
-      issues.push("Recommended catalog missing");
-    }
-  } catch (err) {
-    issues.push(`Recommended catalog unreadable: ${err.message}`);
+    recordProblem(`Store/IDE content hash mismatches: ${hashMismatches.length}`);
   }
 
   const backupCount = countBackupDirs();
 
   const mcp = inspectMcpForDoctor({ homeDir, manifest });
   for (const w of mcp.warnings) {
-    issues.push(w);
+    warnings.push(w);
   }
   for (const issue of mcp.issues) {
-    issues.push(issue);
+    recordProblem(issue);
   }
 
   const report = {
     ok: issues.length === 0,
+    soft,
     issues,
+    warnings,
     node: nodeOk,
     platform: process.platform,
     packageVersion,
@@ -1490,12 +1577,11 @@ function runDoctor(options = {}) {
     manifestReadable,
     manifestSkillCount: manifest ? Object.keys(manifest.skills || {}).length : 0,
     installedIdeRoots,
+    managedIdeRoots,
     skillCountsByIde,
     brokenSymlinksByIde,
     hashMismatches,
     backupCount,
-    catalogPath,
-    catalogReadable,
     mcp,
     checkedAt: new Date().toISOString()
   };
@@ -1539,7 +1625,12 @@ module.exports = {
   hashFile,
   getBackupsDir,
   backupSkillDir,
+  KENMARK_MANAGED_MARKER,
   detectInstalledIdes,
+  detectManagedIdes,
+  resolveExplicitTargetIdes,
+  buildTargetMapForIdes,
+  ensureKenmarkTargetPath,
   resolveFallbackTargetIdes,
   resolveLinkModeLabel,
   readManifest,

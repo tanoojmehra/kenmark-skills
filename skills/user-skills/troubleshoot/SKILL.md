@@ -582,5 +582,12 @@ Then run the tracks and synthesize.
 | User wants a specialist to implement fixes in code | Domain sub-agent (e.g. `senior-dev-troubleshooter`, `build-error-resolver`) after diagnosis |
 | Vercel bill, caching, slow routes on a deployed app | `vercel-optimize` (metrics-first) |
 | Picking which installed skill to use | `skills-router` |
+| Dirty repo, scattered docs, dumps | `repo-hygiene` |
+| Secrets, keys, tokens | `repo-secrets-audit` |
+| Make repo public | `repo-public-readiness` |
+| Docs quality | `repo-docs-audit` |
+| Release / publish | `repo-release-readiness` |
+| Other repo health | `skills-router` → `repo-*` family |
 
 Do not route “troubleshoot this bug” to `skills-router` unless the user is asking which skill to use.
+Do not route “sanitize repo” to `troubleshoot` — use **`repo-hygiene`**. Do not route “find secrets” to `troubleshoot` — use **`repo-secrets-audit`**.

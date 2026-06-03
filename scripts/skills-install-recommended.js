@@ -20,6 +20,7 @@ const {
   resolveProfilePlan,
   summarizeProfile,
   resolveInstallCommands,
+  resolveVerifyCommand,
   runGitSyncInstall,
   listProfiles,
   defaultProfileId
@@ -27,7 +28,9 @@ const {
 const {
   buildGlobalTargets,
   buildProjectTargets,
-  adoptCatalogSkills
+  adoptCatalogSkills,
+  resolveExplicitTargetIdes,
+  buildTargetMapForIdes
 } = require("./kenmark-hub");
 
 const repoRoot = path.resolve(__dirname, "..");
@@ -52,7 +55,7 @@ function printUsage() {
   console.log("  --project           Install into current project directory");
   console.log("  --scope global|project");
   console.log("  --ecc-profile <id>  Override ECC profile (minimal, core, full)");
-  console.log("  --ide <target>      Limit adopt/relink to one IDE: cursor, claude, all, …");
+  console.log("  --ide <target>      Limit adopt/relink: cursor, cursor,codex,claude, all, …");
   console.log("  --skip-adopt        Skip post-install catalog adoption");
   console.log("  --copy              Copy into IDE paths instead of symlinks (adopt relink)");
   console.log("  --symlink           Force symlinks on Windows instead of copy (adopt relink)");
@@ -281,6 +284,16 @@ function runShell(command, dryRun, cwd) {
 }
 
 function runInstallCommand(cmdEntry, dryRun) {
+  if (cmdEntry.strategy === "manual") {
+    console.log(`Manual install: ${cmdEntry.message}`);
+    if (cmdEntry.manualSteps?.length) {
+      console.log("Steps:");
+      for (const step of cmdEntry.manualSteps) {
+        console.log(`  ${step}`);
+      }
+    }
+    return { status: 0 };
+  }
   if (cmdEntry.strategy === "git-sync") {
     return runGitSyncInstall({
       repoUrl: cmdEntry.repoUrl,
@@ -292,9 +305,9 @@ function runInstallCommand(cmdEntry, dryRun) {
   return runShell(cmdEntry.command, dryRun, cmdEntry.cwd);
 }
 
-function verifyPack(pack, scope) {
-  const cmd = pack.install?.verify?.[scope] || pack.install?.verify;
-  if (!cmd || typeof cmd !== "string") return null;
+function verifyPack(pack, scope, entry) {
+  const cmd = resolveVerifyCommand(pack, scope, entry);
+  if (!cmd) return null;
   const cwd = scope === "project" ? process.cwd() : undefined;
   const result = spawnSync(cmd, {
     shell: true,
@@ -418,12 +431,11 @@ async function run() {
     scope === "project" ? buildProjectTargets(process.cwd()) : buildGlobalTargets(os.homedir());
   let targetMap = fullTargetMap;
   if (args.explicitIde && args.ide) {
-    if (args.ide === "all") {
-      // keep full map
-    } else if (fullTargetMap[args.ide]) {
-      targetMap = { [args.ide]: fullTargetMap[args.ide] };
-    } else {
-      console.error(`Unknown --ide value: ${args.ide}`);
+    try {
+      const targetIdes = resolveExplicitTargetIdes(args.ide, fullTargetMap);
+      targetMap = buildTargetMapForIdes(fullTargetMap, targetIdes);
+    } catch (err) {
+      console.error(err.message);
       process.exit(1);
     }
   }
@@ -512,10 +524,18 @@ async function run() {
         break;
       }
     }
-    if (!args.dryRun && pack.install?.verify) {
-      const okVerify = verifyPack(pack, scope);
+    if (!args.dryRun && resolveVerifyCommand(pack, scope, entry)) {
+      const okVerify = verifyPack(pack, scope, entry);
+      const verifyHint =
+        entry.seoSkills?.length > 1
+          ? ` (${entry.seoSkills.length} SEO/GEO skills)`
+          : entry.seoSkills?.length === 1
+            ? ` (${entry.seoSkills[0]})`
+            : "";
       console.log(
-        okVerify ? "Verify: OK" : "Verify: not detected — check install manually"
+        okVerify
+          ? `Verify: OK${verifyHint}`
+          : `Verify: not detected${verifyHint} — check install manually`
       );
     }
   }

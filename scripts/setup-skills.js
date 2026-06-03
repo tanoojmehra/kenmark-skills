@@ -32,6 +32,9 @@ const {
   buildMcpDocumentForProfile,
   listMcpProfileNames,
   detectInstalledIdes,
+  detectManagedIdes,
+  resolveExplicitTargetIdes,
+  ensureKenmarkTargetPath,
   resolveFallbackTargetIdes,
   resolveLinkModeLabel
 } = require("./kenmark-hub");
@@ -220,28 +223,9 @@ function parseArgs(argv) {
 
 function resolveTargetIdes(args, targetMap) {
   if (args.explicitIde && args.ide) {
-    const requested = String(args.ide).toLowerCase();
-    if (requested === "all") {
-      return Object.keys(targetMap);
-    }
-    if (requested.includes(",")) {
-      const list = requested.split(",").map((s) => s.trim().toLowerCase());
-      const invalid = list.filter((ide) => !targetMap[ide]);
-      if (invalid.length) {
-        throw new Error(`Unknown --ide value(s): ${invalid.join(", ")}`);
-      }
-      return list;
-    }
-    if (targetMap[requested]) {
-      return [requested];
-    }
-    throw new Error(`Unknown --ide value: ${args.ide}`);
+    return resolveExplicitTargetIdes(args.ide, targetMap);
   }
   return null;
-}
-
-function ensureTargetPath(targetPath) {
-  fs.mkdirSync(targetPath, { recursive: true });
 }
 
 function ensureParentDir(filePath) {
@@ -387,7 +371,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
             }
             continue;
           }
-          ensureTargetPath(targetPath);
+          ensureKenmarkTargetPath(targetPath);
           const linkResults = relinkSkillsToIdes(skillNames, { [ide]: targetPath }, {
             forceCopy,
             forceSymlink,
@@ -583,7 +567,10 @@ async function run() {
     const targetMapPreview = mode === "project" ? projectTargets : globalTargets;
     if (!args.explicitIde) {
       const detected = detectInstalledIdes(targetMapPreview);
-      targetIdes = await promptIde(Object.keys(targetMapPreview), detected);
+      const managed = detectManagedIdes(targetMapPreview);
+      targetIdes = await promptIde(Object.keys(targetMapPreview), detected, {
+        managedIdes: managed
+      });
     }
   }
 

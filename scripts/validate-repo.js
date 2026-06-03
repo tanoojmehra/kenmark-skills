@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Repo validation for kenmark-skills — run via `npm run validate` or as part of `npm test`.
+ * Repo validation for kenmark-skills — run via `npm run validate` or `npm test`.
  */
 
 const fs = require("fs");
@@ -70,6 +70,7 @@ const REQUIRED_PACKAGE_SCRIPTS = [
   "subagents-inventory",
   "install-recommended",
   "doctor",
+  "doctor:local",
   "check",
   "validate",
   "test",
@@ -78,6 +79,7 @@ const REQUIRED_PACKAGE_SCRIPTS = [
 
 const REQUIRED_PACKAGE_FILES = [
   "CHANGELOG.md",
+  "skills/README.md",
   "skills/user-skills/**/*",
   "skills/user-skills/recommended-catalog.json",
   "config/mcp-servers.json",
@@ -87,6 +89,7 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/recommended-catalog.js",
   "scripts/setup-skills.js",
   "scripts/doctor.js",
+  "scripts/validate.js",
   "scripts/validate-repo.js",
   "scripts/skills-init.js",
   "scripts/skills-inventory.js",
@@ -97,11 +100,21 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/interactive.js"
 ];
 
-/** Universal skill bodies and the recommended catalog (not CHANGELOG — may cite retired terms). */
+/** Paths scanned for forbidden literals/patterns. CHANGELOG is historical — excluded. */
 const FORBIDDEN_SCAN_RELATIVE = [
+  "README.md",
+  "skills/README.md",
   "skills/user-skills",
-  "skills/user-skills/recommended-catalog.json"
+  "scripts",
+  "config"
 ];
+
+const FORBIDDEN_SCAN_EXCLUDE_RELATIVE = new Set([
+  "CHANGELOG.md",
+  "scripts/validate-repo.js" // defines FORBIDDEN_* lists and path-pattern labels
+]);
+
+const FORBIDDEN_SCAN_EXTENSIONS = new Set([".md", ".json", ".js"]);
 
 const errors = [];
 const warnings = [];
@@ -399,6 +412,54 @@ function validateCatalog() {
   }
 }
 
+/** init-brain must document the numbered KB scaffold (regression guard). */
+const INIT_BRAIN_KB_MARKERS = [
+  "brain/kb",
+  "00-project-overview.md",
+  "Step 1.5",
+  "Brain KB maintenance",
+  "KB update requirement"
+];
+
+const COMMIT_PUSH_KB_MARKERS = ["Brain KB check before commit", "brain/kb/"];
+
+function validateInitBrainKb() {
+  const initBrainPath = path.join(userSkillsDir, "init-brain", "SKILL.md");
+  if (!fs.existsSync(initBrainPath)) {
+    fail("skills/user-skills/init-brain/SKILL.md missing (KB validation skipped)");
+    return;
+  }
+  let text;
+  try {
+    text = fs.readFileSync(initBrainPath, "utf8");
+  } catch (err) {
+    fail(`init-brain/SKILL.md: unreadable (${err.message})`);
+    return;
+  }
+  for (const marker of INIT_BRAIN_KB_MARKERS) {
+    if (!text.includes(marker)) {
+      fail(`init-brain/SKILL.md: missing required KB marker "${marker}"`);
+    }
+  }
+
+  const commitPushPath = path.join(userSkillsDir, "commit-push", "SKILL.md");
+  if (!fs.existsSync(commitPushPath)) {
+    fail("skills/user-skills/commit-push/SKILL.md missing (KB validation skipped)");
+    return;
+  }
+  try {
+    text = fs.readFileSync(commitPushPath, "utf8");
+  } catch (err) {
+    fail(`commit-push/SKILL.md: unreadable (${err.message})`);
+    return;
+  }
+  for (const marker of COMMIT_PUSH_KB_MARKERS) {
+    if (!text.includes(marker)) {
+      fail(`commit-push/SKILL.md: missing required KB marker "${marker}"`);
+    }
+  }
+}
+
 function validatePackageJson() {
   let pkg;
   try {
@@ -418,13 +479,22 @@ function validatePackageJson() {
   if (scripts.validate !== "node scripts/validate-repo.js") {
     fail('package.json: scripts.validate must be "node scripts/validate-repo.js"');
   }
-  if (
-    scripts.test !==
-    "node scripts/validate-repo.js && node scripts/cli.js doctor"
-  ) {
-    fail(
-      'package.json: scripts.test must be "node scripts/validate-repo.js && node scripts/cli.js doctor"'
-    );
+  if (scripts.test !== "node scripts/validate-repo.js") {
+    fail('package.json: scripts.test must be "node scripts/validate-repo.js"');
+  }
+  if (scripts["doctor:local"] !== "node scripts/cli.js doctor") {
+    fail('package.json: scripts["doctor:local"] must be "node scripts/cli.js doctor"');
+  }
+
+  const cliPath = path.join(repoRoot, "scripts", "cli.js");
+  let cliSrc = "";
+  try {
+    cliSrc = fs.readFileSync(cliPath, "utf8");
+  } catch (err) {
+    fail(`scripts/cli.js: unreadable (${err.message})`);
+  }
+  if (!cliSrc.includes('command === "validate"')) {
+    fail('scripts/cli.js must register the "validate" command');
   }
 
   const files = pkg.files || [];
@@ -466,23 +536,24 @@ function collectFilesRecursive(dir, acc = []) {
 }
 
 function findForbiddenTerms() {
-  const filesToScan = [];
+  const filesToScan = new Set();
 
   for (const rel of FORBIDDEN_SCAN_RELATIVE) {
     const abs = path.join(repoRoot, rel);
     if (!fs.existsSync(abs)) continue;
     if (fs.statSync(abs).isDirectory()) {
-      filesToScan.push(...collectFilesRecursive(abs));
+      for (const f of collectFilesRecursive(abs)) {
+        filesToScan.add(f);
+      }
     } else {
-      filesToScan.push(abs);
+      filesToScan.add(abs);
     }
   }
 
   for (const abs of filesToScan) {
-    if (!abs.endsWith(".md") && !abs.endsWith(".json")) continue;
-    if (abs.endsWith("recommended-catalog.json") || abs.endsWith("SKILL.md")) {
-      // scanned below with universal filter for skills
-    }
+    const rel = path.relative(repoRoot, abs);
+    if (FORBIDDEN_SCAN_EXCLUDE_RELATIVE.has(rel)) continue;
+    if (!FORBIDDEN_SCAN_EXTENSIONS.has(path.extname(abs))) continue;
 
     let text;
     try {
@@ -501,7 +572,6 @@ function findForbiddenTerms() {
       }
     }
 
-    const rel = path.relative(repoRoot, abs);
     for (const literal of FORBIDDEN_LITERALS) {
       if (text.includes(literal)) {
         fail(`${rel}: forbidden project-specific term "${literal}"`);
@@ -521,6 +591,7 @@ function main() {
 
   validateSkills();
   validateCatalog();
+  validateInitBrainKb();
   validatePackageJson();
   findForbiddenTerms();
 

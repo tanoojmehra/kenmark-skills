@@ -13,7 +13,9 @@ const {
   buildGlobalTargets,
   buildProjectTargets,
   getStoreDir,
-  adoptCatalogSkills
+  adoptCatalogSkills,
+  resolveExplicitTargetIdes,
+  buildTargetMapForIdes
 } = require("./kenmark-hub");
 
 const repoRoot = path.resolve(__dirname, "..");
@@ -107,27 +109,9 @@ function parseArgs(argv) {
 
 function resolveTargetIdes(args, targetMap) {
   if (args.explicitIde && args.ide) {
-    const requested = String(args.ide).toLowerCase();
-    if (requested === "all") {
-      return Object.keys(targetMap);
-    }
-    if (requested.includes(",")) {
-      return requested.split(",").map((s) => s.trim().toLowerCase()).filter((ide) => targetMap[ide]);
-    }
-    if (targetMap[requested]) {
-      return [requested];
-    }
-    throw new Error(`Unknown --ide value: ${args.ide}`);
+    return resolveExplicitTargetIdes(args.ide, targetMap);
   }
   return Object.keys(targetMap);
-}
-
-function buildTargetMapForIdes(fullMap, targetIdes) {
-  const filtered = {};
-  for (const ide of targetIdes) {
-    filtered[ide] = fullMap[ide];
-  }
-  return filtered;
 }
 
 async function run() {

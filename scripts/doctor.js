@@ -6,19 +6,32 @@ const { runDoctor } = require("./kenmark-hub");
 function printUsage() {
   console.log("Usage: kenmark-skills doctor [options]");
   console.log("");
-  console.log("Diagnose Kenmark skills install: store, manifest, MCP, IDE links, and catalog.");
+  console.log(
+    "Diagnose local Kenmark install: ~/.kenmark store, manifest, MCP, IDE links, symlinks, and hash drift."
+  );
+  console.log("For repo/package invariants, use: kenmark-skills validate");
   console.log("");
   console.log("Options:");
+  console.log("  --soft          Report problems as warnings; exit 0");
+  console.log("  --no-fail       Exit 0 even when issues are found (issues still listed; JSON ok:false)");
   console.log("  --json <path>   Write full report as JSON");
   console.log("  -h, --help      Show help");
 }
 
 function parseArgs(argv) {
-  const args = { jsonPath: null };
+  const args = { jsonPath: null, soft: false, noFail: false };
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (token === "--help" || token === "-h") {
       args.help = true;
+      continue;
+    }
+    if (token === "--soft") {
+      args.soft = true;
+      continue;
+    }
+    if (token === "--no-fail") {
+      args.noFail = true;
       continue;
     }
     if (token === "--json") {
@@ -37,15 +50,26 @@ function run() {
   }
 
   const repoRoot = path.resolve(__dirname, "..");
-  const report = runDoctor({ repoRoot, jsonPath: args.jsonPath });
+  const report = runDoctor({
+    repoRoot,
+    jsonPath: args.jsonPath,
+    soft: args.soft
+  });
 
-  console.log(`Kenmark skills doctor — ${report.ok ? "OK" : "issues found"}`);
+  const headline = report.ok
+    ? "OK"
+    : args.soft
+      ? "warnings (soft)"
+      : "issues found";
+  console.log(`Kenmark skills doctor — ${headline}`);
+  if (args.soft) {
+    console.log("(soft mode: warnings only, exit 0)");
+  }
   console.log(`Node: ${report.node} (${report.platform})`);
   console.log(`Package: ${report.packageVersion || "unknown"}`);
   console.log(`Kenmark home: ${report.kenmarkHome}`);
   console.log(`Store: ${report.storeDir} (${report.storeSkillCount} skill(s))`);
   console.log(`Manifest: ${report.manifestPath} (${report.manifestReadable ? "readable" : "missing/unreadable"})`);
-  console.log(`Catalog: ${report.catalogPath} (${report.catalogReadable ? "readable" : "missing/unreadable"})`);
   console.log(`Backups: ${report.backupCount} skill backup(s) on disk`);
   console.log("");
 
@@ -91,6 +115,17 @@ function run() {
   } else {
     console.log("Detected IDE roots: none");
   }
+  const managedOnly = (report.managedIdeRoots || []).filter(
+    (ide) => !report.installedIdeRoots.includes(ide)
+  );
+  if (report.managedIdeRoots?.length) {
+    console.log(`Kenmark-managed targets: ${report.managedIdeRoots.join(", ")}`);
+  }
+  if (managedOnly.length) {
+    console.log(
+      `  (skills path exists from Kenmark only — not counted as installed: ${managedOnly.join(", ")})`
+    );
+  }
 
   console.log("\nSkill counts by IDE:");
   for (const [ide, count] of Object.entries(report.skillCountsByIde)) {
@@ -106,6 +141,13 @@ function run() {
     }
   }
 
+  if (report.warnings.length) {
+    console.log("\nWarnings:");
+    for (const w of report.warnings) {
+      console.log(`  • ${w}`);
+    }
+  }
+
   if (report.issues.length) {
     console.log("\nIssues:");
     for (const issue of report.issues) {
@@ -117,7 +159,7 @@ function run() {
     console.log(`\nFull report written to ${path.resolve(args.jsonPath)}`);
   }
 
-  process.exit(report.ok ? 0 : 1);
+  process.exit(args.noFail || report.ok ? 0 : 1);
 }
 
 run();
