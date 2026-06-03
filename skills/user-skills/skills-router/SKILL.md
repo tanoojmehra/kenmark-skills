@@ -52,7 +52,7 @@ Each skill in the registry includes:
 | `category` | Kenmark: `onboarding`, `workflow`, `git`, `issues`, `admin`. Third-party skills may use broader inferred labels. |
 | `scope` | `universal` (Kenmark store / default setup) or `project-specific` (repo-local copy) |
 | `project` | When `scope` is `project-specific`, target repo or product id |
-| `phase` | Workflow phase: `setup`, `ship`, `maintain`, `verify`, `discover`, `plan` |
+| `phase` | Workflow phase: `setup`, `ship`, `maintain`, `verify`, `discover`, `plan`, `diagnose` |
 | `risk` | Side-effect level: `read-only`, `write-files`, `shell`, `git-write`, `destructive-possible` |
 | `stack` | Stack fit, e.g. `["any"]`, `["django"]`, `["react", "typescript"]` |
 | `allowedTools` | Frontmatter `allowed-tools` list |
@@ -166,7 +166,7 @@ def as_string_list(value) -> list[str]:
 def infer_category(name: str, description: str, triggers: list[str]) -> str:
     if name == "init-brain" or name == "skills-init":
         return "onboarding"
-    if name == "skills-router":
+    if name == "skills-router" or name == "troubleshoot":
         return "workflow"
     if name == "commit-push":
         return "git"
@@ -186,6 +186,19 @@ def infer_category(name: str, description: str, triggers: list[str]) -> str:
     if "init brain" in text or "brain/rules" in text:
         return "onboarding"
     if "router" in text or "route skill" in text:
+        return "workflow"
+    if any(
+        k in text
+        for k in [
+            "troubleshoot",
+            "diagnose",
+            "debug",
+            "investigate",
+            "root cause",
+            "root-cause",
+            "hypothesis",
+        ]
+    ):
         return "workflow"
     if "seo" in text or "geo " in text:
         return "seo"
@@ -211,6 +224,19 @@ def infer_phase(name: str, description: str, category: str) -> str:
         return "maintain"
     if any(k in text for k in ["check", "verify", "scan", "test", "validate"]):
         return "verify"
+    if name == "troubleshoot" or any(
+        k in text
+        for k in [
+            "troubleshoot",
+            "diagnose",
+            "debug",
+            "investigate",
+            "root cause",
+            "root-cause",
+            "hypothesis",
+        ]
+    ):
+        return "diagnose"
     if any(k in text for k in ["list", "find", "router", "discover", "search skill"]):
         return "discover"
     if any(k in text for k in ["plan", "roadmap", "design doc"]):
@@ -429,6 +455,7 @@ Do **not** use this skill for first-time Kenmark setup; use **`skills-init`** or
 | Tests, QA, verification, evals | `testing` | `tdd-workflow`, `verification-loop` |
 | Skill install, update, inventory | `admin` | `skills-init`, `skills-maintain`, `skills-update` |
 | Agent workflow, discovery, learning | `workflow` | `find-skills`, `continuous-learning`, `skills-router` |
+| Troubleshoot, debug, root cause, investigate | `workflow` | `troubleshoot` |
 
 ## Output format
 
