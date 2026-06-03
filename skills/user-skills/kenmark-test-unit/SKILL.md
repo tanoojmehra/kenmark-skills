@@ -46,6 +46,37 @@ Good targets:
 
 ---
 
+## Package manager rule
+
+Detect package manager from lockfile:
+
+| Lockfile | Package manager |
+| --- | --- |
+| `pnpm-lock.yaml` | `pnpm` |
+| `yarn.lock` | `yarn` |
+| `bun.lockb` | `bun` |
+| `package-lock.json` | `npm` |
+
+Prefer package scripts and repo-local binaries before `npx`.
+
+Do not use `npx` to fetch tools unless:
+- the tool is already listed in dependencies/devDependencies, or
+- the user approves adding/fetching it.
+
+---
+
+## Testing safety contract
+
+- Do not use production data or production credentials.
+- Do not hit paid/external services unless explicitly approved.
+- Do not add new frameworks when the repo already has a good one.
+- Prefer existing scripts and conventions.
+- Run the smallest relevant test first.
+- Document any env vars or setup needed.
+- Update `brain/kb/` when testing setup changes materially.
+
+---
+
 ## Core principle
 
 ```text
@@ -88,6 +119,16 @@ Do not invent a new convention if one exists.
 
 ---
 
+## Before writing tests
+
+- Read the target file.
+- Read nearest existing tests.
+- Match naming/import conventions.
+- Identify public behavior.
+- Identify dependencies to mock.
+
+---
+
 ## Step 3 — Write tests
 
 Each unit test should include:
@@ -110,18 +151,44 @@ loading/empty/error states
 
 ---
 
+## React component testing rules
+
+- Prefer Testing Library queries by role, label, text.
+- Avoid testing internal state directly.
+- Mock network boundaries, not UI behavior.
+- Include accessible-name checks for interactive elements.
+
+---
+
+## Hook testing rules
+
+- Use Testing Library `renderHook` or existing repo pattern.
+- Test state transitions and cleanup.
+- Control timers when testing debounce/throttle.
+
+---
+
+## Utility testing rules
+
+- Cover boundary values.
+- Cover invalid input.
+- Cover regression examples from bugs/issues.
+
+---
+
 ## Step 4 — Run smallest command
 
-Run the narrowest test command first:
+**Hard rule:** Run the narrowest test first. Do **not** run the full suite until the targeted test passes.
+
+Run the narrowest test command first (use detected package manager — see Package manager rule):
 
 ```bash
-npm test -- path/to/file.test.ts
-pnpm test path/to/file.test.ts
-npx vitest run path/to/file.test.ts
-npx jest path/to/file.test.ts
+$PM test -- path/to/file.test.ts
+./node_modules/.bin/vitest run path/to/file.test.ts
+./node_modules/.bin/jest path/to/file.test.ts
 ```
 
-Then broader test command if needed.
+Only after the targeted test passes, run a broader test command if needed.
 
 ---
 
@@ -140,6 +207,14 @@ Then broader test command if needed.
 
 ## Remaining gaps
 ```
+
+---
+
+## Related skills
+
+**Verify gates:** After creating/changing tests, run **`kenmark-repo-quality`** to verify test/type/lint/build gates.
+
+**KB updates:** If this changes the test framework, commands, CI gates, fixtures, env vars, or coverage policy, update `brain/kb/10-testing-and-quality.md` via **`kenmark-repo-kb`**.
 
 ---
 

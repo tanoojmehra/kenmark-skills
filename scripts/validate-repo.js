@@ -875,6 +875,17 @@ const CORE_WORKFLOW_ROUTING_MARKERS = [
   "kenmark-subagents"
 ];
 
+/** Bundled testing suite — directory, category, docs, and README links (regression guard). */
+const REQUIRED_TEST_SKILLS = [
+  "kenmark-test-plan",
+  "kenmark-test-unit",
+  "kenmark-test-integration",
+  "kenmark-test-e2e",
+  "kenmark-test-mocks",
+  "kenmark-test-coverage",
+  "kenmark-test-ci"
+];
+
 function validateCoreWorkflowRouting() {
   const readmePaths = [
     { file: "README.md", abs: path.join(repoRoot, "README.md") },
@@ -912,6 +923,92 @@ function validateCoreWorkflowRouting() {
 
   console.log(
     "  ✓ core workflow routing — README.md and skills/README.md mention kenmark-plan, kenmark-output, kenmark-subagents"
+  );
+}
+
+function validateTestingSuite() {
+  const skillsReadmePath = path.join(repoRoot, "skills", "README.md");
+  const rootReadmePath = path.join(repoRoot, "README.md");
+
+  let skillsReadme = "";
+  let rootReadme = "";
+
+  if (!fs.existsSync(skillsReadmePath)) {
+    fail("skills/README.md missing (testing suite check skipped)");
+    return;
+  }
+  if (!fs.existsSync(rootReadmePath)) {
+    fail("README.md missing (testing suite check skipped)");
+    return;
+  }
+
+  try {
+    skillsReadme = fs.readFileSync(skillsReadmePath, "utf8");
+  } catch (err) {
+    fail(`skills/README.md: unreadable for testing suite check (${err.message})`);
+    return;
+  }
+  try {
+    rootReadme = fs.readFileSync(rootReadmePath, "utf8");
+  } catch (err) {
+    fail(`README.md: unreadable for testing suite check (${err.message})`);
+    return;
+  }
+
+  for (const skillId of REQUIRED_TEST_SKILLS) {
+    const skillDir = path.join(userSkillsDir, skillId);
+    const skillMd = path.join(skillDir, "SKILL.md");
+
+    if (!fs.existsSync(skillDir)) {
+      fail(`testing suite: missing directory skills/user-skills/${skillId}/`);
+      continue;
+    }
+    if (!fs.existsSync(skillMd)) {
+      fail(`testing suite: missing skills/user-skills/${skillId}/SKILL.md`);
+      continue;
+    }
+
+    let content;
+    try {
+      content = fs.readFileSync(skillMd, "utf8");
+    } catch (err) {
+      fail(`testing suite: ${skillId}/SKILL.md unreadable (${err.message})`);
+      continue;
+    }
+
+    const { block, error } = splitFrontmatter(content);
+    if (error) {
+      fail(`testing suite: ${skillId}/SKILL.md ${error}`);
+      continue;
+    }
+
+    const fm = parseFrontmatterBlock(block);
+    const category = String(fm.category || "").trim();
+    if (category !== "testing") {
+      fail(
+        `testing suite: ${skillId}/SKILL.md category must be "testing" (found "${category}")`
+      );
+    }
+
+    const name = String(fm.name || "").trim();
+    if (name !== skillId) {
+      fail(
+        `testing suite: ${skillId}/SKILL.md frontmatter name "${name}" does not match directory`
+      );
+    }
+
+    if (!skillsReadme.includes(skillId)) {
+      fail(`skills/README.md: missing testing skill "${skillId}"`);
+    }
+
+    const linkPath = `skills/user-skills/${skillId}/SKILL.md`;
+    if (!rootReadme.includes(linkPath)) {
+      fail(`README.md: missing link to ${linkPath}`);
+    }
+  }
+
+  console.log(
+    `  ✓ testing suite — ${REQUIRED_TEST_SKILLS.length} kenmark-test-* skills present, categorized, and documented`
   );
 }
 
@@ -1352,6 +1449,7 @@ function main() {
   validateSkills();
   validateSkillCountConsistency();
   validateCoreWorkflowRouting();
+  validateTestingSuite();
   validateCatalog();
   validateCatalogBehavior();
   validateInitBrainKb();

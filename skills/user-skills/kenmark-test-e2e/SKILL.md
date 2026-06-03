@@ -67,6 +67,37 @@ Cypress only if repo already uses it or team prefers it
 
 ---
 
+## Package manager rule
+
+Detect package manager from lockfile:
+
+| Lockfile | Package manager |
+| --- | --- |
+| `pnpm-lock.yaml` | `pnpm` |
+| `yarn.lock` | `yarn` |
+| `bun.lockb` | `bun` |
+| `package-lock.json` | `npm` |
+
+Prefer package scripts and repo-local binaries before `npx`.
+
+Do not use `npx` to fetch tools unless:
+- the tool is already listed in dependencies/devDependencies, or
+- the user approves adding/fetching it.
+
+---
+
+## Testing safety contract
+
+- Do not use production data or production credentials.
+- Do not hit paid/external services unless explicitly approved.
+- Do not add new frameworks when the repo already has a good one.
+- Prefer existing scripts and conventions.
+- Run the smallest relevant test first.
+- Document any env vars or setup needed.
+- Update `brain/kb/` when testing setup changes materially.
+
+---
+
 ## Step 1 — Detect app startup
 
 Inspect scripts:
@@ -108,17 +139,45 @@ label text
 test ids only when needed
 ```
 
+**Journey budget:** A first E2E suite should usually cover **1–3 critical journeys**, not the whole app.
+
+---
+
+## Flake prevention
+
+- Prefer role/label selectors.
+- Avoid arbitrary sleeps.
+- Use wait-for-visible/network-idle only when meaningful.
+- Seed deterministic test data.
+- Avoid relying on external third-party services.
+- Clean up data after test.
+
+---
+
+## Auth state guidance
+
+For authenticated flows:
+
+- Prefer test login helper or storage state.
+- Do not use personal credentials.
+- Use test users only.
+
+---
+
+## Browser install safety
+
+Do not run `npx playwright install` or download browsers unless the user approves or CI already requires it.
+
 ---
 
 ## Step 3 — Run safely
 
-Use existing commands:
+Use existing commands (detect package manager — see Package manager rule):
 
 ```bash
-npm run test:e2e
-pnpm test:e2e
-npx playwright test
-npx cypress run
+$PM run test:e2e
+./node_modules/.bin/playwright test
+./node_modules/.bin/cypress run
 ```
 
 If a server is required, use the framework's webServer config when possible.
@@ -142,6 +201,14 @@ If a server is required, use the framework's webServer config when possible.
 
 ## Flake risks
 ```
+
+---
+
+## Related skills
+
+**Verify gates:** After creating/changing tests, run **`kenmark-repo-quality`** to verify test/type/lint/build gates.
+
+**KB updates:** If this changes the test framework, commands, CI gates, fixtures, env vars, or coverage policy, update `brain/kb/10-testing-and-quality.md` via **`kenmark-repo-kb`**.
 
 ---
 

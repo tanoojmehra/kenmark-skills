@@ -22,7 +22,7 @@ allowed-tools:
   - Bash
   - TodoWrite
   - AskUserQuestion
-risk: write-files
+risk: read-only
 disable-model-invocation: false
 ---
 
@@ -46,11 +46,53 @@ Do not write tests by default. Produce a plan first.
 
 ---
 
+## Package manager rule
+
+Detect package manager from lockfile:
+
+| Lockfile | Package manager |
+| --- | --- |
+| `pnpm-lock.yaml` | `pnpm` |
+| `yarn.lock` | `yarn` |
+| `bun.lockb` | `bun` |
+| `package-lock.json` | `npm` |
+
+Prefer package scripts and repo-local binaries before `npx`.
+
+Do not use `npx` to fetch tools unless:
+- the tool is already listed in dependencies/devDependencies, or
+- the user approves adding/fetching it.
+
+---
+
 ## Core principle
 
 ```text
 Test behavior, boundaries, and risk — not implementation noise.
 ```
+
+---
+
+## Step 0 — Determine scope
+
+Clarify what the plan covers before inspecting the repo:
+
+- Whole repo
+- One feature
+- One bug/regression
+- One release gate
+- One module/component/API
+
+If scope is unclear, ask before planning.
+
+---
+
+## Test pyramid guidance
+
+- Prefer unit tests for pure logic and small components.
+- Prefer integration tests for API/service/database boundaries.
+- Prefer E2E tests for critical user journeys only.
+- Avoid replacing integration tests with brittle E2E flows.
 
 ---
 
@@ -140,6 +182,40 @@ P2: UI states, utility functions, edge cases
 
 ---
 
+## What not to test
+
+Call out low-ROI or out-of-scope areas explicitly:
+
+- third-party library internals
+- styling-only changes without behavior impact
+- trivial getters/setters with no logic
+- flows already covered at a lower layer
+- areas outside the agreed scope (Step 0)
+
+---
+
+## Minimum viable test suite
+
+Define the smallest set that meaningfully reduces risk for the current scope:
+
+- P0 paths that must exist before merge
+- one representative test per critical boundary
+- no optional E2E unless scope requires it
+
+---
+
+## Recommended order to implement tests
+
+Suggest implementation sequence:
+
+1. Unit tests for pure logic and validators
+2. Integration tests for API/DB/service boundaries
+3. Mocks/fixtures needed by steps 1–2
+4. E2E for 1–3 critical journeys (if in scope)
+5. Coverage audit and CI gates last
+
+---
+
 ## Output format
 
 ```markdown
@@ -156,6 +232,12 @@ P2: UI states, utility functions, edge cases
 | Area | Risk | Test layer | Test to write |
 | --- | --- | --- | --- |
 
+## What not to test
+
+## Minimum viable test suite
+
+## Recommended order to implement tests
+
 ## Scripts to add/update
 
 ## Files likely involved
@@ -166,6 +248,14 @@ P2: UI states, utility functions, edge cases
 
 ## Acceptance criteria
 ```
+
+---
+
+## Related skills
+
+**Verify gates:** After creating/changing tests, run **`kenmark-repo-quality`** to verify test/type/lint/build gates.
+
+**KB updates:** If this changes the test framework, commands, CI gates, fixtures, env vars, or coverage policy, update `brain/kb/10-testing-and-quality.md` via **`kenmark-repo-kb`**.
 
 ---
 

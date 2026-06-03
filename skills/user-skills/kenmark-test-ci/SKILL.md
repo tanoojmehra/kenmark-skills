@@ -48,6 +48,37 @@ It covers:
 
 ---
 
+## Package manager rule
+
+Detect package manager from lockfile:
+
+| Lockfile | Package manager |
+| --- | --- |
+| `pnpm-lock.yaml` | `pnpm` |
+| `yarn.lock` | `yarn` |
+| `bun.lockb` | `bun` |
+| `package-lock.json` | `npm` |
+
+Prefer package scripts and repo-local binaries before `npx`.
+
+Do not use `npx` to fetch tools unless:
+- the tool is already listed in dependencies/devDependencies, or
+- the user approves adding/fetching it.
+
+---
+
+## Testing safety contract
+
+- Do not use production data or production credentials.
+- Do not hit paid/external services unless explicitly approved.
+- Do not add new frameworks when the repo already has a good one.
+- Prefer existing scripts and conventions.
+- Run the smallest relevant test first.
+- Document any env vars or setup needed.
+- Update `brain/kb/` when testing setup changes materially.
+
+---
+
 ## Core principle
 
 ```text
@@ -98,6 +129,57 @@ Add E2E only for mature apps or critical flows.
 
 ---
 
+## Standard CI templates
+
+### GitHub Actions (Node)
+
+Adapt install/cache steps to detected package manager:
+
+| Lockfile | Setup | Install |
+| --- | --- | --- |
+| `pnpm-lock.yaml` | `pnpm/action-setup` + `actions/setup-node` with `cache: pnpm` | `pnpm install --frozen-lockfile` |
+| `package-lock.json` | `actions/setup-node` with `cache: npm` | `npm ci` |
+| `yarn.lock` | `actions/setup-node` with `cache: yarn` | `yarn install --frozen-lockfile` |
+| `bun.lockb` | `oven-sh/setup-bun` | `bun install --frozen-lockfile` |
+
+```yaml
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck --if-present
+      - run: npm run lint --if-present
+      - run: npm test --if-present
+      - run: npm run build --if-present
+```
+
+Replace `npm ci` / `cache: npm` with the detected package manager from the table above. Prefer `--if-present` for optional gates.
+
+---
+
+## Monorepo guidance
+
+For monorepos:
+
+- detect package manager workspace config
+- run affected/package-specific tests when available
+- avoid running every expensive E2E job on every PR unless needed
+
+---
+
 ## Step 3 — Update CI safely
 
 Do not add secrets to repo.
@@ -130,6 +212,14 @@ payment sandbox credentials
 
 ## Failure behavior
 ```
+
+---
+
+## Related skills
+
+**Verify gates:** After creating/changing tests, run **`kenmark-repo-quality`** to verify test/type/lint/build gates.
+
+**KB updates:** If this changes the test framework, commands, CI gates, fixtures, env vars, or coverage policy, update `brain/kb/10-testing-and-quality.md` via **`kenmark-repo-kb`**.
 
 ---
 

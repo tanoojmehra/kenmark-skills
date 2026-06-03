@@ -40,11 +40,54 @@ It checks:
 
 ---
 
+## Package manager rule
+
+Detect package manager from lockfile:
+
+| Lockfile | Package manager |
+| --- | --- |
+| `pnpm-lock.yaml` | `pnpm` |
+| `yarn.lock` | `yarn` |
+| `bun.lockb` | `bun` |
+| `package-lock.json` | `npm` |
+
+Prefer package scripts and repo-local binaries before `npx`.
+
+Do not use `npx` to fetch tools unless:
+- the tool is already listed in dependencies/devDependencies, or
+- the user approves adding/fetching it.
+
+---
+
 ## Core principle
 
 ```text
 Coverage percentage is a signal, not the goal.
 ```
+
+---
+
+## Meaningful threshold guidance
+
+Suggested defaults:
+
+- New/changed critical files: meaningful tests required.
+- Global line coverage: do not enforce aggressively at first.
+- Critical modules: higher branch coverage than UI glue.
+- Avoid coverage gates that block useful refactors without improving quality.
+
+---
+
+## Weak test detection
+
+Weak test patterns:
+
+- test only renders without assertions
+- snapshots with no behavioral assertions
+- mocks everything including the unit under test
+- asserts implementation details
+- no negative/error cases
+- tests duplicate code instead of behavior
 
 ---
 
@@ -59,12 +102,13 @@ find . -maxdepth 4 -type f \( -name "coverage-final.json" -o -name "lcov.info" -
 
 ## Step 2 — Run coverage only if safe
 
-Use existing command:
+**Command safety:** Run coverage only if the command exists and does not require production services. If the coverage command is absent, propose scripts/config instead of running arbitrary tools.
+
+Use existing command (detect package manager — see Package manager rule):
 
 ```bash
-npm run test:coverage
-pnpm test:coverage
-npm run coverage
+$PM run test:coverage
+$PM run coverage
 ```
 
 If no coverage command exists, recommend one instead of forcing it.
@@ -108,6 +152,14 @@ error handling
 
 ## Next tests to write
 ```
+
+---
+
+## Related skills
+
+**Verify gates:** After creating/changing tests, run **`kenmark-repo-quality`** to verify test/type/lint/build gates.
+
+**KB updates:** If this changes the test framework, commands, CI gates, fixtures, env vars, or coverage policy, update `brain/kb/10-testing-and-quality.md` via **`kenmark-repo-kb`**.
 
 ---
 

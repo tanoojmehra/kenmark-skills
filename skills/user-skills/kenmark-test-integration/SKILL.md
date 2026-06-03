@@ -46,6 +46,37 @@ Good targets:
 
 ---
 
+## Package manager rule
+
+Detect package manager from lockfile:
+
+| Lockfile | Package manager |
+| --- | --- |
+| `pnpm-lock.yaml` | `pnpm` |
+| `yarn.lock` | `yarn` |
+| `bun.lockb` | `bun` |
+| `package-lock.json` | `npm` |
+
+Prefer package scripts and repo-local binaries before `npx`.
+
+Do not use `npx` to fetch tools unless:
+- the tool is already listed in dependencies/devDependencies, or
+- the user approves adding/fetching it.
+
+---
+
+## Testing safety contract
+
+- Do not use production data or production credentials.
+- Do not hit paid/external services unless explicitly approved.
+- Do not add new frameworks when the repo already has a good one.
+- Prefer existing scripts and conventions.
+- Run the smallest relevant test first.
+- Document any env vars or setup needed.
+- Update `brain/kb/` when testing setup changes materially.
+
+---
+
 ## Core principle
 
 ```text
@@ -85,7 +116,14 @@ multi-module workflow
 Look for:
 
 ```bash
-find . -maxdepth 3 -type f \( -name ".env.test" -o -name "docker-compose*.yml" -o -name "prisma.schema" -o -name "schema.prisma" \) -print
+find . -maxdepth 4 -type f \( \
+  -name ".env.test" -o \
+  -name ".env.example" -o \
+  -name "docker-compose*.yml" -o \
+  -name "schema.prisma" -o \
+  -name "vitest.config.*" -o \
+  -name "jest.config.*" \
+\) -not -path "*/node_modules/*" -print
 ```
 
 For Prisma/MongoDB:
@@ -94,6 +132,20 @@ For Prisma/MongoDB:
 Use DATABASE_URL_TEST or isolated test DB.
 Never reuse DATABASE_URL without explicit confirmation.
 ```
+
+**Production DB refusal:** If only `DATABASE_URL` exists and no test DB variable exists, do **not** run DB integration tests. Recommend creating `DATABASE_URL_TEST` or an isolated test database first.
+
+---
+
+## Cleanup options
+
+Choose one strategy and apply consistently:
+
+- transaction rollback per test
+- truncate known test tables
+- unique test namespace/prefix
+- test container reset
+- seeded fixture teardown
 
 ---
 
@@ -117,6 +169,14 @@ auth behavior
 validation errors
 DB side effects
 ```
+
+API integration tests should check:
+
+- auth required / forbidden
+- validation failure
+- success response
+- database side effect
+- idempotency or duplicate handling when relevant
 
 For DB:
 
@@ -146,6 +206,14 @@ cleanup
 
 ## Data safety notes
 ```
+
+---
+
+## Related skills
+
+**Verify gates:** After creating/changing tests, run **`kenmark-repo-quality`** to verify test/type/lint/build gates.
+
+**KB updates:** If this changes the test framework, commands, CI gates, fixtures, env vars, or coverage policy, update `brain/kb/10-testing-and-quality.md` via **`kenmark-repo-kb`**.
 
 ---
 
