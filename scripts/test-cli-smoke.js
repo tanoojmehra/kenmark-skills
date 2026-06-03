@@ -45,7 +45,11 @@ const COMMANDS = [
 const ASSERTIONS = [
   {
     args: ["update", "--kenmark-only", "--global", "--ide", "auto", "-y", "--dry-run"],
-    expectStdout: [/setup-skills\.js --global --install --ide auto -y/]
+    expectStdout: [
+      /setup-skills\.js --global --install --ide auto -y/,
+      /Kenmark skills/
+    ],
+    rejectStdout: [/Recommended packs/, /kenmark-packs\.js/, /--all/]
   },
   {
     args: ["update", "--both", "--global", "--ide", "auto", "--dry-run", "-y"],

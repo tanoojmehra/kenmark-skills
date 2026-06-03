@@ -140,8 +140,8 @@ async function promptMode(preset) {
   const rl = createRl();
   console.log("\nWhat should we update?");
   console.log("  1) Kenmark skills only — re-sync from kenmark-skills package [default]");
-  console.log("  2) Recommended packs only — Impeccable, ECC, … (npx reinstall)");
-  console.log("  3) Both — npm package (optional) + Kenmark + recommended\n");
+  console.log("  2) Recommended packs only — selected optional packs");
+  console.log("  3) Both — Kenmark + selected optional packs\n");
   const answer = await ask(rl, "Choose [1/2/3] (default 1): ");
   rl.close();
   const lower = answer.toLowerCase();
@@ -329,6 +329,7 @@ async function run() {
   }
 
   if (mode === "recommended" || mode === "both") {
+    const catalog = loadCatalog();
     const recArgs = [
       scope === "project" ? "--project" : "--global",
       "-y"
@@ -338,26 +339,34 @@ async function run() {
     } else if (args.allPacks) {
       recArgs.push("--all");
     } else {
-      const catalog = loadCatalog();
       const defaults = defaultSelectedIds(catalog);
-      recArgs.push("--ids", defaults.join(","));
+      if (!defaults.length) {
+        console.log("\nNo default optional packs configured; skipping recommended refresh.");
+      } else {
+        recArgs.push("--ids", defaults.join(","));
+      }
     }
-    if (args.eccProfile) {
-      recArgs.push("--ecc-profile", args.eccProfile);
-    }
-    if (args.skipAdopt) recArgs.push("--skip-adopt");
-    recArgs.push("--ide", ide || "auto");
-    if (args.dryRun) recArgs.push("--dry-run");
+    const shouldRunRecommended =
+      recArgs.includes("--all") || recArgs.some((a, i) => a === "--ids" && recArgs[i + 1]);
 
-    const result = runNodeScript(
-      recommendedScript,
-      recArgs,
-      false,
-      "Recommended packs"
-    );
-    if (!args.dryRun && result.status !== 0) {
-      console.error(`Recommended refresh failed (exit ${result.status})`);
-      process.exit(result.status || 1);
+    if (shouldRunRecommended) {
+      if (args.eccProfile) {
+        recArgs.push("--ecc-profile", args.eccProfile);
+      }
+      if (args.skipAdopt) recArgs.push("--skip-adopt");
+      recArgs.push("--ide", ide || "auto");
+      if (args.dryRun) recArgs.push("--dry-run");
+
+      const result = runNodeScript(
+        recommendedScript,
+        recArgs,
+        false,
+        "Recommended packs"
+      );
+      if (!args.dryRun && result.status !== 0) {
+        console.error(`Recommended refresh failed (exit ${result.status})`);
+        process.exit(result.status || 1);
+      }
     }
   }
 
