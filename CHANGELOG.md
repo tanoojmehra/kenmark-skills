@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### repo-quality-gates
+
+- **repo-quality-gates (1.1.0):** Prefer `./node_modules/.bin/` for direct typecheck/lint/format invocations; use `npx` only as fallback when local binaries are missing.
+
 ### New skill
 
 - **repo-quality-gates (1.0.0):** Universal verify-phase workflow — discover package scripts, run safe typecheck/lint/format/build/test/dev gates in order, classify failures, report fix plan without auto-editing (`category: workflow`, `phase: verify`, `risk: shell`).

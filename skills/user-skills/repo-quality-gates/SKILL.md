@@ -1,6 +1,6 @@
 ---
 name: repo-quality-gates
-version: 1.0.0
+version: 1.1.0
 category: workflow
 scope: universal
 phase: verify
@@ -85,6 +85,7 @@ If the user says “check everything,” use `standard-check` unless the repo is
 - Do not auto-fix lint/format errors unless the user approves.
 - If a command may modify files (`format`, `lint --fix`, codegen), first run its check-only variant when available.
 - If a command fails, preserve the exact error summary and the command used.
+- Prefer repo-local binaries and package scripts over `npx` fallback commands. Use `npx` only when the tool is not locally installed and the user accepts that it may fetch packages.
 
 ---
 
@@ -198,23 +199,33 @@ pnpm run build
 pnpm test
 ```
 
+When no package script exists, prefer **repo-local binaries** under `node_modules/.bin/` so checks use the same versions as the lockfile. Fall back to `npx` only if the binary is missing (and note that `npx` may fetch packages).
+
 If only `tsc` is available and TypeScript exists:
 
 ```bash
+./node_modules/.bin/tsc --noEmit
+# fallback when binary missing:
 npx tsc --noEmit
 ```
 
 If ESLint config exists but no lint script:
 
 ```bash
+./node_modules/.bin/eslint .
+# fallback:
 npx eslint .
 ```
 
 If Prettier config exists but no format check script:
 
 ```bash
+./node_modules/.bin/prettier . --check
+# fallback:
 npx prettier . --check
 ```
+
+Before using a fallback, verify the local binary exists (e.g. `test -x ./node_modules/.bin/tsc`).
 
 Do not run `--fix` or `--write` without approval.
 
@@ -362,3 +373,4 @@ Examples:
 - Do not paste entire logs when the first actionable error is enough.
 - Do not start multiple dev servers on different ports.
 - Do not hide skipped gates. Always say why a gate was skipped.
+- Do not default to `npx` when `./node_modules/.bin/<tool>` exists — unexpected installs and version drift are common failure modes.
