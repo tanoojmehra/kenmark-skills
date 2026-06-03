@@ -176,7 +176,7 @@ npx kenmark-skills init --skip-recommended -y        # wizard, Kenmark step only
 
 | Command | Adopt by default? |
 | --- | --- |
-| `setup` | Yes (`--skip-adopt` to disable); MCP merge (`--skip-mcp` to disable) |
+| `setup` | Yes (`--skip-adopt` to disable); MCP opt-in (`--with-mcp` or `--mcp-profile`) |
 | `init` | Yes (after `setup`; again after packs if selected) |
 | `install-recommended` | Yes (`--skip-adopt` to disable) |
 | `update` | Yes (`--skip-adopt` to disable) |
@@ -194,13 +194,16 @@ When store content already exists but differs from an IDE copy, adopt reports **
 | `--ide <target>` | setup, uninstall, adopt | `cursor`, `claude`, `codex`, `all`, … |
 | `-y` | most commands | Skip interactive prompts |
 | `--skip-adopt` | setup, install-recommended, update | Skip post-install adopt pass |
-| `--skip-mcp` | setup | Skip bundled MCP install/merge |
+| `--with-mcp` | setup | Install all bundled MCP servers (profile `all`) |
+| `--mcp-profile <name>` | setup | MCP profile: `none`, `web`, `research`, `deep`, `all` (default: none) |
+| `--skip-mcp` | setup | Skip MCP even when `--with-mcp` / `--mcp-profile` is set |
 | `--strict-targets` | setup | Fail if no IDE skill dir is detected and `--ide` is omitted |
-| `--copy` | setup | Copy into IDE paths instead of symlinks |
-| `--symlink` | setup | Force symlinks on Windows (junction) instead of copy |
-| `--prefer-copy-on-windows` | setup | Copy on Windows (default: on) |
-| `--force` | setup, adopt | Overwrite store entries / adopt from IDE when hashes differ |
-| `--adopt-overwrite` | adopt | Alias for `--force` on adopt |
+| `--copy` | setup, install-recommended | Copy into IDE paths instead of symlinks |
+| `--symlink` | setup, install-recommended | Force symlinks on Windows (junction) instead of copy |
+| `--prefer-copy-on-windows` | setup, install-recommended | Copy on Windows (default: on) |
+| `--no-prefer-copy-on-windows` | setup, install-recommended | Symlink/junction on Windows instead of copy |
+| `--force` | setup, adopt, install-recommended | Overwrite store entries / adopt from IDE when hashes differ |
+| `--adopt-overwrite` | adopt, install-recommended | Alias for `--force` on adopt |
 | `--keep-store` | uninstall | Remove IDE links; keep `~/.kenmark` |
 | `--json <path>` | doctor, inventory | Write full JSON report |
 
@@ -257,11 +260,25 @@ Kenmark and adoptable catalog skills are stored once, then linked into each IDE.
 | `~/.kenmark/store/mcp.json` | Canonical MCP server definitions |
 | `~/.kenmark/manifest.json` | Install metadata |
 
-`setup` populates the store, symlinks into IDE skill dirs (copies on Windows when symlinks fail), then runs **adopt** unless `--skip-adopt` is set. It also merges bundled MCP servers into Cursor and Claude configs unless `--skip-mcp` is set.
+`setup` populates the store, symlinks into IDE skill dirs (copies on Windows when symlinks fail), then runs **adopt** unless `--skip-adopt` is set. **MCP is opt-in:** pass `--with-mcp` or `--mcp-profile <name>` to install bundled servers; plain `setup` does not touch MCP configs.
 
-### Bundled MCP servers
+### Bundled MCP servers (opt-in)
 
-Source: [`config/mcp-servers.json`](config/mcp-servers.json). On `setup`, Kenmark copies this into `~/.kenmark/store/mcp.json` and **merges** each server into existing configs (existing entries with the same name are left unchanged unless you pass `--force`).
+Source: [`config/mcp-servers.json`](config/mcp-servers.json). Profiles: [`config/mcp-profiles.json`](config/mcp-profiles.json). When you opt in, Kenmark copies the selected profile into `~/.kenmark/store/mcp.json` and **merges** those servers into existing configs (existing entries with the same name are left unchanged unless you pass `--force`).
+
+```bash
+npx kenmark-skills setup --mcp-profile web --global --ide cursor -y
+npx kenmark-skills setup --mcp-profile research --global --ide all -y
+npx kenmark-skills setup --with-mcp --global --ide all -y   # profile: all
+```
+
+| Profile | Servers |
+| --- | --- |
+| `none` | (default) — no MCP install |
+| `web` | `playwright`, `browsermcp` |
+| `research` | `context7`, `fetch` |
+| `deep` | `sequential-thinking`, `context7`, `fetch` |
+| `all` | every bundled server |
 
 | Server | Transport |
 | --- | --- |
@@ -301,7 +318,7 @@ Restart Cursor or Claude Code after setup if MCP tools do not show up. Other IDE
 
 ### Recommended packs
 
-Catalog: [`skills/user-skills/recommended-catalog.json`](skills/user-skills/recommended-catalog.json) (v4 **profiles**: `lean`, `core-next`, `growth-seo`, `audit-review`, `power-user`). Default profile is **lean**; **core-next** is the Kenmark Next.js stack.
+Catalog: [`skills/user-skills/recommended-catalog.json`](skills/user-skills/recommended-catalog.json) (v4 **profiles**: `lean`, `core-next`, `growth-seo`, `audit-review`, `power-user`). Default profile is **lean**; **core-next** is the recommended Next.js full-stack profile.
 
 ```bash
 npx kenmark-skills install-recommended --list-profiles

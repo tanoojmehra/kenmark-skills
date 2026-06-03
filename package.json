@@ -1,7 +1,7 @@
 {
   "name": "kenmark-skills",
   "version": "1.2.7",
-  "description": "13 Kenmark agent skills + CLI (init, setup, update, adopt, inventory) for Cursor, Codex, and Claude Code. Optional curated packs via install-recommended.",
+  "description": "13 universal Kenmark agent skills + 9-command CLI for Cursor, Claude Code, Codex, and other SKILL.md-compatible agents. Includes setup, init, update, adopt, doctor, inventory, and profile-based recommended packs.",
   "license": "MIT",
   "private": false,
   "type": "commonjs",
@@ -19,6 +19,8 @@
     "inventory": "node scripts/cli.js inventory",
     "subagents-inventory": "node scripts/cli.js subagents-inventory",
     "install-recommended": "node scripts/cli.js install-recommended",
+    "doctor": "node scripts/cli.js doctor",
+    "check": "node scripts/cli.js doctor",
     "setup:skills": "node scripts/setup-skills.js",
     "pack:check": "npm pack --dry-run",
     "publish:public": "npm publish --access public"
@@ -30,6 +32,7 @@
     "skills/user-skills/**/*",
     "skills/user-skills/recommended-catalog.json",
     "config/mcp-servers.json",
+    "config/mcp-profiles.json",
     "scripts/cli.js",
     "scripts/interactive.js",
     "scripts/kenmark-hub.js",
