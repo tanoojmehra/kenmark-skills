@@ -100,6 +100,7 @@ const REQUIRED_PACKAGE_SCRIPTS = [
   "test:packs-verify",
   "test:install",
   "test:pack",
+  "test:broken-links",
   "test:all",
   "pack:check"
 ];
@@ -128,7 +129,8 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/test-cli-smoke.js",
   "scripts/test-packs-verify-skip.js",
   "scripts/test-install-temp-home.js",
-  "scripts/test-pack.js"
+  "scripts/test-pack.js",
+  "scripts/test-broken-symlink-cleanup.js"
 ];
 
 /** Paths scanned for forbidden literals/patterns. CHANGELOG is historical — excluded. */
@@ -160,7 +162,8 @@ const LEGACY_NAME_DOC_SCAN_RELATIVE = [
 
 const LEGACY_NAME_DOC_SCAN_EXCLUDE = new Set([
   ...FORBIDDEN_SCAN_EXCLUDE_RELATIVE,
-  "skills/user-skills/recommended-catalog.json"
+  "skills/user-skills/recommended-catalog.json",
+  "scripts/test-broken-symlink-cleanup.js" // intentional dangling legacy symlink fixture
 ]);
 
 const SETUP_INSTALL_SCRIPTS = ["scripts/setup-skills.js", "scripts/kenmark-hub.js"];
@@ -1112,9 +1115,17 @@ function validatePackageJson() {
   if (scripts["test:pack"] !== "node scripts/test-pack.js") {
     fail('package.json: scripts["test:pack"] must be "node scripts/test-pack.js"');
   }
-  if (scripts["test:all"] !== "npm run test && npm run test:install && npm run test:pack") {
+  if (
+    scripts["test:all"] !==
+    "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links"
+  ) {
     fail(
-      'package.json: scripts["test:all"] must be "npm run test && npm run test:install && npm run test:pack"'
+      'package.json: scripts["test:all"] must be "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links"'
+    );
+  }
+  if (scripts["test:broken-links"] !== "node scripts/test-broken-symlink-cleanup.js") {
+    fail(
+      'package.json: scripts["test:broken-links"] must be "node scripts/test-broken-symlink-cleanup.js"'
     );
   }
   if (scripts.prepublishOnly !== "npm run test:all && npm run pack:check") {

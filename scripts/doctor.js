@@ -134,6 +134,13 @@ function run() {
     console.log(`  ${ide}: ${count}${brokenNote}`);
   }
 
+  if (Object.values(report.brokenSymlinksByIde).some((items) => items.length)) {
+    console.log("\nSuggested fix:");
+    console.log("  npx kenmark-skills setup --global --ide auto -y");
+    console.log("  If stale links exist in Kenmark-managed IDE dirs too:");
+    console.log("  npx kenmark-skills setup --global --ide all -y");
+  }
+
   if (report.hashMismatches.length) {
     console.log("\nStore/IDE hash mismatches:");
     for (const m of report.hashMismatches) {
