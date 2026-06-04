@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## v2.1.1 — Dangling legacy symlink cleanup
+
+### Fix
+
+- **kenmark-hub.js:** Use `lstatSync` / `pathEntryExists` instead of `existsSync` for removal, legacy cleanup, and symlink ownership proof so dangling Kenmark store symlinks are detected, backed up, and removed during setup.
+- **kenmark-hub.js:** Legacy symlink backups write `SYMLINK_TARGET.txt` instead of copying missing targets.
+- **kenmark-hub.js:** Doctor skill counts include valid symlinked skills with a resolvable `SKILL.md`.
+- **doctor.js:** Suggest `setup --global --ide auto|all` when broken IDE symlinks are found.
+- **test-broken-symlink-cleanup.js:** Regression test for dangling `issues-check` → store cleanup.
+
 ### Breaking (UX)
 
 - **recommended-catalog.json (v5):** Primary mental model is **selectable optional installs** with repo-aware suggestions (`mode: selectable`), not profile-first setup. `profiles` renamed to **`presets`** (advanced/CI shortcuts). Default install selection is only **impeccable** + **code-review-skill** via `defaults.selectedIds`. SEO split into **`seo-geo-selected`** and **`seo-geo-full`** packs.

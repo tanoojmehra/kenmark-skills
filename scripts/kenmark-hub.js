@@ -403,12 +403,43 @@ function pathIsWithinDir(childPath, dirPath) {
   return Boolean(rel) && !rel.startsWith("..") && !path.isAbsolute(rel);
 }
 
-function isSymlinkToKenmarkStore(skillPath, storeDir) {
-  if (!fs.existsSync(skillPath)) return false;
+function pathEntryExists(targetPath) {
   try {
-    const stat = fs.lstatSync(skillPath);
-    if (!stat.isSymbolicLink()) return false;
-    return pathIsWithinDir(skillPath, storeDir);
+    fs.lstatSync(targetPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function lstatIfExists(targetPath) {
+  try {
+    return fs.lstatSync(targetPath);
+  } catch {
+    return null;
+  }
+}
+
+function isBrokenSymlink(targetPath) {
+  const stat = lstatIfExists(targetPath);
+  if (!stat?.isSymbolicLink()) return false;
+  return !fs.existsSync(targetPath);
+}
+
+function isSymlinkToKenmarkStore(skillPath, storeDir) {
+  const stat = lstatIfExists(skillPath);
+  if (!stat?.isSymbolicLink()) return false;
+
+  try {
+    const target = fs.readlinkSync(skillPath);
+    const resolvedTarget = path.resolve(path.dirname(skillPath), target);
+    const storeResolved = path.resolve(storeDir);
+    const rel = path.relative(storeResolved, resolvedTarget);
+
+    return (
+      resolvedTarget === storeResolved ||
+      (rel && !rel.startsWith("..") && !path.isAbsolute(rel))
+    );
   } catch {
     return false;
   }
@@ -460,7 +491,7 @@ function isProvenKenmarkLegacyPath(skillPath, context) {
 }
 
 function backupLegacyCleanupPath(skillName, skillPath) {
-  if (!fs.existsSync(skillPath)) return null;
+  if (!pathEntryExists(skillPath)) return null;
 
   const backupRoot = path.join(
     getBackupsDir(),
@@ -469,7 +500,19 @@ function backupLegacyCleanupPath(skillName, skillPath) {
     skillName
   );
   fs.mkdirSync(path.dirname(backupRoot), { recursive: true });
-  fs.cpSync(skillPath, backupRoot, { recursive: true });
+
+  const stat = lstatIfExists(skillPath);
+  if (stat?.isSymbolicLink()) {
+    const linkTarget = fs.readlinkSync(skillPath);
+    fs.mkdirSync(backupRoot, { recursive: true });
+    fs.writeFileSync(
+      path.join(backupRoot, "SYMLINK_TARGET.txt"),
+      `${linkTarget}\n`,
+      "utf8"
+    );
+  } else {
+    fs.cpSync(skillPath, backupRoot, { recursive: true });
+  }
 
   return {
     skillName,
@@ -509,7 +552,7 @@ function removeLegacyKenmarkInstalls(
   for (const root of roots) {
     for (const legacyName of legacyPaths) {
       const fullPath = path.join(root, legacyName);
-      if (!fs.existsSync(fullPath)) continue;
+      if (!pathEntryExists(fullPath)) continue;
 
       const proofs = collectKenmarkLegacyOwnershipProofs(fullPath, {
         ...ownershipContext,
@@ -1078,12 +1121,14 @@ function pickBestSourceInstance(instances) {
 }
 
 function removePathIfExists(targetPath) {
-  if (!fs.existsSync(targetPath)) return;
-  const stat = fs.lstatSync(targetPath);
+  const stat = lstatIfExists(targetPath);
+  if (!stat) return;
+
   if (stat.isSymbolicLink() || stat.isFile()) {
     fs.rmSync(targetPath, { force: true });
     return;
   }
+
   if (stat.isDirectory()) {
     fs.rmSync(targetPath, { recursive: true, force: true });
   }
@@ -1670,11 +1715,18 @@ function uninstallMcpFromIdes(mcpTargetMap, targetIdes, options = {}) {
 
 function countSkillsInDir(dirPath) {
   if (!fs.existsSync(dirPath)) return 0;
-  return fs
-    .readdirSync(dirPath, { withFileTypes: true })
-    .filter((e) => e.isDirectory())
-    .filter((e) => fs.existsSync(path.join(dirPath, e.name, "SKILL.md")))
-    .length;
+
+  let count = 0;
+  for (const ent of fs.readdirSync(dirPath, { withFileTypes: true })) {
+    const full = path.join(dirPath, ent.name);
+    if (ent.name === KENMARK_MANAGED_MARKER) continue;
+
+    const skillMd = path.join(full, "SKILL.md");
+    if (fs.existsSync(skillMd)) {
+      count += 1;
+    }
+  }
+  return count;
 }
 
 function findBrokenSymlinks(rootPath) {
@@ -1982,6 +2034,9 @@ module.exports = {
   isVendoredMirror,
   isVendoredAgent,
   safeRealpath,
+  pathEntryExists,
+  lstatIfExists,
+  isBrokenSymlink,
   hashDirectory,
   hashFile,
   getBackupsDir,

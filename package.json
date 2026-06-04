@@ -1,6 +1,6 @@
 {
   "name": "kenmark-skills",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "33 universal Kenmark agent skills + 11-command CLI for Cursor, Claude Code, Codex, and other SKILL.md-compatible agents. Includes setup, init, update, adopt, validate, doctor, inventory, mcp, selectable optional packs with repo-aware suggestions, kenmark-repo-* maintenance skills, and kenmark-test-* testing suite skills.",
   "license": "MIT",
   "private": false,
@@ -29,7 +29,8 @@
     "test:packs-verify": "node scripts/test-packs-verify-skip.js",
     "test:install": "node scripts/test-install-temp-home.js",
     "test:pack": "node scripts/test-pack.js",
-    "test:all": "npm run test && npm run test:install && npm run test:pack",
+    "test:broken-links": "node scripts/test-broken-symlink-cleanup.js",
+    "test:all": "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links",
     "prepublishOnly": "npm run test:all && npm run pack:check",
     "setup:skills": "node scripts/setup-skills.js",
     "pack:check": "npm pack --dry-run",
@@ -59,7 +60,8 @@
     "scripts/test-cli-smoke.js",
     "scripts/test-packs-verify-skip.js",
     "scripts/test-install-temp-home.js",
-    "scripts/test-pack.js"
+    "scripts/test-pack.js",
+    "scripts/test-broken-symlink-cleanup.js"
   ],
   "engines": {
     "node": ">=18"
