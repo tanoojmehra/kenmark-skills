@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Skills — git branch policy
+
+- **kenmark-init (1.2.0):** `brain/rules/workflow.md` template adds **Git branch policy** table (`main`, `master`, `dev`, `develop`, `staging`, `production`); `deployment.md` cross-links; reset/modularize can merge policy into existing `workflow.md`; related `kenmark-commit` note.
+- **kenmark-commit (2.1.2):** Extended default protected deployment branches (`staging`, `production`); workflow.md Git branch policy table overrides defaults.
+- **kenmark-commit (2.2.0):** Step 2 branch safety — protected deployment branches plus stale/mismatched feature-branch check before staging; hard rule against stacking unrelated work on old branches.
+
 ### Docs / doctor
 
 - **doctor / README:** WSL install-path warning, Windows setup note, and `homeDir` in doctor output for path debugging.

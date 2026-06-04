@@ -1,6 +1,6 @@
 ---
 name: kenmark-commit
-version: 1.1.0
+version: 2.2.0
 category: git
 scope: universal
 phase: ship
@@ -53,11 +53,25 @@ opportunistically after unrelated edits.
 3. **No destructive git** — no `push --force`, `reset --hard`, or skipping hooks
    (`--no-verify`) unless the user explicitly asks.
 
-4. **No push to main/master by default** — if on the default branch, create a
-   feature branch first (derive name from the dominant change), then commit and
-   push with `-u origin HEAD`.
+4. **No direct commits or pushes to protected deployment branches by default**
+   - **Core protected branches:** `main`, `master`, `dev`, `develop`.
+   - **Extended default protected branches:** `staging`, `production` (environment-named
+     deploy branches — also protected unless `brain/rules/workflow.md` narrows the list).
+   - Treat `main`/`master`/`production` as production CI/CD branches.
+   - Treat `dev`/`develop`/`staging` as test/staging CI/CD branches.
+   - If currently on a protected branch, create a feature branch first, derive its
+     name from the dominant change, then commit and push with `-u origin HEAD`.
+   - Only commit/push directly to a protected branch when the user explicitly says
+     to do so after being warned that CI/CD may run.
 
-5. **No secrets in commits** — never stage `.env`, credentials, keys, or token
+5. **Do not blindly commit to an old or mismatched feature branch**
+   - Always check the current branch name and recent branch history before staging.
+   - If the current branch name clearly does not match the current change, stop and
+     create or ask to create a better-named branch before committing.
+   - If the branch already has unrelated local/unpushed commits, do not stack new
+     unrelated work on top of it without explicit user approval.
+
+6. **No secrets in commits** — never stage `.env`, credentials, keys, or token
    files. Warn if the user asked to commit them.
 
 ---
@@ -78,11 +92,154 @@ git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || true
 
 Resolve default branch: strip `origin/` from `origin/HEAD`, or use `main`.
 
+Also resolve protected deployment branches.
+
+**Read `brain/rules/workflow.md` first when present** — its Git branch policy table
+overrides or replaces the defaults below.
+
+**Default protected deployment branches** (when workflow.md is missing or has no table):
+
+```text
+# Core (branch-name conventions)
+main
+master
+dev
+develop
+
+# Extended default (environment-named deploy branches)
+staging
+production
+```
+
+If other project docs (`CLAUDE.md`, `AGENTS.md`, `brain/rules/standards.md`) define
+protected/deploy branches, merge with the defaults (workflow.md wins on conflict).
+
 If the working tree is clean, report nothing to commit and stop.
 
 ---
 
-## Step 2 — Group changes by feature / area
+## Step 2 — Branch safety and intent check
+
+Before staging or committing, determine whether the current branch is safe and
+appropriate for the current work.
+
+Run:
+
+```bash
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+DEFAULT_REF="$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | sed 's#^origin/##')"
+DEFAULT_BRANCH="${DEFAULT_REF:-main}"
+git branch -vv
+git log --oneline "${DEFAULT_BRANCH}..HEAD" 2>/dev/null || true
+```
+
+Resolve the protected list from `brain/rules/workflow.md` (Git branch policy table) when
+present; otherwise use the default list from Step 1 (core + extended).
+
+### Protected branch rule
+
+Default protected deployment branches (core):
+
+```text
+main
+master
+dev
+develop
+```
+
+Extended defaults (also protected unless `workflow.md` narrows): `staging`, `production`.
+
+If `CURRENT_BRANCH` is protected:
+
+1. Stop before staging.
+2. Explain the branch role:
+   - `main`/`master`/`production` usually triggers production CI/CD.
+   - `dev`/`develop`/`staging` usually triggers test/staging CI/CD.
+3. Create a feature branch unless the user explicitly approved direct commit/push.
+
+Suggested branch naming:
+
+```bash
+git switch -c feature/<short-change-summary>
+```
+
+Examples:
+
+```text
+feature/add-antigravity-target
+fix/cleanup-broken-symlinks
+test/harden-e2e-suite
+docs/update-testing-skills
+```
+
+Only remain on the protected branch if the user explicitly says something like:
+
+```text
+Commit directly to dev.
+Push directly to main.
+I understand this will trigger CI/CD.
+```
+
+### Existing branch suitability rule
+
+If already on a non-protected branch, still check whether the branch matches the
+current work.
+
+Use these signals:
+
+- Current branch name (`CURRENT_BRANCH`).
+- Dominant changed paths from `git status --short` and `git diff --stat`.
+- Dominant change type: `feat`, `fix`, `test`, `docs`, `chore`, `ci`, `build`,
+  `refactor`, or `perf`.
+- Recent branch commits from `git log --oneline "${DEFAULT_BRANCH}..HEAD"`.
+- Ahead/behind and upstream info from `git branch -vv`.
+
+Treat the branch as **probably appropriate** when:
+
+- The branch name matches the dominant area or feature.
+- Recent branch commits are related to the current change.
+- The branch is new/empty and has no unrelated local commits.
+
+Treat the branch as **stale or mismatched** when:
+
+- The branch name points to an older feature or bug unrelated to current changes.
+- Recent branch commits are about a different area.
+- The branch has unpushed unrelated commits.
+- The branch is named generically (`dev`, `temp`, `test`, `changes`, `wip`) and
+  does not describe the current work.
+
+If the branch is stale/mismatched:
+
+1. Stop before staging.
+2. Summarize why the branch looks wrong.
+3. Propose a better branch name.
+4. Ask the user before switching if there are existing branch commits.
+5. If there are no unrelated local commits, create the better branch with
+   `git switch -c <type>/<short-change-summary>`.
+
+Do not rename/delete the old branch unless the user explicitly asks.
+
+### Branch decision output
+
+Before grouping commits, output a short branch decision:
+
+```text
+Current branch: old-login-fix
+Branch assessment: mismatched — current changes are Antigravity IDE target support
+Decision: create fix/add-antigravity-target before staging
+```
+
+or:
+
+```text
+Current branch: fix/add-antigravity-target
+Branch assessment: appropriate
+Decision: commit on current branch
+```
+
+---
+
+## Step 3 — Group changes by feature / area
 
 Partition **staged + unstaged + untracked** files into logical commit groups.
 Prefer **file-level** grouping (do not use `git add -p`).
@@ -197,7 +354,7 @@ dedicated `docs(brain):` commit in the push batch). **Code and KB move together.
 
 ---
 
-## Step 3 — Message convention
+## Step 4 — Message convention
 
 Priority:
 
@@ -231,7 +388,7 @@ feat: changes (co-authored by …)   ← NEVER
 
 ---
 
-## Step 4 — Commit each group (sequential)
+## Step 5 — Commit each group (sequential)
 
 For each group:
 
@@ -261,7 +418,7 @@ Working tree should be clean (or only intentionally excluded files remain).
 
 ---
 
-## Step 5 — Push
+## Step 6 — Push
 
 Only push when this skill was invoked (user asked to commit **and** push) or
 explicitly said "push".
@@ -275,13 +432,14 @@ git push
 If push is rejected (non-fast-forward):
 
 - Report the error; suggest `git pull --rebase` only if the user asks.
-- **Never** force-push to `main`/`master`.
+- **Never** force-push to protected deployment branches (`main`, `master`, `dev`,
+  `develop`, `staging`, `production`, or any branch listed in `brain/rules/workflow.md`).
 
 Report: branch name, commit SHAs + subjects, remote URL if useful, push result.
 
 ---
 
-## Step 6 — Post-commit hygiene
+## Step 7 — Post-commit hygiene
 
 If the repo uses `brain/` (standards + KB):
 
@@ -300,6 +458,7 @@ If the repo uses `brain/` (standards + KB):
 | Generic buckets + optional profile | One giant "misc" commit |
 | `git add` explicit paths | `git add -A` blindly |
 | Verify message has no trailers | Co-authored-by anywhere |
-| Feature branch off main | Commit directly on main |
+| Create feature branches off protected branches (`main`, `dev`) | Commit directly on protected deployment branches |
+| Switch away from stale/mismatched feature branches when appropriate | Stack unrelated work onto an old branch |
 | `git push -u origin HEAD` first time | Force push |
 | HEREDOC for messages | `-m "line1\nline2"` escaping mistakes |

@@ -858,10 +858,18 @@ const INIT_BRAIN_KB_MARKERS = [
   "00-project-overview.md",
   "Step 1.5",
   "Brain KB maintenance",
-  "KB update requirement"
+  "KB update requirement",
+  "Git branch policy"
 ];
 
-const COMMIT_PUSH_KB_MARKERS = ["Brain KB check before commit", "brain/kb/"];
+const COMMIT_PUSH_KB_MARKERS = [
+  "Brain KB check before commit",
+  "brain/kb/",
+  "Git branch policy",
+  "protected deployment branches",
+  "Branch safety and intent check",
+  "stale or mismatched"
+];
 
 /** kenmark-issues-scan must enforce global ID ledger (regression guard). */
 const ISSUES_SCAN_ID_MARKERS = [
