@@ -1,6 +1,6 @@
 ---
 name: kenmark-init
-version: 1.1.0
+version: 1.2.0
 category: onboarding
 scope: universal
 phase: setup
@@ -95,7 +95,7 @@ Project knowledge base for humans and AI agents.
 | --- | --- |
 | [rules/standards.md](rules/standards.md) | Lean universal rules (read every session) |
 | [rules/stack.md](rules/stack.md) | Stack-specific conventions (Next.js, Prisma, etc.) |
-| [rules/workflow.md](rules/workflow.md) | Coding flow and scope |
+| [rules/workflow.md](rules/workflow.md) | Coding flow, scope, git branch policy |
 | [rules/testing.md](rules/testing.md) | Testing policy |
 | [rules/ui.md](rules/ui.md) | UI / design guidance |
 | [rules/deployment.md](rules/deployment.md) | Deployment notes (optional; customize per project) |
@@ -130,7 +130,7 @@ For each file below, **create only if missing** (do not overwrite existing repo 
 | --- | --- |
 | `standards.md` | Every non-trivial task (required) |
 | `stack.md` | Stack/framework/database work |
-| `workflow.md` | Multi-file changes, scope, dev servers |
+| `workflow.md` | Multi-file changes, scope, dev servers, protected deployment branches |
 | `testing.md` | Tests, QA, verification |
 | `ui.md` | UI, layout, design polish |
 | `deployment.md` | Deploy, CI/CD, hosting |
@@ -421,7 +421,7 @@ Report to the user:
 - **Do not** remove user sections outside markers.
 - **Do not** delete `brain/` or issue files under `brain/issues/`.
 - If any `brain/rules/*.md` already exists, **keep the repo file** unless the user asks to reset or modularize; sync from disk for `sync-full` (embeds `standards.md` only).
-- **Reset / modularize:** If the user asks to reset standards or migrate from a monolithic `standards.md`, replace `standards.md` with the lean template and add missing modular files from [Modular rule files](#modular-rule-files); offer to archive old content into `stack.md` / `workflow.md` if still useful.
+- **Reset / modularize:** If the user asks to reset standards or migrate from a monolithic `standards.md`, replace `standards.md` with the lean template and add missing modular files from [Modular rule files](#modular-rule-files); offer to archive old content into `stack.md` / `workflow.md` if still useful. If `workflow.md` exists but lacks **Git branch policy**, merge that section from the template without wiping other content.
 - On re-run, **ask again** for targets and mode unless the user specified them in the request.
 - Switching `stub` ↔ `sync-full` replaces only the marked block.
 
@@ -524,6 +524,35 @@ Customize for this repo. Default template assumes Next.js + Tailwind + shadcn/ui
 ```markdown
 # Development workflow
 
+## Git branch policy
+
+Protected **deployment branches** — pushing here usually triggers CI/CD. Do not commit or push directly unless a human explicitly approves and understands pipelines may run.
+
+### Protected deployment branches
+
+Customize this table for your repo. Remove rows you do not use; add branches (e.g. `release/*` patterns) as needed.
+
+| Branch | Purpose | Direct commit/push |
+| --- | --- | --- |
+| `main` | Production CI/CD | no |
+| `master` | Production CI/CD (legacy name) | no |
+| `dev` | Test / staging CI/CD | no |
+| `develop` | Test / staging CI/CD (legacy name) | no |
+| `staging` | Staging environment CI/CD | no |
+| `production` | Production environment CI/CD | no |
+
+**Typical layouts:** `main` + `dev` only; or `production` + `develop`; or `main` + `staging` + `production`. Keep the table aligned with your remotes and CI config.
+
+### Workflow
+
+- Use feature branches for normal work (`feature/…`, `fix/…`, `docs/…`, `test/…`).
+- Merge through PR/MR unless explicitly approved for direct push.
+- **kenmark-commit** reads this section first; branches listed here override skill defaults.
+
+### Explicit override
+
+Direct commit/push to a protected branch only when the user explicitly says so (e.g. “commit directly to dev”) and accepts that CI/CD may run.
+
 ## Planning
 
 - Multi-file or ambiguous tasks: outline steps briefly before large edits (todo list optional — do not over-plan simple fixes).
@@ -599,7 +628,8 @@ Optional — fill in per project.
 
 ## Environments
 
-- Document staging/production URLs and branch rules here when known.
+- Document staging/production URLs here when known.
+- **Branch → environment mapping** lives in [workflow.md](workflow.md) (Git branch policy table); keep both files consistent.
 
 ## CI/CD
 
@@ -614,5 +644,6 @@ Optional — fill in per project.
 
 ## Related skills
 
+- `kenmark-commit` — reads `brain/rules/workflow.md` Git branch policy for protected deployment branches
 - `kenmark-issues-setup` — bootstrap `brain/issues/` when issue tracking is needed
 - `kenmark-issues-check` / `kenmark-issues-scan` — maintain issues after brain exists
