@@ -103,6 +103,25 @@ Optional: `npm install -g kenmark-skills` if you want the shorter `kenmark-skill
 - **Node.js** 18+ (npm install / publish only)
 - An agent environment that discovers skills from disk (Cursor, Codex CLI, Claude Code, Gemini CLI, OpenCode, etc.)
 
+### Windows note
+
+Run `npx kenmark-skills setup` from **PowerShell** or **CMD** if you use native Windows Cursor/Claude. Running from **WSL** installs into the WSL home directory (`/home/...`), which native Windows IDEs usually will not read.
+
+On Windows, Kenmark copies skills into IDE folders by default (not symlinks). For an explicit copy install:
+
+```powershell
+npx kenmark-skills setup --global --ide cursor --copy --skip-adopt -y
+```
+
+Confirm install path:
+
+```powershell
+node -p "process.platform + ' ' + require('os').homedir()"
+Test-Path "$env:USERPROFILE\.cursor\skills\kenmark-init\SKILL.md"
+```
+
+`kenmark-skills doctor` warns when it detects WSL and prints your home directory for debugging.
+
 ---
 
 ## Skills catalog

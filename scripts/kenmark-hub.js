@@ -1874,6 +1874,13 @@ function inspectMcpForDoctor({ homeDir, manifest }) {
   };
 }
 
+function isRunningInWsl() {
+  return (
+    process.platform === "linux" &&
+    Boolean(process.env.WSL_DISTRO_NAME || process.env.WSL_INTEROP)
+  );
+}
+
 function runDoctor(options = {}) {
   const {
     repoRoot = path.resolve(__dirname, ".."),
@@ -1887,6 +1894,13 @@ function runDoctor(options = {}) {
   const targetMap = buildGlobalTargets(homeDir);
   const issues = [];
   const warnings = [];
+  const runningInWsl = isRunningInWsl();
+
+  if (runningInWsl) {
+    warnings.push(
+      "Running inside WSL. Native Windows IDEs will not see skills installed under the WSL home directory. Run setup from PowerShell/CMD, or install into the Windows user profile explicitly."
+    );
+  }
 
   function recordProblem(msg) {
     if (soft) {
@@ -1981,6 +1995,8 @@ function runDoctor(options = {}) {
     warnings,
     node: nodeOk,
     platform: process.platform,
+    homeDir,
+    runningInWsl,
     packageVersion,
     kenmarkHome: getKenmarkHome(),
     storeDir,

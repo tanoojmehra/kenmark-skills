@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Docs / doctor
+
+- **doctor / README:** WSL install-path warning, Windows setup note, and `homeDir` in doctor output for path debugging.
+
 ## v2.1.1 — Dangling legacy symlink cleanup
 
 ### Fix

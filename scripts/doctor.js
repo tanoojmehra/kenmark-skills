@@ -66,6 +66,9 @@ function run() {
     console.log("(soft mode: warnings only, exit 0)");
   }
   console.log(`Node: ${report.node} (${report.platform})`);
+  if (report.homeDir) {
+    console.log(`Home: ${report.homeDir}`);
+  }
   console.log(`Package: ${report.packageVersion || "unknown"}`);
   console.log(`Kenmark home: ${report.kenmarkHome}`);
   console.log(`Store: ${report.storeDir} (${report.storeSkillCount} skill(s))`);
@@ -135,10 +138,22 @@ function run() {
   }
 
   if (Object.values(report.brokenSymlinksByIde).some((items) => items.length)) {
+    const copyFlag = report.platform === "win32" ? " --copy" : "";
     console.log("\nSuggested fix:");
-    console.log("  npx kenmark-skills setup --global --ide auto -y");
+    console.log(`  npx kenmark-skills setup --global --ide auto${copyFlag} -y`);
     console.log("  If stale links exist in Kenmark-managed IDE dirs too:");
-    console.log("  npx kenmark-skills setup --global --ide all -y");
+    console.log(`  npx kenmark-skills setup --global --ide all${copyFlag} -y`);
+  }
+
+  if (report.platform === "win32") {
+    const cursorCount = report.skillCountsByIde?.cursor ?? 0;
+    if (cursorCount === 0 && report.storeSkillCount > 0) {
+      console.log("\nWindows tip:");
+      console.log(
+        "  npx kenmark-skills setup --global --ide cursor --copy --skip-adopt -y"
+      );
+      console.log("  Then restart Cursor (Developer: Reload Window or full quit).");
+    }
   }
 
   if (report.hashMismatches.length) {
