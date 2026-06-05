@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v2.1.2 — Git branch policy and setup/docs polish
+
 ### Skills — git branch policy
 
 - **kenmark-init (1.2.0):** `brain/rules/workflow.md` template adds **Git branch policy** table (`main`, `master`, `dev`, `develop`, `staging`, `production`); `deployment.md` cross-links; reset/modularize can merge policy into existing `workflow.md`; related `kenmark-commit` note.
