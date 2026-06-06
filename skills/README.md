@@ -16,7 +16,7 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (33)
+skills/user-skills/          ← bundled universal skills (35)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow
@@ -27,6 +27,8 @@ skills/user-skills/          ← bundled universal skills (33)
   kenmark-repo-hygiene/              category: workflow (phase: audit)
   kenmark-repo-secrets/
   kenmark-repo-public/
+  kenmark-security-review/         category: workflow (phase: audit)
+  kenmark-performance/             category: workflow (phase: audit)
   kenmark-repo-kb/              category: workflow (phase: maintain)
   kenmark-repo-docs/
   kenmark-repo-structure/
@@ -69,8 +71,10 @@ not in this package.
 | Are docs good? | `kenmark-repo-docs` |
 | Is this ready to publish/release? | `kenmark-repo-release` |
 | Repo layout is confusing | `kenmark-repo-structure` |
-| Dependency bloat / unused packages | `kenmark-repo-deps` |
+| Dependency bloat / monorepo drift / unused packages | `kenmark-repo-deps` |
 | Dev/build/type/lint/format errors | `kenmark-repo-quality` |
+| Security review, auth bypass, RBAC, injection, SSRF, CORS, rate limits | `kenmark-security-review` |
+| Performance bottlenecks, slow routes, DB queries, bundle, hydration, caching | `kenmark-performance` |
 
 ## Testing suite (routing)
 
@@ -99,8 +103,10 @@ not in this package.
 | `kenmark-repo-kb` | Update `brain/kb/` after code changes |
 | `kenmark-repo-docs` | README, setup, env docs, KB freshness, broken links |
 | `kenmark-repo-structure` | Folder layout and module boundaries |
-| `kenmark-repo-deps` | Package health, duplicates, lockfile consistency |
+| `kenmark-repo-deps` | Package health, monorepo drift, lockfile/PM consistency, UI overlap |
 | `kenmark-repo-quality` | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
+| `kenmark-security-review` | Read-only secure-code review (auth, injection, SSRF, uploads) |
+| `kenmark-performance` | Slow pages/routes, N+1, bundle/hydration, caching, API latency |
 | `kenmark-repo-release` | Pre-release version, changelog, tests, meta consistency |
 | `kenmark-test-plan` | Test strategy: layers, tools, ROI, CI gates before writing tests |
 | `kenmark-test-unit` | Unit tests for functions, components, hooks, utilities |
@@ -123,6 +129,8 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Need issue tracking? | `kenmark-issues-setup` / `kenmark-issues-scan` |
 | Need skill choice? | `kenmark-router` |
 | Repo health (see table above) | `kenmark-repo-*` family |
+| Security review / auth / RBAC / injection / SSRF? | `kenmark-security-review` |
+| Performance / slow routes / DB / bundle / hydration? | `kenmark-performance` |
 | Testing (see testing table above) | `kenmark-test-*` family |
 | Installed skills inventory? | `kenmark-maintain` |
 | Need commit? | `kenmark-commit` |

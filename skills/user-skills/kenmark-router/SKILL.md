@@ -42,8 +42,21 @@ When several bundled skills could apply, prefer this order:
 | Repo clutter, scattered docs, dumps | **`kenmark-repo-hygiene`** |
 | Keys, secrets, credentials | **`kenmark-repo-secrets`** |
 | Make repo public / open source / public repo readiness | **`kenmark-repo-public`** |
+| Security review, auth bypass, RBAC, injection, SSRF, open redirects, CORS, rate limits | **`kenmark-security-review`** |
+| Performance bottlenecks, slow routes, DB queries, bundle size, hydration, caching | **`kenmark-performance`** |
 
 **Ambiguous:** `sanitize repo` — if the user means **public** or **open-source** prep, use **`kenmark-repo-public`** (often with **`kenmark-repo-secrets`**), not **`kenmark-repo-hygiene`**. Use **`kenmark-repo-hygiene`** only for clutter (files, docs, dumps, orphans).
+
+### Audit / review boundaries
+
+| User asks for… | Use | Not |
+| --- | --- | --- |
+| Secrets, tokens, keys, `.env`, credentials | **`kenmark-repo-secrets`** | `kenmark-security-review` (app auth/injection, not secret scanning) |
+| Safe to make repo public / open source | **`kenmark-repo-public`** | `kenmark-security-review` alone |
+| Build / type / lint / test failures | **`kenmark-repo-quality`** | `kenmark-performance` |
+| Dependency bloat / unused packages / lockfile drift | **`kenmark-repo-deps`** | `kenmark-performance` alone |
+| Performance impact **from dependencies** (bundle weight, duplicate React, UI overlap) | **`kenmark-performance`** and possibly **`kenmark-repo-deps`** | `kenmark-repo-quality` |
+| App security review (auth bypass, RBAC, injection, SSRF, uploads, CORS) | **`kenmark-security-review`** | `kenmark-repo-secrets` for credential scans |
 
 | Situation | Skill |
 | --- | --- |
@@ -288,6 +301,8 @@ def infer_phase(name: str, description: str, category: str) -> str:
         return "maintain"
     if name == "kenmark-repo-deps":
         return "verify"
+    if name in ("kenmark-security-review", "kenmark-performance"):
+        return "audit"
     if name.startswith("kenmark-repo-"):
         return "audit"
     if any(
@@ -307,6 +322,13 @@ def infer_phase(name: str, description: str, category: str) -> str:
             "release readiness",
             "update brain",
             "sync kb",
+            "security review",
+            "performance review",
+            "performance audit",
+            "auth bypass",
+            "n+1",
+            "bundle size",
+            "hydration",
         ]
     ):
         return "audit"
@@ -521,6 +543,9 @@ Do **not** use this skill for first-time Kenmark setup; use **`kenmark-setup`** 
    - Prefer skills with explicit `triggers[]` matches over description-only matches
    - Prefer narrower skills over umbrella skills (`seo-page` over `seo`; `django-tdd` over `coding-standards`)
    - Among `repo-*` skills, prefer the specialist over `kenmark-repo-hygiene` (e.g. `kenmark-repo-secrets` for "find secrets", `kenmark-repo-public` for "make public", "public repo readiness", "sanitize before public", `kenmark-repo-release` for "npm publish")
+   - For **auth bypass, RBAC, injection, SSRF, open redirect, CORS, rate limits** → **`kenmark-security-review`** (not `kenmark-repo-secrets` unless they ask for keys/tokens)
+   - For **slow routes, N+1, bundle size, hydration bloat, caching, API latency** → **`kenmark-performance`** (not `kenmark-repo-quality` unless build/type/lint/test is failing)
+   - For **dependency bloat / duplicate packages** → **`kenmark-repo-deps`**; if the user ties slowness to **heavy deps or bundle weight**, prefer **`kenmark-performance`** and note **`kenmark-repo-deps`** as a follow-up
    - If the task mentions **public**, **open source**, **publish**, or **safe to publish**, prefer **`kenmark-repo-public`** over **`kenmark-repo-hygiene`** even when the user also says "sanitize" or "clean"
    - Prefer `source: kenmark` over `catalog` over `user` when scores are equal
    - Prefer `maturity: stable` over `catalog` over `user`
@@ -555,6 +580,8 @@ Do **not** use this skill for first-time Kenmark setup; use **`kenmark-setup`** 
 | Folder layout / structure | `workflow` | `kenmark-repo-structure` |
 | Package / dependency health | `workflow` | `kenmark-repo-deps` |
 | Dev/build/type/lint/format errors | `workflow` | `kenmark-repo-quality` |
+| Security review (auth, RBAC, injection, SSRF, CORS, rate limits) | `workflow` | `kenmark-security-review` |
+| Performance bottlenecks (slow routes, DB, bundle, hydration, caching) | `workflow` | `kenmark-performance` |
 | Release, publish, handoff | `workflow` | `kenmark-repo-release` |
 | Test strategy before writing tests | `testing` | `kenmark-test-plan` |
 | Unit tests | `testing` | `kenmark-test-unit` |

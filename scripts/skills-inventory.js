@@ -43,7 +43,9 @@ const KEEP_ALWAYS = new Set([
   "kenmark-repo-structure",
   "kenmark-repo-deps",
   "kenmark-repo-quality",
-  "kenmark-repo-release"
+  "kenmark-repo-release",
+  "kenmark-security-review",
+  "kenmark-performance"
 ]);
 
 function printUsage() {

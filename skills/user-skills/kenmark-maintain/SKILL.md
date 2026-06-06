@@ -84,7 +84,7 @@ Use this table format:
 
 Always treat these as **keep** (one canonical copy):
 
-- `impeccable`, `kenmark-router`, `find-skills`, `kenmark-init`, `kenmark-commit`, `kenmark-troubleshoot`, Kenmark `repo-*` skills (`kenmark-repo-hygiene`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-repo-kb`, `kenmark-repo-docs`, `kenmark-repo-structure`, `kenmark-repo-deps`, `kenmark-repo-release`), Kenmark `issues-*` / `skills-*` skills (including `kenmark-setup`)
+- `impeccable`, `kenmark-router`, `find-skills`, `kenmark-init`, `kenmark-commit`, `kenmark-troubleshoot`, Kenmark `repo-*` skills (`kenmark-repo-hygiene`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-repo-kb`, `kenmark-repo-docs`, `kenmark-repo-structure`, `kenmark-repo-deps`, `kenmark-repo-quality`, `kenmark-repo-release`), `kenmark-security-review`, `kenmark-performance`, Kenmark `issues-*` / `skills-*` skills (including `kenmark-setup`)
 
 ## Step 3 — Group by category
 

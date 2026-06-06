@@ -536,6 +536,8 @@ Do not run the full public checklist here. Use **`kenmark-repo-public`** (verdic
 | Docs quality | `kenmark-repo-docs` |
 | Folder layout / structure | `kenmark-repo-structure` |
 | Package bloat / deps | `kenmark-repo-deps` |
+| App security review (auth, injection, SSRF) | `kenmark-security-review` |
+| Performance review (slow routes, bundle, hydration) | `kenmark-performance` |
 | npm publish / release | `kenmark-repo-release` |
 | Inventory installed agent skills (not repo files) | `kenmark-maintain` |
 | Pick which skill to run | `kenmark-router` |

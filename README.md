@@ -26,11 +26,11 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 ## Overview
 
-`kenmark-skills` ships **33 first-party skills**, an **11-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
+`kenmark-skills` ships **35 first-party skills**, an **11-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
 
 | Asset | Count | Notes |
 | --- | ---: | --- |
-| Kenmark skills | 33 | Bundled in `skills/user-skills/` |
+| Kenmark skills | 35 | Bundled in `skills/user-skills/` |
 | CLI commands | 11 | See [CLI reference](#cli-reference) |
 | Bundled sub-agents | 0 | Inventory/maintain skills only |
 | Recommended packs | 6 | Impeccable, code review, Graphify, SEO selected/full, ECC |
@@ -59,6 +59,8 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 | Docs quality? | **`kenmark-repo-docs`** |
 | Release / npm publish? | **`kenmark-repo-release`** |
 | Build/type/lint/format/dev errors? | **`kenmark-repo-quality`** |
+| Security review / auth / RBAC / injection / SSRF? | **`kenmark-security-review`** |
+| Performance / slow routes / DB / bundle / hydration? | **`kenmark-performance`** |
 | Need test strategy? | **`kenmark-test-plan`** |
 | Need unit/API/E2E tests? | **`kenmark-test-unit`** / **`kenmark-test-integration`** / **`kenmark-test-e2e`** |
 | Need test fixtures/mocks? | **`kenmark-test-mocks`** |
@@ -150,8 +152,10 @@ Skills are grouped by use case. Open each `SKILL.md` for full workflows and trig
 | [`kenmark-repo-kb`](skills/user-skills/kenmark-repo-kb/SKILL.md) | Update `brain/kb/` and changelog after code changes |
 | [`kenmark-repo-docs`](skills/user-skills/kenmark-repo-docs/SKILL.md) | Documentation quality, README/env accuracy, broken links |
 | [`kenmark-repo-structure`](skills/user-skills/kenmark-repo-structure/SKILL.md) | Folder layout, naming, module boundaries |
-| [`kenmark-repo-deps`](skills/user-skills/kenmark-repo-deps/SKILL.md) | Package bloat, unused deps, lockfile consistency |
+| [`kenmark-repo-deps`](skills/user-skills/kenmark-repo-deps/SKILL.md) | Package bloat, monorepo drift, lockfile/PM consistency, UI overlap |
 | [`kenmark-repo-quality`](skills/user-skills/kenmark-repo-quality/SKILL.md) | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
+| [`kenmark-security-review`](skills/user-skills/kenmark-security-review/SKILL.md) | Read-only secure-code review (auth, injection, SSRF, uploads, CORS) |
+| [`kenmark-performance`](skills/user-skills/kenmark-performance/SKILL.md) | Slow pages/routes, N+1, bundle/hydration, caching, API latency |
 | [`kenmark-repo-release`](skills/user-skills/kenmark-repo-release/SKILL.md) | Pre-release version, changelog, tests, meta consistency |
 
 ### Testing (`kenmark-test-*`)
@@ -210,7 +214,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | Command | Description |
 | --- | --- |
 | `init` | First-time wizard: runs `setup` + optional `install-recommended` |
-| `setup` | Install 33 Kenmark skills → `~/.kenmark/store` + IDE symlinks |
+| `setup` | Install 35 Kenmark skills → `~/.kenmark/store` + IDE symlinks |
 | `uninstall` | Remove Kenmark links from IDE paths (`--keep-store` optional); also removes Kenmark MCP if installed |
 | `mcp` | MCP management (`mcp uninstall` removes Kenmark MCP from IDE configs + `~/.kenmark/store/mcp.json`; skills unchanged) |
 | `install-recommended` | Install packs from [`recommended-catalog.json`](skills/user-skills/recommended-catalog.json) |
@@ -238,7 +242,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | | `init` | `setup` |
 | --- | --- | --- |
 | **Use when** | First install; want optional curated packs | Kenmark skills only; re-link IDEs |
-| **Installs** | Kenmark + optional catalog packs | 33 Kenmark skills |
+| **Installs** | Kenmark + optional catalog packs | 35 Kenmark skills |
 | **Implementation** | `setup` → `install-recommended` | `setup-skills.js` |
 | **Later refreshes** | Use `update`, not `init` again | `update` or `setup --force` |
 
@@ -561,7 +565,7 @@ kenmark-skills/
 │   └── setup-skills.js     # kenmark-skills-setup
 └── skills/
     ├── README.md           # logical categories vs flat on-disk layout
-    └── user-skills/        # 33 universal skills + recommended-catalog.json
+    └── user-skills/        # 35 universal skills + recommended-catalog.json
 ```
 
 **Not committed here:** `.claude/`, `.cursor/`, `.agents/` (local IDE installs), `brain/` (optional dev workspace). Edit `skills/user-skills/<name>/SKILL.md` for bundled skills.

@@ -94,7 +94,7 @@ node scripts/kenmark-setup.js
 
 1. Restart the IDE if skills do not appear
 2. In a project repo, run **`kenmark-init`** to create `brain/` and install IDE pointer stubs (standards in `brain/rules/standards.md`)
-3. While coding: **`kenmark-troubleshoot`** when the problem is unclear; **`kenmark-router`** when the right skill is not obvious; **`repo-*`** skills for repo health (e.g. **`kenmark-repo-public`** + **`kenmark-repo-secrets`** before a public push, **`kenmark-repo-hygiene`** for clutter, **`kenmark-repo-kb`** after features)
+3. While coding: **`kenmark-troubleshoot`** when the problem is unclear; **`kenmark-router`** when the right skill is not obvious; **`repo-*`** skills for repo health (e.g. **`kenmark-repo-public`** + **`kenmark-repo-secrets`** before a public push, **`kenmark-repo-hygiene`** for clutter, **`kenmark-repo-kb`** after features); **`kenmark-security-review`** for auth/injection/SSRF; **`kenmark-performance`** for slow routes, DB, or bundle issues
 
 ## Related skills
 
