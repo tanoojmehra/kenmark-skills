@@ -116,7 +116,7 @@ not in this package.
 | `kenmark-test-coverage` | Coverage and risk-gap audit (read-only) |
 | `kenmark-test-ci` | Wire tests into CI/CD and release gates |
 
-See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [README](../README.md) lists all bundled skills.
+See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [README](../README.md) lists all bundled skills and [Skill activation tiers](../README.md#skill-activation-tiers).
 
 ## Recommended day-to-day order
 

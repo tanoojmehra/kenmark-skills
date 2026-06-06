@@ -12,6 +12,7 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 - [Quick start](#quick-start)
 - [Requirements](#requirements)
 - [Skills catalog](#skills-catalog)
+- [Skill activation tiers](#skill-activation-tiers)
 - [CLI reference](#cli-reference)
 - [Installation](#installation)
 - [Kenmark hub](#kenmark-hub)
@@ -200,6 +201,54 @@ Pairs with **`npx kenmark-skills`** commands below.
 | [`kenmark-update`](skills/user-skills/kenmark-update/SKILL.md) | Refresh Kenmark skills and optional recommended packs |
 | [`kenmark-maintain`](skills/user-skills/kenmark-maintain/SKILL.md) | Inventory installed skills; recommend keep vs remove (no auto-delete) |
 | [`kenmark-agents`](skills/user-skills/kenmark-agents/SKILL.md) | Same for sub-agents across IDEs (no auto-delete) |
+
+---
+
+## Skill activation tiers
+
+Guidance for **humans and agents** on when to invoke bundled skills. This is **not** frontmatter schema — all skills remain installed; tiers describe **how often to reach for each skill**, not whether it exists on disk.
+
+### Core daily skills
+
+May be used freely during normal coding workflows:
+
+- `kenmark-router`
+- `kenmark-troubleshoot`
+- `kenmark-plan`
+- `kenmark-output`
+- `kenmark-init`
+- `kenmark-repo-quality`
+- `kenmark-repo-secrets`
+- `kenmark-repo-public`
+- `kenmark-repo-kb`
+- `kenmark-commit`
+- `kenmark-maintain`
+- `kenmark-security-review`
+- `kenmark-performance`
+
+### Specialist skills
+
+Use only when the task **clearly matches** the domain:
+
+- `kenmark-subagents`
+- `kenmark-repo-docs`
+- `kenmark-repo-structure`
+- `kenmark-repo-deps`
+- `kenmark-repo-release`
+- `kenmark-repo-hygiene`
+- all `kenmark-test-*` skills
+- all `kenmark-issues-*` skills
+
+### Explicit admin skills
+
+Run only when the user **explicitly** asks to install, update, audit, or prune skills/agents:
+
+- `kenmark-setup`
+- `kenmark-packs`
+- `kenmark-update`
+- `kenmark-agents`
+
+**`kenmark-router`** applies this policy when auto-assigning skills. See [`kenmark-router`](skills/user-skills/kenmark-router/SKILL.md).
 
 ---
 
@@ -544,6 +593,8 @@ rm -f ~/.claude/commands/kenmark-*.md
 3. The agent must **read and follow** the full `SKILL.md`, not improvise from the description.
 
 When the problem is unclear, start with **`kenmark-troubleshoot`** (evidence, hypotheses, ranked plan) — not **`kenmark-router`**. Use the router when the task domain is clear but the right specialist skill is not.
+
+For **when to invoke** each bundled skill by default, see [Skill activation tiers](#skill-activation-tiers).
 
 **Troubleshoot examples:** “kenmark-troubleshoot my Cursor slowdown”, “diagnose this production issue”, “find root cause of this deployment failure”, “build a test plan before fixing”.
 

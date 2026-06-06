@@ -27,6 +27,40 @@ While **coding**, when you're not sure which skill applies, search the installed
 
 This is a day-to-day programming tool — not part of project onboarding (`kenmark-init`, `kenmark-setup`).
 
+## Skill activation tiers
+
+Follow the bundled skill activation policy (see root [README — Skill activation tiers](../../../README.md#skill-activation-tiers)). Summary:
+
+### Core daily skills
+
+Prefer for **broad or unclear coding workflows** when a Kenmark skill fits:
+
+`kenmark-router`, `kenmark-troubleshoot`, `kenmark-plan`, `kenmark-output`, `kenmark-init`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-repo-kb`, `kenmark-commit`, `kenmark-maintain`, `kenmark-security-review`, `kenmark-performance`
+
+### Specialist skills
+
+Route only when user intent **clearly matches** the domain:
+
+`kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-structure`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, all `kenmark-test-*`, all `kenmark-issues-*`
+
+Do not default to **`kenmark-subagents`** for small fixes. Do not default to **`kenmark-test-*`** unless the user wants tests written, improved, or audited. Do not default to **`kenmark-issues-*`** unless issue tracking is in scope.
+
+### Explicit admin skills
+
+**Do not invoke** unless the user explicitly asks for skill/agent **setup**, **install**, **update**, **inventory**, **cleanup**, **pruning**, or **maintenance** of the local skills library:
+
+`kenmark-setup`, `kenmark-packs`, `kenmark-update`, `kenmark-agents`
+
+**Exception:** **`kenmark-maintain`** is core daily — use it when the user asks about installed skills inventory or cleanup recommendations, but still not for casual coding tasks.
+
+### Router rules
+
+1. **Prefer core daily skills** for broad/unclear coding workflows.
+2. **Use specialist skills** only when the user intent matches their scope (or they name the skill/trigger).
+3. **Never auto-route to explicit admin skills** without an explicit install/update/setup/prune request.
+
+---
+
 ## Recommended Kenmark workflows
 
 When several bundled skills could apply, prefer this order:
@@ -538,8 +572,12 @@ Do **not** use this skill for first-time Kenmark setup; use **`kenmark-setup`** 
    | `phase` wrong (e.g. setup skill for a ship task) | −2 |
    | `risk` too high for a read-only request | −2 |
    | `risk` too low for a write/destructive request and no safer alternative | −1 |
+   | **Explicit admin** skill (`kenmark-setup`, `kenmark-packs`, `kenmark-update`, `kenmark-agents`) without install/update/setup/prune/inventory intent | −6 |
+   | **Specialist** skill (`kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-structure`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, `kenmark-test-*`, `kenmark-issues-*`) on a broad/unclear coding task | −2 |
+   | **Core daily** skill when task is general coding/repo work | +1 |
 
 4. **Tie-break** (in order):
+   - Apply [Skill activation tiers](#skill-activation-tiers): prefer **core daily** over specialist; never pick **explicit admin** without explicit user intent
    - Prefer skills with explicit `triggers[]` matches over description-only matches
    - Prefer narrower skills over umbrella skills (`seo-page` over `seo`; `django-tdd` over `coding-standards`)
    - Among `repo-*` skills, prefer the specialist over `kenmark-repo-hygiene` (e.g. `kenmark-repo-secrets` for "find secrets", `kenmark-repo-public` for "make public", "public repo readiness", "sanitize before public", `kenmark-repo-release` for "npm publish")
@@ -566,7 +604,7 @@ Do **not** use this skill for first-time Kenmark setup; use **`kenmark-setup`** 
 | UI polish, layout, visual design, MUI | `design` | `impeccable`, `design-taste-frontend` |
 | APIs, services, frameworks, languages | `backend` | `backend-patterns`, `django-patterns` |
 | Tests, QA, verification, evals | `testing` | `kenmark-test-plan`, `kenmark-test-unit`, `kenmark-test-integration`, `kenmark-test-e2e`, `kenmark-test-mocks`, `kenmark-test-coverage`, `kenmark-test-ci` |
-| Skill install, update, inventory | `admin` | `kenmark-setup`, `kenmark-maintain`, `kenmark-update` |
+| Skill install, update, packs (explicit admin only) | `admin` | `kenmark-setup`, `kenmark-packs`, `kenmark-update`, `kenmark-agents` |
 | Agent workflow, discovery, learning | `workflow` | `find-skills`, `continuous-learning`, `kenmark-router` |
 | Plan before implementation | `workflow` | `kenmark-plan` |
 | Complete final deliverables / no omissions | `workflow` | `kenmark-output` |

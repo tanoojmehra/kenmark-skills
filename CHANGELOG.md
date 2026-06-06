@@ -17,6 +17,7 @@
 
 - Bundled skill count **35** (README, `skills/README.md`, `package.json`, inventory keep list, router routing tables).
 - Router audit boundaries, day-to-day README guidance, and cross-links in `kenmark-repo-hygiene` / `kenmark-setup`.
+- **Skill activation tiers** in README (core daily, specialist, explicit admin); `kenmark-router` scoring respects the policy.
 
 ## v2.1.2 — Git branch policy and setup/docs polish
 
