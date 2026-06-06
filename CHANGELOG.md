@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## v2.2.0 — Audit skills (security-review, performance, repo-deps)
+
+### New skills
+
+- **kenmark-security-review:** Read-only secure-code review (auth/RBAC, injection, uploads, SSRF, redirects, CORS, rate limits, security config). Delegates secrets to `kenmark-repo-secrets` and public readiness to `kenmark-repo-public`.
+- **kenmark-performance:** Read-only performance review for Next.js/Node/Prisma/Mongo/React stacks — slow routes, N+1, bundle/hydration, caching, API latency, memory/CPU (P0–P3 impact model). Not a substitute for `kenmark-repo-quality`.
+
+### Skills — enhancements
+
+- **kenmark-repo-deps (1.2.0):** Monorepo/workspace drift, `packageManager` vs lockfile, duplicate React/Next majors, overrides/resolutions review, UI-library overlap, bundle/side-effect and client/server import boundary checks; expanded report sections.
+
+### Docs / validation
+
+- Bundled skill count **35** (README, `skills/README.md`, `package.json`, inventory keep list, router routing tables).
+- Router audit boundaries, day-to-day README guidance, and cross-links in `kenmark-repo-hygiene` / `kenmark-setup`.
+
 ## v2.1.2 — Git branch policy and setup/docs polish
 
 ### Skills — git branch policy
