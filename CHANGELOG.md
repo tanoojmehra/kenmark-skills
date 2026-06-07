@@ -2,13 +2,16 @@
 
 ## Unreleased
 
+## v2.3.0 — Issues fix-and-ship orchestrator
+
 ### New skills
 
-- **kenmark-issues-fix-and-ship (1.0.0):** Orchestrator chaining `kenmark-issues-scan` → fix loop → `kenmark-issues-check` → `kenmark-commit` → PR/merge with protected-branch safety (`references/workflow.md`, `references/merge-safety.md`).
+- **kenmark-issues-fix-and-ship (1.1.0):** End-to-end orchestrator — parse blob, dedupe INDEX, create issues, P0→P2 fix loop on feature branch, complete issues, pre-commit validation, `kenmark-commit`, PR-first merge with explicit user confirmation (`references/workflow.md`, `references/merge-safety.md`). Triggers include "fix issues end to end", "blob to merge", "scan fix commit and merge".
 
 ### Docs
 
-- Bundled skill count **36** (`skills/README.md`, inventory keep list, router routing).
+- Bundled skill count **36** (`package.json`, `README.md`, `skills/README.md`, inventory keep list, router routing).
+- Release metadata aligned for v2.3.0 (version bump, README counts, CHANGELOG section).
 
 ## v2.2.0 — Audit skills (security-review, performance, repo-deps)
 
