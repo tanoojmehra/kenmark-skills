@@ -10,9 +10,7 @@ No global install required — `npx` downloads and runs the CLI (or uses your np
 
 The **init** wizard walks you through Kenmark skills, optional curated packs, IDE targets, and MCP server selection — all interactively. To refresh an existing install, use **`update`** (do not run `init` again for upgrades).
 
-For scripts, CI, and agents, see [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
-**Agent skills and CLI for Cursor, Codex, Claude Code, and other harnesses that read `SKILL.md` files.**
+**36 first-party skills**, a **12-command CLI**, and a **curated catalog** of optional third-party packs. Agent skills and CLI for Cursor, Codex, Claude Code, and other harnesses that read `SKILL.md` files.
 
 Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-skills). Created by **Tanooj Mehra** and **Adwait Date**.
 
@@ -20,778 +18,164 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 ## Table of contents
 
-- [Overview](#overview)
+- [At a glance](#at-a-glance)
 - [Quick start](#quick-start)
 - [Requirements](#requirements)
-- [Skills catalog](#skills-catalog)
-- [Skill activation tiers](#skill-activation-tiers)
-- [CLI reference](#cli-reference)
-- [Installation](#installation)
-- [Kenmark hub](#kenmark-hub)
-- [Operations](#operations)
-- [Uninstall](#uninstall)
-- [Using skills in chat](#using-skills-in-chat)
-- [Repository layout](#repository-layout)
+- [Suggested workflow](#suggested-workflow)
+- [Documentation (brain/)](#documentation-brain)
+- [Agents and automation](#agents-and-automation-non-interactive)
 - [Contributing](#contributing)
-- [Agents and automation (non-interactive)](#agents-and-automation-non-interactive)
 - [License](#license)
 
 ---
 
-## Overview
+## At a glance
 
-`kenmark-skills` ships **36 first-party skills**, a **12-command CLI**, and a **curated catalog** of optional third-party packs. Skills install once under `~/.kenmark/store` and link into each IDE’s skills directory.
-
-| Asset | Count | Notes |
+| Asset | Count | Detail |
 | --- | ---: | --- |
 | Kenmark skills | 36 | Bundled in `skills/user-skills/` |
-| CLI commands | 11 | See [CLI reference](#cli-reference) |
-| Bundled sub-agents | 0 | Inventory/maintain skills only |
-| Recommended packs | 6 | Impeccable, code review, Graphify, SEO selected/full, ECC |
+| CLI commands | 12 | [brain/kb/05-api-and-integrations.md](brain/kb/05-api-and-integrations.md) |
+| Recommended packs | 6 | Impeccable, code review, Graphify, SEO, ECC — [brain/kb/features/004-recommended-packs.md](brain/kb/features/004-recommended-packs.md) |
+| MCP servers | 5 | Opt-in; Cursor + Claude — [brain/kb/features/003-mcp-integration.md](brain/kb/features/003-mcp-integration.md) |
 
-**Suggested workflow**
-
-**Setup (once)**
-
-1. **Install** — `npx kenmark-skills init`.
-2. **Onboard a repo** — run **`kenmark-init`** in the agent.
-
-**Day-to-day (pick the first row that fits)**
-
-| Situation | Skill |
-| --- | --- |
-| Problem unclear? | **`kenmark-troubleshoot`** |
-| Need a plan before work? | **`kenmark-plan`** |
-| Need parallel/specialist tracks? | **`kenmark-subagents`** |
-| Need complete final deliverable? | **`kenmark-output`** |
-| Need issue tracking? | **`kenmark-issues-setup`** / **`kenmark-issues-scan`** |
-| Scan, fix, commit, and ship issues? | **`kenmark-issues-fix-and-ship`** |
-| Need skill choice? | **`kenmark-router`** |
-| Repo clutter / scattered docs? | **`kenmark-repo-hygiene`** |
-| Secrets / keys / tokens? | **`kenmark-repo-secrets`** |
-| Make repo public? | **`kenmark-repo-public`** |
-| Update brain after code change? | **`kenmark-repo-kb`** |
-| Docs quality? | **`kenmark-repo-docs`** |
-| Release / npm publish? | **`kenmark-repo-release`** |
-| Build/type/lint/format/dev errors? | **`kenmark-repo-quality`** |
-| Security review / auth / RBAC / injection / SSRF? | **`kenmark-security-review`** |
-| Performance / slow routes / DB / bundle / hydration? | **`kenmark-performance`** |
-| Need test strategy? | **`kenmark-test-plan`** |
-| Need unit/API/E2E tests? | **`kenmark-test-unit`** / **`kenmark-test-integration`** / **`kenmark-test-e2e`** |
-| Need test fixtures/mocks? | **`kenmark-test-mocks`** |
-| Need coverage or CI test gates? | **`kenmark-test-coverage`** / **`kenmark-test-ci`** |
-| Installed skills inventory? | **`kenmark-maintain`** |
-| Need commit? | **`kenmark-commit`** |
-
-**Maintain** — periodic **`kenmark-update`**, **`kenmark-maintain`**, **`kenmark-agents`**.
-
-**Troubleshoot trigger examples:** "kenmark-troubleshoot my Cursor slowdown", "diagnose this production issue", "find root cause of this deployment failure", "build a test plan before fixing".
-
-Many skills expect a project **`brain/`** directory (standards, numbered **KB** under **`brain/kb/`**, changelog, optional issues). That layout is created in *your* repos via **`kenmark-init`**, which inspects the codebase and seeds `brain/kb/00`–`11` plus optional `features/` and `decisions/` — not shipped inside this package. Rules live under **`brain/rules/`** (lean **`standards.md`** plus optional **`stack.md`**, **`workflow.md`**, etc.); IDE entry files get a short **Read-first stub** by default (multi-IDE, no hooks). **`kenmark-commit`** enforces KB updates alongside behavioral code changes.
+Skills install once under `~/.kenmark/store` and link into each IDE's skills directory. See [brain/kb/features/005-kenmark-hub-store.md](brain/kb/features/005-kenmark-hub-store.md).
 
 ---
 
 ## Quick start
 
-No global install required — `npx` downloads and runs the CLI each time (or uses your npm cache).
-
 ```bash
-# Guided install: Kenmark skills + optional curated packs + IDE + MCP
+# Guided install (humans)
 npx kenmark-skills init
 
 # Refresh later — do not re-run init
 npx kenmark-skills update
 ```
 
-Optional: `npm install -g kenmark-skills` if you want the shorter `kenmark-skills` command without `npx`.
+Optional: `npm install -g kenmark-skills` for the shorter `kenmark-skills` command.
 
-In a project repo (agent chat): *"Run kenmark-init on this repo"*.
+In a **project repo** (agent chat): *"Run kenmark-init on this repo"* to bootstrap that repo's `brain/` (standards, numbered KB, optional IDE stubs).
 
-For non-interactive installs (agents, CI), see [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
+For scripts, CI, and agents, see [Agents and automation](#agents-and-automation-non-interactive).
 
 ---
 
 ## Requirements
 
-- **Node.js** 18+ (npm install / publish only)
+- **Node.js** 18+
 - An agent environment that discovers skills from disk (Cursor, Codex CLI, Claude Code, Gemini CLI, OpenCode, etc.)
 
 ### Windows note
 
-Run `npx kenmark-skills init` from **PowerShell** or **CMD** if you use native Windows Cursor/Claude. Running from **WSL** installs into the WSL home directory (`/home/...`), which native Windows IDEs usually will not read.
-
-On Windows, Kenmark copies skills into IDE folders by default (not symlinks). For an explicit copy install, see [Agents and automation (non-interactive)](#agents-and-automation-non-interactive) (legacy `setup` alias).
-
-Confirm install path:
-
-```powershell
-node -p "process.platform + ' ' + require('os').homedir()"
-Test-Path "$env:USERPROFILE\.cursor\skills\kenmark-init\SKILL.md"
-```
-
-`kenmark-skills doctor` warns when it detects WSL and prints your home directory for debugging.
+Run `npx kenmark-skills init` from **PowerShell** or **CMD** if you use native Windows Cursor/Claude. WSL installs into `/home/...`, which native Windows IDEs usually will not read. Kenmark copies skills on Windows by default (not symlinks). Confirm with `npx kenmark-skills doctor`.
 
 ---
 
-## Skills catalog
+## Suggested workflow
 
-Skills are grouped by use case. Open each `SKILL.md` for full workflows and trigger phrases.
+**Setup (once):** `npx kenmark-skills init` → **kenmark-init** in your project repo.
 
-### Onboard
+**Day-to-day:** start with **kenmark-troubleshoot** when the problem is unclear; **kenmark-plan** before large work; **kenmark-subagents** for parallel specialist tracks; **kenmark-output** for complete deliverables; **kenmark-router** when the domain is clear but the skill is not; **kenmark-commit** when shipping changes.
 
-| Skill | Purpose |
-| --- | --- |
-| [`kenmark-init`](skills/user-skills/kenmark-init/SKILL.md) | Bootstrap `brain/` + numbered `brain/kb/` from repo inspection; install cross-IDE pointer stubs (optional full embed) |
-| [`kenmark-setup`](skills/user-skills/kenmark-setup/SKILL.md) | First-time CLI wizard (`npx kenmark-skills init`) |
-
-### While coding
-
-| Skill | Purpose |
-| --- | --- |
-| [`kenmark-router`](skills/user-skills/kenmark-router/SKILL.md) | Search installed skills and auto-assign the best match for the current task |
-| [`kenmark-plan`](skills/user-skills/kenmark-plan/SKILL.md) | Plan complex work before implementation |
-| [`kenmark-subagents`](skills/user-skills/kenmark-subagents/SKILL.md) | Split complex work into specialist investigation tracks |
-| [`kenmark-output`](skills/user-skills/kenmark-output/SKILL.md) | Enforce complete final outputs and deliverables |
-| [`kenmark-troubleshoot`](skills/user-skills/kenmark-troubleshoot/SKILL.md) | Universal diagnosis: evidence, hypotheses, ranked action plan (read-only first) |
-| [`kenmark-repo-hygiene`](skills/user-skills/kenmark-repo-hygiene/SKILL.md) | Audit clutter, scattered docs, orphan assets, dumps; cleanup only after approval |
-| [`kenmark-repo-secrets`](skills/user-skills/kenmark-repo-secrets/SKILL.md) | Deep read-only scan for secrets and credentials (redacted report) |
-| [`kenmark-repo-public`](skills/user-skills/kenmark-repo-public/SKILL.md) | Safe-to-publish checklist before open-sourcing |
-| [`kenmark-repo-kb`](skills/user-skills/kenmark-repo-kb/SKILL.md) | Update `brain/kb/` and changelog after code changes |
-| [`kenmark-repo-docs`](skills/user-skills/kenmark-repo-docs/SKILL.md) | Documentation quality, README/env accuracy, broken links |
-| [`kenmark-repo-structure`](skills/user-skills/kenmark-repo-structure/SKILL.md) | Folder layout, naming, module boundaries |
-| [`kenmark-repo-deps`](skills/user-skills/kenmark-repo-deps/SKILL.md) | Package bloat, monorepo drift, lockfile/PM consistency, UI overlap |
-| [`kenmark-repo-quality`](skills/user-skills/kenmark-repo-quality/SKILL.md) | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
-| [`kenmark-security-review`](skills/user-skills/kenmark-security-review/SKILL.md) | Read-only secure-code review (auth, injection, SSRF, uploads, CORS) |
-| [`kenmark-performance`](skills/user-skills/kenmark-performance/SKILL.md) | Slow pages/routes, N+1, bundle/hydration, caching, API latency |
-| [`kenmark-repo-release`](skills/user-skills/kenmark-repo-release/SKILL.md) | Pre-release version, changelog, tests, meta consistency |
-
-### Testing (`kenmark-test-*`)
-
-| Skill | Purpose |
-| --- | --- |
-| [`kenmark-test-plan`](skills/user-skills/kenmark-test-plan/SKILL.md) | Test strategy: layers, tools, ROI, CI gates before writing tests |
-| [`kenmark-test-unit`](skills/user-skills/kenmark-test-unit/SKILL.md) | Unit tests for functions, components, hooks, utilities |
-| [`kenmark-test-integration`](skills/user-skills/kenmark-test-integration/SKILL.md) | API, DB, service, and module boundary tests |
-| [`kenmark-test-e2e`](skills/user-skills/kenmark-test-e2e/SKILL.md) | Browser/user-journey tests (Playwright, Cypress, etc.) |
-| [`kenmark-test-mocks`](skills/user-skills/kenmark-test-mocks/SKILL.md) | Fixtures, factories, MSW handlers, fake adapters |
-| [`kenmark-test-coverage`](skills/user-skills/kenmark-test-coverage/SKILL.md) | Coverage and risk-gap audit (read-only) |
-| [`kenmark-test-ci`](skills/user-skills/kenmark-test-ci/SKILL.md) | Wire tests into CI/CD and release gates |
-
-`kenmark-repo-quality` runs/checks test commands; `kenmark-test-*` skills create/improve the test suite.
-
-### Ship
-
-| Skill | Purpose |
-| --- | --- |
-| [`kenmark-commit`](skills/user-skills/kenmark-commit/SKILL.md) | Feature-grouped conventional commits and push (no co-author trailers) |
-
-### Issue tracking (`kenmark-issues-*`)
-
-Requires **`kenmark-init`** or at least `brain/issues/` from **`kenmark-issues-setup`**.
-
-| Skill | Purpose |
-| --- | --- |
-| [`kenmark-issues-setup`](skills/user-skills/kenmark-issues-setup/SKILL.md) | Create `brain/issues/` layout and `INDEX.md` |
-| [`kenmark-issues-list`](skills/user-skills/kenmark-issues-list/SKILL.md) | Dashboard of open issues by area and priority |
-| [`kenmark-issues-check`](skills/user-skills/kenmark-issues-check/SKILL.md) | Move resolved issues to `completed/`; refresh index |
-| [`kenmark-issues-scan`](skills/user-skills/kenmark-issues-scan/SKILL.md) | Discover and file new issues under `brain/issues/` |
-| [`kenmark-issues-maintain`](skills/user-skills/kenmark-issues-maintain/SKILL.md) | Audit tracker health (duplicates, stale index, missing files) |
-| [`kenmark-issues-fix-and-ship`](skills/user-skills/kenmark-issues-fix-and-ship/SKILL.md) | End-to-end scan → fix → complete → commit → merge orchestrator |
-
-### Skills library (admin)
-
-Pairs with **`npx kenmark-skills`** commands below.
-
-| Skill | Purpose |
-| --- | --- |
-| [`kenmark-packs`](skills/user-skills/kenmark-packs/SKILL.md) | Install curated third-party packs from the catalog |
-| [`kenmark-update`](skills/user-skills/kenmark-update/SKILL.md) | Refresh Kenmark skills and optional recommended packs |
-| [`kenmark-maintain`](skills/user-skills/kenmark-maintain/SKILL.md) | Inventory installed skills; recommend keep vs remove (no auto-delete) |
-| [`kenmark-agents`](skills/user-skills/kenmark-agents/SKILL.md) | Same for sub-agents across IDEs (no auto-delete) |
+Full skill catalog, activation tiers, and routing tables: [brain/kb/features/002-skills-catalog.md](brain/kb/features/002-skills-catalog.md) and [brain/kb/08-flows-and-workflows.md](brain/kb/08-flows-and-workflows.md).
 
 ---
 
-## Skill activation tiers
+## Documentation (brain/)
 
-Guidance for **humans and agents** on when to invoke bundled skills. This is **not** frontmatter schema — all skills remain installed; tiers describe **how often to reach for each skill**, not whether it exists on disk.
+Long-form reference lives in **`brain/`** (this repo's dev knowledge base — not shipped on npm).
 
-### Core daily skills
-
-May be used freely during normal coding workflows:
-
-- `kenmark-router`
-- `kenmark-troubleshoot`
-- `kenmark-plan`
-- `kenmark-output`
-- `kenmark-init`
-- `kenmark-repo-quality`
-- `kenmark-repo-secrets`
-- `kenmark-repo-public`
-- `kenmark-repo-kb`
-- `kenmark-commit`
-- `kenmark-maintain`
-- `kenmark-security-review`
-- `kenmark-performance`
-
-### Specialist skills
-
-Use only when the task **clearly matches** the domain:
-
-- `kenmark-subagents`
-- `kenmark-repo-docs`
-- `kenmark-repo-structure`
-- `kenmark-repo-deps`
-- `kenmark-repo-release`
-- `kenmark-repo-hygiene`
-- all `kenmark-test-*` skills
-- all `kenmark-issues-*` skills
-
-### Explicit admin skills
-
-Run only when the user **explicitly** asks to install, update, audit, or prune skills/agents:
-
-- `kenmark-setup`
-- `kenmark-packs`
-- `kenmark-update`
-- `kenmark-agents`
-
-**`kenmark-router`** applies this policy when auto-assigning skills. See [`kenmark-router`](skills/user-skills/kenmark-router/SKILL.md).
-
----
-
-## CLI reference
-
-**Entry points:** `npx kenmark-skills init` (recommended) · `npx kenmark-skills <command>` · `kenmark-skills` if installed globally (optional) · `kenmark-skills-setup` (= legacy `setup` bin).
-
-In a terminal, **`init` prompts by default**. For scripts and agents, see [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
-### Commands
-
-| Command | Description |
+| Topic | Where |
 | --- | --- |
-| `init` | **Recommended first install** — Kenmark skills + optional curated packs (wizard or flags) |
-| `setup` | Legacy alias: Install 36 Kenmark skills → `~/.kenmark/store` + IDE symlinks (prefer `init --skip-recommended`) |
-| `uninstall` | Remove Kenmark links from IDE paths (`--keep-store` optional); also removes Kenmark MCP if installed |
-| `mcp` | MCP management (`mcp uninstall` removes Kenmark MCP from IDE configs + `~/.kenmark/store/mcp.json`; skills unchanged) |
-| `install-recommended` | Install packs from [`recommended-catalog.json`](skills/user-skills/recommended-catalog.json) |
-| `update` | Refresh Kenmark and/or recommended installs |
-| `adopt` | Consolidate catalog skills on disk into the store + relink |
-| `validate` | Repo/package invariants (skills, catalog JSON, `package.json`, forbidden terms); same checks as `npm test` |
-| `doctor` | Diagnose local install: store, manifest, MCP (`npx`/`uvx` on PATH), IDE links, symlinks, hash drift |
-| `cleanup` | Surgical removal by category: broken symlinks, legacy paths, kenmark-* skills, catalog packs |
-| `inventory` | Report on installed skills (keep / dedupe / remove) |
-| `subagents-inventory` | Same for sub-agents (alias: `agents-inventory`) |
-
-### Examples
-
-| Audience | Example |
-| --- | --- |
-| Human | `npx kenmark-skills init` |
-| Agent / CI | See [Agents and automation (non-interactive)](#agents-and-automation-non-interactive) |
-
-### First install (`init`)
-
-Use **`init`** for every new install. It runs the Kenmark skills step and optionally **`install-recommended`** for curated packs.
-
-| Goal | Command |
-| --- | --- |
-| Full guided wizard | `npx kenmark-skills init` |
-| Kenmark skills only (agent) | See [Agents and automation (non-interactive)](#agents-and-automation-non-interactive) |
-| Kenmark + specific packs | See [Agents and automation (non-interactive)](#agents-and-automation-non-interactive) |
-| MCP by profile or server name | See [Agents and automation (non-interactive)](#agents-and-automation-non-interactive) |
-| Later refreshes | **`update`**, not `init` again |
-
-### `init` vs `setup`
-
-| | `init` | `setup` |
-| --- | --- | --- |
-| **Use when** | First install; want optional curated packs | Kenmark skills only; re-link IDEs |
-| **Installs** | Kenmark + optional catalog packs | 36 Kenmark skills |
-| **MCP** | Interactive wizard prompts for servers by name; `-y` needs `--mcp-servers` or `--mcp-profile` | Same (interactive or flags) |
-| **Implementation** | `setup` → `install-recommended` | `setup-skills.js` |
-| **Later refreshes** | Use `update`, not `init` again | `update` or `setup --force` |
-
-```bash
-npx kenmark-skills init    # full wizard
-```
-
-**Legacy `setup`:** still works for backward compatibility and advanced flags (`--copy`, `--force`, `--skip-adopt`) that `init` does not expose. Migration and non-interactive examples: [Agents and automation (non-interactive)](#agents-and-automation-non-interactive). Direct bin: `kenmark-skills-setup`.
-
-### Catalog adoption (`adopt`)
-
-**Adopt** copies adoptable catalog skills (Impeccable, ECC, etc.) **already on disk** into `~/.kenmark/store/skills` and relinks IDE paths. It does not download packs.
-
-| Command | Adopt by default? |
-| --- | --- |
-| `init` | Yes (Kenmark step; again after packs if selected) |
-| `setup` (legacy) | Yes (`--skip-adopt` to disable); MCP opt-in (`--with-mcp`, `--mcp-profile`, or `--mcp-servers`) |
-| `install-recommended` | Yes (`--skip-adopt` to disable) |
-| `update` | Yes (`--skip-adopt` to disable) |
-| `adopt` | Standalone consolidation |
-
-On a fresh machine, adopt may no-op until catalog skills exist.
-
-When store content already exists but differs from an IDE copy, adopt reports **review-required** and does not overwrite until you run `adopt --adopt-overwrite` (or `--force`). Full source priority (bundled → store → IDE) is not applied yet beyond this guard.
-
-### Common flags
-
-| Flag | Applies to | Purpose |
-| --- | --- | --- |
-| `--global` / `--project` | install commands | User-wide vs current repo |
-| `--ide <target>` | init, setup, uninstall, adopt | `cursor`, `claude`, `codex`, `all`, … |
-| `-y` | most commands | Skip interactive prompts |
-| `--skip-recommended` | init | Kenmark skills only (skip curated packs) |
-| `--skip-adopt` | setup, install-recommended, update | Skip post-install adopt pass |
-| `--with-mcp` | init, setup | Install all bundled MCP servers (profile `all`) |
-| `--mcp-profile <name>` | init, setup | MCP profile: `none`, `web`, `research`, `deep`, `all` (default: none) |
-| `--mcp-servers <list>` | init, setup, update | MCP servers by name: `playwright`, `context7`, `fetch`, … |
-| `--skip-mcp` | init, setup | Skip MCP even when `--with-mcp` / `--mcp-profile` / `--mcp-servers` is set |
-| `--strict-targets` | setup | Fail if no IDE skill dir is detected and `--ide` is omitted |
-| `--copy` | setup, install-recommended | Copy into IDE paths instead of symlinks |
-| `--symlink` | setup, install-recommended | Force symlinks on Windows (junction) instead of copy |
-| `--prefer-copy-on-windows` | setup, install-recommended | Copy on Windows (default: on) |
-| `--no-prefer-copy-on-windows` | setup, install-recommended | Symlink/junction on Windows instead of copy |
-| `--force` | setup, adopt, install-recommended | Overwrite store entries / adopt from IDE when hashes differ |
-| `--adopt-overwrite` | adopt, install-recommended | Alias for `--force` on adopt |
-| `--keep-store` | uninstall | Remove IDE links; keep `~/.kenmark` |
-| `--mcp-only` | uninstall | Remove Kenmark MCP only; leave skill links and store skills intact |
-| `--soft` | doctor | Warnings only; exit 0 (e.g. before first `init`) |
-| `--json <path>` | doctor, inventory | Write full JSON report |
-| `--no-fail` | doctor | Exit 0 with issues still listed (`ok: false` in `--json`; use `--soft` to downgrade to warnings) |
-| `--dry-run` | cleanup | List targets without deleting |
-| `--broken-only` / `--legacy-only` / `--all` | cleanup | Hygiene presets (default: `--broken-only`) |
-| `--kenmark` / `--recommended` / `--packs` | cleanup | Remove kenmark-* or catalog pack skills from IDE dirs |
-| `--all-managed` / `--full` | cleanup | kenmark + packs, or everything Kenmark manages |
-| `--include-store` | cleanup | Also clear matching ~/.kenmark/store entries |
-
----
-
-## Installation
-
-### Default: `npx` (no global install)
-
-```bash
-npx kenmark-skills init
-```
-
-`npx` fetches the package from npm when needed. Pin a version with `npx kenmark-skills@1.5.0 init` for reproducibility, or use `npx kenmark-skills@latest init` for the newest release.
-
-For non-interactive installs (agents, CI), see [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
-### Optional: global CLI shorthand
-
-```bash
-npm install -g kenmark-skills
-kenmark-skills init    # same as npx kenmark-skills init
-```
-
-Use this only if you run the CLI often and prefer omitting `npx`.
-
-### Project-scoped skills (`--project`)
-
-Install into the current repo’s IDE folders instead of your home directory. Use **`--project`** on `init` (interactive wizard) or see [Agents and automation (non-interactive)](#agents-and-automation-non-interactive) for flag examples.
-
-### Per-IDE targeting
-
-The init wizard lets you pick IDE targets. To install for a specific harness non-interactively, pass **`--ide`** — see [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
-Restart Claude Code if `/kenmark-*` slash commands do not appear immediately.
-
-### All IDEs (advanced)
-
-Use **`--ide all`** only when you want every harness path this package knows about (beyond cursor/claude/codex). It can create links in IDE folders you do not use. Non-interactive example: [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
----
-
-## Kenmark hub
-
-Kenmark and adoptable catalog skills are stored once, then linked into each IDE.
-
-| Path | Role |
-| --- | --- |
-| `~/.kenmark/store/skills/<name>/` | Canonical skill content |
-| `~/.kenmark/store/mcp.json` | Canonical MCP server definitions |
-| `~/.kenmark/manifest.json` | Install metadata |
-
-**First install (`init`)** populates the store, symlinks into IDE skill dirs (copies on Windows when symlinks fail), then runs **adopt** unless `--skip-adopt` is set. **MCP is opt-in:** pass `--with-mcp`, `--mcp-profile <name>`, or `--mcp-servers <list>` on `init` or legacy `setup`; plain install does not touch MCP configs.
-
-### Skill path portability
-
-When skills are copied into `~/.kenmark/store` (via `init`, `update`, or `adopt`), Kenmark rewrites hardcoded IDE anchor paths like `.cursor/skills/<name>/` to `./` in `SKILL.md` and `scripts/*.{js,mjs}`. That keeps bundled scripts and docs working regardless of which IDE path the skill is linked from.
-
-`doctor` scans the same files in linked IDE copies and reports non-portable paths. Repair with `npx kenmark-skills adopt` (interactive) or see [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
-### Bundled MCP servers (opt-in)
-
-Source: [`config/mcp-servers.json`](config/mcp-servers.json). Profiles: [`config/mcp-profiles.json`](config/mcp-profiles.json) (non-interactive shortcuts). Interactive `init` / `setup` / `update` let you pick individual servers by name. When you opt in, Kenmark copies the selected servers into `~/.kenmark/store/mcp.json` and **merges** them into existing configs (existing entries with the same name are left unchanged unless you pass `--force`).
-
-Non-interactive MCP examples (`--mcp-servers`, `--mcp-profile`, `--with-mcp`): [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
-| Profile | Servers |
-| --- | --- |
-| `none` | (default) — no MCP install |
-| `web` | `playwright`, `browsermcp` |
-| `research` | `context7`, `fetch` |
-| `deep` | `sequential-thinking`, `context7`, `fetch` |
-| `all` | every bundled server |
-
-| Server | Transport |
-| --- | --- |
-| `playwright` | `npx -y @playwright/mcp@latest` |
-| `context7` | `npx -y @upstash/context7-mcp` |
-| `sequential-thinking` | `npx -y @modelcontextprotocol/server-sequential-thinking` |
-| `fetch` | `uvx mcp-server-fetch` (requires [uv](https://docs.astral.sh/uv/); or install `mcp-server-fetch` via pip and edit the entry) |
-| `browsermcp` | `npx -y @browsermcp/mcp@latest` |
-
-| Scope | Cursor | Claude Code |
-| --- | --- | --- |
-| Global (`--global`) | `~/.cursor/mcp.json` | `~/.claude.json` → `mcpServers` |
-| Project (`--project`) | `.cursor/mcp.json` | `.mcp.json` at repo root |
-
-Restart Cursor or Claude Code after install if MCP tools do not show up. Other IDEs in `--ide all` are unchanged (no standard MCP path in this package yet).
-
-**Remove MCP only** (keeps Kenmark skills installed): run `npx kenmark-skills mcp uninstall` or `npx kenmark-skills uninstall --mcp-only` (interactive). Non-interactive examples: [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
-Full `uninstall` still removes Kenmark MCP entries when they were installed via `init` / `setup` with `--with-mcp`, `--mcp-profile`, or `--mcp-servers`.
-
-### IDE skill directories
-
-| IDE / runtime | Global skills path |
-| --- | --- |
-| Cursor | `~/.cursor/skills` |
-| Codex / shared agents | `~/.agents/skills` |
-| Claude Code | `~/.claude/skills` |
-| Gemini CLI | `~/.gemini/skills` |
-| OpenCode | `~/.opencode/skills` |
-| Kiro | `~/.kiro/skills` |
-| Trae / Trae CN | `~/.trae/skills`, `~/.trae-cn/skills` |
-| Rovo Dev | `~/.rovodev/skills` |
-| Qoder | `~/.qoder/skills` |
-| MiniMax Code | `~/.minimax/skills` |
-
-**Claude Code** uses the same `kenmark-*` skill folders under `~/.claude/skills/`. Setup does not create duplicate slash-command wrappers in `~/.claude/commands/` (install/uninstall remove any stale `kenmark-*.md` files from older versions).
-
----
-
-## Operations
-
-### Recommended packs
-
-Catalog: [`skills/user-skills/recommended-catalog.json`](skills/user-skills/recommended-catalog.json) (v5 **selectable optional installs** with repo-aware suggestions). Default selection is **Impeccable** + **Awesome Code Review** only; heavy packs (Graphify, SEO full, ECC) are opt-in. **Presets** (`lean`, `core-next`, `growth-seo`, …) remain for agents/CI via `--profile` but are not the primary UX.
-
-```bash
-npx kenmark-skills install-recommended --suggest          # recommendations only
-npx kenmark-skills install-recommended --list             # all optional installs + metadata
-npx kenmark-skills install-recommended                    # interactive checklist
-```
-
-Non-interactive pack installs (`--ids`, `--profile`): [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
-In chat: **`kenmark-packs`** (guided), **`kenmark-maintain`** (cleanup, no auto-delete).
-
-### Update
-
-```bash
-npx kenmark-skills update
-```
-
-Non-interactive refresh flags (`--both`, `--kenmark-only`, `--recommended-only`, `--npm-only`, `--skip-adopt`): [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
-### Inventory
-
-**Skills** — scan IDE paths; keep / dedupe / remove report:
-
-```bash
-npx kenmark-skills inventory
-npx kenmark-skills inventory --markdown ./skills-report.md --json ./skills.json
-npx kenmark-skills inventory --include-plugins
-```
-
-**Sub-agents** — same layout; reads `agents/` YAML frontmatter:
-
-```bash
-npx kenmark-skills subagents-inventory
-npx kenmark-skills subagents-inventory --markdown ./agents-report.md --include-marketplaces
-```
-
-Pair CLI output with **`kenmark-maintain`** and **`kenmark-agents`** in chat for guided cleanup.
-
-### On-demand adopt
-
-```bash
-npx kenmark-skills adopt
-```
-
-When setup reported review-required, use `--adopt-overwrite`. Non-interactive examples: [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
-### Validate vs doctor
-
-| Command | Scope | CI / fresh clone |
-| --- | --- | --- |
-| `validate` | Repo/package invariants (skills, catalog JSON, `package.json`, forbidden terms) | Yes — `npm test` |
-| `doctor` | Local install (`~/.kenmark`, manifest, MCP, IDE links, symlinks, hash drift, non-portable skill paths) | No — run after `init` |
-| `doctor --soft` | Same as `doctor`, but warnings only (exit 0) | Optional pre-install check |
-| `doctor --no-fail` | Full issue list; exit 0 (e.g. write `--json` for agents) | Diagnostics / scripting |
-
-**Validation entry points** (equivalent checks; both scripts ship in the npm package):
-
-| How you run it | Script chain |
-| --- | --- |
-| `npm run validate` or `npm test` | `scripts/validate-repo.js` |
-| `npx kenmark-skills validate` | `scripts/validate.js` → `scripts/validate-repo.js` |
-
-`validate.js` is a thin wrapper so the CLI command stays next to other `cli.js` dispatches; npm scripts call `validate-repo.js` directly to avoid an extra hop in CI.
-
-```bash
-npx kenmark-skills validate
-npm test   # same checks as validate (direct validate-repo.js)
-npm run validate
-
-npx kenmark-skills doctor
-npx kenmark-skills doctor --soft
-npx kenmark-skills doctor --json ./kenmark-doctor.json
-npx kenmark-skills doctor --json ./kenmark-doctor.json --no-fail
-```
-
-### Cleanup (broken links, legacy paths, managed skills)
-
-`doctor` reports broken symlinks but does not remove them. Use **`cleanup`** for surgical removal by category — safer and more flexible than `uninstall`.
-
-| Category | Flag | Removes |
-|----------|------|---------|
-| Broken (default) | *(default)* / `--broken-only` | Dangling symlinks only |
-| Legacy | `--legacy-only` | Proven unprefixed Kenmark paths (+ store when applicable) |
-| Hygiene | `--all` | Broken + legacy |
-| Kenmark core | `--kenmark` | kenmark-* bundled skills from selected IDE dirs |
-| Catalog packs | `--recommended` / `--packs` | impeccable, code-review-skill, graphify, ECC skills, etc. |
-| All managed | `--all-managed` | Kenmark core + catalog packs |
-| Full | `--full` | Broken + legacy + all managed skills |
-
-**vs `uninstall`:** `uninstall` removes all kenmark-* bundled skills from IDE folders (store preserved by default). It does **not** remove catalog pack skills. `cleanup` lets you pick categories — e.g. remove only recommended packs, or only broken links.
-
-Non-interactive cleanup examples: [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
----
-
-## Uninstall
-
-If you installed the CLI globally, `npm uninstall -g kenmark-skills` removes only that binary — not skills already linked into IDE folders. Using `npx` alone does not require any npm uninstall.
-
-```bash
-# Global
-npx kenmark-skills uninstall --global
-npx kenmark-skills uninstall --global --ide claude
-
-# Project-local
-npx kenmark-skills uninstall --project
-# npx kenmark-skills uninstall --project --ide all   # advanced: all IDE paths in this repo
-
-# MCP only (Cursor / Claude configs + ~/.kenmark/store/mcp.json)
-npx kenmark-skills mcp uninstall --global --ide cursor
-```
-
-Non-interactive uninstall flags: [Agents and automation (non-interactive)](#agents-and-automation-non-interactive).
-
-**Troubleshooting `Unknown command: uninstall`**
-
-```bash
-npx kenmark-skills@latest uninstall --global --ide claude
-npm cache clean --force   # if npx still serves an old version
-```
-
-**Manual fallback (Claude global)**
-
-```bash
-rm -rf ~/.claude/skills/{kenmark-init,kenmark-commit,kenmark-router,kenmark-troubleshoot,kenmark-setup,kenmark-packs,kenmark-update,kenmark-maintain,kenmark-issues-setup,kenmark-issues-list,kenmark-issues-check,kenmark-issues-scan,kenmark-issues-maintain}
-rm -f ~/.claude/commands/kenmark-*.md
-```
-
----
-
-## Using skills in chat
-
-1. Confirm the skill folder is on the agent’s skill search path (after `init`).
-2. Name the skill or its trigger phrase — e.g. “Run **kenmark-init**”, “Use **kenmark-commit**”, “**kenmark-issues-list**”.
-3. The agent must **read and follow** the full `SKILL.md`, not improvise from the description.
-
-When the problem is unclear, start with **`kenmark-troubleshoot`** (evidence, hypotheses, ranked plan) — not **`kenmark-router`**. Use the router when the task domain is clear but the right specialist skill is not.
-
-For **when to invoke** each bundled skill by default, see [Skill activation tiers](#skill-activation-tiers).
-
-**Troubleshoot examples:** “kenmark-troubleshoot my Cursor slowdown”, “diagnose this production issue”, “find root cause of this deployment failure”, “build a test plan before fixing”.
-
-**`kenmark-router` cache:** the router writes `~/.kenmark/cache/skills-registry.json` at runtime (user-wide, outside the repo).
-
----
-
-## Repository layout
-
-```text
-kenmark-skills/
-├── README.md
-├── CHANGELOG.md
-├── package.json
-├── scripts/
-│   ├── cli.js              # kenmark-skills binary
-│   ├── validate.js         # CLI validate → validate-repo.js
-│   ├── validate-repo.js    # npm test / npm run validate; shared implementation
-│   └── setup-skills.js     # kenmark-skills-setup
-└── skills/
-    ├── README.md           # logical categories vs flat on-disk layout
-    └── user-skills/        # 36 universal skills + recommended-catalog.json
-```
-
-**Not committed here:** `.claude/`, `.cursor/`, `.agents/` (local IDE installs), `brain/` (optional dev workspace). Edit `skills/user-skills/<name>/SKILL.md` for bundled skills.
-
-### Testing (maintainers)
-
-| When | Command | What runs |
-| --- | --- | --- |
-| **Development** (fast) | `npm test` | `validate` + `test:cli` (repo invariants + CLI smoke) |
-| **Before publish** | `npm run test:all && npm run pack:check` | Full gate: above + `test:install` + `test:pack` + `npm pack --dry-run` |
-
-`npm publish` also runs **`prepublishOnly`** (`test:all` then `pack:check`) so the release gate is enforced automatically.
-
-Equivalent: `npm run validate` is the same repo checks as the first step of `npm test`; `npx kenmark-skills validate` goes through `validate.js`.
-
-**Maintainers:** `npm run validate` · `npm test` · `npm run test:all` · `npm run pack:check` · `npx kenmark-skills validate` · `npm run doctor:local` (after init) · `npm run publish:public`
-
----
-
-## Contributing
-
-1. Change skills under `skills/user-skills/<skill-name>/SKILL.md`.
-2. Use the shared frontmatter schema on every skill: `name`, `version`, `category`, `scope`, `phase`, `description`, `triggers`, `allowed-tools`, `risk`, `disable-model-invocation` (plus `project` when `scope: project-specific`). Categories: `onboarding`, `workflow`, `git`, `issues`, `admin`, `testing`. Bundled skills use `scope: universal`. See [`skills/README.md`](skills/README.md) for the logical folder map — on-disk skill dirs stay flat under `skills/user-skills/`.
-3. Add a dated entry to [`CHANGELOG.md`](CHANGELOG.md).
-4. Open a PR describing skill changes and new trigger phrases.
+| Brain index | [brain/INDEX.md](brain/INDEX.md) |
+| Project overview | [brain/kb/00-project-overview.md](brain/kb/00-project-overview.md) |
+| Architecture & CLI routing | [brain/kb/01-architecture.md](brain/kb/01-architecture.md) |
+| CLI commands, flags, MCP, IDE paths | [brain/kb/05-api-and-integrations.md](brain/kb/05-api-and-integrations.md) |
+| init / update / adopt / cleanup / uninstall | [brain/kb/08-flows-and-workflows.md](brain/kb/08-flows-and-workflows.md) |
+| Skills catalog & tiers | [brain/kb/features/002-skills-catalog.md](brain/kb/features/002-skills-catalog.md) |
+| Recommended packs | [brain/kb/features/004-recommended-packs.md](brain/kb/features/004-recommended-packs.md) |
+| Kenmark hub store | [brain/kb/features/005-kenmark-hub-store.md](brain/kb/features/005-kenmark-hub-store.md) |
+| Testing & validate | [brain/kb/10-testing-and-quality.md](brain/kb/10-testing-and-quality.md) |
+| Agent standards | [brain/rules/standards.md](brain/rules/standards.md) |
 
 ---
 
 ## Agents and automation (non-interactive)
 
-Pass explicit flags and **`-y`** to skip TTY prompts in scripts, CI, and agent harnesses. Set **`KENMARK_SKILLS_NONINTERACTIVE=1`** to force non-interactive behavior without `-y`.
+Pass explicit flags and **`-y`** to skip TTY prompts. Set **`KENMARK_SKILLS_NONINTERACTIVE=1`** to force non-interactive behavior without `-y`.
+
+Full flag tables and MCP profiles: [brain/kb/05-api-and-integrations.md](brain/kb/05-api-and-integrations.md).
 
 ### First install
 
 ```bash
-# Kenmark skills only (defaults to cursor, claude, codex when no IDE dirs are found)
 npx kenmark-skills init --global --skip-recommended -y
-
-# Shorthand (same as above when --global is implied)
-npx kenmark-skills init --skip-recommended -y
-
-# Target a specific IDE
 npx kenmark-skills init --global --ide cursor --skip-recommended -y
-npx kenmark-skills init --global --ide claude --skip-recommended -y
-npx kenmark-skills init --global --ide codex --skip-recommended -y
-npx kenmark-skills init --global --ide cursor,claude,codex --skip-recommended -y
-
-# Project-scoped
 npx kenmark-skills init --project --skip-recommended -y
-
-# All IDE paths (advanced — may create clutter)
-npx kenmark-skills init --global --ide all --skip-recommended -y
-
-# Kenmark + specific packs
 npx kenmark-skills init --global --ids impeccable,code-review-skill -y
-```
-
-### Migration from legacy `setup`
-
-```bash
-# Deprecated:
-npx kenmark-skills setup --global -y
-
-# Preferred:
-npx kenmark-skills init --global --skip-recommended -y
-```
-
-Legacy **`setup`** remains for advanced flags (`--copy`, `--force`, `--skip-adopt`) that `init` does not expose:
-
-```powershell
-npx kenmark-skills setup --global --ide cursor --copy --skip-adopt -y
 ```
 
 ### MCP (non-interactive)
 
-Use **`--mcp-servers`**, **`--mcp-profile`**, or **`--with-mcp`** on `init` or legacy `setup`. Plain install does not touch MCP configs.
+Plain install does not touch MCP configs. Opt in with:
 
 ```bash
-npx kenmark-skills init --global --skip-recommended --mcp-profile web -y
 npx kenmark-skills init --global --skip-recommended --mcp-servers playwright,context7 -y
-npx kenmark-skills init --mcp-servers playwright,context7 --global --skip-recommended --ide cursor -y
-npx kenmark-skills init --mcp-profile research --global --skip-recommended -y
-npx kenmark-skills init --with-mcp --global --skip-recommended -y   # profile: all
-# Advanced — every detected harness path (may create clutter):
-# npx kenmark-skills init --mcp-profile research --global --ide all --skip-recommended -y
+npx kenmark-skills init --global --skip-recommended --mcp-profile web -y
+npx kenmark-skills init --with-mcp --global --skip-recommended -y   # all servers
 ```
 
-### Update
+### Update, packs, adopt, cleanup, uninstall
 
 ```bash
 npx kenmark-skills update --both --global -y
-npx kenmark-skills update --kenmark-only --global -y
-npx kenmark-skills update --recommended-only --global --ids impeccable -y
-npx kenmark-skills update --npm-only -y
-npx kenmark-skills update --skip-adopt
-```
-
-### Recommended packs
-
-```bash
 npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y
-npx kenmark-skills install-recommended --profile core-next --global -y   # preset (advanced)
-```
-
-### Inventory, doctor, and adopt
-
-```bash
-npx kenmark-skills inventory --markdown ./report.md -y
-npx kenmark-skills doctor --json ./doctor.json
-npx kenmark-skills doctor --json ./kenmark-doctor.json --no-fail
 npx kenmark-skills adopt --global -y
-npx kenmark-skills adopt --global --adopt-overwrite -y   # when setup reported review-required
-npx kenmark-skills adopt --global --ide all -y         # repair non-portable skill paths
-```
-
-### Cleanup
-
-| Category | Flag | Removes |
-|----------|------|---------|
-| Broken (default) | *(default)* / `--broken-only` | Dangling symlinks only |
-| Legacy | `--legacy-only` | Proven unprefixed Kenmark paths (+ store when applicable) |
-| Hygiene | `--all` | Broken + legacy |
-| Kenmark core | `--kenmark` | kenmark-* bundled skills from selected IDE dirs |
-| Catalog packs | `--recommended` / `--packs` | impeccable, code-review-skill, graphify, ECC skills, etc. |
-| All managed | `--all-managed` | Kenmark core + catalog packs |
-| Full | `--full` | Broken + legacy + all managed skills |
-
-```bash
-npx kenmark-skills cleanup --global --ide auto
-npx kenmark-skills cleanup --global --ide cursor,claude --dry-run -y
-npx kenmark-skills cleanup --global --all -y              # broken + legacy hygiene
-npx kenmark-skills cleanup --global --kenmark --dry-run -y
-npx kenmark-skills cleanup --global --recommended -y      # catalog packs only
-npx kenmark-skills cleanup --global --all-managed -y      # kenmark + packs
-npx kenmark-skills cleanup --full --global --ide auto -y  # everything above
-npx kenmark-skills cleanup --global --kenmark --include-store -y
-```
-
-### Uninstall (non-interactive)
-
-```bash
-npx kenmark-skills uninstall --project -y
+npx kenmark-skills doctor --json ./doctor.json --no-fail
+npx kenmark-skills cleanup --global --recommended -y
+npx kenmark-skills uninstall --global -y
 npx kenmark-skills mcp uninstall --global --ide cursor -y
-npx kenmark-skills uninstall --mcp-only --global -y
-# npx kenmark-skills uninstall --mcp-only --global --ide all -y   # advanced: all IDE paths
 ```
 
-### Environment variable
+Legacy **`setup`** remains for `--copy`, `--force`, `--skip-adopt` not exposed on `init`:
 
 ```bash
-export KENMARK_SKILLS_NONINTERACTIVE=1
-npx kenmark-skills init --global --skip-recommended
+npx kenmark-skills setup --global --ide cursor --copy --skip-adopt -y
 ```
+
+Migration: `setup -y` → `init --skip-recommended -y`. Legacy `setup` runs **Install 36 Kenmark skills** via `setup-skills.js`.
+
+| | `init` | `setup` |
+| --- | --- | --- |
+| **Installs** | Kenmark + optional packs | 36 Kenmark skills |
+| **Later refreshes** | Use `update` | Use `update` |
+
+### Testing skills (links)
+
+[`kenmark-test-plan`](skills/user-skills/kenmark-test-plan/SKILL.md) · [`kenmark-test-unit`](skills/user-skills/kenmark-test-unit/SKILL.md) · [`kenmark-test-integration`](skills/user-skills/kenmark-test-integration/SKILL.md) · [`kenmark-test-e2e`](skills/user-skills/kenmark-test-e2e/SKILL.md) · [`kenmark-test-mocks`](skills/user-skills/kenmark-test-mocks/SKILL.md) · [`kenmark-test-coverage`](skills/user-skills/kenmark-test-coverage/SKILL.md) · [`kenmark-test-ci`](skills/user-skills/kenmark-test-ci/SKILL.md)
+
+### Repository layout
+
+```text
+kenmark-skills/
+├── README.md
+├── brain/                  # dev KB (git only; see brain/INDEX.md)
+├── scripts/cli.js          # kenmark-skills binary
+└── skills/user-skills/     # 36 universal skills + recommended-catalog.json
+```
+
+---
+
+## Contributing
+
+1. Edit skills under `skills/user-skills/<skill-name>/SKILL.md`.
+2. Use the shared frontmatter schema (`name`, `version`, `category`, `scope`, `phase`, `description`, `triggers`, `allowed-tools`, `risk`, `disable-model-invocation`). See [`skills/README.md`](skills/README.md).
+3. Run `npm run validate` (or `npm test`).
+4. Add a dated entry to [`CHANGELOG.md`](CHANGELOG.md).
+5. Update matching `brain/kb/` docs for CLI or catalog changes.
+6. Open a PR.
+
+**Maintainers:** `npm test` · `npm run test:all` · `npm run pack:check` · `npm run publish:public`
 
 ---
 

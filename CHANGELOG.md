@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## v2.3.10 — brain/ knowledge base + README slim (2026-06-07)
+
+### Docs
+
+- **brain/:** Initialized project knowledge base — `rules/`, numbered `kb/`, `features/`, INDEX, CHANGELOG. Documents CLI, 36 skills, MCP, recommended packs, hub store, and workflows.
+- **README:** Reduced to quick start + pointers to `brain/kb/` (~250 lines vs ~800).
+- **AGENTS.md:** Pointer stub to `brain/rules/standards.md`.
+- **.gitignore:** Track `brain/` in git; exclude local `brain/issues/`.
+
 ## v2.3.9 — README interactive vs agent split (2026-06-07)
 
 ### Docs
