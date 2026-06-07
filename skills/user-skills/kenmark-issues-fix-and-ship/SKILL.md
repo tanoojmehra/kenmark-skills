@@ -1,11 +1,16 @@
 ---
 name: kenmark-issues-fix-and-ship
-version: 1.0.0
+version: 1.1.0
 category: workflow
 scope: universal
 phase: ship
-description: "End-to-end orchestrator: parse issue candidates, scan/dedupe INDEX, fix on a feature branch, complete issues, kenmark-commit, and merge (PR default). Use for \"fix issues and ship\", \"issues fix and ship\", or full scan-fix-commit-merge workflows."
+description: "End-to-end issues workflow — take a text blob, create issues, fix them in priority order, maintain status, commit, and merge to main (PR default). Use when the user pastes an issues blob or says \"fix issues end to end\", \"run the issues workflow\", \"blob to merge\", or \"scan, fix, commit, and merge\"."
 triggers:
+  - fix issues end to end
+  - run the issues workflow
+  - issues blob to merge
+  - scan fix commit and merge
+  - blob to merge
   - fix issues and ship
   - issues fix and ship
   - kenmark-issues-fix-and-ship
@@ -20,6 +25,7 @@ allowed-tools:
   - Grep
   - Glob
   - AskUserQuestion
+  - TodoWrite
 risk: git-write
 disable-model-invocation: false
 ---
@@ -31,7 +37,7 @@ disable-model-invocation: false
 Orchestrate the full issue-to-production workflow in repos that use `brain/issues/`:
 
 ```text
-parse candidates → dedupe INDEX → create issues → fix loop → complete issues → commit/push → merge
+parse blob → dedupe INDEX → create issues → fix loop → complete issues → commit/push → merge
 ```
 
 Load sibling skills for each phase — do not reimplement their rules:
@@ -48,47 +54,100 @@ See `references/workflow.md` for phase detail and `references/merge-safety.md` f
 
 ---
 
-## Hard rules
+## Hard rules (non-negotiable)
 
 1. **Read first:** `brain/rules/standards.md`, `brain/issues/INDEX.md`, and `brain/rules/workflow.md` when present.
 2. **Global issue IDs:** never reuse IDs; compute next ID from INDEX + active + `completed/` (see `kenmark-issues-scan`).
-3. **Feature branch:** never commit directly to protected deployment branches unless the user explicitly approves after a CI/CD warning.
-4. **No co-author trailers** in commits (see `kenmark-commit`).
+3. **Feature branch:** never commit on `main`, `master`, `dev`, `develop`, `staging`, or `production` unless the user explicitly approves after a CI/CD warning.
+4. **No co-author trailers** — never add `Co-authored-by:`, `Made-with:`, or similar; verify each commit with `git log -1 --format=%B`.
 5. **No force push**, **no `--no-verify`**, **no git config** changes.
 6. **Code and KB move together** — update `brain/kb/` and `brain/CHANGELOG.md` for behavioral changes.
-7. **Merge default:** open a PR; direct merge to `main`/`master` only when the user explicitly requests it.
+7. **Merge default:** open a PR; direct merge only when the user explicitly requests it.
+8. **Stop if zero new issues** — when the blob yields no unique candidates after dedupe, report and stop before creating a feature branch.
+9. **Confirm large or risky fixes** — when a fix touches many files (>8 unrelated paths) or changes a public API surface, pause and confirm with the user before committing.
 
 ---
 
-## Phase 1 — Parse candidates and dedupe
+## Phase 0 — Preconditions
 
-1. Accept a blob (user message, scan notes, or pasted findings).
-2. Read `brain/issues/INDEX.md` and list existing titles / IDs.
-3. Drop duplicates of open or completed issues (same bug pattern or file).
-4. Assign next IDs per `kenmark-issues-scan` ID ledger rules.
+```bash
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+test -f "$REPO_ROOT/brain/issues/INDEX.md" || echo "STOP: run kenmark-issues-setup first"
+git rev-parse --abbrev-ref HEAD
+git status --short
+```
 
-Output a short plan: candidate issues, IDs to assign, files likely touched.
+If `INDEX.md` is missing, run `kenmark-issues-setup` or stop. If INDEX ledger disagrees with folders, run `kenmark-issues-maintain` before creating issues.
+
+---
+
+## Phase 1 — Parse blob and dedupe
+
+1. Accept a blob (user message, pasted findings, scan notes, or bullet list).
+2. Split into candidate issues — one bug/gap per candidate with title, evidence paths, and suggested fix.
+3. Read `brain/issues/INDEX.md` and grep existing issue titles:
+
+```bash
+ISSUES_DIR="$(git rev-parse --show-toplevel)/brain/issues"
+grep -h "^title:" "$ISSUES_DIR"/*.md "$ISSUES_DIR/completed"/*.md 2>/dev/null | sort -u
+```
+
+4. Drop duplicates of open or completed issues (same bug pattern, same primary file, or same title).
+5. Compute next IDs per `kenmark-issues-scan` ID ledger rules.
+
+**Stop gate:** if zero unique candidates remain, report "no new issues from blob" and stop. Do not create a feature branch or empty commits.
+
+Output a short plan: candidate issues, IDs to assign, files likely touched, estimated priority (P0/P1/P2).
 
 ---
 
 ## Phase 2 — Create issues
 
-Follow `kenmark-issues-scan` Step 5–6:
+Follow `kenmark-issues-scan` Steps 5–6:
 
-- Write `brain/issues/{id}-{slug}.md` with frontmatter and acceptance criteria.
-- Update `INDEX.md` ledger, counts, and priority tables.
+- Write `brain/issues/{id}-{slug}.md` with frontmatter (`id`, `title`, `severity`, `area`, `source: kenmark-issues-fix-and-ship`, `status: open`, `created`, `files`, `related`) and acceptance criteria.
+- Update `INDEX.md` ledger (`Last Assigned ID`, `Next ID`), counts, and priority tables.
+
+Set `status: in-progress` in frontmatter when starting fixes in Phase 3 (optional; revert to `open` if abandoning).
 
 ---
 
 ## Phase 3 — Fix loop (feature branch)
 
-1. **Branch safety** (see `kenmark-commit` Step 2): create `fix/` or `feature/` branch if on a protected branch or if the current branch name mismatches the work.
-2. For each open issue (priority order P0 → P1 → P2):
-   - Read issue evidence and `files:` hints.
-   - Implement the smallest correct fix; match repo conventions.
-   - Run quality gates when feasible: `pnpm typecheck`, `pnpm lint`, tests relevant to the change.
-   - Update impacted `brain/kb/` files.
-3. If INDEX drift appears (missing files, wrong counts), run `kenmark-issues-maintain` before closing issues.
+### Branch safety (before any code edit)
+
+Follow `kenmark-commit` Step 2:
+
+```bash
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+```
+
+If on a protected branch or branch name mismatches the work, create:
+
+```bash
+git switch -c fix/<short-summary>
+# or: git switch -c feature/<short-summary>
+```
+
+### Per-issue loop (P0 → P1 → P2)
+
+For each open issue from this run (or all open if user asked to fix existing backlog):
+
+1. Read issue `files:` and Evidence section.
+2. Search codebase to confirm the bug still exists.
+3. Implement the **smallest correct fix**; match repo naming and patterns.
+4. Update impacted `brain/kb/` files when behavior, API, schema, auth, UI, deploy, or workflow changed.
+5. Run quality gates when feasible (detect from `package.json` scripts):
+
+```bash
+pnpm typecheck   # or npm run typecheck / yarn typecheck
+pnpm lint        # or npm run lint
+pnpm test        # when tests exist and cover the change
+```
+
+6. If INDEX drift appears, run `kenmark-issues-maintain` before closing issues.
+
+**Pause gate:** if a single fix touches >8 unrelated file paths or changes a public API (exported types, route contracts, env vars), ask the user to confirm before proceeding.
 
 ---
 
@@ -98,32 +157,69 @@ Follow `kenmark-issues-check`:
 
 1. Verify each fixed issue against the codebase (grep / read evidence paths).
 2. Move resolved files to `brain/issues/completed/`.
-3. Add `completed: YYYY-MM-DD` to frontmatter; update `INDEX.md` active/completed tables.
-4. Skip AskUserQuestion when the user explicitly invoked this orchestrator for a full ship run and evidence is clear.
+3. Add `completed: YYYY-MM-DD` and `status: completed` to frontmatter; update `INDEX.md` active/completed tables.
+4. Skip `AskUserQuestion` when the user explicitly invoked this orchestrator for a full ship run and evidence is clear.
+5. Run `kenmark-issues-maintain` if counts or ledger drift after bulk closes.
 
 ---
 
-## Phase 5 — Commit and push
+## Phase 5 — Pre-commit validation
+
+Before invoking `kenmark-commit`, run repo validation:
+
+```bash
+pnpm typecheck && pnpm lint
+# Add pnpm test when the repo has meaningful tests for touched areas
+```
+
+Report failures honestly; fix or ask the user before committing.
+
+---
+
+## Phase 6 — Commit and push
 
 Invoke `kenmark-commit`:
 
-- Group logical commits by area.
-- Include `brain/` updates in the same push batch.
+- Group logical commits by area (code + matching `brain/` in same batch).
+- Never stage `.env`, credentials, or secrets.
+- After each commit: `git log -1 --format=%B` — abort if co-author trailers appear.
 - Push with `-u origin HEAD` when no upstream exists.
 
 ---
 
-## Phase 6 — Merge
+## Phase 7 — Merge
 
-**Default:** create a PR (`gh pr create`) with summary and test plan.
+**Default (PR-first):**
 
-**Direct merge** only when the user explicitly says e.g. "merge to main" and accepts CI/CD may run:
+```bash
+gh pr create --title "fix: <summary>" --body "$(cat <<'EOF'
+## Summary
+- <issue IDs and fixes>
+
+## Test plan
+- [ ] typecheck
+- [ ] lint
+- [ ] manual verification of <area>
+EOF
+)"
+```
+
+Ask the user to confirm merge target every time:
+
+```
+Merge target?
+A) Open PR only (recommended)
+B) Merge PR to main/master after CI
+C) Direct merge to <branch> — I understand CI/CD may run
+```
+
+**Direct merge** only when the user explicitly chooses C and names the branch. See `references/merge-safety.md`.
+
+Before merge:
 
 1. Ensure PR checks pass or user waived them.
 2. Merge via `gh pr merge` (squash or merge per repo convention).
-3. Report PR URL and merge commit on the default branch.
-
-Never force-push protected branches.
+3. Never force-push protected branches.
 
 ---
 
@@ -131,8 +227,26 @@ Never force-push protected branches.
 
 Return to the user:
 
-- Issue IDs created and completed (with dates)
-- Root cause and fix summary per bug
-- Skill/files touched (if this workflow added skills or KB)
-- Checks run (typecheck, lint, test)
-- Branch, commit SHAs, PR URL, merge result
+| Item | Detail |
+| --- | --- |
+| Issues created | IDs and titles |
+| Issues completed | IDs with completion dates |
+| Fixes | Root cause + fix summary per bug |
+| Checks | typecheck, lint, test — pass/fail |
+| Git | branch, commit SHAs + subjects |
+| Ship | PR URL, merge result (if merged) |
+| KB | `brain/kb/` and `CHANGELOG.md` files updated |
+
+---
+
+## Quick reference — do / don't
+
+| Do | Don't |
+| --- | --- |
+| Feature branch off protected branches | Commit directly on `main`/`dev` |
+| Dedupe blob against INDEX + completed | Create duplicate issues |
+| Stop when blob yields zero new issues | Open empty PRs |
+| `git log -1 --format=%B` after each commit | Co-authored-by trailers |
+| PR by default | Force-push protected branches |
+| Confirm large/API-breaking fixes | Silent wide refactors |
+| `kenmark-commit` grouping rules | `git add -A` blindly |
