@@ -276,7 +276,7 @@ async function run() {
 
   let mode = args.mode || "global";
   if (interactive && !args.explicitMode) {
-    mode = await promptScope(mode);
+    mode = await promptScope(mode, { purpose: "cleanup" });
   }
 
   let categories = resolveCleanupCategories(args);
