@@ -29,7 +29,7 @@ function printUsage() {
   console.log("  kenmark-skills adopt [--global|--project] [--ide <target>] [--dry-run] [-y]");
   console.log("  kenmark-skills validate");
   console.log("  kenmark-skills doctor [--soft] [--no-fail] [--json path]");
-  console.log("  kenmark-skills cleanup [--global|--project] [--ide <target>] [--dry-run] [-y]");
+  console.log("  kenmark-skills cleanup [--global|--project] [--ide <target>] [--kenmark|--recommended|--all-managed|--full] [--dry-run] [-y]");
   console.log("  kenmark-skills version");
   console.log("  kenmark-skills help");
   console.log("");

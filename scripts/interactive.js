@@ -440,6 +440,76 @@ async function promptHighBloatConfirm() {
   return lower === "y" || lower === "yes";
 }
 
+function parseCleanupCategoryChoice(answer) {
+  const c = { broken: false, legacy: false, kenmark: false, recommended: false };
+  if (!answer) {
+    c.broken = true;
+    return c;
+  }
+  const lower = answer.toLowerCase();
+  if (lower === "defaults" || lower === "default" || lower === "d" || lower === "1") {
+    c.broken = true;
+    return c;
+  }
+  if (lower === "full" || lower === "6" || lower === "everything") {
+    c.broken = true;
+    c.legacy = true;
+    c.kenmark = true;
+    c.recommended = true;
+    return c;
+  }
+  if (lower === "all-managed" || lower === "managed" || lower === "5") {
+    c.kenmark = true;
+    c.recommended = true;
+    return c;
+  }
+  if (lower === "all" || lower === "hygiene") {
+    c.broken = true;
+    c.legacy = true;
+    return c;
+  }
+
+  const parts = lower.split(/[\s,]+/).filter(Boolean);
+  for (const part of parts) {
+    if (part === "1" || part === "broken" || part === "broken-only") c.broken = true;
+    if (part === "2" || part === "legacy" || part === "legacy-only") c.legacy = true;
+    if (part === "3" || part === "kenmark" || part === "core") c.kenmark = true;
+    if (
+      part === "4" ||
+      part === "recommended" ||
+      part === "packs" ||
+      part === "pack" ||
+      part === "catalog"
+    ) {
+      c.recommended = true;
+    }
+  }
+  if (!c.broken && !c.legacy && !c.kenmark && !c.recommended) {
+    c.broken = true;
+  }
+  return c;
+}
+
+/**
+ * @returns {Promise<{broken: boolean, legacy: boolean, kenmark: boolean, recommended: boolean}>}
+ */
+async function promptCleanupCategories() {
+  const rl = createRl();
+  console.log("\nWhat should cleanup remove?\n");
+  console.log("  1) broken      — dangling symlinks only [default]");
+  console.log("  2) legacy      — proven unprefixed Kenmark paths (+ store when applicable)");
+  console.log("  3) kenmark     — kenmark-* bundled skills from selected IDE dirs");
+  console.log("  4) recommended — catalog pack skills (impeccable, graphify, ECC, …)");
+  console.log("  5) all-managed — kenmark + recommended packs");
+  console.log("  6) full        — broken + legacy + all managed skills\n");
+  console.log(
+    "Enter: numbers 1,3 · ids broken,kenmark · all-managed · full · Enter for broken only\n"
+  );
+  const answer = await ask(rl, "Choice> ");
+  rl.close();
+  return parseCleanupCategoryChoice(answer);
+}
+
 /**
  * @param {Array<{id: string, description: string, servers: string[]}>} profiles
  * @param {{ defaultProfile?: string, askInstall?: boolean, installPrompt?: string }} opts
@@ -504,6 +574,8 @@ module.exports = {
   promptSelectProfile,
   printProfileSummary,
   promptHighBloatConfirm,
+  promptCleanupCategories,
+  parseCleanupCategoryChoice,
   promptEccProfile,
   promptMcpProfile,
   confirmPlan,

@@ -140,6 +140,7 @@ function run() {
   if (Object.values(report.brokenSymlinksByIde).some((items) => items.length)) {
     console.log("\nSuggested fix:");
     console.log("  npx kenmark-skills cleanup --global --ide auto -y");
+    console.log("  npx kenmark-skills cleanup --global --kenmark --dry-run   # preview kenmark-* removal");
     console.log("  npx kenmark-skills cleanup --global --all --dry-run   # preview legacy + broken");
     const copyFlag = report.platform === "win32" ? " --copy" : "";
     console.log("  To refresh working links after cleanup:");

@@ -1209,6 +1209,24 @@ function getAdoptableSkillNames(sourceUserSkillsDir, catalogPath, options = {}) 
   return [...names].sort();
 }
 
+/** First-party kenmark-* skills shipped in this package (same as bundled list). */
+function listKenmarkCoreSkillNames(sourceUserSkillsDir) {
+  return listKenmarkBundledSkillNames(sourceUserSkillsDir);
+}
+
+/** Catalog / recommended pack skill folder names (adoptable minus kenmark core). */
+function listRecommendedPackSkillNames(sourceUserSkillsDir, catalogPath, options = {}) {
+  const core = new Set(listKenmarkBundledSkillNames(sourceUserSkillsDir));
+  return getAdoptableSkillNames(sourceUserSkillsDir, catalogPath, options).filter(
+    (name) => !core.has(name)
+  );
+}
+
+/** Kenmark core + catalog pack skills (everything Kenmark can adopt/relink). */
+function listAllManagedSkillNames(sourceUserSkillsDir, catalogPath, options = {}) {
+  return getAdoptableSkillNames(sourceUserSkillsDir, catalogPath, options);
+}
+
 function newestMtime(dirPath) {
   const skillMd = path.join(dirPath, "SKILL.md");
   if (!fs.existsSync(skillMd)) return 0;
@@ -1624,6 +1642,74 @@ function uninstallKenmarkFromIdes(skillNames, targetMap, { keepStore = true, dry
     for (const name of skillNames) {
       removePathIfExists(path.join(storeDir, name));
     }
+  }
+
+  return results;
+}
+
+/**
+ * Surgical cleanup of Kenmark-managed skill names from IDE dirs and optionally the store.
+ * Only removes paths whose basename is in skillNames (never scans for arbitrary folders).
+ */
+function removeManagedSkillsForCleanup(
+  skillNames,
+  targetMap,
+  { dryRun = false, includeStore = false } = {}
+) {
+  const storeDir = getStoreDir();
+  const manifest = readManifest();
+  const results = [];
+  let manifestChanged = false;
+  const names = [...new Set(skillNames || [])];
+
+  for (const name of names) {
+    for (const [ide, targetPath] of Object.entries(targetMap || {})) {
+      if (!targetPath) continue;
+      const idePath = path.join(targetPath, name);
+      if (!pathEntryExists(idePath)) continue;
+
+      if (dryRun) {
+        results.push({ name, path: idePath, ide, action: "would-remove" });
+        continue;
+      }
+      removePathIfExists(idePath);
+      results.push({ name, path: idePath, ide, action: "removed" });
+    }
+
+    if (includeStore) {
+      const storePath = path.join(storeDir, name);
+      if (pathEntryExists(storePath)) {
+        if (dryRun) {
+          results.push({ name, path: storePath, ide: "store", action: "would-remove" });
+        } else {
+          removePathIfExists(storePath);
+          results.push({ name, path: storePath, ide: "store", action: "removed" });
+        }
+      }
+      if (manifest.skills?.[name]) {
+        if (dryRun) {
+          results.push({
+            name,
+            path: path.join(storeDir, name),
+            ide: "manifest",
+            action: "would-remove-manifest"
+          });
+        } else {
+          delete manifest.skills[name];
+          manifestChanged = true;
+          results.push({
+            name,
+            path: path.join(storeDir, name),
+            ide: "manifest",
+            action: "removed-manifest"
+          });
+        }
+      }
+    }
+  }
+
+  if (!dryRun && includeStore && manifestChanged) {
+    writeManifest(manifest);
   }
 
   return results;
@@ -2250,6 +2336,9 @@ module.exports = {
   readManifest,
   writeManifest,
   listKenmarkBundledSkillNames,
+  listKenmarkCoreSkillNames,
+  listRecommendedPackSkillNames,
+  listAllManagedSkillNames,
   getAdoptableSkillNames,
   resolvePackAdoptSkillNames,
   isCatalogSkillPack,
@@ -2262,6 +2351,7 @@ module.exports = {
   relinkSkillsToIdes,
   adoptCatalogSkills,
   uninstallKenmarkFromIdes,
+  removeManagedSkillsForCleanup,
   readMcpDocument,
   installMcpToStore,
   installMcpToIdes,

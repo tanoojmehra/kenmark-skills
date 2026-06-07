@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Integration test: kenmark-skills cleanup removes broken symlinks in a temp HOME.
+ * Integration test: kenmark-skills cleanup modes in a temp HOME.
  */
 
 const os = require("os");
@@ -26,6 +26,25 @@ function rmDirSafe(dir) {
   fs.rmSync(dir, { recursive: true, force: true });
 }
 
+function runCleanup(args, home) {
+  return spawnSync(process.execPath, [cliPath, "cleanup", ...args], {
+    cwd: repoRoot,
+    env: { ...process.env, HOME: home },
+    encoding: "utf8"
+  });
+}
+
+function writeSkillDir(dir, name) {
+  const skillDir = path.join(dir, name);
+  fs.mkdirSync(skillDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(skillDir, "SKILL.md"),
+    `---\nname: ${name}\n---\n# ${name}\n`,
+    "utf8"
+  );
+  return skillDir;
+}
+
 function main() {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kenmark-cleanup-"));
   const home = path.join(tmp, "home");
@@ -38,15 +57,7 @@ function main() {
     fs.mkdirSync(geminiSkills, { recursive: true });
     fs.symlinkSync(missingTarget, path.join(geminiSkills, "stale-skill"), "dir");
 
-    const dryRun = spawnSync(
-      process.execPath,
-      [cliPath, "cleanup", "--global", "--ide", "gemini", "--dry-run", "-y"],
-      {
-        cwd: repoRoot,
-        env: { ...process.env, HOME: home },
-        encoding: "utf8"
-      }
-    );
+    const dryRun = runCleanup(["--global", "--ide", "gemini", "--dry-run", "-y"], home);
     if (dryRun.status !== 0) {
       throw new Error(`cleanup --dry-run exited with ${dryRun.status}`);
     }
@@ -57,15 +68,7 @@ function main() {
       throw new Error("Dry-run should not remove the broken symlink");
     }
 
-    const cleanup = spawnSync(
-      process.execPath,
-      [cliPath, "cleanup", "--global", "--ide", "gemini", "-y"],
-      {
-        cwd: repoRoot,
-        env: { ...process.env, HOME: home },
-        encoding: "utf8"
-      }
-    );
+    const cleanup = runCleanup(["--global", "--ide", "gemini", "-y"], home);
     if (cleanup.status !== 0) {
       console.error(cleanup.stdout);
       console.error(cleanup.stderr);
@@ -76,6 +79,51 @@ function main() {
     }
     if (!/Removed 1 broken symlink/.test(cleanup.stdout || "")) {
       throw new Error("Expected cleanup summary to report 1 removed broken symlink");
+    }
+
+    const cursorSkills = path.join(home, ".cursor", "skills");
+    fs.mkdirSync(cursorSkills, { recursive: true });
+    writeSkillDir(cursorSkills, "kenmark-commit");
+    writeSkillDir(cursorSkills, "impeccable");
+    writeSkillDir(cursorSkills, "my-custom-skill");
+
+    const kenmarkDry = runCleanup(
+      ["--global", "--ide", "cursor", "--kenmark", "--dry-run", "-y"],
+      home
+    );
+    if (kenmarkDry.status !== 0) {
+      throw new Error(`cleanup --kenmark --dry-run exited with ${kenmarkDry.status}`);
+    }
+    if (!/Would remove 1 kenmark-\* skill path/.test(kenmarkDry.stdout || "")) {
+      throw new Error("Expected kenmark dry-run to report 1 kenmark skill path");
+    }
+    if (!pathEntryExists(path.join(cursorSkills, "kenmark-commit"))) {
+      throw new Error("Kenmark dry-run should not remove kenmark-commit");
+    }
+
+    const kenmarkRun = runCleanup(["--global", "--ide", "cursor", "--kenmark", "-y"], home);
+    if (kenmarkRun.status !== 0) {
+      throw new Error(`cleanup --kenmark exited with ${kenmarkRun.status}`);
+    }
+    if (pathEntryExists(path.join(cursorSkills, "kenmark-commit"))) {
+      throw new Error("Expected kenmark-commit to be removed by --kenmark cleanup");
+    }
+    if (!pathEntryExists(path.join(cursorSkills, "impeccable"))) {
+      throw new Error("impeccable should remain after --kenmark cleanup");
+    }
+    if (!pathEntryExists(path.join(cursorSkills, "my-custom-skill"))) {
+      throw new Error("my-custom-skill should never be removed by cleanup");
+    }
+
+    const packsRun = runCleanup(["--global", "--ide", "cursor", "--packs", "-y"], home);
+    if (packsRun.status !== 0) {
+      throw new Error(`cleanup --packs exited with ${packsRun.status}`);
+    }
+    if (pathEntryExists(path.join(cursorSkills, "impeccable"))) {
+      throw new Error("Expected impeccable to be removed by --packs cleanup");
+    }
+    if (!pathEntryExists(path.join(cursorSkills, "my-custom-skill"))) {
+      throw new Error("my-custom-skill should remain after --packs cleanup");
     }
 
     console.log("Cleanup temp HOME test passed.");

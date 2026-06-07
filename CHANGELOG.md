@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## v2.3.7 — Cleanup managed skills (2026-06-07)
+
+### Feature
+
+- **`kenmark-skills cleanup`:** Expanded categories beyond broken/legacy hygiene — `--kenmark`, `--recommended` / `--packs`, `--all-managed`, and `--full`. Interactive mode prompts for categories. `--include-store` clears matching store entries. Only removes known Kenmark-managed or catalog pack skill names (never arbitrary user skills).
+
+### Docs
+
+- **README:** Cleanup operations table, examples, and clarification vs `uninstall`.
+
+### Test
+
+- **test-cleanup-temp-home.js:** Covers `--kenmark` and `--packs` modes; verifies user-owned skills are untouched.
+
 ## v2.3.6 — Cleanup subcommand (2026-06-07)
 
 ### Feature

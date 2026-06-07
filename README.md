@@ -288,7 +288,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | `adopt` | Consolidate catalog skills on disk into the store + relink |
 | `validate` | Repo/package invariants (skills, catalog JSON, `package.json`, forbidden terms); same checks as `npm test` |
 | `doctor` | Diagnose local install: store, manifest, MCP (`npx`/`uvx` on PATH), IDE links, symlinks, hash drift |
-| `cleanup` | Remove broken symlinks and proven legacy Kenmark paths (opt-in; lighter than uninstall) |
+| `cleanup` | Surgical removal by category: broken symlinks, legacy paths, kenmark-* skills, catalog packs |
 | `inventory` | Report on installed skills (keep / dedupe / remove) |
 | `subagents-inventory` | Same for sub-agents (alias: `agents-inventory`) |
 
@@ -359,8 +359,11 @@ When store content already exists but differs from an IDE copy, adopt reports **
 | `--soft` | doctor | Warnings only; exit 0 (e.g. before first `setup`) |
 | `--json <path>` | doctor, inventory | Write full JSON report |
 | `--no-fail` | doctor | Exit 0 with issues still listed (`ok: false` in `--json`; use `--soft` to downgrade to warnings) |
-| `--dry-run` | cleanup | List broken symlinks / legacy paths without deleting |
-| `--broken-only` / `--legacy-only` / `--all` | cleanup | Cleanup mode (default: `--broken-only`) |
+| `--dry-run` | cleanup | List targets without deleting |
+| `--broken-only` / `--legacy-only` / `--all` | cleanup | Hygiene presets (default: `--broken-only`) |
+| `--kenmark` / `--recommended` / `--packs` | cleanup | Remove kenmark-* or catalog pack skills from IDE dirs |
+| `--all-managed` / `--full` | cleanup | kenmark + packs, or everything Kenmark manages |
+| `--include-store` | cleanup | Also clear matching ~/.kenmark/store entries |
 
 ---
 
@@ -582,14 +585,31 @@ npx kenmark-skills doctor --json ./kenmark-doctor.json
 npx kenmark-skills doctor --json ./kenmark-doctor.json --no-fail
 ```
 
-### Cleanup (broken links and legacy paths)
+### Cleanup (broken links, legacy paths, managed skills)
 
-`doctor` reports broken symlinks but does not remove them. Use **`cleanup`** to opt in — safer than `uninstall` because it only removes dangling symlinks and proven legacy Kenmark folder names (same ownership checks as `setup`).
+`doctor` reports broken symlinks but does not remove them. Use **`cleanup`** for surgical removal by category — safer and more flexible than `uninstall`.
+
+| Category | Flag | Removes |
+|----------|------|---------|
+| Broken (default) | *(default)* / `--broken-only` | Dangling symlinks only |
+| Legacy | `--legacy-only` | Proven unprefixed Kenmark paths (+ store when applicable) |
+| Hygiene | `--all` | Broken + legacy |
+| Kenmark core | `--kenmark` | kenmark-* bundled skills from selected IDE dirs |
+| Catalog packs | `--recommended` / `--packs` | impeccable, code-review-skill, graphify, ECC skills, etc. |
+| All managed | `--all-managed` | Kenmark core + catalog packs |
+| Full | `--full` | Broken + legacy + all managed skills |
+
+**vs `uninstall`:** `uninstall` removes all kenmark-* bundled skills from IDE folders (store preserved by default). It does **not** remove catalog pack skills. `cleanup` lets you pick categories — e.g. remove only recommended packs, or only broken links.
 
 ```bash
 npx kenmark-skills cleanup --global --ide auto
 npx kenmark-skills cleanup --global --ide cursor,claude --dry-run -y
-npx kenmark-skills cleanup --global --all -y    # broken symlinks + legacy paths
+npx kenmark-skills cleanup --global --all -y              # broken + legacy hygiene
+npx kenmark-skills cleanup --global --kenmark --dry-run -y
+npx kenmark-skills cleanup --global --recommended -y      # catalog packs only
+npx kenmark-skills cleanup --global --all-managed -y      # kenmark + packs
+npx kenmark-skills cleanup --full --global --ide auto -y  # everything above
+npx kenmark-skills cleanup --global --kenmark --include-store -y
 ```
 
 ---
