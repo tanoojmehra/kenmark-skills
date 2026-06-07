@@ -29,6 +29,7 @@ function printUsage() {
   console.log("  kenmark-skills adopt [--global|--project] [--ide <target>] [--dry-run] [-y]");
   console.log("  kenmark-skills validate");
   console.log("  kenmark-skills doctor [--soft] [--no-fail] [--json path]");
+  console.log("  kenmark-skills cleanup [--global|--project] [--ide <target>] [--dry-run] [-y]");
   console.log("  kenmark-skills version");
   console.log("  kenmark-skills help");
   console.log("");
@@ -151,6 +152,14 @@ if (command === "validate") {
 
 if (command === "doctor") {
   const scriptPath = path.join(__dirname, "doctor.js");
+  const result = spawnSync(process.execPath, [scriptPath, ...args.slice(1)], {
+    stdio: "inherit"
+  });
+  process.exit(result.status === null ? 1 : result.status);
+}
+
+if (command === "cleanup") {
+  const scriptPath = path.join(__dirname, "kenmark-cleanup.js");
   const result = spawnSync(process.execPath, [scriptPath, ...args.slice(1)], {
     stdio: "inherit"
   });

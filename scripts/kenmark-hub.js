@@ -2266,5 +2266,7 @@ module.exports = {
   installMcpToStore,
   installMcpToIdes,
   uninstallMcpFromIdes,
+  findBrokenSymlinks,
+  removePathIfExists,
   runDoctor
 };

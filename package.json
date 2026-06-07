@@ -1,7 +1,7 @@
 {
   "name": "kenmark-skills",
-  "version": "2.3.5",
-  "description": "36 universal Kenmark agent skills + 11-command CLI for Cursor, Claude Code, Codex, and other SKILL.md-compatible agents. Includes setup, init, update, adopt, validate, doctor, inventory, mcp, selectable optional packs with repo-aware suggestions, kenmark-repo-* maintenance skills, kenmark-security-review, kenmark-performance, and kenmark-test-* testing suite skills.",
+  "version": "2.3.6",
+  "description": "36 universal Kenmark agent skills + 12-command CLI for Cursor, Claude Code, Codex, and other SKILL.md-compatible agents. Includes setup, init, update, adopt, cleanup, validate, doctor, inventory, mcp, selectable optional packs with repo-aware suggestions, kenmark-repo-* maintenance skills, kenmark-security-review, kenmark-performance, and kenmark-test-* testing suite skills.",
   "license": "MIT",
   "private": false,
   "type": "commonjs",
@@ -20,6 +20,7 @@
     "inventory": "node scripts/cli.js inventory",
     "subagents-inventory": "node scripts/cli.js subagents-inventory",
     "install-recommended": "node scripts/cli.js install-recommended",
+    "cleanup": "node scripts/cli.js cleanup",
     "doctor": "node scripts/cli.js doctor",
     "doctor:local": "node scripts/cli.js doctor",
     "check": "node scripts/cli.js doctor",
@@ -29,7 +30,7 @@
     "test:packs-verify": "node scripts/test-packs-verify-skip.js",
     "test:install": "node scripts/test-install-temp-home.js",
     "test:pack": "node scripts/test-pack.js",
-    "test:broken-links": "node scripts/test-broken-symlink-cleanup.js",
+    "test:broken-links": "node scripts/test-broken-symlink-cleanup.js && node scripts/test-cleanup-temp-home.js",
     "test:portability": "node scripts/test-skill-portability.js",
     "test:all": "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability",
     "prepublishOnly": "npm run test:all && npm run pack:check",
@@ -51,6 +52,7 @@
     "scripts/setup-skills.js",
     "scripts/skills-adopt.js",
     "scripts/doctor.js",
+    "scripts/kenmark-cleanup.js",
     "scripts/validate.js",
     "scripts/validate-repo.js",
     "scripts/kenmark-setup.js",
@@ -63,6 +65,7 @@
     "scripts/test-install-temp-home.js",
     "scripts/test-pack.js",
     "scripts/test-broken-symlink-cleanup.js",
+    "scripts/test-cleanup-temp-home.js",
     "scripts/test-skill-portability.js"
   ],
   "engines": {

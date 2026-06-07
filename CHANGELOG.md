@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## v2.3.6 — Cleanup subcommand (2026-06-07)
+
+### Feature
+
+- **`kenmark-skills cleanup`:** Opt-in removal of broken skill symlinks and proven legacy Kenmark paths (`--broken-only` default, `--legacy-only`, `--all`). Supports `--global` / `--project`, `--ide`, `--dry-run`, and `-y`. Reuses setup legacy ownership checks; proven legacy removals are backed up under `~/.kenmark/backups/legacy-cleanup/`.
+- **`doctor`:** Suggested fix now points to `cleanup` before re-running `setup`.
+
+### Test
+
+- **test-cli-smoke.js:** `cleanup --dry-run --global -y`.
+- **test-cleanup-temp-home.js:** Temp `HOME` integration test for broken symlink removal.
+
 ## v2.3.5 — MCP prompts in init/setup/update (2026-06-07)
 
 ### Feature

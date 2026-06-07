@@ -73,7 +73,8 @@ const COMMANDS = [
     "--dry-run"
   ],
   ["update", "--both", "--global", "--ide", "auto", "--dry-run", "-y"],
-  ["doctor", "--soft", "--no-fail"]
+  ["doctor", "--soft", "--no-fail"],
+  ["cleanup", "--dry-run", "--global", "-y"]
 ];
 
 /** @type {{ args: string[], expectStdout?: RegExp[], rejectStdout?: RegExp[] }[]} */

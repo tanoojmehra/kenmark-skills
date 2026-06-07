@@ -138,11 +138,12 @@ function run() {
   }
 
   if (Object.values(report.brokenSymlinksByIde).some((items) => items.length)) {
-    const copyFlag = report.platform === "win32" ? " --copy" : "";
     console.log("\nSuggested fix:");
+    console.log("  npx kenmark-skills cleanup --global --ide auto -y");
+    console.log("  npx kenmark-skills cleanup --global --all --dry-run   # preview legacy + broken");
+    const copyFlag = report.platform === "win32" ? " --copy" : "";
+    console.log("  To refresh working links after cleanup:");
     console.log(`  npx kenmark-skills setup --global --ide auto${copyFlag} -y`);
-    console.log("  If stale links exist in Kenmark-managed IDE dirs too:");
-    console.log(`  npx kenmark-skills setup --global --ide all${copyFlag} -y`);
   }
 
   if (report.platform === "win32") {

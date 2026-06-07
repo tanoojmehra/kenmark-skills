@@ -91,6 +91,7 @@ const REQUIRED_PACKAGE_SCRIPTS = [
   "inventory",
   "subagents-inventory",
   "install-recommended",
+  "cleanup",
   "doctor",
   "doctor:local",
   "check",
@@ -118,6 +119,7 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/recommended-catalog.js",
   "scripts/setup-skills.js",
   "scripts/doctor.js",
+  "scripts/kenmark-cleanup.js",
   "scripts/validate.js",
   "scripts/validate-repo.js",
   "scripts/kenmark-setup.js",
@@ -132,6 +134,7 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/test-install-temp-home.js",
   "scripts/test-pack.js",
   "scripts/test-broken-symlink-cleanup.js",
+  "scripts/test-cleanup-temp-home.js",
   "scripts/test-skill-portability.js"
 ];
 
@@ -1133,9 +1136,12 @@ function validatePackageJson() {
       'package.json: scripts["test:all"] must be "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability"'
     );
   }
-  if (scripts["test:broken-links"] !== "node scripts/test-broken-symlink-cleanup.js") {
+  if (
+    scripts["test:broken-links"] !==
+    "node scripts/test-broken-symlink-cleanup.js && node scripts/test-cleanup-temp-home.js"
+  ) {
     fail(
-      'package.json: scripts["test:broken-links"] must be "node scripts/test-broken-symlink-cleanup.js"'
+      'package.json: scripts["test:broken-links"] must chain test-broken-symlink-cleanup.js and test-cleanup-temp-home.js'
     );
   }
   if (scripts["test:portability"] !== "node scripts/test-skill-portability.js") {
