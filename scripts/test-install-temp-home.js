@@ -47,7 +47,7 @@ function main() {
 
     const result = spawnSync(
       process.execPath,
-      [cliPath, "setup", "--global", "--ide", "claude", "-y", "--skip-adopt"],
+      [cliPath, "setup", "--global", "--ide", "claude", "-y"],
       {
         cwd: repoRoot,
         stdio: "inherit",
@@ -106,6 +106,20 @@ function main() {
       manifest.skills && Object.keys(manifest.skills).length > 0,
       "manifest.json has no skills entries"
     );
+
+    const otherIdePaths = [
+      path.join(tempHome, ".cursor", "skills"),
+      path.join(tempHome, ".agents", "skills"),
+      path.join(tempHome, ".gemini", "skills")
+    ];
+    for (const idePath of otherIdePaths) {
+      if (!fs.existsSync(idePath)) continue;
+      const names = listDirNames(idePath).filter((n) => n.startsWith("kenmark-"));
+      assert(
+        names.length === 0,
+        `expected no kenmark-* skills under ${idePath}, found: ${names.join(", ")}`
+      );
+    }
 
     console.log("\nOK — temp HOME install integration test passed.");
   } catch (err) {

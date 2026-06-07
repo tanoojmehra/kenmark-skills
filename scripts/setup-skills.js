@@ -35,6 +35,7 @@ const {
   detectInstalledIdes,
   detectManagedIdes,
   resolveExplicitTargetIdes,
+  buildTargetMapForIdes,
   ensureKenmarkTargetPath,
   resolveFallbackTargetIdes,
   resolveLinkModeLabel
@@ -256,6 +257,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
   const skillNames = listKenmarkBundledSkillNames(sourceDir);
   const storeDir = getStoreDir();
   const linkMode = resolveLinkModeLabel({ forceCopy, forceSymlink, preferCopyOnWindows });
+  const selectedTargetMap = buildTargetMapForIdes(targetMap, targetIdes);
 
   const plan = [];
   if (action === "install") {
@@ -308,7 +310,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
       if (action === "install") {
         const storeResult = installKenmarkSkillsToStoreWithLegacyCleanup(
           sourceDir,
-          targetMap,
+          selectedTargetMap,
           { force, dryRun }
         );
         if (!dryRun) {
@@ -396,7 +398,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
             const adoptResult = adoptCatalogSkills({
               sourceUserSkillsDir: sourceDir,
               catalogPath,
-              targetMap,
+              targetMap: selectedTargetMap,
               eccProfile,
               homeDir,
               force: false,
@@ -499,7 +501,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
         return;
       }
 
-      const uninstallResults = uninstallKenmarkFromIdes(skillNames, targetMap, {
+      const uninstallResults = uninstallKenmarkFromIdes(skillNames, selectedTargetMap, {
         keepStore,
         dryRun
       });
