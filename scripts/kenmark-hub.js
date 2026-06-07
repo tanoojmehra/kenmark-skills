@@ -114,6 +114,14 @@ const MCP_PROFILE_DESCRIPTIONS = {
   all: "Every bundled MCP server"
 };
 
+const MCP_SERVER_DESCRIPTIONS = {
+  playwright: "Browser automation",
+  context7: "Library docs",
+  "sequential-thinking": "Step-by-step reasoning",
+  fetch: "Fetch URLs as markdown",
+  browsermcp: "Browser MCP bridge"
+};
+
 function listMcpProfilesForPrompt(repoRoot) {
   const { profiles } = readMcpProfiles(repoRoot);
   return Object.keys(profiles)
@@ -172,21 +180,89 @@ function buildMcpDocumentForProfile(repoRoot, profileName) {
   return { profile, serverNames: Object.keys(doc.mcpServers).sort(), doc };
 }
 
-function shouldInstallMcp({ skipMcp, withMcp, mcpProfile }) {
+function listBundledMcpServerNames(repoRoot) {
+  const bundled = readMcpDocument(getBundledMcpPath(repoRoot));
+  return Object.keys(bundled.mcpServers || {}).sort();
+}
+
+function listMcpServersForPrompt(repoRoot) {
+  return listBundledMcpServerNames(repoRoot).map((id) => ({
+    id,
+    description: MCP_SERVER_DESCRIPTIONS[id] || id
+  }));
+}
+
+function parseMcpServersArg(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) {
+    return raw.map((s) => String(s).trim()).filter(Boolean);
+  }
+  return String(raw)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+function resolveMcpServerNames(rawServers, repoRoot) {
+  const names = parseMcpServersArg(rawServers);
+  if (!names.length) return [];
+  const bundled = readMcpDocument(getBundledMcpPath(repoRoot));
+  const known = Object.keys(bundled.mcpServers || {});
+  const invalid = names.filter((name) => !known.includes(name));
+  if (invalid.length) {
+    throw new Error(
+      `Unknown MCP server(s): ${invalid.join(", ")}. Known servers: ${known.join(", ")}`
+    );
+  }
+  return [...names].sort();
+}
+
+function buildMcpDocumentForServers(repoRoot, serverNames) {
+  const resolved = resolveMcpServerNames(serverNames, repoRoot);
+  if (!resolved.length) {
+    return { serverNames: [], doc: { mcpServers: {} } };
+  }
+  const bundled = readMcpDocument(getBundledMcpPath(repoRoot));
+  const doc = filterMcpDocumentByServers(bundled, resolved);
+  return { serverNames: Object.keys(doc.mcpServers).sort(), doc };
+}
+
+function formatMcpPlanLine(serverNames, targetLabel = "Cursor / Claude") {
+  const list = serverNames.length ? serverNames.join(", ") : "none";
+  return `MCP servers (${list}) → ${targetLabel}`;
+}
+
+function resolveMcpInstall({ skipMcp, withMcp, mcpProfile, mcpServers, repoRoot }) {
   if (skipMcp) {
-    return { enabled: false, profile: "none" };
+    return { enabled: false, serverNames: [], profile: null };
+  }
+  const serversFromArg = parseMcpServersArg(mcpServers);
+  if (serversFromArg.length) {
+    const serverNames = resolveMcpServerNames(serversFromArg, repoRoot);
+    return { enabled: serverNames.length > 0, serverNames, profile: null };
   }
   if (mcpProfile) {
     const profile = String(mcpProfile).trim().toLowerCase();
     if (profile === "none") {
-      return { enabled: false, profile: "none" };
+      return { enabled: false, serverNames: [], profile: "none" };
     }
-    return { enabled: true, profile };
+    const { profile: resolved, serverNames } = buildMcpDocumentForProfile(repoRoot, profile);
+    return { enabled: serverNames.length > 0, serverNames, profile: resolved };
   }
   if (withMcp) {
-    return { enabled: true, profile: "all" };
+    const { serverNames } = buildMcpDocumentForProfile(repoRoot, "all");
+    return { enabled: serverNames.length > 0, serverNames, profile: "all" };
   }
-  return { enabled: false, profile: "none" };
+  return { enabled: false, serverNames: [], profile: null };
+}
+
+function shouldInstallMcp({ skipMcp, withMcp, mcpProfile, mcpServers, repoRoot }) {
+  const resolved = resolveMcpInstall({ skipMcp, withMcp, mcpProfile, mcpServers, repoRoot });
+  return {
+    enabled: resolved.enabled,
+    profile: resolved.profile || (resolved.enabled ? null : "none"),
+    serverNames: resolved.serverNames
+  };
 }
 
 function buildMcpGlobalTargets(homeDir = os.homedir()) {
@@ -2288,6 +2364,14 @@ module.exports = {
   listMcpProfileNames,
   listMcpProfilesForPrompt,
   MCP_PROFILE_DESCRIPTIONS,
+  MCP_SERVER_DESCRIPTIONS,
+  listBundledMcpServerNames,
+  listMcpServersForPrompt,
+  parseMcpServersArg,
+  resolveMcpServerNames,
+  buildMcpDocumentForServers,
+  formatMcpPlanLine,
+  resolveMcpInstall,
   resolveMcpProfileName,
   buildMcpDocumentForProfile,
   shouldInstallMcp,

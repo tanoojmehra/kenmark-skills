@@ -6,14 +6,17 @@
 npx kenmark-skills init
 ```
 
+Non-interactive (agents / CI — Kenmark skills only):
+
 ```bash
-npx kenmark-skills setup --global -y
+npx kenmark-skills init --global --skip-recommended -y
 ```
 
 No global install required — `npx` downloads and runs the CLI (or uses your npm cache).
 
-- **init** — guided wizard: Kenmark skills + optional curated packs
-- **setup --global -y** — Kenmark skills only, non-interactive (defaults to cursor, claude, codex when no IDE dirs are found)
+- **init** — first-time install: guided wizard for Kenmark skills + optional curated packs
+- **init --skip-recommended -y** — Kenmark skills only, no prompts (defaults to cursor, claude, codex when no IDE dirs are found)
+- **update** — refresh an existing install (do not run init again for upgrades)
 
 **Agent skills and CLI for Cursor, Codex, Claude Code, and other harnesses that read `SKILL.md` files.**
 
@@ -55,7 +58,7 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 **Setup (once)**
 
-1. **Install** — `npx kenmark-skills init` (or `setup` for Kenmark-only).
+1. **Install** — `npx kenmark-skills init`.
 2. **Onboard a repo** — run **`kenmark-init`** in the agent.
 
 **Day-to-day (pick the first row that fits)**
@@ -102,10 +105,13 @@ No global install required — `npx` downloads and runs the CLI each time (or us
 npx kenmark-skills init
 
 # Kenmark skills only, non-interactive (defaults to cursor, claude, codex when no IDE dirs are found)
-npx kenmark-skills setup --global -y
+npx kenmark-skills init --global --skip-recommended -y
 
 # Or target those three explicitly:
-# npx kenmark-skills setup --global --ide cursor,claude,codex -y
+# npx kenmark-skills init --global --ide cursor,claude,codex --skip-recommended -y
+
+# Refresh later — do not re-run init
+# npx kenmark-skills update --both --global -y
 
 # In a project repo (agent chat)
 # "Run kenmark-init on this repo"
@@ -124,9 +130,9 @@ Optional: `npm install -g kenmark-skills` if you want the shorter `kenmark-skill
 
 ### Windows note
 
-Run `npx kenmark-skills setup` from **PowerShell** or **CMD** if you use native Windows Cursor/Claude. Running from **WSL** installs into the WSL home directory (`/home/...`), which native Windows IDEs usually will not read.
+Run `npx kenmark-skills init` from **PowerShell** or **CMD** if you use native Windows Cursor/Claude. Running from **WSL** installs into the WSL home directory (`/home/...`), which native Windows IDEs usually will not read.
 
-On Windows, Kenmark copies skills into IDE folders by default (not symlinks). For an explicit copy install:
+On Windows, Kenmark copies skills into IDE folders by default (not symlinks). For an explicit copy install (legacy `setup` alias — advanced flags not on `init`):
 
 ```powershell
 npx kenmark-skills setup --global --ide cursor --copy --skip-adopt -y
@@ -271,16 +277,16 @@ Run only when the user **explicitly** asks to install, update, audit, or prune s
 
 ## CLI reference
 
-**Entry points:** `npx kenmark-skills <command>` (default) · `kenmark-skills` if installed globally (optional) · `kenmark-skills-setup` (= `setup`, legacy).
+**Entry points:** `npx kenmark-skills init` (recommended) · `npx kenmark-skills <command>` · `kenmark-skills` if installed globally (optional) · `kenmark-skills-setup` (= legacy `setup` bin).
 
-In a terminal, commands **prompt by default**. For scripts and agents, pass flags and **`-y`**.
+In a terminal, **`init` prompts by default**. For scripts and agents, pass flags and **`-y`**.
 
 ### Commands
 
 | Command | Description |
 | --- | --- |
-| `init` | First-time wizard: runs `setup` + optional `install-recommended` |
-| `setup` | Install 36 Kenmark skills → `~/.kenmark/store` + IDE symlinks |
+| `init` | **Recommended first install** — Kenmark skills + optional curated packs (wizard or flags) |
+| `setup` | Legacy alias: Install 36 Kenmark skills → `~/.kenmark/store` + IDE symlinks (prefer `init --skip-recommended`) |
 | `uninstall` | Remove Kenmark links from IDE paths (`--keep-store` optional); also removes Kenmark MCP if installed |
 | `mcp` | MCP management (`mcp uninstall` removes Kenmark MCP from IDE configs + `~/.kenmark/store/mcp.json`; skills unchanged) |
 | `install-recommended` | Install packs from [`recommended-catalog.json`](skills/user-skills/recommended-catalog.json) |
@@ -298,11 +304,24 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | --- | --- |
 | Human | `npx kenmark-skills init` |
 | Agent | `npx kenmark-skills init --global --skip-recommended -y` |
-| Agent | `npx kenmark-skills setup --global --ide cursor -y` |
+| Agent | `npx kenmark-skills init --global --ide cursor --skip-recommended -y` |
 | Agent | `npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y` |
 | Agent | `npx kenmark-skills update --both --global -y` |
 | Agent | `npx kenmark-skills inventory --markdown ./report.md -y` |
 | Agent | `npx kenmark-skills doctor --json ./doctor.json` |
+
+### First install (`init`)
+
+Use **`init`** for every new install. It runs the Kenmark skills step and optionally **`install-recommended`** for curated packs.
+
+| Goal | Command |
+| --- | --- |
+| Full guided wizard | `npx kenmark-skills init` |
+| Kenmark skills only (agent) | `npx kenmark-skills init --global --skip-recommended -y` |
+| Kenmark + specific packs | `npx kenmark-skills init --global --ids impeccable,code-review-skill -y` |
+| MCP by profile (non-interactive) | `npx kenmark-skills init --global --skip-recommended --mcp-profile web -y` |
+| MCP by server name | `npx kenmark-skills init --global --skip-recommended --mcp-servers playwright,context7 -y` |
+| Later refreshes | **`update`**, not `init` again |
 
 ### `init` vs `setup`
 
@@ -310,15 +329,16 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | --- | --- | --- |
 | **Use when** | First install; want optional curated packs | Kenmark skills only; re-link IDEs |
 | **Installs** | Kenmark + optional catalog packs | 36 Kenmark skills |
-| **MCP** | Interactive wizard prompts for profile; `-y` needs `--mcp-profile` | Same (interactive or flags) |
+| **MCP** | Interactive wizard prompts for servers by name; `-y` needs `--mcp-servers` or `--mcp-profile` | Same (interactive or flags) |
 | **Implementation** | `setup` → `install-recommended` | `setup-skills.js` |
 | **Later refreshes** | Use `update`, not `init` again | `update` or `setup --force` |
 
 ```bash
 npx kenmark-skills init                              # full wizard
-npx kenmark-skills setup -y                          # Kenmark only
-npx kenmark-skills init --skip-recommended -y        # wizard, Kenmark step only
+npx kenmark-skills init --skip-recommended -y        # Kenmark only (replaces old setup -y)
 ```
+
+**Legacy `setup`:** still works for backward compatibility and advanced flags (`--copy`, `--force`, `--skip-adopt`) that `init` does not expose. Prints a one-line hint to prefer `init`. Direct bin: `kenmark-skills-setup`.
 
 ### Catalog adoption (`adopt`)
 
@@ -326,8 +346,8 @@ npx kenmark-skills init --skip-recommended -y        # wizard, Kenmark step only
 
 | Command | Adopt by default? |
 | --- | --- |
-| `setup` | Yes (`--skip-adopt` to disable); MCP opt-in (`--with-mcp` or `--mcp-profile`) |
-| `init` | Yes (after `setup`; again after packs if selected) |
+| `init` | Yes (Kenmark step; again after packs if selected) |
+| `setup` (legacy) | Yes (`--skip-adopt` to disable); MCP opt-in (`--with-mcp`, `--mcp-profile`, or `--mcp-servers`) |
 | `install-recommended` | Yes (`--skip-adopt` to disable) |
 | `update` | Yes (`--skip-adopt` to disable) |
 | `adopt` | Standalone consolidation |
@@ -341,12 +361,14 @@ When store content already exists but differs from an IDE copy, adopt reports **
 | Flag | Applies to | Purpose |
 | --- | --- | --- |
 | `--global` / `--project` | install commands | User-wide vs current repo |
-| `--ide <target>` | setup, uninstall, adopt | `cursor`, `claude`, `codex`, `all`, … |
+| `--ide <target>` | init, setup, uninstall, adopt | `cursor`, `claude`, `codex`, `all`, … |
 | `-y` | most commands | Skip interactive prompts |
+| `--skip-recommended` | init | Kenmark skills only (skip curated packs) |
 | `--skip-adopt` | setup, install-recommended, update | Skip post-install adopt pass |
-| `--with-mcp` | setup | Install all bundled MCP servers (profile `all`) |
-| `--mcp-profile <name>` | setup | MCP profile: `none`, `web`, `research`, `deep`, `all` (default: none) |
-| `--skip-mcp` | setup | Skip MCP even when `--with-mcp` / `--mcp-profile` is set |
+| `--with-mcp` | init, setup | Install all bundled MCP servers (profile `all`) |
+| `--mcp-profile <name>` | init, setup | MCP profile: `none`, `web`, `research`, `deep`, `all` (default: none) |
+| `--mcp-servers <list>` | init, setup, update | MCP servers by name: `playwright`, `context7`, `fetch`, … |
+| `--skip-mcp` | init, setup | Skip MCP even when `--with-mcp` / `--mcp-profile` / `--mcp-servers` is set |
 | `--strict-targets` | setup | Fail if no IDE skill dir is detected and `--ide` is omitted |
 | `--copy` | setup, install-recommended | Copy into IDE paths instead of symlinks |
 | `--symlink` | setup, install-recommended | Force symlinks on Windows (junction) instead of copy |
@@ -356,7 +378,7 @@ When store content already exists but differs from an IDE copy, adopt reports **
 | `--adopt-overwrite` | adopt, install-recommended | Alias for `--force` on adopt |
 | `--keep-store` | uninstall | Remove IDE links; keep `~/.kenmark` |
 | `--mcp-only` | uninstall | Remove Kenmark MCP only; leave skill links and store skills intact |
-| `--soft` | doctor | Warnings only; exit 0 (e.g. before first `setup`) |
+| `--soft` | doctor | Warnings only; exit 0 (e.g. before first `init`) |
 | `--json <path>` | doctor, inventory | Write full JSON report |
 | `--no-fail` | doctor | Exit 0 with issues still listed (`ok: false` in `--json`; use `--soft` to downgrade to warnings) |
 | `--dry-run` | cleanup | List targets without deleting |
@@ -373,7 +395,7 @@ When store content already exists but differs from an IDE copy, adopt reports **
 
 ```bash
 npx kenmark-skills init
-npx kenmark-skills setup --global -y
+npx kenmark-skills init --global --skip-recommended -y
 ```
 
 `npx` fetches the package from npm when needed. Pin a version with `npx kenmark-skills@1.5.0 init` for reproducibility, or use `npx kenmark-skills@latest init` for the newest release.
@@ -392,16 +414,16 @@ Use this only if you run the CLI often and prefer omitting `npx`.
 Install into the current repo’s IDE folders instead of your home directory:
 
 ```bash
-npx kenmark-skills setup --project -y
+npx kenmark-skills init --project --skip-recommended -y
 ```
 
 ### Per-IDE targeting
 
 ```bash
-npx kenmark-skills setup --global --ide cursor
-npx kenmark-skills setup --global --ide claude
-npx kenmark-skills setup --global --ide codex
-npx kenmark-skills setup --global --ide cursor,claude,codex
+npx kenmark-skills init --global --ide cursor --skip-recommended -y
+npx kenmark-skills init --global --ide claude --skip-recommended -y
+npx kenmark-skills init --global --ide codex --skip-recommended -y
+npx kenmark-skills init --global --ide cursor,claude,codex --skip-recommended -y
 ```
 
 Restart Claude Code if `/kenmark-*` slash commands do not appear immediately.
@@ -411,7 +433,7 @@ Restart Claude Code if `/kenmark-*` slash commands do not appear immediately.
 Use `--ide all` only when you want every harness path this package knows about (beyond cursor/claude/codex). It can create links in IDE folders you do not use.
 
 ```bash
-npx kenmark-skills setup --global --ide all -y
+npx kenmark-skills init --global --ide all --skip-recommended -y
 ```
 
 ---
@@ -426,11 +448,11 @@ Kenmark and adoptable catalog skills are stored once, then linked into each IDE.
 | `~/.kenmark/store/mcp.json` | Canonical MCP server definitions |
 | `~/.kenmark/manifest.json` | Install metadata |
 
-`setup` populates the store, symlinks into IDE skill dirs (copies on Windows when symlinks fail), then runs **adopt** unless `--skip-adopt` is set. **MCP is opt-in:** pass `--with-mcp` or `--mcp-profile <name>` to install bundled servers; plain `setup` does not touch MCP configs.
+**First install (`init`)** populates the store, symlinks into IDE skill dirs (copies on Windows when symlinks fail), then runs **adopt** unless `--skip-adopt` is set. **MCP is opt-in:** pass `--with-mcp`, `--mcp-profile <name>`, or `--mcp-servers <list>` on `init` or legacy `setup`; plain install does not touch MCP configs.
 
 ### Skill path portability
 
-When skills are copied into `~/.kenmark/store` (via `setup`, `update`, or `adopt`), Kenmark rewrites hardcoded IDE anchor paths like `.cursor/skills/<name>/` to `./` in `SKILL.md` and `scripts/*.{js,mjs}`. That keeps bundled scripts and docs working regardless of which IDE path the skill is linked from.
+When skills are copied into `~/.kenmark/store` (via `init`, `update`, or `adopt`), Kenmark rewrites hardcoded IDE anchor paths like `.cursor/skills/<name>/` to `./` in `SKILL.md` and `scripts/*.{js,mjs}`. That keeps bundled scripts and docs working regardless of which IDE path the skill is linked from.
 
 `doctor` scans the same files in linked IDE copies and reports non-portable paths. Repair with:
 
@@ -440,15 +462,15 @@ npx kenmark-skills adopt --global --ide all -y
 
 ### Bundled MCP servers (opt-in)
 
-Source: [`config/mcp-servers.json`](config/mcp-servers.json). Profiles: [`config/mcp-profiles.json`](config/mcp-profiles.json). When you opt in, Kenmark copies the selected profile into `~/.kenmark/store/mcp.json` and **merges** those servers into existing configs (existing entries with the same name are left unchanged unless you pass `--force`).
+Source: [`config/mcp-servers.json`](config/mcp-servers.json). Profiles: [`config/mcp-profiles.json`](config/mcp-profiles.json) (non-interactive shortcuts). Interactive `init` / `setup` / `update` let you pick individual servers by name. When you opt in, Kenmark copies the selected servers into `~/.kenmark/store/mcp.json` and **merges** them into existing configs (existing entries with the same name are left unchanged unless you pass `--force`).
 
 ```bash
-npx kenmark-skills setup --mcp-profile web --global --ide cursor -y
-npx kenmark-skills setup --mcp-profile research --global -y
-npx kenmark-skills setup --with-mcp --global -y   # profile: all (default IDEs: cursor, claude, codex)
+npx kenmark-skills init --mcp-servers playwright,context7 --global --skip-recommended --ide cursor -y
+npx kenmark-skills init --mcp-profile web --global --skip-recommended --ide cursor -y
+npx kenmark-skills init --mcp-profile research --global --skip-recommended -y
+npx kenmark-skills init --with-mcp --global --skip-recommended -y   # profile: all
 # Advanced — every detected harness path (may create clutter):
-# npx kenmark-skills setup --mcp-profile research --global --ide all -y
-# npx kenmark-skills setup --with-mcp --global --ide all -y
+# npx kenmark-skills init --mcp-profile research --global --ide all --skip-recommended -y
 ```
 
 | Profile | Servers |
@@ -472,7 +494,7 @@ npx kenmark-skills setup --with-mcp --global -y   # profile: all (default IDEs: 
 | Global (`--global`) | `~/.cursor/mcp.json` | `~/.claude.json` → `mcpServers` |
 | Project (`--project`) | `.cursor/mcp.json` | `.mcp.json` at repo root |
 
-Restart Cursor or Claude Code after setup if MCP tools do not show up. Other IDEs in `--ide all` are unchanged (no standard MCP path in this package yet).
+Restart Cursor or Claude Code after install if MCP tools do not show up. Other IDEs in `--ide all` are unchanged (no standard MCP path in this package yet).
 
 **Remove MCP only** (keeps Kenmark skills installed):
 
@@ -482,7 +504,7 @@ npx kenmark-skills uninstall --mcp-only --global -y
 # npx kenmark-skills uninstall --mcp-only --global --ide all -y   # advanced: all IDE paths
 ```
 
-Full `uninstall` still removes Kenmark MCP entries when they were installed via `setup --with-mcp` / `--mcp-profile`.
+Full `uninstall` still removes Kenmark MCP entries when they were installed via `init` / `setup` with `--with-mcp`, `--mcp-profile`, or `--mcp-servers`.
 
 ### IDE skill directories
 
@@ -561,8 +583,8 @@ npx kenmark-skills adopt --global --adopt-overwrite -y   # when setup reported r
 | Command | Scope | CI / fresh clone |
 | --- | --- | --- |
 | `validate` | Repo/package invariants (skills, catalog JSON, `package.json`, forbidden terms) | Yes — `npm test` |
-| `doctor` | Local install (`~/.kenmark`, manifest, MCP, IDE links, symlinks, hash drift, non-portable skill paths) | No — run after `setup` |
-| `doctor --soft` | Same as `doctor`, but warnings only (exit 0) | Optional pre-setup check |
+| `doctor` | Local install (`~/.kenmark`, manifest, MCP, IDE links, symlinks, hash drift, non-portable skill paths) | No — run after `init` |
+| `doctor --soft` | Same as `doctor`, but warnings only (exit 0) | Optional pre-install check |
 | `doctor --no-fail` | Full issue list; exit 0 (e.g. write `--json` for agents) | Diagnostics / scripting |
 
 **Validation entry points** (equivalent checks; both scripts ship in the npm package):
@@ -649,7 +671,7 @@ rm -f ~/.claude/commands/kenmark-*.md
 
 ## Using skills in chat
 
-1. Confirm the skill folder is on the agent’s skill search path (after `setup` / `init`).
+1. Confirm the skill folder is on the agent’s skill search path (after `init`).
 2. Name the skill or its trigger phrase — e.g. “Run **kenmark-init**”, “Use **kenmark-commit**”, “**kenmark-issues-list**”.
 3. The agent must **read and follow** the full `SKILL.md`, not improvise from the description.
 
@@ -693,7 +715,7 @@ kenmark-skills/
 
 Equivalent: `npm run validate` is the same repo checks as the first step of `npm test`; `npx kenmark-skills validate` goes through `validate.js`.
 
-**Maintainers:** `npm run validate` · `npm test` · `npm run test:all` · `npm run pack:check` · `npx kenmark-skills validate` · `npm run doctor:local` (after setup) · `npm run publish:public`
+**Maintainers:** `npm run validate` · `npm test` · `npm run test:all` · `npm run pack:check` · `npx kenmark-skills validate` · `npm run doctor:local` (after init) · `npm run publish:public`
 
 ---
 

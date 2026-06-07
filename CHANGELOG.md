@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## v2.3.8 — MCP server selection + init-centric CLI (2026-06-07)
+
+### Feature
+
+- **Interactive MCP:** `init`, `setup`, and `update` now prompt for individual MCP **servers** by name (from `config/mcp-servers.json`) instead of bundled profiles.
+- **`--mcp-servers`:** Non-interactive flag to install specific servers (e.g. `--mcp-servers playwright,context7,fetch`). `--mcp-profile` and `--with-mcp` remain supported.
+
+### Docs
+
+- **README:** `init` is the single recommended first-install command; removed confusing `init` vs `setup` table. Legacy `setup` documented as backward-compat alias only.
+- **README:** MCP server selection and `--mcp-servers` usage; migration examples (`setup -y` → `init --skip-recommended -y`).
+
+### CLI
+
+- **`setup` deprecation hint:** Prints one-line stderr note — prefer `npx kenmark-skills init --skip-recommended -y` (`setup` and `kenmark-skills-setup` bin unchanged).
+
+### Test
+
+- **test-cli-smoke.js:** `--mcp-servers` dry-run and updated plan text assertions.
+
 ## v2.3.7 — Cleanup managed skills (2026-06-07)
 
 ### Feature

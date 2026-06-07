@@ -511,7 +511,58 @@ async function promptCleanupCategories() {
 }
 
 /**
- * @param {Array<{id: string, description: string, servers: string[]}>} profiles
+ * @param {Array<{id: string, description: string}>} servers
+ * @param {{ askInstall?: boolean, installPrompt?: string }} opts
+ * @returns {Promise<string[]>} selected server ids (empty = skip)
+ */
+async function promptMcpServers(servers, opts = {}) {
+  const askInstall = opts.askInstall !== false;
+  if (askInstall) {
+    const message =
+      opts.installPrompt ||
+      "Install bundled MCP servers into Cursor / Claude configs?";
+    const want = await promptYesNo(message, false);
+    if (!want) return [];
+  }
+
+  if (!servers.length) return [];
+
+  const rl = createRl();
+  console.log("\nSelect MCP servers (comma-separated numbers or ids):\n");
+  servers.forEach((s, i) => {
+    console.log(`  ${i + 1}) ${s.id} — ${s.description}`);
+  });
+  console.log(
+    "\nEnter: number(s) 1,2 · ids playwright,context7 · all · Enter/none to skip\n"
+  );
+  const answer = await ask(rl, "Choice> ");
+  rl.close();
+
+  if (!answer) return [];
+  const lower = answer.toLowerCase();
+  if (lower === "none" || lower === "skip" || lower === "n" || lower === "no") {
+    return [];
+  }
+  if (lower === "all") return servers.map((s) => s.id);
+
+  const picked = new Set();
+  const parts = lower.split(/[\s,]+/).filter(Boolean);
+  for (const part of parts) {
+    const num = parseInt(part, 10);
+    if (!Number.isNaN(num) && num >= 1 && num <= servers.length) {
+      picked.add(servers[num - 1].id);
+      continue;
+    }
+    const byId = servers.find((s) => s.id === part);
+    if (byId) picked.add(byId.id);
+  }
+  if (picked.size > 0) return [...picked].sort();
+  console.log(`Unknown choice "${answer}"; skipping MCP.`);
+  return [];
+}
+
+/**
+ * @param {Array<{id: string, description: string, servers?: string[]}>} profiles
  * @param {{ defaultProfile?: string, askInstall?: boolean, installPrompt?: string }} opts
  * @returns {Promise<string|null>} profile id or null when user declines install
  */
@@ -578,6 +629,7 @@ module.exports = {
   parseCleanupCategoryChoice,
   promptEccProfile,
   promptMcpProfile,
+  promptMcpServers,
   confirmPlan,
   banner
 };

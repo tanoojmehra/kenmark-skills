@@ -18,6 +18,7 @@ const COMMANDS = [
   ["validate"],
   ["setup", "--dry-run", "--global", "--ide", "claude", "-y"],
   ["setup", "--dry-run", "--global", "--ide", "cursor", "--mcp-profile", "web", "-y"],
+  ["setup", "--dry-run", "--global", "--ide", "cursor", "--mcp-servers", "playwright,fetch", "-y"],
   ["init", "--dry-run", "--global", "--ide", "claude", "--skip-recommended", "-y"],
   [
     "init",
@@ -77,7 +78,7 @@ const COMMANDS = [
   ["cleanup", "--dry-run", "--global", "-y"]
 ];
 
-/** @type {{ args: string[], expectStdout?: RegExp[], rejectStdout?: RegExp[] }[]} */
+/** @type {{ args: string[], expectStdout?: RegExp[], expectStderr?: RegExp[], rejectStdout?: RegExp[] }[]} */
 const ASSERTIONS = [
   {
     args: ["update", "--kenmark-only", "--global", "--ide", "auto", "-y", "--dry-run"],
@@ -101,7 +102,7 @@ const ASSERTIONS = [
     ],
     expectStdout: [
       /setup-skills\.js --global --install --ide auto -y --mcp-profile web/,
-      /MCP profile "web"/
+      /MCP servers \(browsermcp, playwright\)/
     ]
   },
   {
@@ -118,12 +119,43 @@ const ASSERTIONS = [
     ],
     expectStdout: [
       /setup-skills\.js --global --install -y --ide cursor --mcp-profile research/,
-      /MCP profile "research"/
+      /MCP servers \(context7, fetch\)/
+    ]
+  },
+  {
+    args: [
+      "init",
+      "--dry-run",
+      "--global",
+      "--ide",
+      "cursor",
+      "--skip-recommended",
+      "--mcp-servers",
+      "playwright,context7",
+      "-y"
+    ],
+    expectStdout: [
+      /setup-skills\.js --global --install -y --ide cursor --mcp-servers playwright,context7/,
+      /MCP servers \(context7, playwright\)/
     ]
   },
   {
     args: ["setup", "--dry-run", "--global", "--ide", "cursor", "--mcp-profile", "web", "-y"],
-    expectStdout: [/MCP profile "web"/, /playwright/, /browsermcp/]
+    expectStdout: [/MCP servers \(browsermcp, playwright\)/, /browsermcp/],
+    expectStderr: [/prefer `npx kenmark-skills init --skip-recommended -y`/]
+  },
+  {
+    args: [
+      "setup",
+      "--dry-run",
+      "--global",
+      "--ide",
+      "cursor",
+      "--mcp-servers",
+      "playwright,fetch",
+      "-y"
+    ],
+    expectStdout: [/MCP servers \(fetch, playwright\)/, /fetch/, /playwright/]
   },
   {
     args: ["update", "--both", "--global", "--ide", "auto", "--dry-run", "-y"],
@@ -160,11 +192,16 @@ function runCli(args) {
   return { label, result };
 }
 
-function checkAssertions(label, stdout, rules) {
+function checkAssertions(label, stdout, stderr, rules) {
   const problems = [];
   for (const re of rules.expectStdout || []) {
     if (!re.test(stdout)) {
       problems.push(`expected stdout to match ${re}`);
+    }
+  }
+  for (const re of rules.expectStderr || []) {
+    if (!re.test(stderr)) {
+      problems.push(`expected stderr to match ${re}`);
     }
   }
   for (const re of rules.rejectStdout || []) {
@@ -212,12 +249,13 @@ function main() {
   for (const rules of ASSERTIONS) {
     const { label, result } = runCli(rules.args);
     const code = result.status === null ? 1 : result.status;
-    const stdout = (result.stdout || "") + (result.stderr || "");
+    const stdout = (result.stdout || "");
+    const stderr = (result.stderr || "");
     const problems = [];
     if (code !== 0) {
       problems.push(`exit ${code}`);
     }
-    problems.push(...checkAssertions(label, stdout, rules));
+    problems.push(...checkAssertions(label, stdout, stderr, rules));
     if (problems.length) {
       failures.push({ label, problems, stdout: stdout.trim() });
       console.error(`  ✗ ${label} (assertions)`);

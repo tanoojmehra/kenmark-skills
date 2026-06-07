@@ -19,7 +19,7 @@ function printUsage() {
   console.log("");
   console.log("Usage:");
   console.log("  kenmark-skills init [--global|--project] [--ide <target>] [--skip-recommended] [-y]");
-  console.log("  kenmark-skills setup [--global|--project] [--ide <target>] [-y]");
+  console.log("  kenmark-skills setup …          (legacy alias — prefer init)");
   console.log("  kenmark-skills uninstall [--global|--project] [--ide <target>] [--mcp-only] [-y]");
   console.log("  kenmark-skills mcp uninstall [--global|--project] [--ide <target>] [-y]");
   console.log("  kenmark-skills inventory [--json path] [--markdown path] [--include-plugins]");
@@ -35,8 +35,8 @@ function printUsage() {
   console.log("");
   console.log("Examples:");
   console.log("  npx kenmark-skills init");
-  console.log("  npx kenmark-skills setup");
-  console.log("  npx kenmark-skills setup --project --ide cursor -y");
+  console.log("  npx kenmark-skills init --global --skip-recommended -y");
+  console.log("  npx kenmark-skills init --project --ide cursor --skip-recommended -y");
   console.log("  npx kenmark-skills uninstall --global --ide claude -y");
   console.log("  npx kenmark-skills mcp uninstall --global --ide cursor -y");
 }
@@ -55,6 +55,9 @@ if (command === "init") {
 }
 
 if (command === "setup") {
+  console.error(
+    "Note: prefer `npx kenmark-skills init --skip-recommended -y` (setup remains for backward compatibility)."
+  );
   const scriptPath = path.join(__dirname, "setup-skills.js");
   const forwardedArgs = args.slice(1);
   const result = spawnSync(process.execPath, [scriptPath, ...forwardedArgs], {

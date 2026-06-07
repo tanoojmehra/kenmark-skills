@@ -8,7 +8,7 @@ const {
   promptScope,
   promptAction,
   promptIde,
-  promptMcpProfile,
+  promptMcpServers,
   confirmPlan,
   banner
 } = require("./interactive");
@@ -29,11 +29,14 @@ const {
   installMcpToStore,
   installMcpToIdes,
   uninstallMcpFromIdes,
-  shouldInstallMcp,
+  resolveMcpInstall,
   resolveMcpProfileName,
-  buildMcpDocumentForProfile,
+  resolveMcpServerNames,
+  buildMcpDocumentForServers,
+  formatMcpPlanLine,
+  listMcpServersForPrompt,
   listMcpProfileNames,
-  listMcpProfilesForPrompt,
+  listBundledMcpServerNames,
   detectInstalledIdes,
   detectManagedIdes,
   resolveExplicitTargetIdes,
@@ -66,9 +69,10 @@ function printUsage() {
   console.log("Claude: namespaced kenmark-* skills only (no slash-command wrappers created).");
   console.log("After install, catalog skills already present in any IDE root are adopted");
   console.log("into ~/.kenmark/store and relinked (use --skip-adopt to disable).");
-  console.log("MCP is opt-in. Pass --with-mcp or --mcp-profile <name> to install bundled servers");
+  console.log("MCP is opt-in. Pass --with-mcp, --mcp-profile <name>, or --mcp-servers <list>");
   console.log("into ~/.kenmark/store/mcp.json and merge into Cursor / Claude MCP configs.");
   console.log(`Profiles: ${listMcpProfileNames(repoRoot).join(", ")} (default: none).`);
+  console.log(`Servers: ${listBundledMcpServerNames(repoRoot).join(", ")}.`);
   console.log("");
   console.log("Options:");
   console.log("  --install | --uninstall   Action (default: install)");
@@ -83,6 +87,7 @@ function printUsage() {
   console.log("  --skip-adopt              Skip post-install catalog adoption (advanced)");
   console.log("  --with-mcp                Install all bundled MCP servers (profile: all)");
   console.log("  --mcp-profile <name>      MCP profile: none, web, research, deep, all");
+  console.log("  --mcp-servers <list>      MCP servers by name (e.g. playwright,context7,fetch)");
   console.log("  --skip-mcp                Skip MCP even if --with-mcp / --mcp-profile is set");
   console.log("  --mcp-only                Uninstall only Kenmark MCP (IDE configs + mcp store); keep skills");
   console.log("  --ecc-profile core        ECC profile (core, developer, …) when adopting");
@@ -96,6 +101,7 @@ function printUsage() {
   console.log("  npx kenmark-skills setup --global --ide cursor,claude,codex -y");
   console.log("  npx kenmark-skills setup --skip-adopt --global --ide cursor -y");
   console.log("  npx kenmark-skills setup --mcp-profile web --global --ide cursor -y");
+  console.log("  npx kenmark-skills setup --mcp-servers playwright,context7 --global --ide cursor -y");
   console.log("  npx kenmark-skills setup --with-mcp --global --ide cursor,claude,codex -y");
   console.log("  npx kenmark-skills uninstall --global --ide claude");
   console.log("  npx kenmark-skills uninstall --mcp-only --global --ide cursor -y");
@@ -121,6 +127,7 @@ function parseArgs(argv) {
     mcpOnly: false,
     withMcp: false,
     mcpProfile: null,
+    mcpServers: null,
     eccProfile: null,
     explicitMode: false,
     explicitAction: false,
@@ -211,6 +218,11 @@ function parseArgs(argv) {
       i += 1;
       continue;
     }
+    if (token === "--mcp-servers") {
+      args.mcpServers = (argv[i + 1] || "").trim() || null;
+      i += 1;
+      continue;
+    }
     if (token === "--ecc-profile") {
       args.eccProfile = (argv[i + 1] || "").trim() || null;
       i += 1;
@@ -255,6 +267,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
   } = options;
   const mcpIdes = filterMcpIdes(targetIdes);
   const installMcp = mcpInstall.enabled;
+  const mcpServerNames = mcpInstall.serverNames || [];
   const mcpProfile = mcpInstall.profile;
   const skillNames = listKenmarkBundledSkillNames(sourceDir);
   const storeDir = getStoreDir();
@@ -276,9 +289,8 @@ function executeInstall(targetMap, targetIdes, action, options) {
       plan.push("Adopt catalog skills found in selected IDE root(s) → store + relink");
     }
     if (installMcp && mcpIdes.length && fs.existsSync(bundledMcpPath)) {
-      const { serverNames } = buildMcpDocumentForProfile(repoRoot, mcpProfile);
       plan.push(
-        `Merge MCP profile "${mcpProfile}" (${serverNames.join(", ") || "none"}) → ${mcpIdes.join(", ")} (${getMcpStorePath()})`
+        `${formatMcpPlanLine(mcpServerNames)} → ${mcpIdes.join(", ")} (${getMcpStorePath()})`
       );
     }
   } else if (mcpOnly) {
@@ -428,20 +440,22 @@ function executeInstall(targetMap, targetIdes, action, options) {
         }
 
         if (installMcp && mcpIdes.length && fs.existsSync(bundledMcpPath)) {
-          const resolvedProfile = resolveMcpProfileName(mcpProfile, repoRoot);
-          const { doc, serverNames } = buildMcpDocumentForProfile(repoRoot, resolvedProfile);
+          const { doc, serverNames } = buildMcpDocumentForServers(repoRoot, mcpServerNames);
           if (dryRun) {
             console.log(
-              `\n[dry-run] would install MCP profile "${resolvedProfile}" (${serverNames.join(", ")})`
+              `\n[dry-run] would install MCP servers (${serverNames.join(", ")})`
             );
           } else {
             console.log("\n━━━ MCP servers ━━━");
-            console.log(`Profile: ${resolvedProfile}`);
+            if (mcpProfile) {
+              console.log(`Profile: ${mcpProfile}`);
+            }
+            console.log(`Servers: ${serverNames.join(", ")}`);
             const storeMcp = installMcpToStore(bundledMcpPath, {
               force,
               dryRun: false,
               mcpDoc: doc,
-              profile: resolvedProfile
+              profile: mcpProfile
             });
             console.log(`MCP store: ${getMcpStorePath()} (${storeMcp.action})`);
             const mcpResults = installMcpToIdes(mcpTargetMap, mcpIdes, {
@@ -596,13 +610,12 @@ async function run() {
       (action || "install") === "install" &&
       !args.skipMcp &&
       !args.withMcp &&
-      !args.mcpProfile
+      !args.mcpProfile &&
+      !args.mcpServers
     ) {
-      const picked = await promptMcpProfile(listMcpProfilesForPrompt(repoRoot), {
-        defaultProfile: "none"
-      });
-      if (picked && picked !== "none") {
-        args.mcpProfile = picked;
+      const picked = await promptMcpServers(listMcpServersForPrompt(repoRoot));
+      if (picked.length) {
+        args.mcpServers = picked.join(",");
       }
     }
   }
@@ -636,13 +649,18 @@ async function run() {
     }
   }
 
-  const mcpInstall = shouldInstallMcp({
+  const mcpInstall = resolveMcpInstall({
     skipMcp: args.skipMcp,
     withMcp: args.withMcp,
-    mcpProfile: args.mcpProfile
+    mcpProfile: args.mcpProfile,
+    mcpServers: args.mcpServers,
+    repoRoot
   });
   if (mcpInstall.enabled) {
-    resolveMcpProfileName(mcpInstall.profile, repoRoot);
+    if (args.mcpProfile && args.mcpServers) {
+      resolveMcpProfileName(args.mcpProfile, repoRoot);
+    }
+    resolveMcpServerNames(mcpInstall.serverNames, repoRoot);
   }
 
   const { plan, run: runAction } = executeInstall(targetMap, targetIdes, action, {

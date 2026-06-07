@@ -6,7 +6,7 @@ const { spawnSync } = require("child_process");
 const {
   wantsInteractive,
   promptScope,
-  promptMcpProfile,
+  promptMcpServers,
   confirmPlan,
   banner
 } = require("./interactive");
@@ -17,8 +17,9 @@ const {
   printUpdatePackChoices
 } = require("./recommended-catalog");
 const {
-  listMcpProfilesForPrompt,
-  buildMcpDocumentForProfile
+  listMcpServersForPrompt,
+  formatMcpPlanLine,
+  resolveMcpInstall
 } = require("./kenmark-hub");
 
 const repoRoot = path.resolve(__dirname, "..");
@@ -47,6 +48,7 @@ function printUsage() {
   console.log("  --npm-only            Only upgrade global kenmark-skills package");
   console.log("  --dry-run             Show planned steps without running");
   console.log("  --mcp-profile <name>  Refresh MCP profile: none, web, research, deep, all");
+  console.log("  --mcp-servers <list>  MCP servers by name (e.g. playwright,context7,fetch)");
   console.log("  --with-mcp            Refresh all bundled MCP servers (profile: all)");
   console.log("  --skip-mcp            Skip MCP refresh even when --mcp-profile / --with-mcp is set");
   console.log("  -y, --yes             Skip confirmation prompts");
@@ -67,7 +69,8 @@ function parseArgs(argv) {
     eccProfile: null,
     skipMcp: false,
     withMcp: false,
-    mcpProfile: null
+    mcpProfile: null,
+    mcpServers: null
   };
   for (let i = 0; i < argv.length; i += 1) {
     const t = argv[i];
@@ -144,6 +147,11 @@ function parseArgs(argv) {
     }
     if (t === "--mcp-profile") {
       args.mcpProfile = (argv[i + 1] || "").trim() || null;
+      i += 1;
+      continue;
+    }
+    if (t === "--mcp-servers") {
+      args.mcpServers = (argv[i + 1] || "").trim() || null;
       i += 1;
       continue;
     }
@@ -272,6 +280,7 @@ async function run() {
   let runNpm = false;
   let ide = args.ide;
   let mcpProfile = args.mcpProfile;
+  let mcpServers = args.mcpServers;
 
   const interactive =
     wantsInteractive(args) &&
@@ -293,12 +302,14 @@ async function run() {
         runNpm = await promptNpmUpdate(false);
       }
       ide = await promptIde(ide);
-      if (!args.skipMcp && !args.withMcp && !args.mcpProfile) {
-        mcpProfile = await promptMcpProfile(listMcpProfilesForPrompt(repoRoot), {
-          defaultProfile: "none",
+      if (!args.skipMcp && !args.withMcp && !args.mcpProfile && !args.mcpServers) {
+        const picked = await promptMcpServers(listMcpServersForPrompt(repoRoot), {
           installPrompt:
             "Refresh or install bundled MCP servers into Cursor / Claude configs?"
         });
+        if (picked.length) {
+          mcpServers = picked.join(",");
+        }
       }
     }
     if (mode === "recommended" || mode === "both") {
@@ -319,7 +330,7 @@ async function run() {
     mode = mode || "kenmark";
     scope = scope || "global";
     runNpm = !args.skipNpm && (mode === "kenmark" || mode === "both") && globalKenmarkInstalled();
-    if (!mcpProfile && args.withMcp) {
+    if (!mcpProfile && !mcpServers && args.withMcp) {
       mcpProfile = "all";
     }
   }
@@ -332,11 +343,15 @@ async function run() {
     if (!args.skipAdopt) {
       plan.push("  + adopt catalog skills into ~/.kenmark/store + relink");
     }
-    if (mcpProfile && mcpProfile !== "none" && !args.skipMcp) {
-      const { serverNames } = buildMcpDocumentForProfile(repoRoot, mcpProfile);
-      plan.push(
-        `MCP profile "${mcpProfile}" (${serverNames.join(", ") || "none"}) → Cursor / Claude`
-      );
+    const mcpInstall = resolveMcpInstall({
+      skipMcp: args.skipMcp,
+      withMcp: args.withMcp,
+      mcpProfile,
+      mcpServers,
+      repoRoot
+    });
+    if (mcpInstall.enabled) {
+      plan.push(formatMcpPlanLine(mcpInstall.serverNames));
     }
   }
   if (mode === "recommended" || mode === "both") {
@@ -387,10 +402,14 @@ async function run() {
     if (args.eccProfile) setupArgs.push("--ecc-profile", args.eccProfile);
     if (args.skipMcp) setupArgs.push("--skip-mcp");
     if (args.withMcp) setupArgs.push("--with-mcp");
-    if (mcpProfile && mcpProfile !== "none") {
+    if (mcpServers) {
+      setupArgs.push("--mcp-servers", mcpServers);
+    } else if (mcpProfile && mcpProfile !== "none") {
       setupArgs.push("--mcp-profile", mcpProfile);
     } else if (args.mcpProfile && args.mcpProfile !== "none") {
       setupArgs.push("--mcp-profile", args.mcpProfile);
+    } else if (args.mcpServers) {
+      setupArgs.push("--mcp-servers", args.mcpServers);
     }
     if (args.dryRun) setupArgs.push("--dry-run");
     const result = runNodeScript(setupScript, setupArgs, args.dryRun, "Kenmark skills");
