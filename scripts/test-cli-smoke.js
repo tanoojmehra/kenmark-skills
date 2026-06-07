@@ -17,7 +17,19 @@ const COMMANDS = [
   ["-v"],
   ["validate"],
   ["setup", "--dry-run", "--global", "--ide", "claude", "-y"],
+  ["setup", "--dry-run", "--global", "--ide", "cursor", "--mcp-profile", "web", "-y"],
   ["init", "--dry-run", "--global", "--ide", "claude", "--skip-recommended", "-y"],
+  [
+    "init",
+    "--dry-run",
+    "--global",
+    "--ide",
+    "cursor",
+    "--skip-recommended",
+    "--mcp-profile",
+    "research",
+    "-y"
+  ],
   ["install-recommended", "--list"],
   [
     "install-recommended",
@@ -49,6 +61,17 @@ const COMMANDS = [
     "-y"
   ],
   ["update", "--kenmark-only", "--global", "--ide", "auto", "-y", "--dry-run"],
+  [
+    "update",
+    "--kenmark-only",
+    "--global",
+    "--ide",
+    "auto",
+    "--mcp-profile",
+    "web",
+    "-y",
+    "--dry-run"
+  ],
   ["update", "--both", "--global", "--ide", "auto", "--dry-run", "-y"],
   ["doctor", "--soft", "--no-fail"]
 ];
@@ -61,7 +84,45 @@ const ASSERTIONS = [
       /setup-skills\.js --global --install --ide auto -y/,
       /Kenmark skills/
     ],
-    rejectStdout: [/Recommended packs/, /kenmark-packs\.js/, /--all/]
+    rejectStdout: [/Recommended packs/, /kenmark-packs\.js/, /--all/, /--mcp-profile/]
+  },
+  {
+    args: [
+      "update",
+      "--kenmark-only",
+      "--global",
+      "--ide",
+      "auto",
+      "--mcp-profile",
+      "web",
+      "-y",
+      "--dry-run"
+    ],
+    expectStdout: [
+      /setup-skills\.js --global --install --ide auto -y --mcp-profile web/,
+      /MCP profile "web"/
+    ]
+  },
+  {
+    args: [
+      "init",
+      "--dry-run",
+      "--global",
+      "--ide",
+      "cursor",
+      "--skip-recommended",
+      "--mcp-profile",
+      "research",
+      "-y"
+    ],
+    expectStdout: [
+      /setup-skills\.js --global --install -y --ide cursor --mcp-profile research/,
+      /MCP profile "research"/
+    ]
+  },
+  {
+    args: ["setup", "--dry-run", "--global", "--ide", "cursor", "--mcp-profile", "web", "-y"],
+    expectStdout: [/MCP profile "web"/, /playwright/, /browsermcp/]
   },
   {
     args: ["update", "--both", "--global", "--ide", "auto", "--dry-run", "-y"],

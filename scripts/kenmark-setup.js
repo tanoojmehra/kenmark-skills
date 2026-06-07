@@ -10,6 +10,7 @@ const {
   promptYesNo,
   promptSelectOptionalPacks,
   promptEccProfile,
+  promptMcpProfile,
   confirmPlan,
   banner
 } = require("./interactive");
@@ -24,7 +25,9 @@ const {
   buildGlobalTargets,
   buildProjectTargets,
   detectInstalledIdes,
-  detectManagedIdes
+  detectManagedIdes,
+  listMcpProfilesForPrompt,
+  buildMcpDocumentForProfile
 } = require("./kenmark-hub");
 
 const repoRoot = path.resolve(__dirname, "..");
@@ -47,12 +50,25 @@ function printUsage() {
   console.log("  --ids a,b             Recommended pack ids — custom (non-interactive)");
   console.log("  --all                 Install all catalog packs (legacy)");
   console.log("  --dry-run             Show steps without running");
+  console.log("  --mcp-profile <name>  MCP profile: none, web, research, deep, all");
+  console.log("  --with-mcp            Install all bundled MCP servers (profile: all)");
+  console.log("  --skip-mcp            Skip MCP even when --mcp-profile / --with-mcp is set");
   console.log("  -y, --yes             Skip prompts (agent mode; pass explicit flags)");
   console.log("  -h, --help            Show help");
 }
 
 function parseArgs(argv) {
-  const args = { yes: false, dryRun: false, scope: null, ide: null, ids: null, all: false };
+  const args = {
+    yes: false,
+    dryRun: false,
+    scope: null,
+    ide: null,
+    ids: null,
+    all: false,
+    skipMcp: false,
+    withMcp: false,
+    mcpProfile: null
+  };
   for (let i = 0; i < argv.length; i += 1) {
     const t = argv[i];
     if (t === "-h" || t === "--help") {
@@ -106,6 +122,19 @@ function parseArgs(argv) {
       args.recommendedOnly = true;
       continue;
     }
+    if (t === "--skip-mcp") {
+      args.skipMcp = true;
+      continue;
+    }
+    if (t === "--with-mcp") {
+      args.withMcp = true;
+      continue;
+    }
+    if (t === "--mcp-profile") {
+      args.mcpProfile = (argv[i + 1] || "").trim() || null;
+      i += 1;
+      continue;
+    }
   }
   return args;
 }
@@ -142,6 +171,7 @@ async function run() {
   let selectedPreset = null;
   let selectedPacks = [];
   let eccProfile = null;
+  let mcpProfile = args.mcpProfile;
 
   if (interactive) {
     installKenmark = await promptYesNo(
@@ -196,6 +226,16 @@ async function run() {
       });
       ideArg = ides.length === targetKeys.length ? "all" : ides.join(",");
     }
+    if (
+      installKenmark &&
+      !args.skipMcp &&
+      !args.withMcp &&
+      !args.mcpProfile
+    ) {
+      mcpProfile = await promptMcpProfile(listMcpProfilesForPrompt(repoRoot), {
+        defaultProfile: "none"
+      });
+    }
   } else {
     if (args.recommendedOnly && args.skipRecommended) {
       console.error("Cannot use --recommended-only and --skip-recommended together.");
@@ -209,6 +249,9 @@ async function run() {
       Boolean(args.profile);
     if (args.skipRecommended) {
       installRecommended = false;
+    }
+    if (!mcpProfile && args.withMcp) {
+      mcpProfile = "all";
     }
     if (args.suggest) {
       const { printSuggest } = require("./recommended-catalog");
@@ -236,6 +279,12 @@ async function run() {
   if (installKenmark) {
     const ideLabel = ideArg || "auto-detect";
     plan.push(`Kenmark skills → ${scope} (${ideLabel})`);
+    if (mcpProfile && mcpProfile !== "none" && !args.skipMcp) {
+      const { serverNames } = buildMcpDocumentForProfile(repoRoot, mcpProfile);
+      plan.push(
+        `MCP profile "${mcpProfile}" (${serverNames.join(", ") || "none"}) → Cursor / Claude`
+      );
+    }
   }
   if (installRecommended) {
     if (selectedPreset) {
@@ -250,6 +299,13 @@ async function run() {
   if (!installKenmark && !installRecommended) {
     console.log("Nothing selected to install.");
     process.exit(0);
+  }
+
+  if (args.dryRun) {
+    console.log("\nPlanned steps:");
+    for (const line of plan) {
+      console.log(`  • ${line}`);
+    }
   }
 
   const ok =
@@ -269,6 +325,13 @@ async function run() {
       "-y"
     ];
     if (ideArg) setupArgs.push("--ide", ideArg);
+    if (args.skipMcp) setupArgs.push("--skip-mcp");
+    if (args.withMcp) setupArgs.push("--with-mcp");
+    if (mcpProfile && mcpProfile !== "none") {
+      setupArgs.push("--mcp-profile", mcpProfile);
+    } else if (args.mcpProfile && args.mcpProfile !== "none") {
+      setupArgs.push("--mcp-profile", args.mcpProfile);
+    }
     const result = runNode(setupScript, setupArgs, args.dryRun, "Kenmark skills");
     if (!args.dryRun && result.status !== 0) process.exit(result.status || 1);
   }

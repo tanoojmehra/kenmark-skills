@@ -300,6 +300,7 @@ In a terminal, commands **prompt by default**. For scripts and agents, pass flag
 | --- | --- | --- |
 | **Use when** | First install; want optional curated packs | Kenmark skills only; re-link IDEs |
 | **Installs** | Kenmark + optional catalog packs | 36 Kenmark skills |
+| **MCP** | Interactive wizard prompts for profile; `-y` needs `--mcp-profile` | Same (interactive or flags) |
 | **Implementation** | `setup` → `install-recommended` | `setup-skills.js` |
 | **Later refreshes** | Use `update`, not `init` again | `update` or `setup --force` |
 

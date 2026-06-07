@@ -106,6 +106,29 @@ function listMcpProfileNames(repoRoot) {
   return Object.keys(readMcpProfiles(repoRoot).profiles).sort();
 }
 
+const MCP_PROFILE_DESCRIPTIONS = {
+  none: "Skip — no MCP install or change",
+  web: "Browser automation for UI testing and browsing",
+  research: "Docs lookup and web fetch for library/API research",
+  deep: "Reasoning plus research tools for complex investigation",
+  all: "Every bundled MCP server"
+};
+
+function listMcpProfilesForPrompt(repoRoot) {
+  const { profiles } = readMcpProfiles(repoRoot);
+  return Object.keys(profiles)
+    .sort((a, b) => {
+      if (a === "none") return -1;
+      if (b === "none") return 1;
+      return a.localeCompare(b);
+    })
+    .map((id) => ({
+      id,
+      description: MCP_PROFILE_DESCRIPTIONS[id] || id,
+      servers: profiles[id] || []
+    }));
+}
+
 function resolveMcpProfileName(rawProfile, repoRoot) {
   const name = String(rawProfile || "none")
     .trim()
@@ -2177,6 +2200,8 @@ module.exports = {
   getMcpProfilesPath,
   readMcpProfiles,
   listMcpProfileNames,
+  listMcpProfilesForPrompt,
+  MCP_PROFILE_DESCRIPTIONS,
   resolveMcpProfileName,
   buildMcpDocumentForProfile,
   shouldInstallMcp,

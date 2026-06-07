@@ -8,6 +8,7 @@ const {
   promptScope,
   promptAction,
   promptIde,
+  promptMcpProfile,
   confirmPlan,
   banner
 } = require("./interactive");
@@ -32,6 +33,7 @@ const {
   resolveMcpProfileName,
   buildMcpDocumentForProfile,
   listMcpProfileNames,
+  listMcpProfilesForPrompt,
   detectInstalledIdes,
   detectManagedIdes,
   resolveExplicitTargetIdes,
@@ -589,6 +591,19 @@ async function run() {
       targetIdes = await promptIde(Object.keys(targetMapPreview), detected, {
         managedIdes: managed
       });
+    }
+    if (
+      (action || "install") === "install" &&
+      !args.skipMcp &&
+      !args.withMcp &&
+      !args.mcpProfile
+    ) {
+      const picked = await promptMcpProfile(listMcpProfilesForPrompt(repoRoot), {
+        defaultProfile: "none"
+      });
+      if (picked && picked !== "none") {
+        args.mcpProfile = picked;
+      }
     }
   }
 

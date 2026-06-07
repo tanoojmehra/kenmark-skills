@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## v2.3.5 — MCP prompts in init/setup/update (2026-06-07)
+
+### Feature
+
+- **init / setup / update:** Interactive flows now ask whether to install or refresh bundled MCP servers and which profile to use (`none`, `web`, `research`, `deep`, `all`), with numbered choices and server lists like pack selection.
+- **Non-interactive (`-y`):** MCP remains opt-in via `--mcp-profile` or `--with-mcp`; plain `-y` does not install MCP.
+
+### Test
+
+- **test-cli-smoke.js:** Dry-run assertions for init/setup/update with `--mcp-profile`.
+
 ## v2.3.4 — Wire recommended packs to all IDEs (2026-06-07)
 
 ### Fix

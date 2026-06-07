@@ -440,6 +440,56 @@ async function promptHighBloatConfirm() {
   return lower === "y" || lower === "yes";
 }
 
+/**
+ * @param {Array<{id: string, description: string, servers: string[]}>} profiles
+ * @param {{ defaultProfile?: string, askInstall?: boolean, installPrompt?: string }} opts
+ * @returns {Promise<string|null>} profile id or null when user declines install
+ */
+async function promptMcpProfile(profiles, opts = {}) {
+  const defaultProfile = opts.defaultProfile || "none";
+  const askInstall = opts.askInstall !== false;
+  if (askInstall) {
+    const message =
+      opts.installPrompt ||
+      "Install bundled MCP servers into Cursor / Claude configs?";
+    const want = await promptYesNo(message, false);
+    if (!want) return "none";
+  }
+
+  if (!profiles.length) return "none";
+
+  const rl = createRl();
+  console.log("\nMCP profile (merged into Cursor / Claude MCP configs):\n");
+  profiles.forEach((p, i) => {
+    const def = p.id === defaultProfile ? " [default]" : "";
+    const servers =
+      p.servers?.length > 0 ? ` · servers: ${p.servers.join(", ")}` : "";
+    console.log(`  ${i + 1}) ${p.id}${def} — ${p.description}${servers}`);
+  });
+  console.log(
+    "\nEnter: number · profile id (e.g. web) · Enter for default · none to skip\n"
+  );
+  const answer = await ask(
+    rl,
+    `Profile [1-${profiles.length} or id] (default ${defaultProfile}): `
+  );
+  rl.close();
+
+  if (!answer) return defaultProfile;
+  const lower = answer.toLowerCase();
+  if (lower === "none" || lower === "skip" || lower === "n" || lower === "no") {
+    return "none";
+  }
+  const num = parseInt(lower, 10);
+  if (!Number.isNaN(num) && num >= 1 && num <= profiles.length) {
+    return profiles[num - 1].id;
+  }
+  const byId = profiles.find((p) => p.id === lower);
+  if (byId) return byId.id;
+  console.log(`Unknown profile "${answer}"; using ${defaultProfile}.`);
+  return defaultProfile;
+}
+
 module.exports = {
   IDE_LABELS,
   createRl,
@@ -455,6 +505,7 @@ module.exports = {
   printProfileSummary,
   promptHighBloatConfirm,
   promptEccProfile,
+  promptMcpProfile,
   confirmPlan,
   banner
 };
