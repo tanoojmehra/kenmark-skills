@@ -21,6 +21,7 @@ Status: reviewed
 - **TTY + EOF:** `init`/`update` may exit 0 with "Nothing selected" when stdin is TTY but EOF (agent subprocesses) — see local `brain/issues/` (gitignored).
 - **WSL vs native Windows:** Installs into WSL home are invisible to native Windows IDEs — doctor warns.
 - **Adopt overwrite:** Hash mismatches require explicit `--adopt-overwrite` / `--force`.
+- **Impeccable script paths:** Upstream `SKILL.md` uses `node ./scripts/*.mjs` (skill-relative). Agents run shell from project CWD — kenmark adopt rewrites these to absolute store paths; re-run `npx kenmark-skills adopt --global --ide all -y` after upgrading kenmark-skills if impeccable setup still fails.
 - **ECC / SEO full packs:** High bloat; overlap caps in catalog JSON.
 
 ## Important files inspected

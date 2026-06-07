@@ -11,7 +11,9 @@ const {
   normalizeSkillPaths,
   findNonPortablePaths,
   scanSkillForNonPortablePaths,
-  processSkillPortability
+  processSkillPortability,
+  findCwdRelativeScriptInvocations,
+  normalizeCwdRelativeScripts
 } = require("./kenmark-hub");
 
 function assert(cond, msg) {
@@ -61,6 +63,68 @@ function testProcessSkillPortability() {
   }
 }
 
+function testNormalizeCwdRelativeScripts() {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kenmark-portability-cwd-"));
+  try {
+    const skillName = "impeccable";
+    const skillDir = path.join(tmp, skillName);
+    const scriptsDir = path.join(skillDir, "scripts");
+    fs.mkdirSync(scriptsDir, { recursive: true });
+    fs.writeFileSync(path.join(scriptsDir, "context.mjs"), "// context\n", "utf8");
+    fs.writeFileSync(path.join(scriptsDir, "detect.mjs"), "// detect\n", "utf8");
+
+    const input =
+      "Run `node ./scripts/context.mjs` and `node ./scripts/detect.mjs --json src`";
+    const expectedScript = fs.realpathSync.native
+      ? fs.realpathSync.native(path.join(skillDir, "scripts", "context.mjs"))
+      : fs.realpathSync(path.join(skillDir, "scripts", "context.mjs"));
+    const expectedDetect = fs.realpathSync.native
+      ? fs.realpathSync.native(path.join(skillDir, "scripts", "detect.mjs"))
+      : fs.realpathSync(path.join(skillDir, "scripts", "detect.mjs"));
+    const output = normalizeCwdRelativeScripts(input, skillDir);
+
+    assert(output.includes(`node ${JSON.stringify(expectedScript)}`), "context path absolute");
+    assert(
+      output.includes(`node ${JSON.stringify(expectedDetect)} --json src`),
+      "detect path absolute with args preserved"
+    );
+    assert(findCwdRelativeScriptInvocations(output).length === 0, "no cwd-relative left");
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
+function testProcessSkillPortabilityCwdRelative() {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kenmark-portability-cwd-process-"));
+  try {
+    const skillName = "impeccable";
+    const skillDir = path.join(tmp, skillName);
+    const scriptsDir = path.join(skillDir, "scripts");
+    fs.mkdirSync(scriptsDir, { recursive: true });
+    fs.writeFileSync(path.join(scriptsDir, "context.mjs"), "// context\n", "utf8");
+    fs.writeFileSync(
+      path.join(skillDir, "SKILL.md"),
+      "Run `node ./scripts/context.mjs` once per session.\n",
+      "utf8"
+    );
+
+    processSkillPortability(skillDir, skillName);
+
+    const skillMd = fs.readFileSync(path.join(skillDir, "SKILL.md"), "utf8");
+    const expected = fs.realpathSync.native
+      ? fs.realpathSync.native(path.join(skillDir, "scripts", "context.mjs"))
+      : fs.realpathSync(path.join(skillDir, "scripts", "context.mjs"));
+    assert(skillMd.includes(`node ${JSON.stringify(expected)}`), "SKILL.md cwd-relative rewritten");
+    const findings = scanSkillForNonPortablePaths(skillDir, skillName);
+    assert(
+      findings.filter((f) => f.kind === "cwd-relative-script").length === 0,
+      "scan finds no cwd-relative script invocations after repair"
+    );
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
 function testAdoptRepairsStoreCurrent() {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kenmark-portability-adopt-"));
   try {
@@ -71,13 +135,26 @@ function testAdoptRepairsStoreCurrent() {
     fs.mkdirSync(scriptsDir, { recursive: true });
 
     const badAnchor = `.agents/skills/${skillName}/scripts/context.mjs`;
-    fs.writeFileSync(path.join(skillDir, "SKILL.md"), `node ${badAnchor}\n`, "utf8");
+    fs.writeFileSync(
+      path.join(skillDir, "SKILL.md"),
+      `node ${badAnchor}\nRun \`node ./scripts/context.mjs\`.\n`,
+      "utf8"
+    );
     fs.writeFileSync(path.join(scriptsDir, "context.mjs"), `// ${badAnchor}\n`, "utf8");
 
     processSkillPortability(skillDir, skillName);
 
     const skillMd = fs.readFileSync(path.join(skillDir, "SKILL.md"), "utf8");
-    assert(skillMd.includes("node ./scripts/context.mjs"), "store-current adopt repair normalizes SKILL.md");
+    const absScript = JSON.stringify(
+      fs.realpathSync.native
+        ? fs.realpathSync.native(path.join(skillDir, "scripts", "context.mjs"))
+        : fs.realpathSync(path.join(skillDir, "scripts", "context.mjs"))
+    );
+    assert(
+      (skillMd.match(new RegExp(`node ${absScript.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "g")) || [])
+        .length >= 2,
+      "store-current adopt repair normalizes IDE anchors and cwd-relative scripts"
+    );
     assert(
       scanSkillForNonPortablePaths(skillDir, skillName).length === 0,
       "store-current adopt repair leaves no non-portable paths"
@@ -116,6 +193,10 @@ function main() {
   console.log("  ✓ normalizeSkillPaths / findNonPortablePaths");
   testProcessSkillPortability();
   console.log("  ✓ processSkillPortability");
+  testNormalizeCwdRelativeScripts();
+  console.log("  ✓ normalizeCwdRelativeScripts");
+  testProcessSkillPortabilityCwdRelative();
+  console.log("  ✓ processSkillPortability cwd-relative rewrite");
   testAdoptRepairsStoreCurrent();
   console.log("  ✓ adopt store-current repair");
   testScanSkillForNonPortablePaths();

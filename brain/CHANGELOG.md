@@ -9,3 +9,9 @@ Brain knowledge base for the kenmark-skills repository.
 - Sync mode: none (brain only — no IDE entry stubs in this commit).
 - README simplified; long reference moved to `brain/kb/`.
 - `.gitignore`: track `brain/` but exclude local `brain/issues/`.
+
+## v2026.06.07-impeccable-cwd
+
+- **kenmark-hub:** Rewrite cwd-relative `node ./scripts/*.mjs` in catalog skill `SKILL.md` / `reference/*.md` to absolute store paths during adopt; doctor flags leftovers.
+- **KB:** Updated testing doc, known risks, recommended-packs troubleshooting.
+- **Issue 007:** Completed — impeccable setup scripts fail from consumer project CWD.
