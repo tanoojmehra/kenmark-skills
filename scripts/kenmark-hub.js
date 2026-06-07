@@ -963,6 +963,54 @@ function normalizeSkillPaths(content, skillName) {
   return content.replace(nonPortablePathPattern(skillName), "./");
 }
 
+const CWD_RELATIVE_SCRIPT_RE = /node \.\/scripts\/(\S+)/g;
+const CWD_RELATIVE_SCRIPT_BACKTICK_RE = /`node \.\/scripts\/([^`]+)`/g;
+
+function findCwdRelativeScriptInvocations(content) {
+  const matches = [];
+  for (const pattern of [
+    new RegExp(CWD_RELATIVE_SCRIPT_BACKTICK_RE.source, "g"),
+    new RegExp(CWD_RELATIVE_SCRIPT_RE.source, "g")
+  ]) {
+    let match;
+    while ((match = pattern.exec(content)) !== null) {
+      matches.push(match[0]);
+    }
+  }
+  return matches;
+}
+
+function buildAbsoluteSkillScriptCommand(skillRoot, scriptAndArgs) {
+  const tokens = scriptAndArgs.trim().split(/\s+/);
+  const scriptFile = tokens[0];
+  const args = tokens.slice(1).join(" ");
+  const absScript = path.join(skillRoot, "scripts", scriptFile);
+  const command = `node ${JSON.stringify(absScript)}`;
+  return args ? `${command} ${args}` : command;
+}
+
+function normalizeCwdRelativeScripts(content, skillDir) {
+  const skillRoot = resolveSkillRoot(skillDir);
+  let normalized = content.replace(CWD_RELATIVE_SCRIPT_BACKTICK_RE, (match, scriptAndArgs) => {
+    return `\`${buildAbsoluteSkillScriptCommand(skillRoot, scriptAndArgs)}\``;
+  });
+  normalized = normalized.replace(CWD_RELATIVE_SCRIPT_RE, (match, scriptAndArgs) => {
+    return buildAbsoluteSkillScriptCommand(skillRoot, scriptAndArgs);
+  });
+  return normalized;
+}
+
+function listSkillAgentFacingRelPaths(skillDir) {
+  const targetFiles = ["SKILL.md"];
+  const refDir = path.join(skillDir, "reference");
+  if (fs.existsSync(refDir)) {
+    fs.readdirSync(refDir)
+      .filter((f) => f.endsWith(".md"))
+      .forEach((f) => targetFiles.push(path.join("reference", f)));
+  }
+  return targetFiles;
+}
+
 function listSkillPortabilityRelPaths(skillDir) {
   const targetFiles = ["SKILL.md"];
   const scriptDir = path.join(skillDir, "scripts");
@@ -982,7 +1030,16 @@ function scanSkillForNonPortablePaths(skillDir, skillName) {
     const content = fs.readFileSync(fullPath, "utf8");
     const matches = findNonPortablePaths(content, skillName);
     if (matches.length) {
-      findings.push({ relPath, matches });
+      findings.push({ relPath, matches, kind: "ide-anchor" });
+    }
+  }
+  for (const relPath of listSkillAgentFacingRelPaths(skillRoot)) {
+    const fullPath = path.join(skillRoot, relPath);
+    if (!fs.existsSync(fullPath)) continue;
+    const content = fs.readFileSync(fullPath, "utf8");
+    const cwdMatches = findCwdRelativeScriptInvocations(content);
+    if (cwdMatches.length) {
+      findings.push({ relPath, matches: cwdMatches, kind: "cwd-relative-script" });
     }
   }
   return findings;
@@ -998,6 +1055,17 @@ function processSkillPortability(skillDir, skillName) {
 
     const content = fs.readFileSync(fullPath, "utf8");
     const normalized = normalizeSkillPaths(content, skillName);
+    if (content !== normalized) {
+      fs.writeFileSync(fullPath, normalized, "utf8");
+    }
+  }
+
+  for (const relPath of listSkillAgentFacingRelPaths(skillRoot)) {
+    const fullPath = path.join(skillRoot, relPath);
+    if (!fs.existsSync(fullPath)) continue;
+
+    const content = fs.readFileSync(fullPath, "utf8");
+    const normalized = normalizeCwdRelativeScripts(content, skillRoot);
     if (content !== normalized) {
       fs.writeFileSync(fullPath, normalized, "utf8");
     }
@@ -2277,8 +2345,12 @@ function runDoctor(options = {}) {
     const storeReal = safeRealpath(storePath);
 
     for (const finding of scanSkillForNonPortablePaths(storePath, name)) {
+      const kindLabel =
+        finding.kind === "cwd-relative-script"
+          ? "cwd-relative script invocations"
+          : "non-portable hardcoded paths";
       recordProblem(
-        `Skill '${name}' in store contains non-portable hardcoded paths in ${finding.relPath}`
+        `Skill '${name}' in store contains ${kindLabel} in ${finding.relPath}`
       );
     }
 
@@ -2289,8 +2361,12 @@ function runDoctor(options = {}) {
       const ideReal = safeRealpath(idePath);
       if (ideReal !== storeReal) {
         for (const finding of scanSkillForNonPortablePaths(idePath, name)) {
+          const kindLabel =
+            finding.kind === "cwd-relative-script"
+              ? "cwd-relative script invocations"
+              : "non-portable hardcoded paths";
           recordProblem(
-            `Skill '${name}' in ${ide} contains non-portable hardcoded paths in ${finding.relPath}`
+            `Skill '${name}' in ${ide} contains ${kindLabel} in ${finding.relPath}`
           );
         }
       }
@@ -2412,8 +2488,11 @@ module.exports = {
   resolveFallbackTargetIdes,
   resolveSkillRoot,
   findNonPortablePaths,
+  findCwdRelativeScriptInvocations,
   normalizeSkillPaths,
+  normalizeCwdRelativeScripts,
   listSkillPortabilityRelPaths,
+  listSkillAgentFacingRelPaths,
   scanSkillForNonPortablePaths,
   processSkillPortability,
   resolveLinkModeLabel,

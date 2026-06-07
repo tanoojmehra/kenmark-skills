@@ -25,7 +25,7 @@ Checks include:
 | `test-pack.js` | npm pack contents |
 | `test-broken-symlink-cleanup.js` | Cleanup broken symlinks |
 | `test-cleanup-temp-home.js` | Cleanup kenmark/packs modes |
-| `test-skill-portability.js` | Path rewrite in store |
+| `test-skill-portability.js` | Path rewrite in store (IDE anchors + cwd-relative `./scripts/` in agent-facing docs) |
 
 ### doctor (`scripts/doctor.js`)
 

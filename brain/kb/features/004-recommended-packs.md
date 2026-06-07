@@ -37,6 +37,8 @@ npx kenmark-skills install-recommended --profile core-next --global -y
 
 In chat: **kenmark-packs** (guided), **kenmark-maintain** (inventory, no auto-delete).
 
+After install/adopt, Kenmark rewrites impeccable `SKILL.md` script invocations from `./scripts/` to absolute store paths so agents can run setup scripts from any project directory. If impeccable setup fails with missing `scripts/context.mjs`, run `npx kenmark-skills adopt --global --ide all -y`.
+
 ## Cleanup catalog packs
 
 ```bash

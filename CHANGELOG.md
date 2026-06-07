@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## v2.3.11 — Impeccable cwd-relative script repair (2026-06-07)
+
+### Fix
+
+- **kenmark-hub.js:** During catalog skill adopt/portability repair, rewrite agent-facing `node ./scripts/*.mjs` invocations in `SKILL.md` and `reference/*.md` to absolute store-resolved paths. Fixes impeccable setup failing when agents run scripts from a consumer project root (e.g. `kenmark-studio`) instead of the skill directory.
+- **doctor:** Flags remaining cwd-relative script invocations in store and IDE copies.
+
 ## v2.3.10 — brain/ knowledge base + README slim (2026-06-07)
 
 ### Docs
