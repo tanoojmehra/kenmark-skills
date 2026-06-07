@@ -1,13 +1,13 @@
 # Flows and workflows
 
-Last updated: 2026-06-07
+Last updated: 2026-06-08
 Status: reviewed
 
 ## Confirmed facts
 
 ### Human first-time setup
 
-1. `npx kenmark-skills init` — wizard selects Kenmark skills, optional packs, IDE targets, MCP servers.
+1. `npx kenmark-skills init` — wizard selects Kenmark skills, optional packs, IDE targets, MCP servers. When running from a **global** install that lags npm `latest`, init prompts to upgrade the CLI first (or use `--upgrade-cli -y` / `npx kenmark-skills@latest init`).
 2. Restart IDE if skills/MCP do not appear.
 3. In a **project repo**, run **kenmark-init** in agent chat to bootstrap that repo's `brain/`.
 
@@ -33,7 +33,7 @@ npx kenmark-skills update          # interactive
 npx kenmark-skills update --both --global -y   # non-interactive
 ```
 
-Do **not** re-run `init` for upgrades — use `update`.
+Do **not** re-run `init` for routine skill refreshes — use `update`. Re-run `init` when you want the first-install wizard again or after upgrading a stale global CLI.
 
 ### Adopt workflow
 

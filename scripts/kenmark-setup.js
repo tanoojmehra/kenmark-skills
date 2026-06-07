@@ -34,6 +34,17 @@ const {
 const repoRoot = path.resolve(__dirname, "..");
 const setupScript = path.join(__dirname, "setup-skills.js");
 const recommendedScript = path.join(__dirname, "kenmark-packs.js");
+const {
+  readLocalPackageVersion,
+  fetchNpmLatestVersion,
+  semverLt,
+  globalKenmarkInstalled,
+  globalKenmarkSetupScriptPath,
+  runningFromGlobalPackage,
+  readGlobalPackageVersion,
+  runNpmInstallLatest,
+  formatStaleCliHint
+} = require("./cli-package");
 
 function printUsage() {
   console.log("Usage: node scripts/kenmark-setup.js [options]");
@@ -55,6 +66,8 @@ function printUsage() {
   console.log("  --mcp-servers <list>  MCP servers by name (e.g. playwright,context7,fetch)");
   console.log("  --with-mcp            Install all bundled MCP servers (profile: all)");
   console.log("  --skip-mcp            Skip MCP even when --mcp-profile / --with-mcp is set");
+  console.log("  --skip-npm            Skip CLI version check and global package upgrade");
+  console.log("  --upgrade-cli         Non-interactive: upgrade global kenmark-skills@latest before init");
   console.log("  -y, --yes             Skip prompts (agent mode; pass explicit flags)");
   console.log("  -h, --help            Show help");
 }
@@ -70,7 +83,9 @@ function parseArgs(argv) {
     skipMcp: false,
     withMcp: false,
     mcpProfile: null,
-    mcpServers: null
+    mcpServers: null,
+    skipNpm: false,
+    upgradeCli: false
   };
   for (let i = 0; i < argv.length; i += 1) {
     const t = argv[i];
@@ -143,6 +158,14 @@ function parseArgs(argv) {
       i += 1;
       continue;
     }
+    if (t === "--skip-npm") {
+      args.skipNpm = true;
+      continue;
+    }
+    if (t === "--upgrade-cli") {
+      args.upgradeCli = true;
+      continue;
+    }
   }
   return args;
 }
@@ -159,6 +182,70 @@ function runNode(scriptPath, scriptArgs, dryRun, label) {
   });
 }
 
+async function maybeUpgradeCliBeforeInit(args) {
+  const localVersion = readLocalPackageVersion(repoRoot);
+  console.log(`Running kenmark-skills v${localVersion}`);
+
+  if (args.skipNpm || args.dryRun) return;
+
+  const latestVersion = fetchNpmLatestVersion();
+  if (!latestVersion || !semverLt(localVersion, latestVersion)) return;
+
+  const fromGlobal = runningFromGlobalPackage(__filename);
+  const globalInstalled = globalKenmarkInstalled();
+
+  if (!fromGlobal) {
+    if (!args.yes) {
+      console.warn(formatStaleCliHint(localVersion, latestVersion, { globalInstalled }));
+    }
+    return;
+  }
+
+  let shouldUpgrade = false;
+  if (args.upgradeCli) {
+    shouldUpgrade = true;
+  } else if (wantsInteractive(args)) {
+    shouldUpgrade = await promptYesNo(
+      `CLI is outdated (v${localVersion} → npm latest v${latestVersion}). Upgrade global package before installing skills?`,
+      true
+    );
+  } else {
+    console.warn(formatStaleCliHint(localVersion, latestVersion, { globalInstalled: true }));
+    return;
+  }
+
+  if (!shouldUpgrade) return;
+
+  const npmResult = runNpmInstallLatest(false);
+  if (npmResult.status !== 0) {
+    console.error("npm install failed; continuing with current CLI version.");
+    return;
+  }
+
+  const upgradedVersion = readGlobalPackageVersion();
+  if (!upgradedVersion || semverLt(upgradedVersion, latestVersion)) {
+    console.warn(
+      upgradedVersion
+        ? `Global CLI is v${upgradedVersion} (npm latest v${latestVersion}); continuing without re-exec.`
+        : "Could not read upgraded global package version; continuing without re-exec."
+    );
+    return;
+  }
+
+  const newSetupScript = globalKenmarkSetupScriptPath();
+  if (!newSetupScript || path.resolve(newSetupScript) === path.resolve(__filename)) {
+    return;
+  }
+
+  console.log(`\nRe-running init with upgraded CLI (v${upgradedVersion})…\n`);
+  const result = spawnSync(process.execPath, [newSetupScript, ...process.argv.slice(2)], {
+    stdio: "inherit",
+    env: process.env,
+    cwd: process.cwd()
+  });
+  process.exit(result.status === null ? 1 : result.status);
+}
+
 async function run() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -170,6 +257,8 @@ async function run() {
     "kenmark-skills init",
     "Interactive setup — every choice is explicit · use flags + -y for agents"
   );
+
+  await maybeUpgradeCliBeforeInit(args);
 
   const interactive = wantsInteractive(args);
   let scope = args.scope;
