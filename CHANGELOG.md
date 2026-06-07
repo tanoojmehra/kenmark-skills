@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## v2.3.9 — Issue tracking docs clarity (2026-06-07)
+
+### Docs
+
+- **Issue tracking routing:** Split "Need issue tracking?" into setup vs scan — `kenmark-issues-setup` bootstraps `brain/issues/` docs; `kenmark-issues-scan` finds bugs and files issues (not setup).
+- **kenmark-init:** Optional Step 1b asks "Need issue tracking?" and runs `kenmark-issues-setup` Steps 2–4 when user opts in.
+- **kenmark-issues-setup / scan / list / check:** Cross-references, redundancy note when init already created `INDEX.md`, and prerequisite guards.
+- **README / skills/README / kenmark-router:** Updated day-to-day tables and issue tracking section.
+
 ## v2.3.8 — MCP server selection + init-centric CLI (2026-06-07)
 
 ### Feature

@@ -1,10 +1,10 @@
 ---
 name: kenmark-init
-version: 1.2.0
+version: 1.3.0
 category: onboarding
 scope: universal
 phase: setup
-description: "Initialize brain/ (numbered KB under brain/kb/, modular rules) and optionally install cross-IDE pointer stubs (or full embed) in CLAUDE.md, AGENTS.md, .cursorrules, .cursor/rules/, GEMINI.md. On init, inspect the repo and document confirmed facts in brain/kb/. Use when applying workspace rules, creating project standards, or enforcing team conventions."
+description: "Initialize brain/ (numbered KB under brain/kb/, modular rules) and optionally bootstrap brain/issues/ issue-tracker docs and install cross-IDE pointer stubs (or full embed) in CLAUDE.md, AGENTS.md, .cursorrules, .cursor/rules/, GEMINI.md. On init, inspect the repo and document confirmed facts in brain/kb/. Use when applying workspace rules, creating project standards, or enforcing team conventions."
 triggers:
   - init brain
   - initialize brain
@@ -112,7 +112,7 @@ Project knowledge base for humans and AI agents.
 | [kb/10-testing-and-quality.md](kb/10-testing-and-quality.md) | Test strategy and quality gates |
 | [kb/11-known-risks-and-decisions.md](kb/11-known-risks-and-decisions.md) | Risks, tradeoffs, architecture decisions |
 | [CHANGELOG.md](CHANGELOG.md) | Versioned log of brain, KB, and standards changes |
-| [issues/INDEX.md](issues/INDEX.md) | Active/completed issue tracker (optional; use `kenmark-issues-setup` skill) |
+| [issues/INDEX.md](issues/INDEX.md) | Active/completed issue tracker (optional; created in Step 1b or via `kenmark-issues-setup`) |
 
 ## Maintenance
 
@@ -237,6 +237,23 @@ If no features are documented yet, list discovered modules from the codebase and
 ### Rule (non-negotiable)
 
 When initializing brain, inspect the current repository and document the project as a numbered KB under `brain/kb/`. Separate confirmed facts from assumptions and unknowns.
+
+---
+
+## Step 1b — Optional issue tracking (`brain/issues/`)
+
+**Ask the user:** "Need issue tracking?" unless they already specified in the same request:
+
+- "with issues", "including issue tracker", "bootstrap issues" → **yes**
+- "brain only" / "just the brain folder" with no mention of issues → ask (default **no** if they decline)
+
+| Answer | Action |
+| --- | --- |
+| **Yes** and `brain/issues/INDEX.md` is **missing** | Follow **`kenmark-issues-setup`** Steps 2–4 (write full `INDEX.md` template). Step 1 already created `brain/issues/` and `brain/issues/completed/`. |
+| **Yes** and `INDEX.md` **exists** | Skip setup; report existing tracker. |
+| **No** | Leave empty dirs only; do not write `INDEX.md`. |
+
+**Not for discovering bugs** — filing issues from the codebase is **`kenmark-issues-scan`**, after tracker docs exist.
 
 ---
 
@@ -409,7 +426,8 @@ Report to the user:
 - Sync mode (`stub` or `sync-full`)
 - Which agent files were updated (selected targets only)
 - Skipped targets
-- Whether `brain/issues/` was left untouched
+- Whether issue tracking was bootstrapped (`brain/issues/INDEX.md` created or skipped)
+- Whether `brain/issues/` dirs were left empty (no INDEX)
 - Reminder: edit rules under `brain/rules/` and KB under `brain/kb/`; re-run kenmark-init to refresh stubs/embeds
 
 ---
@@ -645,5 +663,6 @@ Optional — fill in per project.
 ## Related skills
 
 - `kenmark-commit` — reads `brain/rules/workflow.md` Git branch policy for protected deployment branches
-- `kenmark-issues-setup` — bootstrap `brain/issues/` when issue tracking is needed
-- `kenmark-issues-check` / `kenmark-issues-scan` — maintain issues after brain exists
+- `kenmark-issues-setup` — standalone bootstrap for `brain/issues/` docs (Step 1b runs the same workflow when user opts in)
+- `kenmark-issues-scan` — scan codebase and **create issue files** (requires `INDEX.md`; not setup)
+- `kenmark-issues-check` — move resolved issues to `completed/` and refresh index

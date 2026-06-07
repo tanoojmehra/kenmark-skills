@@ -69,7 +69,8 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 | Need a plan before work? | **`kenmark-plan`** |
 | Need parallel/specialist tracks? | **`kenmark-subagents`** |
 | Need complete final deliverable? | **`kenmark-output`** |
-| Need issue tracking? | **`kenmark-issues-setup`** / **`kenmark-issues-scan`** |
+| Need issue tracker docs (`brain/issues/`)? | **`kenmark-issues-setup`** (or opt in during **`kenmark-init`**) |
+| Find bugs/gaps to file as issues? | **`kenmark-issues-scan`** |
 | Scan, fix, commit, and ship issues? | **`kenmark-issues-fix-and-ship`** |
 | Need skill choice? | **`kenmark-router`** |
 | Repo clutter / scattered docs? | **`kenmark-repo-hygiene`** |
@@ -203,14 +204,14 @@ Skills are grouped by use case. Open each `SKILL.md` for full workflows and trig
 
 ### Issue tracking (`kenmark-issues-*`)
 
-Requires **`kenmark-init`** or at least `brain/issues/` from **`kenmark-issues-setup`**.
+Requires `brain/issues/INDEX.md` from **`kenmark-issues-setup`** or opt-in during **`kenmark-init`**. (`kenmark-init` always creates empty `brain/issues/` dirs; the INDEX and templates are optional.)
 
 | Skill | Purpose |
 | --- | --- |
-| [`kenmark-issues-setup`](skills/user-skills/kenmark-issues-setup/SKILL.md) | Create `brain/issues/` layout and `INDEX.md` |
+| [`kenmark-issues-setup`](skills/user-skills/kenmark-issues-setup/SKILL.md) | Bootstrap `brain/issues/` documentation: `INDEX.md`, templates, `completed/` |
 | [`kenmark-issues-list`](skills/user-skills/kenmark-issues-list/SKILL.md) | Dashboard of open issues by area and priority |
 | [`kenmark-issues-check`](skills/user-skills/kenmark-issues-check/SKILL.md) | Move resolved issues to `completed/`; refresh index |
-| [`kenmark-issues-scan`](skills/user-skills/kenmark-issues-scan/SKILL.md) | Discover and file new issues under `brain/issues/` |
+| [`kenmark-issues-scan`](skills/user-skills/kenmark-issues-scan/SKILL.md) | Scan codebase for bugs/gaps and **create issue files** (not setup) |
 | [`kenmark-issues-maintain`](skills/user-skills/kenmark-issues-maintain/SKILL.md) | Audit tracker health (duplicates, stale index, missing files) |
 | [`kenmark-issues-fix-and-ship`](skills/user-skills/kenmark-issues-fix-and-ship/SKILL.md) | End-to-end scan → fix → complete → commit → merge orchestrator |
 

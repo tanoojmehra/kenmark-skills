@@ -1,10 +1,10 @@
 ---
 name: kenmark-issues-scan
-version: 1.2.0
+version: 1.3.0
 category: issues
 scope: universal
 phase: discover
-description: "Scan the codebase for bugs, gaps, and inconsistencies; create new issue files in brain/issues/ with unique IDs. Use when asked to \"scan for new issues\", \"find new issues\", or \"discover issues\"."
+description: "Scan the codebase for bugs, gaps, and inconsistencies; create new issue files in brain/issues/ with unique IDs. Requires brain/issues/INDEX.md from kenmark-issues-setup or kenmark-init — this skill does NOT bootstrap the tracker. Use when asked to \"scan for new issues\", \"find new issues\", or \"discover issues\"."
 triggers:
   - scan for new issues
   - find new issues
@@ -27,7 +27,10 @@ disable-model-invocation: false
 
 ## Purpose
 
-Scan the codebase for bugs, gaps, and inconsistencies that warrant new issues.
+**Scan and document** — find bugs, gaps, and inconsistencies in the codebase, then **create issue files** under `brain/issues/` with evidence and unique IDs.
+
+**Not setup.** This skill does not create the tracker layout. If `brain/issues/INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or opt in during **`kenmark-init`**) first.
+
 Assign unique IDs (next available in the 3-digit sequence), populate with
 evidence, and optionally update INDEX.md.
 
@@ -42,6 +45,7 @@ evidence, and optionally update INDEX.md.
 5. Never reuse an ID.
 6. Never renumber issues.
 7. If `INDEX.md` and folders disagree, stop and run `kenmark-issues-maintain` before creating new issues.
+8. If `INDEX.md` is missing, stop and run `kenmark-issues-setup` (or `kenmark-init` with issue tracking) — do not invent a tracker inline.
 
 ---
 
