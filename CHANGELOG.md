@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v2.3.12 — Adopt pass portability reporting (2026-06-08)
+
 ### Fix
 
 - **kenmark-hub.js:** `summarizeAdoptResults` / `formatAdoptPassSummary` — adopt pass logs now report `portability-refreshed` for existing store copies (`store-current`), not only newly adopted skills.

@@ -4,6 +4,8 @@ Brain knowledge base for the kenmark-skills repository.
 
 ## v2026.06.07-adopt-reporting
 
+- **Release:** package **2.3.12** (2026-06-08).
+
 - **kenmark-hub:** `summarizeAdoptResults` / `formatAdoptPassSummary` — adopt logs now count `store-current` as portability-refreshed, not zero work.
 - **setup / packs / adopt:** Shared adopt pass summary line; review-required and skipped still surfaced.
 - **Issue 008:** Completed — adopt pass misleading zero adopted count.
