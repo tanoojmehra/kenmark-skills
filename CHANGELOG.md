@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## v2.3.3 — Update flag, install test, setup plan (2026-06-07)
+
+### Fix
+
+- **update:** Parse `--all` for non-interactive refresh of all recommended packs.
+- **setup:** Adopt plan text clarifies catalog adoption targets selected IDE root(s) only.
+
+### Test
+
+- **install:** Assert non-selected IDE skill directories stay completely empty (not just kenmark-* free).
+
 ## v2.3.2 — IDE scoping, update catalog, README (2026-06-07)
 
 ### Fix
