@@ -1,5 +1,11 @@
 # kenmark-skills
 
+```bash
+npx kenmark-skills init
+```
+
+No global install required — `npx` downloads and runs the CLI (or uses your npm cache). For Kenmark skills only, non-interactive: `npx kenmark-skills setup --global -y`.
+
 **Agent skills and CLI for Cursor, Codex, Claude Code, and other harnesses that read `SKILL.md` files.**
 
 Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-skills). Created by **Tanooj Mehra** and **Adwait Date**.
