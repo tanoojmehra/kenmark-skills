@@ -931,6 +931,22 @@ function printOptionalList(catalog) {
   }
 }
 
+/** Compact catalog listing for `kenmark-skills update` interactive pack selection. */
+function printUpdatePackChoices(catalog) {
+  const packs = catalog.packs || [];
+  const defaults = defaultSelectedIds(catalog);
+  console.log(
+    "\nRecommended packs to refresh (comma-separated ids, 'defaults', 'all', or empty=defaults):\n"
+  );
+  for (const pack of packs) {
+    const mark = defaults.includes(pack.id) ? " [default]" : "";
+    console.log(`  ${pack.id}${mark} — ${pack.name}`);
+  }
+  console.log(
+    `\n  Enter or 'defaults' → ${defaults.join(", ") || "(none)"} · 'all' → all ${packs.length} catalog packs`
+  );
+}
+
 module.exports = {
   catalogPath,
   loadCatalog,
@@ -969,5 +985,6 @@ module.exports = {
   printSuggest,
   explainPack,
   printOptionalList,
+  printUpdatePackChoices,
   isSeoPack
 };

@@ -10,7 +10,11 @@ const {
   banner
 } = require("./interactive");
 const readline = require("readline");
-const { loadCatalog, defaultSelectedIds } = require("./recommended-catalog");
+const {
+  loadCatalog,
+  defaultSelectedIds,
+  printUpdatePackChoices
+} = require("./recommended-catalog");
 
 const repoRoot = path.resolve(__dirname, "..");
 const setupScript = path.join(__dirname, "setup-skills.js");
@@ -177,13 +181,20 @@ async function promptIde(preset) {
   return answer.toLowerCase();
 }
 
+function describeRecommendedSelection(args, catalog) {
+  if (args.ids?.length) return args.ids.join(", ");
+  if (args.allPacks) {
+    const allIds = (catalog.packs || []).map((p) => p.id);
+    return `all (${allIds.join(", ")})`;
+  }
+  return `defaults (${defaultSelectedIds(catalog).join(", ")})`;
+}
+
 async function promptRecommendedIds() {
+  const catalog = loadCatalog();
+  printUpdatePackChoices(catalog);
   const rl = createRl();
-  console.log(
-    "\nRecommended packs to refresh (comma-separated ids, 'defaults', 'all', or empty=defaults):\n"
-  );
-  console.log("  impeccable, ecc\n");
-  const answer = await ask(rl, "ids> ");
+  const answer = await ask(rl, "\nids> ");
   rl.close();
   if (!answer) return "defaults";
   return answer;
@@ -283,7 +294,8 @@ async function run() {
     }
   }
   if (mode === "recommended" || mode === "both") {
-    const idsLabel = args.ids?.length ? args.ids.join(", ") : "default packs";
+    const catalog = loadCatalog();
+    const idsLabel = describeRecommendedSelection(args, catalog);
     plan.push(`Recommended packs (${idsLabel}) → ${scope} via npx`);
     if (!args.skipAdopt) {
       plan.push("  + adopt installed skills into ~/.kenmark/store + relink");
