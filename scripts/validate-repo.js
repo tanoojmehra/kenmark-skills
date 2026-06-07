@@ -32,7 +32,7 @@ const {
   printOptionalList,
   isSeoPack
 } = require("./recommended-catalog");
-const { LEGACY_SKILL_RENAMES } = require("./kenmark-hub");
+const { LEGACY_SKILL_RENAMES, listLegacyKenmarkSkillPaths } = require("./kenmark-hub");
 
 const repoRoot = path.resolve(__dirname, "..");
 const userSkillsDir = path.join(repoRoot, "skills", "user-skills");
@@ -136,6 +136,7 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/test-pack.js",
   "scripts/test-broken-symlink-cleanup.js",
   "scripts/test-cleanup-temp-home.js",
+  "scripts/test-legacy-cleanup-canonical.js",
   "scripts/test-skill-portability.js"
 ];
 
@@ -1144,10 +1145,10 @@ function validatePackageJson() {
   }
   if (
     scripts["test:broken-links"] !==
-    "node scripts/test-broken-symlink-cleanup.js && node scripts/test-cleanup-temp-home.js"
+    "node scripts/test-broken-symlink-cleanup.js && node scripts/test-cleanup-temp-home.js && node scripts/test-legacy-cleanup-canonical.js"
   ) {
     fail(
-      'package.json: scripts["test:broken-links"] must chain test-broken-symlink-cleanup.js and test-cleanup-temp-home.js'
+      'package.json: scripts["test:broken-links"] must chain test-broken-symlink-cleanup.js, test-cleanup-temp-home.js, and test-legacy-cleanup-canonical.js'
     );
   }
   if (scripts["test:portability"] !== "node scripts/test-skill-portability.js") {
@@ -1397,6 +1398,13 @@ function validateClaudeWrapperPolicy() {
     fail(
       "scripts/kenmark-hub.js: legacy cleanup must back up proven removals under ~/.kenmark/backups/legacy-cleanup/"
     );
+  }
+  for (const canonical of Object.values(LEGACY_SKILL_RENAMES)) {
+    if (listLegacyKenmarkSkillPaths().includes(canonical)) {
+      fail(
+        `scripts/kenmark-hub.js: listLegacyKenmarkSkillPaths must not include canonical bundled skill ${canonical}`
+      );
+    }
   }
   if (!wrapperFn[0].includes("collectKenmarkCommandOwnershipProofs")) {
     fail(

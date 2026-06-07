@@ -469,10 +469,15 @@ function kenmarkClaudeCommandBasename(skillName) {
 }
 
 function listLegacyKenmarkSkillPaths() {
-  return [
-    ...Object.keys(LEGACY_SKILL_RENAMES),
-    ...Object.keys(LEGACY_SKILL_RENAMES).map((old) => `kenmark-${old}`)
-  ];
+  const paths = [];
+  for (const [old, canonical] of Object.entries(LEGACY_SKILL_RENAMES)) {
+    paths.push(old);
+    const staleKenmarkPath = `kenmark-${old}`;
+    if (staleKenmarkPath !== canonical) {
+      paths.push(staleKenmarkPath);
+    }
+  }
+  return paths;
 }
 
 const KENMARK_PACKAGE_SOURCE = "kenmark-package";

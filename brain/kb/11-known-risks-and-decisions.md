@@ -1,6 +1,6 @@
 # Known risks and decisions
 
-Last updated: 2026-06-07
+Last updated: 2026-06-08
 Status: reviewed
 
 ## Confirmed facts / decisions
@@ -22,7 +22,7 @@ Status: reviewed
 - **WSL vs native Windows:** Installs into WSL home are invisible to native Windows IDEs — doctor warns.
 - **Adopt overwrite:** Hash mismatches require explicit `--adopt-overwrite` / `--force`.
 - **Impeccable script paths:** Upstream `SKILL.md` uses `node ./scripts/*.mjs` (skill-relative). Agents run shell from project CWD — kenmark adopt rewrites these to absolute store paths; re-run `npx kenmark-skills adopt --global --ide all -y` after upgrading kenmark-skills if impeccable setup still fails.
-- **ECC / SEO full packs:** High bloat; overlap caps in catalog JSON.
+- **Legacy cleanup scope:** `listLegacyKenmarkSkillPaths()` must not include canonical bundled names when `kenmark-${old}` equals the rename target (fixed issue 010).
 
 ## Important files inspected
 

@@ -1,6 +1,6 @@
 # Testing and quality
 
-Last updated: 2026-06-07
+Last updated: 2026-06-08
 Status: reviewed
 
 ## Confirmed facts
@@ -25,6 +25,7 @@ Checks include:
 | `test-pack.js` | npm pack contents |
 | `test-broken-symlink-cleanup.js` | Cleanup broken symlinks |
 | `test-cleanup-temp-home.js` | Cleanup kenmark/packs modes |
+| `test-legacy-cleanup-canonical.js` | Legacy cleanup must not remove canonical bundled skills after init |
 | `test-skill-portability.js` | Path rewrite in store (IDE anchors + cwd-relative `./scripts/` in agent-facing docs); adopt result summarizer (`summarizeAdoptResults`, `formatAdoptPassSummary`) |
 
 ### doctor (`scripts/doctor.js`)

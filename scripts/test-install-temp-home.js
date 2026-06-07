@@ -9,7 +9,11 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
-const { LEGACY_SKILL_RENAMES, buildGlobalTargets } = require("./kenmark-hub");
+const {
+  LEGACY_SKILL_RENAMES,
+  buildGlobalTargets,
+  listLegacyKenmarkSkillPaths
+} = require("./kenmark-hub");
 
 const repoRoot = path.resolve(__dirname, "..");
 const cliPath = path.join(__dirname, "cli.js");
@@ -84,10 +88,7 @@ function main() {
 
     const commandsDir = path.join(tempHome, ".claude", "commands");
     if (fs.existsSync(commandsDir)) {
-      const legacyCommandBasenames = new Set([
-        ...Object.keys(LEGACY_SKILL_RENAMES),
-        ...Object.keys(LEGACY_SKILL_RENAMES).map((k) => `kenmark-${k}`)
-      ]);
+      const legacyCommandBasenames = new Set(listLegacyKenmarkSkillPaths());
       const unexpected = fs
         .readdirSync(commandsDir)
         .filter((f) => f.endsWith(".md"))

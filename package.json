@@ -30,7 +30,7 @@
     "test:packs-verify": "node scripts/test-packs-verify-skip.js",
     "test:install": "node scripts/test-install-temp-home.js",
     "test:pack": "node scripts/test-pack.js",
-    "test:broken-links": "node scripts/test-broken-symlink-cleanup.js && node scripts/test-cleanup-temp-home.js",
+    "test:broken-links": "node scripts/test-broken-symlink-cleanup.js && node scripts/test-cleanup-temp-home.js && node scripts/test-legacy-cleanup-canonical.js",
     "test:portability": "node scripts/test-skill-portability.js",
     "test:all": "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability",
     "prepublishOnly": "npm run test:all && npm run pack:check",
@@ -67,6 +67,7 @@
     "scripts/test-pack.js",
     "scripts/test-broken-symlink-cleanup.js",
     "scripts/test-cleanup-temp-home.js",
+    "scripts/test-legacy-cleanup-canonical.js",
     "scripts/test-skill-portability.js"
   ],
   "engines": {

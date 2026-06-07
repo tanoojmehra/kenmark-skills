@@ -2,6 +2,12 @@
 
 Brain knowledge base for the kenmark-skills repository.
 
+## v2026.06.08-legacy-cleanup-canonical
+
+- **kenmark-hub.js:** `listLegacyKenmarkSkillPaths()` excludes canonical bundled names when `kenmark-${old}` equals `LEGACY_SKILL_RENAMES[old]`; keeps intermediate stale paths like `kenmark-init-brain`.
+- **test-legacy-cleanup-canonical.js:** Regression — setup + legacy cleanup must retain bundled skills.
+- **Issue 010:** Legacy cleanup deletes canonical bundled kenmark-* skills.
+
 ## v2026.06.08-cleanup-scope-prompt
 
 - **interactive.js:** `promptScope` accepts `{ purpose: "cleanup" }` with cleanup-specific title and option descriptions; install flows unchanged.

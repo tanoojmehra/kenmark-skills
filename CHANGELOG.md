@@ -4,6 +4,7 @@
 
 ### Fix
 
+- **kenmark-hub.js:** `listLegacyKenmarkSkillPaths()` no longer treats canonical bundled names (e.g. `kenmark-troubleshoot`) as legacy when `kenmark-${old}` equals the rename target; init/setup legacy cleanup no longer deletes active store skills.
 - **interactive.js:** Cleanup interactive scope prompt asks where cleanup should run (not where skills should be installed); install/setup/update flows unchanged.
 
 ## v2.3.12 — Adopt pass portability reporting (2026-06-08)
