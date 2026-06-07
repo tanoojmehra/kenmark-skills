@@ -271,7 +271,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
       );
     }
     if (!skipAdopt) {
-      plan.push("Adopt catalog skills (Impeccable, ECC, …) found in any IDE root → store + relink");
+      plan.push("Adopt catalog skills found in selected IDE root(s) → store + relink");
     }
     if (installMcp && mcpIdes.length && fs.existsSync(bundledMcpPath)) {
       const { serverNames } = buildMcpDocumentForProfile(repoRoot, mcpProfile);

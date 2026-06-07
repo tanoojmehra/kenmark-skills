@@ -9,7 +9,7 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
-const { LEGACY_SKILL_RENAMES } = require("./kenmark-hub");
+const { LEGACY_SKILL_RENAMES, buildGlobalTargets } = require("./kenmark-hub");
 
 const repoRoot = path.resolve(__dirname, "..");
 const cliPath = path.join(__dirname, "cli.js");
@@ -107,17 +107,14 @@ function main() {
       "manifest.json has no skills entries"
     );
 
-    const otherIdePaths = [
-      path.join(tempHome, ".cursor", "skills"),
-      path.join(tempHome, ".agents", "skills"),
-      path.join(tempHome, ".gemini", "skills")
-    ];
-    for (const idePath of otherIdePaths) {
-      if (!fs.existsSync(idePath)) continue;
-      const names = listDirNames(idePath).filter((n) => n.startsWith("kenmark-"));
+    const otherTargets = buildGlobalTargets(tempHome);
+
+    for (const [ide, idePath] of Object.entries(otherTargets)) {
+      if (ide === "claude") continue;
+      const entries = fs.existsSync(idePath) ? fs.readdirSync(idePath) : [];
       assert(
-        names.length === 0,
-        `expected no kenmark-* skills under ${idePath}, found: ${names.join(", ")}`
+        entries.length === 0,
+        `expected ${ide} skill dir untouched at ${idePath}, found: ${entries.join(", ")}`
       );
     }
 

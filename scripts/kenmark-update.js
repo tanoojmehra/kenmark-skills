@@ -35,6 +35,7 @@ function printUsage() {
   console.log("  --project             Current project directory only");
   console.log("  --ide <target>        IDE for Kenmark sync: cursor, claude, all, …");
   console.log("  --ids a,b             Recommended pack ids (default: defaultSelected)");
+  console.log("  --all                 Refresh all recommended packs");
   console.log("  --ecc-profile core    ECC profile when refreshing recommended");
   console.log("  --skip-npm            Do not run npm update -g kenmark-skills");
   console.log("  --skip-adopt          Do not adopt catalog skills into ~/.kenmark/store");
@@ -91,6 +92,10 @@ function parseArgs(argv) {
     if (t === "--ids") {
       args.ids = (argv[i + 1] || "").split(",").map((s) => s.trim()).filter(Boolean);
       i += 1;
+      continue;
+    }
+    if (t === "--all") {
+      args.allPacks = true;
       continue;
     }
     if (t === "--ecc-profile") {
