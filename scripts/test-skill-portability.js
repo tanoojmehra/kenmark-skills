@@ -61,6 +61,32 @@ function testProcessSkillPortability() {
   }
 }
 
+function testAdoptRepairsStoreCurrent() {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kenmark-portability-adopt-"));
+  try {
+    const skillName = "impeccable";
+    const storeDir = path.join(tmp, ".kenmark", "store", "skills");
+    const skillDir = path.join(storeDir, skillName);
+    const scriptsDir = path.join(skillDir, "scripts");
+    fs.mkdirSync(scriptsDir, { recursive: true });
+
+    const badAnchor = `.agents/skills/${skillName}/scripts/context.mjs`;
+    fs.writeFileSync(path.join(skillDir, "SKILL.md"), `node ${badAnchor}\n`, "utf8");
+    fs.writeFileSync(path.join(scriptsDir, "context.mjs"), `// ${badAnchor}\n`, "utf8");
+
+    processSkillPortability(skillDir, skillName);
+
+    const skillMd = fs.readFileSync(path.join(skillDir, "SKILL.md"), "utf8");
+    assert(skillMd.includes("node ./scripts/context.mjs"), "store-current adopt repair normalizes SKILL.md");
+    assert(
+      scanSkillForNonPortablePaths(skillDir, skillName).length === 0,
+      "store-current adopt repair leaves no non-portable paths"
+    );
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
 function testScanSkillForNonPortablePaths() {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kenmark-portability-scan-"));
   try {
@@ -90,6 +116,8 @@ function main() {
   console.log("  ✓ normalizeSkillPaths / findNonPortablePaths");
   testProcessSkillPortability();
   console.log("  ✓ processSkillPortability");
+  testAdoptRepairsStoreCurrent();
+  console.log("  ✓ adopt store-current repair");
   testScanSkillForNonPortablePaths();
   console.log("  ✓ scanSkillForNonPortablePaths");
   console.log("\nOK — skill portability tests passed.");
