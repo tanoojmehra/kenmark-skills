@@ -175,6 +175,8 @@ function run() {
     for (const issue of report.issues) {
       console.log(`  • ${issue}`);
     }
+    console.log("\nSuggested fix for portability / installation issues:");
+    console.log("  npx kenmark-skills adopt --global --ide all -y");
   }
 
   if (args.jsonPath) {

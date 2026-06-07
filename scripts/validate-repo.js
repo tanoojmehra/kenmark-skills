@@ -101,6 +101,7 @@ const REQUIRED_PACKAGE_SCRIPTS = [
   "test:install",
   "test:pack",
   "test:broken-links",
+  "test:portability",
   "test:all",
   "pack:check"
 ];
@@ -130,7 +131,8 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/test-packs-verify-skip.js",
   "scripts/test-install-temp-home.js",
   "scripts/test-pack.js",
-  "scripts/test-broken-symlink-cleanup.js"
+  "scripts/test-broken-symlink-cleanup.js",
+  "scripts/test-skill-portability.js"
 ];
 
 /** Paths scanned for forbidden literals/patterns. CHANGELOG is historical — excluded. */
@@ -1125,15 +1127,20 @@ function validatePackageJson() {
   }
   if (
     scripts["test:all"] !==
-    "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links"
+    "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability"
   ) {
     fail(
-      'package.json: scripts["test:all"] must be "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links"'
+      'package.json: scripts["test:all"] must be "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability"'
     );
   }
   if (scripts["test:broken-links"] !== "node scripts/test-broken-symlink-cleanup.js") {
     fail(
       'package.json: scripts["test:broken-links"] must be "node scripts/test-broken-symlink-cleanup.js"'
+    );
+  }
+  if (scripts["test:portability"] !== "node scripts/test-skill-portability.js") {
+    fail(
+      'package.json: scripts["test:portability"] must be "node scripts/test-skill-portability.js"'
     );
   }
   if (scripts.prepublishOnly !== "npm run test:all && npm run pack:check") {

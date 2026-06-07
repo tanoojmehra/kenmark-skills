@@ -30,7 +30,8 @@
     "test:install": "node scripts/test-install-temp-home.js",
     "test:pack": "node scripts/test-pack.js",
     "test:broken-links": "node scripts/test-broken-symlink-cleanup.js",
-    "test:all": "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links",
+    "test:portability": "node scripts/test-skill-portability.js",
+    "test:all": "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability",
     "prepublishOnly": "npm run test:all && npm run pack:check",
     "setup:skills": "node scripts/setup-skills.js",
     "pack:check": "npm pack --dry-run",
@@ -61,7 +62,8 @@
     "scripts/test-packs-verify-skip.js",
     "scripts/test-install-temp-home.js",
     "scripts/test-pack.js",
-    "scripts/test-broken-symlink-cleanup.js"
+    "scripts/test-broken-symlink-cleanup.js",
+    "scripts/test-skill-portability.js"
   ],
   "engines": {
     "node": ">=18"

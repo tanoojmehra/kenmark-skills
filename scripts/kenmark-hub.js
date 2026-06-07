@@ -827,6 +827,83 @@ function resolveFallbackTargetIdes({ targetMap, strictTargets = false, mode = "g
   };
 }
 
+function resolveSkillRoot(skillPath) {
+  const realPath = safeRealpath(skillPath);
+  if (fs.existsSync(path.join(realPath, "SKILL.md"))) {
+    return realPath;
+  }
+  let current = realPath;
+  while (current !== path.parse(current).root) {
+    current = path.dirname(current);
+    if (fs.existsSync(path.join(current, "SKILL.md"))) {
+      return current;
+    }
+  }
+  return realPath;
+}
+
+function nonPortablePathPattern(skillName) {
+  return new RegExp(
+    `(\\.(agents|cursor|claude|gemini|opencode|kiro|trae|rovo|qoder|minimax)/skills/${skillName}/)`,
+    "g"
+  );
+}
+
+function findNonPortablePaths(content, skillName) {
+  const matches = [];
+  const pattern = nonPortablePathPattern(skillName);
+  let match;
+  while ((match = pattern.exec(content)) !== null) {
+    matches.push(match[0]);
+  }
+  return matches;
+}
+
+function normalizeSkillPaths(content, skillName) {
+  return content.replace(nonPortablePathPattern(skillName), "./");
+}
+
+function listSkillPortabilityRelPaths(skillDir) {
+  const targetFiles = ["SKILL.md"];
+  const scriptDir = path.join(skillDir, "scripts");
+  if (fs.existsSync(scriptDir)) {
+    const scripts = fs.readdirSync(scriptDir).filter((f) => f.endsWith(".js") || f.endsWith(".mjs"));
+    scripts.forEach((f) => targetFiles.push(path.join("scripts", f)));
+  }
+  return targetFiles;
+}
+
+function scanSkillForNonPortablePaths(skillDir, skillName) {
+  const skillRoot = resolveSkillRoot(skillDir);
+  const findings = [];
+  for (const relPath of listSkillPortabilityRelPaths(skillRoot)) {
+    const fullPath = path.join(skillRoot, relPath);
+    if (!fs.existsSync(fullPath)) continue;
+    const content = fs.readFileSync(fullPath, "utf8");
+    const matches = findNonPortablePaths(content, skillName);
+    if (matches.length) {
+      findings.push({ relPath, matches });
+    }
+  }
+  return findings;
+}
+
+function processSkillPortability(skillDir, skillName) {
+  const skillRoot = resolveSkillRoot(skillDir);
+  if (!fs.existsSync(skillRoot)) return;
+
+  for (const relPath of listSkillPortabilityRelPaths(skillRoot)) {
+    const fullPath = path.join(skillRoot, relPath);
+    if (!fs.existsSync(fullPath)) continue;
+
+    const content = fs.readFileSync(fullPath, "utf8");
+    const normalized = normalizeSkillPaths(content, skillName);
+    if (content !== normalized) {
+      fs.writeFileSync(fullPath, normalized, "utf8");
+    }
+  }
+}
+
 function resolveLinkModeLabel({ forceCopy = false, forceSymlink = false, preferCopyOnWindows = true } = {}) {
   if (forceCopy) return "copy";
   if (process.platform === "win32" && preferCopyOnWindows && !forceSymlink) {
@@ -1227,6 +1304,7 @@ function installKenmarkSkillsToStore(sourceUserSkillsDir, { force = false, dryRu
       }
       removePathIfExists(dest);
       fs.cpSync(src, dest, { recursive: true });
+      processSkillPortability(dest, name);
       manifest.skills[name] = {
         ...(manifest.skills[name] || {}),
         source: "kenmark-package",
@@ -1424,6 +1502,7 @@ function adoptCatalogSkills(options = {}) {
       }
       removePathIfExists(storePath);
       fs.cpSync(sourceDir, storePath, { recursive: true });
+      processSkillPortability(storePath, name);
       manifest.skills[name] = {
         ...(manifest.skills[name] || {}),
         source: best ? `${best.rootId}:${best.skillDir}` : "kenmark-package",
@@ -1968,6 +2047,13 @@ function runDoctor(options = {}) {
     for (const ide of idesForHashCheck) {
       const idePath = path.join(targetMap[ide], name);
       if (!fs.existsSync(idePath)) continue;
+
+      for (const finding of scanSkillForNonPortablePaths(idePath, name)) {
+        recordProblem(
+          `Skill '${name}' in ${ide} contains non-portable hardcoded paths in ${finding.relPath}`
+        );
+      }
+
       const ideHash = hashDirectory(idePath);
       if (ideHash !== storeHash) {
         hashMismatches.push({ skill: name, ide, storePath, idePath });
@@ -2073,6 +2159,12 @@ module.exports = {
   buildTargetMapForIdes,
   ensureKenmarkTargetPath,
   resolveFallbackTargetIdes,
+  resolveSkillRoot,
+  findNonPortablePaths,
+  normalizeSkillPaths,
+  listSkillPortabilityRelPaths,
+  scanSkillForNonPortablePaths,
+  processSkillPortability,
   resolveLinkModeLabel,
   readManifest,
   writeManifest,
