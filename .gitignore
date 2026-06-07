@@ -13,3 +13,8 @@
 # Local npm install artifacts
 node_modules/
 package-lock.json
+
+# Environment files (secrets)
+.env
+.env.*
+!.env.example
