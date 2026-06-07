@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## v2.3.2 — IDE scoping, update catalog, README (2026-06-07)
+
+### Fix
+
+- **setup / adopt / relink:** Respect `--ide` selection instead of applying changes across all IDEs.
+- **update:** Interactive pack prompt lists the full recommended catalog instead of a hardcoded impeccable/ecc subset.
+
+### Docs
+
+- **README:** Lead with `init` and `setup` commands for first-time onboarding.
+
+### Chore
+
+- **gitignore:** Ignore `node_modules/` and `package-lock.json` (avoid self-dependency lockfile in repo).
+
 ## v2.3.1 — Skill portability repair
 
 ### Fix
