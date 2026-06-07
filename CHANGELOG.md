@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Fix
+
+- **interactive.js:** Cleanup interactive scope prompt asks where cleanup should run (not where skills should be installed); install/setup/update flows unchanged.
+
 ## v2.3.12 — Adopt pass portability reporting (2026-06-08)
 
 ### Fix

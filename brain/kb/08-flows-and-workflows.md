@@ -46,7 +46,7 @@ npx kenmark-skills adopt --global --adopt-overwrite -y   # when review-required
 
 ### Cleanup vs uninstall
 
-- **cleanup** — pick categories (broken links, legacy, kenmark-*, packs only).
+- **cleanup** — pick scope (global home vs project repo), then categories (broken links, legacy, kenmark-*, packs only). Interactive scope prompt: "Where should cleanup run?"
 - **uninstall** — remove all Kenmark bundled skill links from selected IDE dirs; MCP removed unless `--mcp-only`.
 
 ### Skill activation tiers (policy)

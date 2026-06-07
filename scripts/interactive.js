@@ -55,17 +55,44 @@ function parseScopeChoice(answer) {
   return null;
 }
 
+const SCOPE_PROMPTS = {
+  install: {
+    title: "Where should skills be installed?",
+    global: "all projects on this machine (~/.cursor, ~/.claude, …)",
+    project: "only this repo (.cursor/, .claude/, … in cwd)"
+  },
+  cleanup: {
+    title: "Where should cleanup run?",
+    global: "user home IDE folders on this machine (~/.cursor, ~/.claude, …)",
+    project: "only this repo (.cursor/, .claude/, … in cwd)"
+  }
+};
+
+/**
+ * @param {"install"|"cleanup"} purpose
+ * @param {{ required?: boolean }} opts
+ */
+function getScopePromptLines(purpose = "install", opts = {}) {
+  const config = SCOPE_PROMPTS[purpose] || SCOPE_PROMPTS.install;
+  const required = opts.required === true;
+  const defaultSuffix = required ? "" : " [default]";
+  return {
+    title: config.title,
+    lines: [
+      `  1) global  — ${config.global}${defaultSuffix}`,
+      `  2) project — ${config.project}`
+    ]
+  };
+}
+
 async function promptScope(defaultScope = "global", opts = {}) {
   const required = opts.required === true;
+  const purpose = opts.purpose === "cleanup" ? "cleanup" : "install";
+  const { title, lines } = getScopePromptLines(purpose, opts);
   const rl = createRl();
-  console.log("\nWhere should skills be installed?");
-  if (required) {
-    console.log("  1) global  — all projects on this machine (~/.cursor, ~/.claude, …)");
-    console.log("  2) project — only this repo (.cursor/, .claude/, … in cwd)\n");
-  } else {
-    console.log("  1) global  — all projects on this machine (~/.cursor, ~/.claude, …) [default]");
-    console.log("  2) project — only this repo (.cursor/, .claude/, … in cwd)\n");
-  }
+  console.log(`\n${title}`);
+  console.log(`${lines[0]}`);
+  console.log(`${lines[1]}\n`);
   const hint = required
     ? "Choose scope [1/2 or global/project] (required): "
     : `Choose scope [1/2 or global/project] (default ${defaultScope}): `;
@@ -617,6 +644,7 @@ module.exports = {
   ask,
   wantsInteractive,
   promptYesNo,
+  getScopePromptLines,
   promptScope,
   promptAction,
   promptIde,

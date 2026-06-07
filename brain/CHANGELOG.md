@@ -2,6 +2,13 @@
 
 Brain knowledge base for the kenmark-skills repository.
 
+## v2026.06.08-cleanup-scope-prompt
+
+- **interactive.js:** `promptScope` accepts `{ purpose: "cleanup" }` with cleanup-specific title and option descriptions; install flows unchanged.
+- **kenmark-cleanup.js:** Passes cleanup purpose to scope prompt.
+- **test-interactive-scope-prompt.js:** Unit tests for install vs cleanup copy.
+- **Issue 009:** Cleanup scope prompt reuses install wording.
+
 ## v2026.06.07-adopt-reporting
 
 - **Release:** package **2.3.12** (2026-06-08).

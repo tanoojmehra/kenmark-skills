@@ -130,6 +130,7 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/subagents-inventory.js",
   "scripts/interactive.js",
   "scripts/test-cli-smoke.js",
+  "scripts/test-interactive-scope-prompt.js",
   "scripts/test-packs-verify-skip.js",
   "scripts/test-install-temp-home.js",
   "scripts/test-pack.js",
@@ -1112,8 +1113,13 @@ function validatePackageJson() {
       'package.json: scripts.test must be "npm run validate && npm run test:cli && npm run test:packs-verify"'
     );
   }
-  if (scripts["test:cli"] !== "node scripts/test-cli-smoke.js") {
-    fail('package.json: scripts["test:cli"] must be "node scripts/test-cli-smoke.js"');
+  if (
+    scripts["test:cli"] !==
+    "node scripts/test-cli-smoke.js && node scripts/test-interactive-scope-prompt.js"
+  ) {
+    fail(
+      'package.json: scripts["test:cli"] must chain test-cli-smoke.js and test-interactive-scope-prompt.js'
+    );
   }
   if (scripts["test:packs-verify"] !== "node scripts/test-packs-verify-skip.js") {
     fail(
