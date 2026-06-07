@@ -1124,24 +1124,65 @@ function resolveEccAdoptSkillNames(catalog, { eccProfile, homeDir } = {}) {
   return resolveEccSkillNamesFromManifests(manifestDir, profileId);
 }
 
+const SEO_PACK_IDS = new Set([
+  "seo-geo-selected",
+  "seo-geo-full",
+  "seo-geo-claude-skills"
+]);
+
+function isSeoCatalogPack(pack) {
+  return Boolean(pack && (pack.category === "seo" || SEO_PACK_IDS.has(pack.id)));
+}
+
+/** Packs that install a detectable SKILL.md (npx, git-sync, python CLI, etc.). */
+function isCatalogSkillPack(pack) {
+  if (!pack || pack.installStrategy === "manual" || isSeoCatalogPack(pack)) {
+    return false;
+  }
+  if (pack.id === "ecc") {
+    return true;
+  }
+  const verify =
+    pack.install?.verify?.global || pack.install?.verify?.project || pack.install?.verify;
+  return typeof verify === "string" && /SKILL\.md/.test(verify);
+}
+
+function resolvePackAdoptSkillNames(pack, catalog, options = {}) {
+  if (!pack) return [];
+  if (Array.isArray(pack.adoptSkillNames) && pack.adoptSkillNames.length) {
+    return [...pack.adoptSkillNames];
+  }
+  if (pack.id === "ecc") {
+    return resolveEccAdoptSkillNames(catalog, options);
+  }
+  if (isCatalogSkillPack(pack)) {
+    return [pack.id];
+  }
+  return [];
+}
+
 function getAdoptableSkillNames(sourceUserSkillsDir, catalogPath, options = {}) {
   const names = new Set(listKenmarkBundledSkillNames(sourceUserSkillsDir));
   const catalog = readRecommendedCatalog(catalogPath);
   const homeDir = options.homeDir || os.homedir();
+  const packIdFilter = options.packIds?.length ? new Set(options.packIds) : null;
 
   for (const pack of catalog.packs || []) {
-    if (pack.id === "impeccable") {
-      names.add("impeccable");
-    }
-    if (pack.id === "ecc") {
-      for (const n of resolveEccAdoptSkillNames(catalog, {
-        eccProfile: options.eccProfile,
-        homeDir
-      })) {
-        names.add(n);
-      }
+    if (packIdFilter && !packIdFilter.has(pack.id)) continue;
+    for (const name of resolvePackAdoptSkillNames(pack, catalog, {
+      eccProfile: options.eccProfile,
+      homeDir
+    })) {
+      names.add(name);
     }
   }
+
+  if (options.seoSkills?.length) {
+    for (const name of options.seoSkills) {
+      names.add(name);
+    }
+  }
+
   return [...names].sort();
 }
 
@@ -1424,7 +1465,9 @@ function adoptCatalogSkills(options = {}) {
   const scanRoots = buildInventoryRoots(homeDir);
   const adoptNames = getAdoptableSkillNames(sourceUserSkillsDir, catalogPath, {
     eccProfile,
-    homeDir
+    homeDir,
+    packIds: options.packIds,
+    seoSkills: options.seoSkills
   });
   const storeDir = getStoreDir();
   const manifest = readManifest();
@@ -2183,6 +2226,8 @@ module.exports = {
   writeManifest,
   listKenmarkBundledSkillNames,
   getAdoptableSkillNames,
+  resolvePackAdoptSkillNames,
+  isCatalogSkillPack,
   findEccManifestDirectory,
   resolveEccAdoptSkillNames,
   resolveEccSkillNamesFromManifests,

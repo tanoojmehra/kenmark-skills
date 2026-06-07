@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## v2.3.4 — Wire recommended packs to all IDEs (2026-06-07)
+
+### Fix
+
+- **install-recommended / adopt:** Catalog packs with SKILL.md verify (e.g. `code-review-skill`, `graphify`) are adoptable and relinked to every `--ide` target, even when install is skipped as already present. Previously only `impeccable` and ECC were wired via the store.
+
+### Test
+
+- **packs-verify:** Assert an already-installed git-sync pack links into cursor, codex, gemini, opencode, and minimax after a multi-IDE install-recommended run.
+
 ## v2.3.3 — Update flag, install test, setup plan (2026-06-07)
 
 ### Fix

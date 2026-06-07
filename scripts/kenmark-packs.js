@@ -551,6 +551,8 @@ async function run() {
         targetMap,
         eccProfile,
         homeDir: os.homedir(),
+        packIds: installPlan.map((entry) => entry.packId),
+        seoSkills: installPlan.flatMap((entry) => entry.seoSkills || []),
         force: args.force,
         adoptOverwrite: args.adoptOverwrite,
         forceCopy: args.forceCopy,

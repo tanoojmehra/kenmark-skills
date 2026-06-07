@@ -12,6 +12,7 @@ const os = require("os");
 const repoRoot = path.resolve(__dirname, "..");
 const packsScript = path.join(__dirname, "kenmark-packs.js");
 const cliScript = path.join(__dirname, "cli.js");
+const { buildGlobalTargets } = require("./kenmark-hub");
 
 function rmDirSafe(dir) {
   if (!dir || !fs.existsSync(dir)) return;
@@ -38,6 +39,12 @@ function runCli(args, env) {
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function skillPresent(homeDir, ideKey, skillName) {
+  const targets = buildGlobalTargets(homeDir);
+  const skillPath = path.join(targets[ideKey], skillName, "SKILL.md");
+  return fs.existsSync(skillPath);
 }
 
 function main() {
@@ -152,6 +159,70 @@ function main() {
       failures.push("cli --force dry-run incorrectly skipped install");
     } else {
       console.log("  ✓ cli --force shows install when verify would pass");
+    }
+
+    const wireHome = path.join(
+      os.tmpdir(),
+      `kenmark-packs-wire-${process.pid}-${Date.now()}`
+    );
+    try {
+      const claudeOnlySkill = path.join(
+        wireHome,
+        ".claude",
+        "skills",
+        "code-review-skill",
+        "SKILL.md"
+      );
+      fs.mkdirSync(path.dirname(claudeOnlySkill), { recursive: true });
+      fs.writeFileSync(claudeOnlySkill, "# code-review-skill\n");
+
+      const wireRun = runPacks(
+        [
+          "--ids",
+          "code-review-skill",
+          "--global",
+          "-y",
+          "--ide",
+          "cursor,codex,gemini,opencode,minimax"
+        ],
+        { HOME: wireHome }
+      );
+      const wireStdout = (wireRun.stdout || "") + (wireRun.stderr || "");
+      if (wireRun.status !== 0) {
+        failures.push(`wire skip run exited ${wireRun.status}`);
+      } else if (
+        !/Already installed: code-review-skill — skipping install/.test(wireStdout)
+      ) {
+        failures.push("wire run did not skip install for code-review-skill");
+      } else {
+        const ides = ["cursor", "codex", "gemini", "opencode", "minimax"];
+        const missing = ides.filter(
+          (ide) => !skillPresent(wireHome, ide, "code-review-skill")
+        );
+        if (missing.length) {
+          failures.push(
+            `wire run did not link code-review-skill to: ${missing.join(", ")}`
+          );
+        } else {
+          const storeSkill = path.join(
+            wireHome,
+            ".kenmark",
+            "store",
+            "skills",
+            "code-review-skill",
+            "SKILL.md"
+          );
+          if (!fs.existsSync(storeSkill)) {
+            failures.push("wire run did not adopt code-review-skill into store");
+          } else {
+            console.log(
+              "  ✓ already-installed pack wires to all selected IDEs"
+            );
+          }
+        }
+      }
+    } finally {
+      rmDirSafe(wireHome);
     }
   } finally {
     rmDirSafe(tempHome);
