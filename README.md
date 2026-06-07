@@ -404,6 +404,16 @@ Kenmark and adoptable catalog skills are stored once, then linked into each IDE.
 
 `setup` populates the store, symlinks into IDE skill dirs (copies on Windows when symlinks fail), then runs **adopt** unless `--skip-adopt` is set. **MCP is opt-in:** pass `--with-mcp` or `--mcp-profile <name>` to install bundled servers; plain `setup` does not touch MCP configs.
 
+### Skill path portability
+
+When skills are copied into `~/.kenmark/store` (via `setup`, `update`, or `adopt`), Kenmark rewrites hardcoded IDE anchor paths like `.cursor/skills/<name>/` to `./` in `SKILL.md` and `scripts/*.{js,mjs}`. That keeps bundled scripts and docs working regardless of which IDE path the skill is linked from.
+
+`doctor` scans the same files in linked IDE copies and reports non-portable paths. Repair with:
+
+```bash
+npx kenmark-skills adopt --global --ide all -y
+```
+
 ### Bundled MCP servers (opt-in)
 
 Source: [`config/mcp-servers.json`](config/mcp-servers.json). Profiles: [`config/mcp-profiles.json`](config/mcp-profiles.json). When you opt in, Kenmark copies the selected profile into `~/.kenmark/store/mcp.json` and **merges** those servers into existing configs (existing entries with the same name are left unchanged unless you pass `--force`).
@@ -527,7 +537,7 @@ npx kenmark-skills adopt --global --adopt-overwrite -y   # when setup reported r
 | Command | Scope | CI / fresh clone |
 | --- | --- | --- |
 | `validate` | Repo/package invariants (skills, catalog JSON, `package.json`, forbidden terms) | Yes — `npm test` |
-| `doctor` | Local install (`~/.kenmark`, manifest, MCP, IDE links, symlinks, hash drift) | No — run after `setup` |
+| `doctor` | Local install (`~/.kenmark`, manifest, MCP, IDE links, symlinks, hash drift, non-portable skill paths) | No — run after `setup` |
 | `doctor --soft` | Same as `doctor`, but warnings only (exit 0) | Optional pre-setup check |
 | `doctor --no-fail` | Full issue list; exit 0 (e.g. write `--json` for agents) | Diagnostics / scripting |
 
