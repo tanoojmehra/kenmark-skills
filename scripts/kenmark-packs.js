@@ -34,6 +34,7 @@ const {
   buildGlobalTargets,
   buildProjectTargets,
   adoptCatalogSkills,
+  formatAdoptPassSummary,
   resolveExplicitTargetIdes,
   buildTargetMapForIdes
 } = require("./kenmark-hub");
@@ -560,19 +561,11 @@ async function run() {
         preferCopyOnWindows: args.preferCopyOnWindows,
         dryRun: false
       });
-      const adopted = adoptResult.results.filter(
-        (r) => r.action === "adopted"
-      ).length;
-      const reviewRequired = adoptResult.results.filter(
-        (r) => r.action === "review-required"
-      ).length;
-      const total = adoptResult.results.length;
-      console.log(
-        `Adopt pass: ${adopted} adopted/updated of ${total} candidate(s)`
-      );
-      if (reviewRequired) {
+      const adoptSummary = formatAdoptPassSummary(adoptResult.results);
+      console.log(adoptSummary.line);
+      if (adoptSummary.reviewRequired) {
         console.log(
-          `  ${reviewRequired} skill(s) need review (store differs from IDE copy). Re-run with --adopt-overwrite to overwrite.`
+          `  ${adoptSummary.reviewRequired} skill(s) need review (store differs from IDE copy). Re-run with --adopt-overwrite to overwrite.`
         );
       }
     }

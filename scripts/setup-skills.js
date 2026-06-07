@@ -25,6 +25,7 @@ const {
   removeKenmarkClaudeCommandWrappers,
   relinkSkillsToIdes,
   adoptCatalogSkills,
+  formatAdoptPassSummary,
   uninstallKenmarkFromIdes,
   installMcpToStore,
   installMcpToIdes,
@@ -421,19 +422,11 @@ function executeInstall(targetMap, targetIdes, action, options) {
               preferCopyOnWindows,
               dryRun: false
             });
-            const adopted = adoptResult.results.filter(
-              (r) => r.action === "adopted"
-            ).length;
-            const reviewRequired = adoptResult.results.filter(
-              (r) => r.action === "review-required"
-            ).length;
-            const total = adoptResult.results.length;
-            console.log(
-              `Adopt pass: ${adopted} adopted/updated of ${total} candidate(s)`
-            );
-            if (reviewRequired) {
+            const adoptSummary = formatAdoptPassSummary(adoptResult.results);
+            console.log(adoptSummary.line);
+            if (adoptSummary.reviewRequired) {
               console.log(
-                `  ${reviewRequired} skill(s) need review (store differs from IDE copy). Run adopt --adopt-overwrite to overwrite.`
+                `  ${adoptSummary.reviewRequired} skill(s) need review (store differs from IDE copy). Run adopt --adopt-overwrite to overwrite.`
               );
             }
           }

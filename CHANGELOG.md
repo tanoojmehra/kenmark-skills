@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Fix
+
+- **kenmark-hub.js:** `summarizeAdoptResults` / `formatAdoptPassSummary` — adopt pass logs now report `portability-refreshed` for existing store copies (`store-current`), not only newly adopted skills.
+- **setup-skills.js, kenmark-packs.js, skills-adopt.js:** Use shared adopt summary (e.g. `Adopt pass: 0 adopted, 39 portability-refreshed of 39 candidate(s)`).
+
 ## v2.3.11 — Impeccable cwd-relative script repair (2026-06-07)
 
 ### Fix

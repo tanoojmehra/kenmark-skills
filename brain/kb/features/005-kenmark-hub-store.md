@@ -29,6 +29,8 @@ Single canonical store under `~/.kenmark/` with symlinks (or copies) into per-ID
 Consolidates skills already on disk (e.g. Impeccable from upstream CLI) into store. Does not download packs.
 
 - Hash mismatch → **review-required** until `adopt --adopt-overwrite` / `--force`.
+- When store already matches source, adopt still runs **portability refresh** (`store-current`) — rewrites non-portable paths without recopying.
+- Summary line reports **adopted** and **portability-refreshed** separately (e.g. `Adopt pass: 0 adopted, 39 portability-refreshed of 39 candidate(s)`).
 - Repairs non-portable paths (`.cursor/skills/foo/` → `./` in SKILL.md).
 
 ## Portability rewrite

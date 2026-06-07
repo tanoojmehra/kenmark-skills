@@ -13,7 +13,9 @@ const {
   scanSkillForNonPortablePaths,
   processSkillPortability,
   findCwdRelativeScriptInvocations,
-  normalizeCwdRelativeScripts
+  normalizeCwdRelativeScripts,
+  summarizeAdoptResults,
+  formatAdoptPassSummary
 } = require("./kenmark-hub");
 
 function assert(cond, msg) {
@@ -164,6 +166,49 @@ function testAdoptRepairsStoreCurrent() {
   }
 }
 
+function testSummarizeAdoptResults() {
+  const mixed = [
+    { name: "a", action: "adopted" },
+    { name: "b", action: "store-current" },
+    { name: "c", action: "store-current" },
+    { name: "d", action: "review-required" },
+    { name: "e", action: "skip", reason: "no-source" }
+  ];
+  const counts = summarizeAdoptResults(mixed);
+  assert(counts.adopted === 1, "summarizeAdoptResults counts adopted");
+  assert(counts.portabilityRefreshed === 2, "summarizeAdoptResults counts portability-refreshed");
+  assert(counts.reviewRequired === 1, "summarizeAdoptResults counts review-required");
+  assert(counts.skipped === 1, "summarizeAdoptResults counts skipped");
+  assert(counts.total === 5, "summarizeAdoptResults counts total");
+
+  const summary = formatAdoptPassSummary(mixed);
+  assert(
+    summary.line ===
+      "Adopt pass: 1 adopted, 2 portability-refreshed of 5 candidate(s) (1 skipped)",
+    "formatAdoptPassSummary mixed actions"
+  );
+
+  const allRefresh = Array.from({ length: 39 }, (_, i) => ({
+    name: `skill-${i}`,
+    action: "store-current"
+  }));
+  const allRefreshSummary = formatAdoptPassSummary(allRefresh);
+  assert(
+    allRefreshSummary.line ===
+      "Adopt pass: 0 adopted, 39 portability-refreshed of 39 candidate(s)",
+    "formatAdoptPassSummary all store-current"
+  );
+
+  const dryRun = formatAdoptPassSummary(
+    [{ name: "x", action: "would-adopt-to-store" }, { name: "y", action: "store-ok" }],
+    { dryRun: true }
+  );
+  assert(
+    dryRun.line === "Adopt pass: 1 would adopt, 1 would portability-refresh of 2 candidate(s)",
+    "formatAdoptPassSummary dry-run labels"
+  );
+}
+
 function testScanSkillForNonPortablePaths() {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "kenmark-portability-scan-"));
   try {
@@ -199,6 +244,8 @@ function main() {
   console.log("  ✓ processSkillPortability cwd-relative rewrite");
   testAdoptRepairsStoreCurrent();
   console.log("  ✓ adopt store-current repair");
+  testSummarizeAdoptResults();
+  console.log("  ✓ summarizeAdoptResults / formatAdoptPassSummary");
   testScanSkillForNonPortablePaths();
   console.log("  ✓ scanSkillForNonPortablePaths");
   console.log("\nOK — skill portability tests passed.");
