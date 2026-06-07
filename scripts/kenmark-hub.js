@@ -358,6 +358,7 @@ const LEGACY_SKILL_RENAMES = {
   "issues-check": "kenmark-issues-check",
   "issues-scan": "kenmark-issues-scan",
   "issues-maintenance": "kenmark-issues-maintain",
+  "issues-fix-and-ship": "kenmark-issues-fix-and-ship",
   "skills-install-recommended": "kenmark-packs",
   "skills-update": "kenmark-update",
   "skills-maintain": "kenmark-maintain",

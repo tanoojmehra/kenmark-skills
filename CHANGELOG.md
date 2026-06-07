@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New skills
+
+- **kenmark-issues-fix-and-ship (1.0.0):** Orchestrator chaining `kenmark-issues-scan` → fix loop → `kenmark-issues-check` → `kenmark-commit` → PR/merge with protected-branch safety (`references/workflow.md`, `references/merge-safety.md`).
+
+### Docs
+
+- Bundled skill count **36** (`skills/README.md`, inventory keep list, router routing).
+
 ## v2.2.0 — Audit skills (security-review, performance, repo-deps)
 
 ### New skills

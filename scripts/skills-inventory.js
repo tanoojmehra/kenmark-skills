@@ -34,6 +34,7 @@ const KEEP_ALWAYS = new Set([
   "kenmark-issues-maintain",
   "kenmark-issues-scan",
   "kenmark-issues-setup",
+  "kenmark-issues-fix-and-ship",
   "kenmark-troubleshoot",
   "kenmark-repo-hygiene",
   "kenmark-repo-secrets",

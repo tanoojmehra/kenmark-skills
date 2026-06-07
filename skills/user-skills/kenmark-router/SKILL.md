@@ -72,6 +72,7 @@ When several bundled skills could apply, prefer this order:
 | Need complete/no-missing-output enforcement | **`kenmark-output`** |
 | Need specialist/parallel investigation | **`kenmark-subagents`** |
 | Need issue tracking in `brain/issues/` | **`kenmark-issues-setup`** / **`kenmark-issues-scan`** |
+| Full scan → fix → commit → merge workflow | **`kenmark-issues-fix-and-ship`** |
 | Need to pick which installed skill fits the task | **`kenmark-router`** (this skill) |
 | Repo clutter, scattered docs, dumps | **`kenmark-repo-hygiene`** |
 | Keys, secrets, credentials | **`kenmark-repo-secrets`** |
@@ -599,7 +600,7 @@ Do **not** use this skill for first-time Kenmark setup; use **`kenmark-setup`** 
 | If the task is about… | Prefer skills in category… | Examples |
 | --- | --- | --- |
 | Commits, pushes, git workflow | `git`   | `kenmark-commit` |
-| Issue tracking, brain/issues | `issues` | `kenmark-issues-list`, `kenmark-issues-check`, `kenmark-issues-scan` |
+| Issue tracking, brain/issues | `issues` | `kenmark-issues-list`, `kenmark-issues-check`, `kenmark-issues-scan`, `kenmark-issues-fix-and-ship` |
 | Search, rankings, metadata, structured data | `seo` | `seo-audit`, `seo-technical`, `seo-schema` |
 | UI polish, layout, visual design, MUI | `design` | `impeccable`, `design-taste-frontend` |
 | APIs, services, frameworks, languages | `backend` | `backend-patterns`, `django-patterns` |
