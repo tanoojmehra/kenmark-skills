@@ -1632,6 +1632,42 @@ function relinkSkillsToIdes(
   return results;
 }
 
+function summarizeAdoptResults(results) {
+  const adopted = results.filter(
+    (r) => r.action === "adopted" || r.action === "would-adopt-to-store"
+  ).length;
+  const portabilityRefreshed = results.filter(
+    (r) => r.action === "store-current" || r.action === "store-ok"
+  ).length;
+  const reviewRequired = results.filter(
+    (r) =>
+      r.action === "review-required" || r.action === "would-review-required"
+  ).length;
+  const skipped = results.filter((r) => r.action === "skip").length;
+  return {
+    adopted,
+    portabilityRefreshed,
+    reviewRequired,
+    skipped,
+    total: results.length
+  };
+}
+
+function formatAdoptPassSummary(results, { dryRun = false } = {}) {
+  const counts = summarizeAdoptResults(results);
+  const adoptedLabel = dryRun ? "would adopt" : "adopted";
+  const refreshLabel = dryRun ? "would portability-refresh" : "portability-refreshed";
+  const segments = [`${counts.adopted} ${adoptedLabel}`];
+  if (counts.portabilityRefreshed > 0) {
+    segments.push(`${counts.portabilityRefreshed} ${refreshLabel}`);
+  }
+  let line = `Adopt pass: ${segments.join(", ")} of ${counts.total} candidate(s)`;
+  if (counts.skipped > 0) {
+    line += ` (${counts.skipped} skipped)`;
+  }
+  return { ...counts, line };
+}
+
 function adoptCatalogSkills(options = {}) {
   const {
     sourceUserSkillsDir,
@@ -2512,6 +2548,8 @@ module.exports = {
   linkSkillIntoIde,
   installKenmarkSkillsToStore,
   relinkSkillsToIdes,
+  summarizeAdoptResults,
+  formatAdoptPassSummary,
   adoptCatalogSkills,
   uninstallKenmarkFromIdes,
   removeManagedSkillsForCleanup,

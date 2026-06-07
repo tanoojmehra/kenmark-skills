@@ -14,6 +14,7 @@ const {
   buildProjectTargets,
   getStoreDir,
   adoptCatalogSkills,
+  formatAdoptPassSummary,
   resolveExplicitTargetIdes,
   buildTargetMapForIdes
 } = require("./kenmark-hub");
@@ -162,13 +163,11 @@ async function run() {
   });
 
   console.log(`Adoptable names (${adoptNames.length}): ${adoptNames.join(", ")}`);
-  const adopted = results.filter(
-    (r) => r.action === "adopted" || r.action === "would-adopt-to-store"
-  );
+  const adoptSummary = formatAdoptPassSummary(results, { dryRun: args.dryRun });
+  console.log(adoptSummary.line);
   const reviewRequired = results.filter(
     (r) => r.action === "review-required" || r.action === "would-review-required"
   );
-  console.log(`Processed: ${results.length} | adopted/updated: ${adopted.length}`);
   if (reviewRequired.length) {
     console.log(
       `Review required: ${reviewRequired.length} skill(s) differ between store and IDE copy.`
