@@ -1,10 +1,10 @@
 ---
 name: kenmark-issues-check
-version: 1.1.0
+version: 1.2.0
 category: issues
 scope: universal
 phase: verify
-description: "Check open issues in brain/issues/ against the codebase. If an issue has been fully resolved by recent work, move it to brain/issues/completed/ and update INDEX.md. Use when asked to \"check issues\", \"check if issues are done\", \"sync issues\", or \"update issues index\"."
+description: "Check open issues in brain/issues/ against the codebase. If an issue has been fully resolved by recent work, move it to brain/issues/completed/ and update INDEX.md. Requires brain/issues/INDEX.md from kenmark-issues-setup or kenmark-init. Use when asked to \"check issues\", \"check if issues are done\", \"sync issues\", or \"update issues index\"."
 triggers:
   - check issues
   - check if issues are done
@@ -30,6 +30,8 @@ disable-model-invocation: false
 Read all open issues in `brain/issues/`, check whether the described problem
 has been resolved by recent code changes, and if so move the issue to
 `brain/issues/completed/` and update `INDEX.md`.
+
+If `INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or opt in during **`kenmark-init`**) first.
 
 ---
 

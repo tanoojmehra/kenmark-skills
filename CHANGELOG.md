@@ -10,6 +10,10 @@
 - **README:** Reduced to quick start + pointers to `brain/kb/` (~250 lines vs ~800).
 - **AGENTS.md:** Pointer stub to `brain/rules/standards.md`.
 - **.gitignore:** Track `brain/` in git; exclude local `brain/issues/`.
+- **Issue tracking routing:** Split "Need issue tracking?" into setup vs scan — `kenmark-issues-setup` bootstraps `brain/issues/` docs; `kenmark-issues-scan` finds bugs and files issues (not setup).
+- **kenmark-init:** Optional Step 1b asks "Need issue tracking?" and runs `kenmark-issues-setup` Steps 2–4 when user opts in.
+- **kenmark-issues-setup / scan / list / check:** Cross-references, redundancy note when init already created `INDEX.md`, and prerequisite guards.
+- **skills/README / kenmark-router:** Updated day-to-day tables and issue tracking section.
 
 ## v2.3.9 — README interactive vs agent split (2026-06-07)
 

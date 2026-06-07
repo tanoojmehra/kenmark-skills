@@ -43,10 +43,10 @@ skills/user-skills/          ← bundled universal skills (36)
   kenmark-test-coverage/         category: testing (phase: audit)
   kenmark-test-ci/               category: testing (phase: ship)
   kenmark-commit/               category: git
-  kenmark-issues-setup/              category: issues
+  kenmark-issues-setup/              category: issues (bootstrap brain/issues/ docs)
   kenmark-issues-list/
   kenmark-issues-check/
-  kenmark-issues-scan/
+  kenmark-issues-scan/               category: issues (scan codebase, file issues)
   kenmark-issues-maintain/
   kenmark-issues-fix-and-ship/   category: workflow (phase: ship)
   kenmark-packs/ category: admin
@@ -127,7 +127,8 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Need a plan before work? | `kenmark-plan` |
 | Need parallel/specialist tracks? | `kenmark-subagents` |
 | Need complete final deliverable? | `kenmark-output` |
-| Need issue tracking? | `kenmark-issues-setup` / `kenmark-issues-scan` |
+| Need issue tracker docs (`brain/issues/`)? | `kenmark-issues-setup` (or opt in during `kenmark-init`) |
+| Find bugs/gaps to file as issues? | `kenmark-issues-scan` |
 | Scan, fix, commit, and ship issues? | `kenmark-issues-fix-and-ship` |
 | Need skill choice? | `kenmark-router` |
 | Repo health (see table above) | `kenmark-repo-*` family |

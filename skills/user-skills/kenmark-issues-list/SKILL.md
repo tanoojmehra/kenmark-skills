@@ -1,10 +1,10 @@
 ---
 name: kenmark-issues-list
-version: 1.2.0
+version: 1.2.1
 category: issues
 scope: universal
 phase: discover
-description: "Display all open issues from brain/issues/ in a table grouped by area/type, with columns for ID, Priority, and Title. Use when asked to \"list issues\", \"show issues\", \"issues dashboard\", or \"show all issues by type\"."
+description: "Display all open issues from brain/issues/ in a table grouped by area/type, with columns for ID, Priority, and Title. Requires brain/issues/INDEX.md from kenmark-issues-setup or kenmark-init. Use when asked to \"list issues\", \"show issues\", \"issues dashboard\", or \"show all issues by type\"."
 triggers:
   - list issues
   - show issues
@@ -30,6 +30,8 @@ well-structured table grouped by area (from `brain/issues/INDEX.md` — e.g.
 frontend, backend, api, database, auth, security, ui, testing, performance, dx,
 infra, docs, workflow, unknown; plus `worker` when the project uses it), sorted
 by priority within each group.
+
+If `INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or opt in during **`kenmark-init`**) first.
 
 ---
 

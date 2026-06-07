@@ -1,10 +1,10 @@
 ---
 name: kenmark-issues-setup
-version: 1.2.0
+version: 1.3.0
 category: issues
 scope: universal
 phase: setup
-description: "Set up the brain/issues/ directory structure: create brain/issues/, brain/issues/completed/, and brain/issues/INDEX.md from scratch. Use when asked to \"setup issues\", \"init issues\", or \"bootstrap issues directory\"."
+description: "Bootstrap brain/issues/ documentation structure: create brain/issues/, brain/issues/completed/, and brain/issues/INDEX.md with ID ledger and templates. Not for scanning the codebase — use kenmark-issues-scan to find bugs and file issues. Redundant if kenmark-init already opted into issue tracking. Use when asked to \"setup issues\", \"init issues\", or \"bootstrap issues directory\"."
 triggers:
   - setup issues
   - init issues
@@ -26,10 +26,21 @@ disable-model-invocation: false
 
 ## Purpose
 
-Create the full `brain/issues/` directory structure from scratch:
+Bootstrap the **`brain/issues/` documentation structure** from scratch — not discover or file bugs.
+
+Creates:
+
 - `brain/issues/` — active issues
 - `brain/issues/completed/` — archived resolved issues
-- `brain/issues/INDEX.md` — master index with all issues grouped by priority
+- `brain/issues/INDEX.md` — master index with ID ledger, priority tables, and templates
+
+**Not this skill:** scanning the codebase and writing issue files is **`kenmark-issues-scan`**.
+
+## Relationship to `kenmark-init`
+
+- **`kenmark-init`** always creates empty `brain/issues/` and `brain/issues/completed/` dirs as part of the brain scaffold.
+- When the user opts in to issue tracking during init (Step 1b), init runs **this skill's Steps 2–4** to write `INDEX.md`.
+- **If `brain/issues/INDEX.md` already exists** (from a prior init or this skill), stop — setup is complete; suggest **`kenmark-issues-scan`** to populate issues or **`kenmark-issues-list`** to view the tracker.
 
 ---
 
@@ -49,6 +60,14 @@ If `brain/` does not exist, create it:
 mkdir -p "$ISSUES_DIR" "$COMPLETED_DIR"
 echo "Created: $ISSUES_DIR and $COMPLETED_DIR"
 ```
+
+If `brain/issues/INDEX.md` already exists:
+
+```bash
+[ -f "$ISSUES_DIR/INDEX.md" ] && echo "SKIP: INDEX.md exists — setup already done"
+```
+
+Report to the user and stop (or offer **`kenmark-issues-scan`** / **`kenmark-issues-list`**).
 
 ---
 
@@ -189,4 +208,11 @@ Report what was created:
 - `brain/issues/completed/` directory
 - `brain/issues/INDEX.md` with full template
 
-Then suggest next steps: use `/kenmark-issues-scan` to populate with issues discovered from the codebase, or use `/kenmark-issues-list` to see the empty state.
+Then suggest next steps: use **`kenmark-issues-scan`** to discover bugs/gaps and create issue files, or use **`kenmark-issues-list`** to see the empty tracker.
+
+## Related skills
+
+- **`kenmark-init`** — optional Step 1b runs this setup when the user opts in during brain bootstrap
+- **`kenmark-issues-scan`** — find bugs/gaps and file issues (requires `INDEX.md` from this skill or init)
+- **`kenmark-issues-list`** — view open issues dashboard
+- **`kenmark-issues-maintain`** — fix tracker structural drift (duplicates, stale index)

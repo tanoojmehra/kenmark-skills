@@ -71,7 +71,8 @@ When several bundled skills could apply, prefer this order:
 | Need a plan before doing work | **`kenmark-plan`** |
 | Need complete/no-missing-output enforcement | **`kenmark-output`** |
 | Need specialist/parallel investigation | **`kenmark-subagents`** |
-| Need issue tracking in `brain/issues/` | **`kenmark-issues-setup`** / **`kenmark-issues-scan`** |
+| Need issue tracker docs (`brain/issues/`) | **`kenmark-issues-setup`** (or opt in during **`kenmark-init`**) |
+| Find bugs/gaps to file as issues | **`kenmark-issues-scan`** |
 | Full scan → fix → commit → merge workflow | **`kenmark-issues-fix-and-ship`** |
 | Need to pick which installed skill fits the task | **`kenmark-router`** (this skill) |
 | Repo clutter, scattered docs, dumps | **`kenmark-repo-hygiene`** |
