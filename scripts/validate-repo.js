@@ -115,6 +115,7 @@ const REQUIRED_PACKAGE_FILES = [
   "config/mcp-servers.json",
   "config/mcp-profiles.json",
   "scripts/cli.js",
+  "scripts/cli-package.js",
   "scripts/kenmark-hub.js",
   "scripts/recommended-catalog.js",
   "scripts/setup-skills.js",
@@ -130,6 +131,7 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/subagents-inventory.js",
   "scripts/interactive.js",
   "scripts/test-cli-smoke.js",
+  "scripts/test-cli-package.js",
   "scripts/test-interactive-scope-prompt.js",
   "scripts/test-packs-verify-skip.js",
   "scripts/test-install-temp-home.js",
@@ -1116,10 +1118,10 @@ function validatePackageJson() {
   }
   if (
     scripts["test:cli"] !==
-    "node scripts/test-cli-smoke.js && node scripts/test-interactive-scope-prompt.js"
+    "node scripts/test-cli-smoke.js && node scripts/test-interactive-scope-prompt.js && node scripts/test-cli-package.js"
   ) {
     fail(
-      'package.json: scripts["test:cli"] must chain test-cli-smoke.js and test-interactive-scope-prompt.js'
+      'package.json: scripts["test:cli"] must chain test-cli-smoke.js, test-interactive-scope-prompt.js, and test-cli-package.js'
     );
   }
   if (scripts["test:packs-verify"] !== "node scripts/test-packs-verify-skip.js") {

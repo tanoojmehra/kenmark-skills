@@ -1,6 +1,6 @@
 # CLI commands and integrations
 
-Last updated: 2026-06-07
+Last updated: 2026-06-08
 Status: reviewed
 
 ## Confirmed facts
@@ -29,6 +29,7 @@ Status: reviewed
 | **When** | First install | Legacy skills-only | Refresh existing | Hygiene / selective removal | Remove all Kenmark links |
 | **Packs** | Optional wizard | No | Optional refresh | `--recommended` / `--packs` | No (packs stay unless cleanup) |
 | **MCP** | Opt-in wizard/flags | Opt-in flags | Can refresh MCP | No | Yes (unless `--mcp-only` on uninstall) |
+| **CLI package** | Optional upgrade when global install is stale | No | Optional `npm install -g @latest` | No | No |
 | **Store** | Populates | Populates | Updates | Optional `--include-store` | `--keep-store` default |
 
 ### Common flags
@@ -39,6 +40,8 @@ Status: reviewed
 | `--ide <target>` | `cursor`, `claude`, `codex`, `all`, comma-separated |
 | `-y` | Skip interactive prompts |
 | `--skip-recommended` | Kenmark skills only on `init` |
+| `--skip-npm` | Skip CLI version check / global upgrade on `init`; skip npm step on `update` |
+| `--upgrade-cli` | Non-interactive `init`: upgrade global package to npm `@latest` before installing skills |
 | `--skip-adopt` | Skip post-install adopt pass |
 | `--mcp-servers <list>` | MCP by name: `playwright`, `context7`, `fetch`, `sequential-thinking`, `browsermcp` |
 | `--mcp-profile <name>` | `none`, `web`, `research`, `deep`, `all` |

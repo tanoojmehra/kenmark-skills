@@ -1,11 +1,11 @@
 # CLI and commands
 
-Last updated: 2026-06-07
+Last updated: 2026-06-08
 Status: reviewed
 
 ## Summary
 
-Twelve-command CLI routed through `scripts/cli.js`. Human default: interactive `init`. Agents/CI: explicit flags + `-y`.
+Twelve-command CLI routed through `scripts/cli.js`. Human default: interactive `init` (checks npm `latest` when running from a global install). Agents/CI: explicit flags + `-y`; use `--skip-npm` or `--upgrade-cli` for CLI package behavior.
 
 ## Entry points
 

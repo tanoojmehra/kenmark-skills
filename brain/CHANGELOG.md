@@ -7,6 +7,12 @@ Brain knowledge base
 
  for the kenmark-skills repository.
 
+## v2026.06.08-init-cli-upgrade
+
+- **cli-package.js:** Shared npm latest check, semver compare, global install helpers.
+- **kenmark-setup.js:** Init checks CLI version; optional global upgrade + re-exec.
+- **kenmark-update.js:** `npm install -g kenmark-skills@latest` (was `npm update -g`).
+
 ## v2026.06.08-legacy-cleanup-canonical
 
 - **kenmark-hub.js:** `listLegacyKenmarkSkillPaths()` excludes canonical bundled names when `kenmark-${old}` equals `LEGACY_SKILL_RENAMES[old]`; keeps intermediate stale paths like `kenmark-init-brain`.

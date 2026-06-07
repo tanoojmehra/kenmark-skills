@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## v2.3.14 — Init CLI upgrade check (2026-06-08)
+
+### Feature
+
+- **`init`:** Detects outdated global CLI against npm `latest`; interactive default prompts to run `npm install -g kenmark-skills@latest` and re-exec init from the upgraded package. Non-interactive: warns unless `--upgrade-cli` is passed. `--skip-npm` skips the check (agent/CI default-friendly).
+- **`update`:** Uses `npm install -g kenmark-skills@latest` instead of `npm update -g` for reliable cross-version upgrades.
+- **`cli-package.js`:** Shared semver check, registry lookup, and global install helpers for init/update.
+
+### Test
+
+- **test-cli-package.js:** Semver comparison unit tests.
+
 ## v2.3.13 — Legacy cleanup + scope prompt (2026-06-08)
 
 ### Fix

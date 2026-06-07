@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const {
@@ -21,11 +20,11 @@ const {
   formatMcpPlanLine,
   resolveMcpInstall
 } = require("./kenmark-hub");
-
-const repoRoot = path.resolve(__dirname, "..");
-const setupScript = path.join(__dirname, "setup-skills.js");
-const recommendedScript = path.join(__dirname, "kenmark-packs.js");
-const packageJsonPath = path.join(repoRoot, "package.json");
+const {
+  readLocalPackageVersion,
+  globalKenmarkInstalled,
+  runNpmInstallLatest
+} = require("./cli-package");
 
 function printUsage() {
   console.log("Usage: node scripts/kenmark-update.js [options]");
@@ -43,7 +42,7 @@ function printUsage() {
   console.log("  --ids a,b             Recommended pack ids (default: defaultSelected)");
   console.log("  --all                 Refresh all recommended packs");
   console.log("  --ecc-profile core    ECC profile when refreshing recommended");
-  console.log("  --skip-npm            Do not run npm update -g kenmark-skills");
+  console.log("  --skip-npm            Do not run npm install -g kenmark-skills@latest");
   console.log("  --skip-adopt          Do not adopt catalog skills into ~/.kenmark/store");
   console.log("  --npm-only            Only upgrade global kenmark-skills package");
   console.log("  --dry-run             Show planned steps without running");
@@ -159,14 +158,9 @@ function parseArgs(argv) {
   return args;
 }
 
-function readPackageVersion() {
-  try {
-    const pkg = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
-    return pkg.version || "unknown";
-  } catch {
-    return "unknown";
-  }
-}
+const repoRoot = path.resolve(__dirname, "..");
+const setupScript = path.join(__dirname, "setup-skills.js");
+const recommendedScript = path.join(__dirname, "kenmark-packs.js");
 
 function createRl() {
   return readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -198,7 +192,7 @@ async function promptNpmUpdate(skipPreset) {
   const rl = createRl();
   const answer = await ask(
     rl,
-    "\nRun `npm update -g kenmark-skills` first (if installed globally)? [Y/n]: "
+    "\nRun `npm install -g kenmark-skills@latest` first (if installed globally)? [Y/n]: "
   );
   rl.close();
   const lower = answer.toLowerCase();
@@ -249,22 +243,6 @@ function runNodeScript(scriptPath, scriptArgs, dryRun, label) {
   });
 }
 
-function runNpmUpdate(dryRun) {
-  const cmd = "npm update -g kenmark-skills";
-  console.log(`\n━━━ npm package ━━━`);
-  console.log(`$ ${cmd}`);
-  if (dryRun) return { status: 0 };
-  return spawnSync(cmd, { shell: true, stdio: "inherit", env: process.env });
-}
-
-function globalKenmarkInstalled() {
-  const result = spawnSync("npm list -g kenmark-skills --depth=0", {
-    shell: true,
-    encoding: "utf8"
-  });
-  return result.status === 0 && /kenmark-skills@/.test(result.stdout || "");
-}
-
 async function run() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -272,7 +250,7 @@ async function run() {
     process.exit(0);
   }
 
-  const localVersion = readPackageVersion();
+  const localVersion = readLocalPackageVersion(repoRoot);
   console.log(`kenmark-skills update (package in this tree: v${localVersion})`);
 
   let mode = args.mode;
@@ -336,7 +314,7 @@ async function run() {
   }
 
   const plan = [];
-  if (runNpm) plan.push("npm update -g kenmark-skills");
+  if (runNpm) plan.push("npm install -g kenmark-skills@latest");
   if (mode === "kenmark" || mode === "both") {
     const ideLabel = ide || "auto-detect";
     plan.push(`Kenmark skills → ${scope} (${ideLabel})`);
@@ -384,9 +362,9 @@ async function run() {
   if (args.dryRun) console.log("\n(dry-run — commands only)\n");
 
   if (runNpm) {
-    const npmResult = runNpmUpdate(args.dryRun);
+    const npmResult = runNpmInstallLatest(args.dryRun);
     if (!args.dryRun && npmResult.status !== 0) {
-      console.error("npm update failed; continuing with local package scripts.");
+      console.error("npm install failed; continuing with local package scripts.");
     }
   }
 
