@@ -16,7 +16,7 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (35)
+skills/user-skills/          ← bundled universal skills (36)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow
@@ -48,6 +48,7 @@ skills/user-skills/          ← bundled universal skills (35)
   kenmark-issues-check/
   kenmark-issues-scan/
   kenmark-issues-maintain/
+  kenmark-issues-fix-and-ship/   category: workflow (phase: ship)
   kenmark-packs/ category: admin
   kenmark-update/
   kenmark-maintain/
@@ -127,6 +128,7 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Need parallel/specialist tracks? | `kenmark-subagents` |
 | Need complete final deliverable? | `kenmark-output` |
 | Need issue tracking? | `kenmark-issues-setup` / `kenmark-issues-scan` |
+| Scan, fix, commit, and ship issues? | `kenmark-issues-fix-and-ship` |
 | Need skill choice? | `kenmark-router` |
 | Repo health (see table above) | `kenmark-repo-*` family |
 | Security review / auth / RBAC / injection / SSRF? | `kenmark-security-review` |
