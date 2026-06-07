@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## v2.3.9 — README interactive vs agent split (2026-06-07)
+
+### Docs
+
+- **README:** Quick install and Quick start show interactive `init` only; consolidated non-interactive flags, MCP, update, cleanup, and `KENMARK_SKILLS_NONINTERACTIVE` in new **Agents and automation (non-interactive)** section before License.
+- **README:** Installation, Operations, and Kenmark hub deduped — middle sections point to the agent section instead of repeating `-y` examples.
+
 ## v2.3.8 — MCP server selection + init-centric CLI (2026-06-07)
 
 ### Feature
