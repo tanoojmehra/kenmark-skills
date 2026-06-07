@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v2.3.13 — Legacy cleanup + scope prompt (2026-06-08)
+
 ### Fix
 
 - **kenmark-hub.js:** `listLegacyKenmarkSkillPaths()` no longer treats canonical bundled names (e.g. `kenmark-troubleshoot`) as legacy when `kenmark-${old}` equals the rename target; init/setup legacy cleanup no longer deletes active store skills.

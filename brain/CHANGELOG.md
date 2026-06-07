@@ -1,6 +1,11 @@
 # CHANGELOG
 
-Brain knowledge base for the kenmark-skills repository.
+Brain knowledge base
+## v2026.06.08-release-2.3.13
+
+- **Release:** package **2.3.13** (2026-06-08). PR #16 — legacy cleanup canonical false-positive; cleanup scope prompt wording.
+
+ for the kenmark-skills repository.
 
 ## v2026.06.08-legacy-cleanup-canonical
 
