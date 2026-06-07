@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Fix
+
+- **kenmark-hub.js:** Rewrite hardcoded IDE anchor paths (`.agents/.cursor/.claude/skills/<name>/`) to `./` when adopting catalog skills into `~/.kenmark/store`, including existing store copies (`store-current` repair). Doctor scans the store and linked IDE copies for non-portable paths; `adopt --symlink` relinks broken copies to the normalized store.
+
 ## v2.3.0 — Issues fix-and-ship orchestrator
 
 ### New skills

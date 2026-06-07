@@ -1513,6 +1513,7 @@ function adoptCatalogSkills(options = {}) {
       };
       results.push({ name, action: "adopted", source: sourceDir });
     } else {
+      processSkillPortability(storePath, name);
       results.push({ name, action: "store-current", source: storePath });
     }
   }
@@ -2045,14 +2046,25 @@ function runDoctor(options = {}) {
   for (const name of storeSkillNames) {
     const storePath = path.join(storeDir, name);
     const storeHash = hashDirectory(storePath);
+    const storeReal = safeRealpath(storePath);
+
+    for (const finding of scanSkillForNonPortablePaths(storePath, name)) {
+      recordProblem(
+        `Skill '${name}' in store contains non-portable hardcoded paths in ${finding.relPath}`
+      );
+    }
+
     for (const ide of idesForHashCheck) {
       const idePath = path.join(targetMap[ide], name);
       if (!fs.existsSync(idePath)) continue;
 
-      for (const finding of scanSkillForNonPortablePaths(idePath, name)) {
-        recordProblem(
-          `Skill '${name}' in ${ide} contains non-portable hardcoded paths in ${finding.relPath}`
-        );
+      const ideReal = safeRealpath(idePath);
+      if (ideReal !== storeReal) {
+        for (const finding of scanSkillForNonPortablePaths(idePath, name)) {
+          recordProblem(
+            `Skill '${name}' in ${ide} contains non-portable hardcoded paths in ${finding.relPath}`
+          );
+        }
       }
 
       const ideHash = hashDirectory(idePath);
