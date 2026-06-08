@@ -5,7 +5,7 @@ Status: reviewed
 
 ## Summary
 
-**36** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
+**41** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
 
 ## Categories
 
@@ -16,6 +16,7 @@ Status: reviewed
 | testing | `kenmark-test-plan`, `kenmark-test-unit`, … `kenmark-test-ci` |
 | git | `kenmark-commit` |
 | issues | `kenmark-issues-setup`, … `kenmark-issues-fix-and-ship` |
+| plans | `kenmark-plans-setup`, `kenmark-plan`, … `kenmark-plans-execute` |
 | admin | `kenmark-packs`, `kenmark-update`, `kenmark-maintain`, `kenmark-agents` |
 
 Full logical map: `skills/README.md`.
@@ -30,7 +31,7 @@ May use freely: `kenmark-router`, `kenmark-troubleshoot`, `kenmark-plan`, `kenma
 
 ### Specialist
 
-Use when task clearly matches: `kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-structure`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, all `kenmark-test-*`, all `kenmark-issues-*`.
+Use when task clearly matches: `kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-structure`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, all `kenmark-test-*`, all `kenmark-issues-*`, all `kenmark-plans-*`.
 
 ### Explicit admin
 

@@ -18,7 +18,7 @@
 | `scripts/kenmark-packs.js` | `install-recommended` |
 | `scripts/skills-adopt.js` | Standalone adopt |
 | `scripts/validate-repo.js` | Repo invariants (skills, catalog, package.json) |
-| `skills/user-skills/` | 36 bundled skills (flat dirs) |
+| `skills/user-skills/` | 41 bundled skills (flat dirs) |
 
 ## Skill frontmatter
 

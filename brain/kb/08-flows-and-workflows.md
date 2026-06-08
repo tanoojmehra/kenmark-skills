@@ -16,7 +16,9 @@ Status: reviewed
 | Situation | Skill |
 | --- | --- |
 | Problem unclear | `kenmark-troubleshoot` |
-| Plan before coding | `kenmark-plan` |
+| Plan before coding | `kenmark-plan` (asks tier: Quick / Prototype / Full Feature / Dig Deep / ULTRATHINK; writes `brain/plans/`) |
+| Execute approved plan | `kenmark-plans-execute` |
+| List or archive plans | `kenmark-plans-list` / `kenmark-plans-check` |
 | Parallel investigation | `kenmark-subagents` |
 | Complete deliverable | `kenmark-output` |
 | Pick right skill | `kenmark-router` |
@@ -52,7 +54,14 @@ npx kenmark-skills adopt --global --adopt-overwrite -y   # when review-required
 ### Skill activation tiers (policy)
 
 - **Core daily:** router, troubleshoot, plan, output, init, repo-quality, commit, maintain, security-review, performance, etc.
-- **Specialist:** repo-docs, test-*, issues-*, repo-release, etc. — only when task matches.
+- **Specialist:** repo-docs, test-*, issues-*, plans-*, repo-release, etc. — only when task matches.
+
+### Plan tracker lifecycle (`brain/plans/`)
+
+1. **`kenmark-init`** or **`kenmark-plans-setup`** — create `INDEX.md` and `completed/`.
+2. **`kenmark-plan`** — ask tier, inspect repo, write `brain/plans/{id}-{slug}.md`, update INDEX.
+3. **`kenmark-plans-execute`** — implement phases on a feature branch; verify; archive to `completed/`.
+4. **`kenmark-plans-check`** / **`kenmark-plans-maintain`** — sync acceptance criteria and fix INDEX drift.
 - **Explicit admin:** setup, packs, update, agents — only when user asks.
 
 Documented in `kenmark-router` skill; see feature 002.
