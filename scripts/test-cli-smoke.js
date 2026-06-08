@@ -19,6 +19,18 @@ const COMMANDS = [
   ["setup", "--dry-run", "--global", "--ide", "claude", "-y"],
   ["setup", "--dry-run", "--global", "--ide", "cursor", "--mcp-profile", "web", "-y"],
   ["setup", "--dry-run", "--global", "--ide", "cursor", "--mcp-servers", "playwright,fetch", "-y"],
+  ["setup", "--dry-run", "--global", "--ide", "gemini,kiro", "--mcp-profile", "web", "-y"],
+  ["setup", "--dry-run", "--global", "--ide", "codex,gemini", "--mcp-servers", "playwright", "-y"],
+  [
+    "setup",
+    "--dry-run",
+    "--global",
+    "--ide",
+    "antigravity-cli,antigravity",
+    "--mcp-profile",
+    "web",
+    "-y"
+  ],
   ["init", "--dry-run", "--global", "--ide", "claude", "--skip-recommended", "-y"],
   [
     "init",
@@ -156,6 +168,49 @@ const ASSERTIONS = [
       "-y"
     ],
     expectStdout: [/MCP servers \(fetch, playwright\)/, /fetch/, /playwright/]
+  },
+  {
+    args: [
+      "setup",
+      "--dry-run",
+      "--global",
+      "--ide",
+      "gemini,kiro",
+      "--mcp-profile",
+      "web",
+      "-y"
+    ],
+    expectStdout: [
+      /\[dry-run\] would install MCP servers \(browsermcp, playwright\)/
+    ]
+  },
+  {
+    args: [
+      "setup",
+      "--dry-run",
+      "--global",
+      "--ide",
+      "codex,gemini",
+      "--mcp-servers",
+      "playwright",
+      "-y"
+    ],
+    expectStdout: [/\[dry-run\] would install MCP servers \(playwright\)/]
+  },
+  {
+    args: [
+      "setup",
+      "--dry-run",
+      "--global",
+      "--ide",
+      "antigravity-cli,antigravity",
+      "--mcp-profile",
+      "web",
+      "-y"
+    ],
+    expectStdout: [
+      /\[dry-run\] would install MCP servers \(browsermcp, playwright\)/
+    ]
   },
   {
     args: ["update", "--both", "--global", "--ide", "auto", "--dry-run", "-y"],

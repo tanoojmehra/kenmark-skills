@@ -44,7 +44,13 @@ const {
   buildTargetMapForIdes,
   ensureKenmarkTargetPath,
   resolveFallbackTargetIdes,
-  resolveLinkModeLabel
+  resolveLinkModeLabel,
+  dedupeAliasTargetIdes,
+  formatAliasTargetNote,
+  removeAliasDuplicateLinks,
+  getExtraProjectSkillPaths,
+  shouldForceCopyForIde,
+  MCP_CAPABLE_IDES
 } = require("./kenmark-hub");
 
 const homeDir = os.homedir();
@@ -59,7 +65,7 @@ const globalMcpTargets = buildMcpGlobalTargets(homeDir);
 const projectMcpTargets = buildMcpProjectTargets(projectDir);
 const bundledMcpPath = getBundledMcpPath(repoRoot);
 
-const MCP_CAPABLE_IDES = new Set(["cursor", "claude"]);
+const MCP_CAPABLE_IDE_SET = new Set(MCP_CAPABLE_IDES);
 
 function printUsage() {
   console.log("Usage: kenmark-skills setup [options]");
@@ -71,14 +77,16 @@ function printUsage() {
   console.log("After install, catalog skills already present in any IDE root are adopted");
   console.log("into ~/.kenmark/store and relinked (use --skip-adopt to disable).");
   console.log("MCP is opt-in. Pass --with-mcp, --mcp-profile <name>, or --mcp-servers <list>");
-  console.log("into ~/.kenmark/store/mcp.json and merge into Cursor / Claude MCP configs.");
+  console.log(
+    `into ~/.kenmark/store/mcp.json and merge into IDE MCP configs (${MCP_CAPABLE_IDES.join(", ")}).`
+  );
   console.log(`Profiles: ${listMcpProfileNames(repoRoot).join(", ")} (default: none).`);
   console.log(`Servers: ${listBundledMcpServerNames(repoRoot).join(", ")}.`);
   console.log("");
   console.log("Options:");
   console.log("  --install | --uninstall   Action (default: install)");
   console.log("  --global | --project      Install scope (default: global when non-interactive)");
-  console.log("  --ide <target>            cursor, claude, codex, all, …");
+  console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, all, …");
   console.log("  --copy                    Copy into IDE paths instead of symlinks");
   console.log("  --symlink                 Force symlinks (Windows: junction) instead of copy");
   console.log("  --prefer-copy-on-windows  Copy on Windows (default: on)");
@@ -249,10 +257,10 @@ function resolveTargetIdes(args, targetMap) {
 }
 
 function filterMcpIdes(targetIdes) {
-  return targetIdes.filter((ide) => MCP_CAPABLE_IDES.has(ide));
+  return targetIdes.filter((ide) => MCP_CAPABLE_IDE_SET.has(ide));
 }
 
-function executeInstall(targetMap, targetIdes, action, options) {
+function executeInstall(targetMap, requestedTargetIdes, action, options) {
   const {
     dryRun,
     forceCopy,
@@ -264,9 +272,12 @@ function executeInstall(targetMap, targetIdes, action, options) {
     mcpInstall,
     mcpOnly,
     eccProfile,
-    mcpTargetMap
+    mcpTargetMap,
+    projectDir = null
   } = options;
-  const mcpIdes = filterMcpIdes(targetIdes);
+  const targetIdes = dedupeAliasTargetIdes(requestedTargetIdes);
+  const aliasNote = formatAliasTargetNote(requestedTargetIdes, targetMap);
+  const mcpIdes = filterMcpIdes(requestedTargetIdes);
   const installMcp = mcpInstall.enabled;
   const mcpServerNames = mcpInstall.serverNames || [];
   const mcpProfile = mcpInstall.profile;
@@ -278,8 +289,20 @@ function executeInstall(targetMap, targetIdes, action, options) {
   const plan = [];
   if (action === "install") {
     plan.push(`Populate Kenmark store → ${storeDir}`);
+    if (aliasNote) {
+      plan.push(aliasNote);
+    }
     for (const ide of targetIdes) {
-      plan.push(`Link Kenmark skills (${linkMode}) → ${ide}: ${targetMap[ide]}`);
+      const copyNote =
+        shouldForceCopyForIde(ide, { forceSymlink }) && !forceCopy ? " (copy — IDE symlinks not discovered)" : "";
+      plan.push(`Link Kenmark skills (${linkMode})${copyNote} → ${ide}: ${targetMap[ide]}`);
+      if (projectDir) {
+        for (const extraPath of getExtraProjectSkillPaths(ide, projectDir)) {
+          plan.push(
+            `Link Kenmark skills (copy) → ${ide} also: ${extraPath}`
+          );
+        }
+      }
     }
     if (targetIdes.includes("claude")) {
       plan.push(
@@ -297,7 +320,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
   } else if (mcpOnly) {
     if (!mcpIdes.length) {
       plan.push(
-        "No MCP-capable IDE in target list (use --ide cursor, claude, or all)"
+        `No MCP-capable IDE in target list (use --ide ${MCP_CAPABLE_IDES.join(", ")}, or all)`
       );
     } else {
       for (const ide of mcpIdes) {
@@ -383,20 +406,40 @@ function executeInstall(targetMap, targetIdes, action, options) {
           }
         }
 
+        let loggedAntigravityCopyNote = false;
         for (const ide of targetIdes) {
           const targetPath = targetMap[ide];
           if (dryRun) {
             console.log(
               `[dry-run] would link ${skillNames.length} skills to ${targetPath}`
             );
+            for (const extraPath of getExtraProjectSkillPaths(ide, projectDir)) {
+              console.log(
+                `[dry-run] would also link ${skillNames.length} skills to ${extraPath}`
+              );
+            }
             continue;
           }
           ensureKenmarkTargetPath(targetPath);
+          for (const extraPath of getExtraProjectSkillPaths(ide, projectDir)) {
+            ensureKenmarkTargetPath(extraPath);
+          }
+          if (
+            shouldForceCopyForIde(ide, { forceSymlink }) &&
+            !forceCopy &&
+            !loggedAntigravityCopyNote
+          ) {
+            console.log(
+              "antigravity IDE: using copy (symlinks not discovered by Antigravity IDE)"
+            );
+            loggedAntigravityCopyNote = true;
+          }
           const linkResults = relinkSkillsToIdes(skillNames, { [ide]: targetPath }, {
             forceCopy,
             forceSymlink,
             preferCopyOnWindows,
-            dryRun: false
+            dryRun: false,
+            projectDir
           });
           console.log(`Linked skills for ${ide}: ${targetPath}`);
           const modes = [...new Set(linkResults.map((r) => r.mode).filter(Boolean))];
@@ -420,7 +463,8 @@ function executeInstall(targetMap, targetIdes, action, options) {
               forceCopy,
               forceSymlink,
               preferCopyOnWindows,
-              dryRun: false
+              dryRun: false,
+              projectDir
             });
             const adoptSummary = formatAdoptPassSummary(adoptResult.results);
             console.log(adoptSummary.line);
@@ -463,7 +507,16 @@ function executeInstall(targetMap, targetIdes, action, options) {
               console.log(`    added: ${added}; skipped (already present): ${skipped}`);
             }
             console.log(
-              "Restart Cursor / Claude Code if MCP tools do not appear immediately."
+              "Restart your IDE or agent CLI if MCP tools do not appear immediately."
+            );
+          }
+        }
+
+        if (!dryRun) {
+          const dedupeResult = removeAliasDuplicateLinks(targetMap);
+          if (dedupeResult.removed > 0) {
+            console.log(
+              `Removed shared-path duplicate skill links (${dedupeResult.removed}) from ${targetMap.gemini}`
             );
           }
         }
@@ -497,7 +550,7 @@ function executeInstall(targetMap, targetIdes, action, options) {
         }
       } else if (mcpOnly) {
         console.log(
-          "No MCP-capable IDE in target list. Use --ide cursor, claude, or all."
+          `No MCP-capable IDE in target list. Use --ide ${MCP_CAPABLE_IDES.join(", ")}, or all.`
         );
       }
 
@@ -667,7 +720,8 @@ async function run() {
     mcpInstall,
     mcpOnly: args.mcpOnly,
     eccProfile: args.eccProfile,
-    mcpTargetMap
+    mcpTargetMap,
+    projectDir: mode === "project" ? projectDir : null
   });
 
   console.log(`Operating system: ${process.platform}`);

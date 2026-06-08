@@ -83,7 +83,7 @@ if (command === "mcp") {
     console.log("Usage:");
     console.log("  kenmark-skills mcp uninstall [--global|--project] [--ide <target>] [-y]");
     console.log("");
-    console.log("Removes Kenmark-managed MCP server entries from Cursor / Claude configs");
+    console.log("Removes Kenmark-managed MCP server entries from IDE MCP configs");
     console.log("and clears ~/.kenmark/store/mcp.json. Does not remove skill links.");
     console.log("");
     console.log("Examples:");

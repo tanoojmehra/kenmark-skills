@@ -12,7 +12,7 @@ const os = require("os");
 const repoRoot = path.resolve(__dirname, "..");
 const packsScript = path.join(__dirname, "kenmark-packs.js");
 const cliScript = path.join(__dirname, "cli.js");
-const { buildGlobalTargets } = require("./kenmark-hub");
+const { buildGlobalTargets, dedupeAliasTargetIdes } = require("./kenmark-hub");
 
 function rmDirSafe(dir) {
   if (!dir || !fs.existsSync(dir)) return;
@@ -41,9 +41,19 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function skillPresent(homeDir, ideKey, skillName) {
+function skillPresent(homeDir, ideKey, skillName, requestedIdes) {
   const targets = buildGlobalTargets(homeDir);
-  const skillPath = path.join(targets[ideKey], skillName, "SKILL.md");
+  const allIdes = Object.keys(targets);
+  const linkIdes = dedupeAliasTargetIdes(requestedIdes || allIdes);
+  let effectiveIde = ideKey;
+  if (!linkIdes.includes(ideKey)) {
+    if (ideKey === "gemini" && linkIdes.includes("codex")) {
+      effectiveIde = "codex";
+    } else {
+      return false;
+    }
+  }
+  const skillPath = path.join(targets[effectiveIde], skillName, "SKILL.md");
   return fs.existsSync(skillPath);
 }
 
@@ -197,7 +207,7 @@ function main() {
       } else {
         const ides = ["cursor", "codex", "gemini", "opencode", "minimax"];
         const missing = ides.filter(
-          (ide) => !skillPresent(wireHome, ide, "code-review-skill")
+          (ide) => !skillPresent(wireHome, ide, "code-review-skill", ides)
         );
         if (missing.length) {
           failures.push(
