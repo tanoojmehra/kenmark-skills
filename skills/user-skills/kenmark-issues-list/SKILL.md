@@ -31,7 +31,7 @@ frontend, backend, api, database, auth, security, ui, testing, performance, dx,
 infra, docs, workflow, unknown; plus `worker` when the project uses it), sorted
 by priority within each group.
 
-If `INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or opt in during **`kenmark-init`**) first.
+If `INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or **`kenmark-init`**) first.
 
 ---
 

@@ -29,7 +29,7 @@ disable-model-invocation: false
 
 **Scan and document** — find bugs, gaps, and inconsistencies in the codebase, then **create issue files** under `brain/issues/` with evidence and unique IDs.
 
-**Not setup.** This skill does not create the tracker layout. If `brain/issues/INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or opt in during **`kenmark-init`**) first.
+**Not setup.** This skill does not create the tracker layout. If `brain/issues/INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or **`kenmark-init`**) first.
 
 Assign unique IDs (next available in the 3-digit sequence), populate with
 evidence, and optionally update INDEX.md.

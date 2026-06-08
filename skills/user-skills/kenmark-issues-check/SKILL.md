@@ -31,7 +31,7 @@ Read all open issues in `brain/issues/`, check whether the described problem
 has been resolved by recent code changes, and if so move the issue to
 `brain/issues/completed/` and update `INDEX.md`.
 
-If `INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or opt in during **`kenmark-init`**) first.
+If `INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or **`kenmark-init`**) first.
 
 ---
 
