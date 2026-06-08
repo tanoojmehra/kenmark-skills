@@ -16,7 +16,10 @@ const {
   adoptCatalogSkills,
   formatAdoptPassSummary,
   resolveExplicitTargetIdes,
-  buildTargetMapForIdes
+  buildTargetMapForIdes,
+  dedupeAliasTargetIdes,
+  formatAliasTargetNote,
+  removeAliasDuplicateLinks
 } = require("./kenmark-hub");
 
 const repoRoot = path.resolve(__dirname, "..");
@@ -30,7 +33,7 @@ function printUsage() {
   console.log("");
   console.log("Options:");
   console.log("  --global | --project      Scope (default: global)");
-  console.log("  --ide <target>            cursor, claude, codex, all, …");
+  console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, all, …");
   console.log("  --copy                    Copy into IDE paths instead of symlinks");
   console.log("  --symlink                 Force symlinks (Windows: junction) instead of copy");
   console.log("  --force                   Overwrite store when source differs (--adopt-overwrite alias)");
@@ -134,13 +137,18 @@ async function run() {
 
   const fullTargetMap =
     mode === "project" ? buildProjectTargets(process.cwd()) : buildGlobalTargets(os.homedir());
-  const targetIdes = resolveTargetIdes(args, fullTargetMap);
-  const targetMap = buildTargetMapForIdes(fullTargetMap, targetIdes);
+  const requestedTargetIdes = resolveTargetIdes(args, fullTargetMap);
+  const linkTargetIdes = dedupeAliasTargetIdes(requestedTargetIdes);
+  const targetMap = buildTargetMapForIdes(fullTargetMap, linkTargetIdes);
+  const aliasNote = formatAliasTargetNote(requestedTargetIdes, fullTargetMap);
 
   const plan = [
     `Adopt catalog skills into ${getStoreDir()}`,
-    `Relink → ${targetIdes.join(", ")}`
+    `Relink → ${linkTargetIdes.join(", ")}`
   ];
+  if (aliasNote) {
+    plan.push(aliasNote);
+  }
 
   const ok = args.yes || args.dryRun || (await confirmPlan(plan, args.dryRun));
   if (!ok) {
@@ -159,7 +167,8 @@ async function run() {
     forceCopy: args.forceCopy,
     forceSymlink: args.forceSymlink,
     preferCopyOnWindows: args.preferCopyOnWindows,
-    dryRun: args.dryRun
+    dryRun: args.dryRun,
+    projectDir: mode === "project" ? process.cwd() : null
   });
 
   console.log(`Adoptable names (${adoptNames.length}): ${adoptNames.join(", ")}`);
@@ -181,6 +190,12 @@ async function run() {
     console.log("(dry-run — no files changed)");
   } else {
     console.log(`Store: ${getStoreDir()}`);
+    const dedupeResult = removeAliasDuplicateLinks(fullTargetMap);
+    if (dedupeResult.removed > 0) {
+      console.log(
+        `Removed shared-path duplicate skill links (${dedupeResult.removed}) from ${fullTargetMap.gemini}`
+      );
+    }
   }
 }
 

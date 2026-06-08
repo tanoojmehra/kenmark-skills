@@ -36,7 +36,10 @@ const {
   adoptCatalogSkills,
   formatAdoptPassSummary,
   resolveExplicitTargetIdes,
-  buildTargetMapForIdes
+  buildTargetMapForIdes,
+  dedupeAliasTargetIdes,
+  formatAliasTargetNote,
+  removeAliasDuplicateLinks
 } = require("./kenmark-hub");
 
 const repoRoot = path.resolve(__dirname, "..");
@@ -412,17 +415,21 @@ async function run() {
 
   const fullTargetMap =
     scope === "project" ? buildProjectTargets(process.cwd()) : buildGlobalTargets(os.homedir());
-  let targetMap = fullTargetMap;
+  let requestedTargetIdes;
   if (args.explicitIde && args.ide) {
     try {
-      const targetIdes = resolveExplicitTargetIdes(args.ide, fullTargetMap);
-      targetMap = buildTargetMapForIdes(fullTargetMap, targetIdes);
+      requestedTargetIdes = resolveExplicitTargetIdes(args.ide, fullTargetMap);
     } catch (err) {
       console.error(err.message);
       process.exit(1);
     }
+  } else {
+    requestedTargetIdes = Object.keys(fullTargetMap);
   }
-  const adoptIdes = Object.keys(targetMap);
+  const linkTargetIdes = dedupeAliasTargetIdes(requestedTargetIdes);
+  const targetMap = buildTargetMapForIdes(fullTargetMap, linkTargetIdes);
+  const aliasNote = formatAliasTargetNote(requestedTargetIdes, fullTargetMap);
+  const adoptIdes = linkTargetIdes;
 
   const packLabels = installPlan.map((e) => {
     let label = e.packId;
@@ -447,6 +454,9 @@ async function run() {
     planLines.push(
       `Adopt into ~/.kenmark/store + relink → ${adoptIdes.join(", ")}`
     );
+    if (aliasNote) {
+      planLines.push(aliasNote);
+    }
   }
 
   const ok =
@@ -559,13 +569,20 @@ async function run() {
         forceCopy: args.forceCopy,
         forceSymlink: args.forceSymlink,
         preferCopyOnWindows: args.preferCopyOnWindows,
-        dryRun: false
+        dryRun: false,
+        projectDir: scope === "project" ? process.cwd() : null
       });
       const adoptSummary = formatAdoptPassSummary(adoptResult.results);
       console.log(adoptSummary.line);
       if (adoptSummary.reviewRequired) {
         console.log(
           `  ${adoptSummary.reviewRequired} skill(s) need review (store differs from IDE copy). Re-run with --adopt-overwrite to overwrite.`
+        );
+      }
+      const dedupeResult = removeAliasDuplicateLinks(fullTargetMap);
+      if (dedupeResult.removed > 0) {
+        console.log(
+          `Removed shared-path duplicate skill links (${dedupeResult.removed}) from ${fullTargetMap.gemini}`
         );
       }
     }

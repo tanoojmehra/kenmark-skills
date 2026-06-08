@@ -12,7 +12,7 @@ const IDE_LABELS = {
   cursor: "Cursor (.cursor/skills)",
   claude: "Claude Code (.claude/skills)",
   codex: "Codex (.agents/skills)",
-  gemini: "Gemini (.gemini/skills)",
+  gemini: "Gemini (.gemini/skills; shares ~/.agents/skills when Codex is also selected)",
   opencode: "OpenCode (.opencode/skills)",
   kiro: "Kiro (.kiro/skills)",
   trae: "Trae (.trae/skills)",
@@ -547,7 +547,7 @@ async function promptMcpServers(servers, opts = {}) {
   if (askInstall) {
     const message =
       opts.installPrompt ||
-      "Install bundled MCP servers into Cursor / Claude configs?";
+      "Install bundled MCP servers into your selected IDE MCP configs?";
     const want = await promptYesNo(message, false);
     if (!want) return [];
   }
@@ -599,7 +599,7 @@ async function promptMcpProfile(profiles, opts = {}) {
   if (askInstall) {
     const message =
       opts.installPrompt ||
-      "Install bundled MCP servers into Cursor / Claude configs?";
+      "Install bundled MCP servers into your selected IDE MCP configs?";
     const want = await promptYesNo(message, false);
     if (!want) return "none";
   }
@@ -607,7 +607,7 @@ async function promptMcpProfile(profiles, opts = {}) {
   if (!profiles.length) return "none";
 
   const rl = createRl();
-  console.log("\nMCP profile (merged into Cursor / Claude MCP configs):\n");
+  console.log("\nMCP profile (merged into selected IDE MCP configs):\n");
   profiles.forEach((p, i) => {
     const def = p.id === defaultProfile ? " [default]" : "";
     const servers =

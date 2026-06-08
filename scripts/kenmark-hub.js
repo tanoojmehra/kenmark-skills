@@ -42,6 +42,8 @@ const IDE_SCAN_PRIORITY = [
   "cursor",
   "claude",
   "gemini",
+  "antigravity-cli",
+  "antigravity",
   "codex",
   "opencode",
   "minimax",
@@ -56,6 +58,8 @@ const AGENT_IDE_SCAN_PRIORITY = [
   "cursor",
   "agents",
   "gemini",
+  "antigravity-cli",
+  "antigravity",
   "codex",
   "opencode",
   "minimax",
@@ -227,7 +231,39 @@ function buildMcpDocumentForServers(repoRoot, serverNames) {
   return { serverNames: Object.keys(doc.mcpServers).sort(), doc };
 }
 
-function formatMcpPlanLine(serverNames, targetLabel = "Cursor / Claude") {
+/** IDEs that accept standard JSON mcpServers (standalone file or nested key). */
+const MCP_CAPABLE_IDES = [
+  "cursor",
+  "claude",
+  "gemini",
+  "antigravity-cli",
+  "antigravity",
+  "kiro",
+  "trae",
+  "trae-cn",
+  "rovo",
+  "qoder"
+];
+
+/** @type {Record<string, "standalone" | "nested">} */
+const MCP_IDE_CONFIG_KIND = {
+  cursor: "standalone",
+  claude: "nested",
+  gemini: "nested",
+  "antigravity-cli": "standalone",
+  antigravity: "standalone",
+  kiro: "standalone",
+  trae: "standalone",
+  "trae-cn": "standalone",
+  rovo: "standalone",
+  qoder: "nested"
+};
+
+function getMcpIdeConfigKind(ide) {
+  return MCP_IDE_CONFIG_KIND[ide] || "standalone";
+}
+
+function formatMcpPlanLine(serverNames, targetLabel = "selected IDE MCP configs") {
   const list = serverNames.length ? serverNames.join(", ") : "none";
   return `MCP servers (${list}) → ${targetLabel}`;
 }
@@ -268,14 +304,30 @@ function shouldInstallMcp({ skipMcp, withMcp, mcpProfile, mcpServers, repoRoot }
 function buildMcpGlobalTargets(homeDir = os.homedir()) {
   return {
     cursor: path.join(homeDir, ".cursor", "mcp.json"),
-    claude: path.join(homeDir, ".claude.json")
+    claude: path.join(homeDir, ".claude.json"),
+    gemini: path.join(homeDir, ".gemini", "settings.json"),
+    "antigravity-cli": path.join(homeDir, ".gemini", "antigravity-cli", "mcp_config.json"),
+    antigravity: path.join(homeDir, ".gemini", "config", "mcp_config.json"),
+    kiro: path.join(homeDir, ".kiro", "settings", "mcp.json"),
+    trae: path.join(homeDir, ".trae", "mcp.json"),
+    "trae-cn": path.join(homeDir, ".trae-cn", "mcp.json"),
+    rovo: path.join(homeDir, ".rovodev", "mcp.json"),
+    qoder: path.join(homeDir, ".qoder", "settings.json")
   };
 }
 
 function buildMcpProjectTargets(projectDir = process.cwd()) {
   return {
     cursor: path.join(projectDir, ".cursor", "mcp.json"),
-    claude: path.join(projectDir, ".mcp.json")
+    claude: path.join(projectDir, ".mcp.json"),
+    gemini: path.join(projectDir, ".gemini", "settings.json"),
+    "antigravity-cli": path.join(projectDir, ".agents", "mcp_config.json"),
+    antigravity: path.join(projectDir, ".agent", "mcp_config.json"),
+    kiro: path.join(projectDir, ".kiro", "settings", "mcp.json"),
+    trae: path.join(projectDir, ".trae", "mcp.json"),
+    "trae-cn": path.join(projectDir, ".trae-cn", "mcp.json"),
+    rovo: path.join(projectDir, ".rovodev", "mcp.json"),
+    qoder: path.join(projectDir, ".qoder", "settings.local.json")
   };
 }
 
@@ -297,6 +349,8 @@ function buildGlobalTargets(homeDir = os.homedir()) {
     codex: path.join(homeDir, ".agents", "skills"),
     claude: path.join(homeDir, ".claude", "skills"),
     gemini: path.join(homeDir, ".gemini", "skills"),
+    "antigravity-cli": path.join(homeDir, ".gemini", "antigravity-cli", "skills"),
+    antigravity: path.join(homeDir, ".gemini", "antigravity", "skills"),
     opencode: path.join(homeDir, ".opencode", "skills"),
     kiro: path.join(homeDir, ".kiro", "skills"),
     trae: path.join(homeDir, ".trae", "skills"),
@@ -313,6 +367,8 @@ function buildProjectTargets(projectDir = process.cwd()) {
     codex: path.join(projectDir, ".agents", "skills"),
     claude: path.join(projectDir, ".claude", "skills"),
     gemini: path.join(projectDir, ".gemini", "skills"),
+    "antigravity-cli": path.join(projectDir, ".agents", "skills"),
+    antigravity: path.join(projectDir, ".agent", "skills"),
     opencode: path.join(projectDir, ".opencode", "skills"),
     kiro: path.join(projectDir, ".kiro", "skills"),
     trae: path.join(projectDir, ".trae", "skills"),
@@ -323,6 +379,222 @@ function buildProjectTargets(projectDir = process.cwd()) {
   };
 }
 
+/** Gemini CLI aliases ~/.agents/skills over ~/.gemini/skills — link once when both IDEs selected. */
+const GEMINI_CODEX_ALIAS = {
+  primary: "codex",
+  secondary: "gemini"
+};
+
+/** Antigravity CLI also discovers ~/.gemini/skills as a shared path — link once when both selected. */
+const ANTIGRAVITY_CLI_GEMINI_ALIAS = {
+  primary: "antigravity-cli",
+  secondary: "gemini"
+};
+
+function hadGeminiCodexAliasOverlap(targetIdes) {
+  const list = Array.isArray(targetIdes) ? targetIdes : [];
+  return (
+    list.includes(GEMINI_CODEX_ALIAS.primary) &&
+    list.includes(GEMINI_CODEX_ALIAS.secondary)
+  );
+}
+
+function hadAntigravityCliGeminiAliasOverlap(targetIdes) {
+  const list = Array.isArray(targetIdes) ? targetIdes : [];
+  return (
+    list.includes(ANTIGRAVITY_CLI_GEMINI_ALIAS.primary) &&
+    list.includes(ANTIGRAVITY_CLI_GEMINI_ALIAS.secondary)
+  );
+}
+
+function dedupeAliasTargetIdes(targetIdes) {
+  let list = Array.isArray(targetIdes) ? [...targetIdes] : [];
+  if (hadGeminiCodexAliasOverlap(list)) {
+    list = list.filter((ide) => ide !== GEMINI_CODEX_ALIAS.secondary);
+  }
+  if (hadAntigravityCliGeminiAliasOverlap(list)) {
+    list = list.filter((ide) => ide !== ANTIGRAVITY_CLI_GEMINI_ALIAS.secondary);
+  }
+  return list;
+}
+
+function formatAliasTargetNote(requestedIdes, targetMap) {
+  const notes = [];
+  if (hadGeminiCodexAliasOverlap(requestedIdes)) {
+    const agentsPath = targetMap?.[GEMINI_CODEX_ALIAS.primary];
+    if (agentsPath) {
+      notes.push(
+        `gemini uses ${agentsPath} (shared with codex — avoids Gemini CLI skill conflicts)`
+      );
+    }
+  }
+  if (hadAntigravityCliGeminiAliasOverlap(requestedIdes)) {
+    const agyPath = targetMap?.[ANTIGRAVITY_CLI_GEMINI_ALIAS.primary];
+    if (agyPath) {
+      notes.push(
+        `gemini uses ${agyPath} (shared with antigravity-cli — avoids Antigravity CLI skill conflicts)`
+      );
+    }
+  }
+  return notes.length ? notes.join("; ") : null;
+}
+
+function findSharedPathDuplicateSkills(targetMap, alias, context = {}) {
+  const primaryPath = targetMap?.[alias.primary];
+  const secondaryPath = targetMap?.[alias.secondary];
+  if (!primaryPath || !secondaryPath || !fs.existsSync(secondaryPath)) {
+    return [];
+  }
+
+  const storeDir = context.storeDir || getStoreDir();
+  let manifest = context.manifest;
+  if (manifest === undefined) {
+    try {
+      manifest = readManifest();
+    } catch {
+      manifest = null;
+    }
+  }
+  const ownershipContext = { storeDir, manifest };
+
+  let secondaryEntries;
+  try {
+    secondaryEntries = fs.readdirSync(secondaryPath, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+
+  const duplicates = [];
+  for (const ent of secondaryEntries) {
+    if (!ent.isDirectory() && !ent.isSymbolicLink()) continue;
+    if (ent.name === KENMARK_MANAGED_MARKER) continue;
+
+    const name = ent.name;
+    const secondarySkillPath = path.join(secondaryPath, name);
+    const primarySkillPath = path.join(primaryPath, name);
+    if (!pathEntryExists(primarySkillPath)) continue;
+
+    if (
+      !isProvenKenmarkLegacyPath(secondarySkillPath, {
+        ...ownershipContext,
+        skillName: name
+      }) ||
+      !isProvenKenmarkLegacyPath(primarySkillPath, {
+        ...ownershipContext,
+        skillName: name
+      })
+    ) {
+      continue;
+    }
+
+    if (safeRealpath(secondarySkillPath) !== safeRealpath(primarySkillPath)) {
+      continue;
+    }
+
+    duplicates.push({
+      name,
+      secondarySkillPath,
+      primarySkillPath,
+      secondaryKey: alias.secondary,
+      primaryKey: alias.primary
+    });
+  }
+
+  return duplicates;
+}
+
+function findGeminiCodexDuplicateSkills(targetMap, context = {}) {
+  const dupes = findSharedPathDuplicateSkills(targetMap, GEMINI_CODEX_ALIAS, context);
+  return dupes.map((dup) => ({
+    name: dup.name,
+    geminiSkillPath: dup.secondarySkillPath,
+    codexSkillPath: dup.primarySkillPath
+  }));
+}
+
+function findAntigravityCliGeminiDuplicateSkills(targetMap, context = {}) {
+  const dupes = findSharedPathDuplicateSkills(
+    targetMap,
+    ANTIGRAVITY_CLI_GEMINI_ALIAS,
+    context
+  );
+  return dupes.map((dup) => ({
+    name: dup.name,
+    geminiSkillPath: dup.secondarySkillPath,
+    antigravityCliSkillPath: dup.primarySkillPath
+  }));
+}
+
+function removeSharedPathDuplicateLinks(targetMap, alias, { dryRun = false } = {}) {
+  const duplicates = findSharedPathDuplicateSkills(targetMap, alias);
+  const results = [];
+
+  for (const dup of duplicates) {
+    if (dryRun) {
+      results.push({
+        name: dup.name,
+        action: "would-remove",
+        path: dup.secondarySkillPath
+      });
+      continue;
+    }
+    removePathIfExists(dup.secondarySkillPath);
+    results.push({ name: dup.name, action: "removed", path: dup.secondarySkillPath });
+  }
+
+  return {
+    removed: results.filter((r) => r.action === "removed").length,
+    results
+  };
+}
+
+function removeGeminiCodexDuplicateLinks(targetMap, options = {}) {
+  return removeSharedPathDuplicateLinks(targetMap, GEMINI_CODEX_ALIAS, options);
+}
+
+function removeAntigravityCliGeminiDuplicateLinks(targetMap, options = {}) {
+  return removeSharedPathDuplicateLinks(targetMap, ANTIGRAVITY_CLI_GEMINI_ALIAS, options);
+}
+
+function removeAliasDuplicateLinks(targetMap, options = {}) {
+  const geminiCodex = removeGeminiCodexDuplicateLinks(targetMap, options);
+  const agyGemini = removeAntigravityCliGeminiDuplicateLinks(targetMap, options);
+  return {
+    removed: geminiCodex.removed + agyGemini.removed,
+    results: [...geminiCodex.results, ...agyGemini.results]
+  };
+}
+
+/** Extra project skill roots when an IDE discovers multiple workspace paths. */
+function getExtraProjectSkillPaths(ide, projectDir) {
+  if (ide !== "antigravity" || !projectDir) return [];
+  const agentsPath = path.join(projectDir, ".agents", "skills");
+  const primaryPath = path.join(projectDir, ".agent", "skills");
+  if (agentsPath === primaryPath) return [];
+  return [agentsPath];
+}
+
+function shouldForceCopyForIde(ide, { forceSymlink = false } = {}) {
+  return ide === "antigravity" && !forceSymlink;
+}
+
+function findAntigravitySymlinkSkills(targetMap) {
+  const agyPath = targetMap?.antigravity;
+  if (!agyPath || !fs.existsSync(agyPath)) return [];
+
+  const symlinks = [];
+  try {
+    for (const ent of fs.readdirSync(agyPath, { withFileTypes: true })) {
+      if (!ent.isSymbolicLink()) continue;
+      if (ent.name === KENMARK_MANAGED_MARKER) continue;
+      symlinks.push({ name: ent.name, path: path.join(agyPath, ent.name) });
+    }
+  } catch {
+    return [];
+  }
+  return symlinks;
+}
+
 function buildInventoryRoots(homeDir = os.homedir()) {
   return [
     { id: "kenmark-store", path: path.join(homeDir, ".kenmark", "store", "skills") },
@@ -330,6 +602,8 @@ function buildInventoryRoots(homeDir = os.homedir()) {
     { id: "cursor", path: path.join(homeDir, ".cursor", "skills") },
     { id: "claude", path: path.join(homeDir, ".claude", "skills") },
     { id: "gemini", path: path.join(homeDir, ".gemini", "skills") },
+    { id: "antigravity-cli", path: path.join(homeDir, ".gemini", "antigravity-cli", "skills") },
+    { id: "antigravity", path: path.join(homeDir, ".gemini", "antigravity", "skills") },
     { id: "codex", path: path.join(homeDir, ".codex", "skills") },
     { id: "opencode", path: path.join(homeDir, ".opencode", "skills") },
     { id: "minimax", path: path.join(homeDir, ".minimax", "skills") },
@@ -835,6 +1109,12 @@ function hasRealIdeInstallEvidence(ide, targetPath) {
 
   if (ide === "claude" && fs.existsSync(path.join(configRoot, ".claude.json"))) {
     return true;
+  }
+
+  if (ide === "antigravity") {
+    if (fs.existsSync(path.join(configRoot, "config", "mcp_config.json"))) {
+      return true;
+    }
   }
 
   const entries = readDirEntryNames(parent);
@@ -1588,7 +1868,8 @@ function relinkSkillsToIdes(
     forceCopy = false,
     forceSymlink = false,
     preferCopyOnWindows = true,
-    dryRun = false
+    dryRun = false,
+    projectDir = null
   } = {}
 ) {
   const storeDir = getStoreDir();
@@ -1598,8 +1879,11 @@ function relinkSkillsToIdes(
   // Pre-create IDE target directories so `setup --ide kiro` makes `~/.kiro/skills/`
   // even when no skills match. Marker distinguishes Kenmark-created paths from real IDE installs.
   if (!dryRun) {
-    for (const [, targetPath] of Object.entries(targetMap)) {
+    for (const [ide, targetPath] of Object.entries(targetMap)) {
       ensureKenmarkTargetPath(targetPath);
+      for (const extraPath of getExtraProjectSkillPaths(ide, projectDir)) {
+        ensureKenmarkTargetPath(extraPath);
+      }
     }
   }
 
@@ -1610,23 +1894,33 @@ function relinkSkillsToIdes(
       continue;
     }
 
-    for (const [, targetPath] of Object.entries(targetMap)) {
-      const idePath = path.join(targetPath, name);
-      if (dryRun) {
-        results.push({ name, idePath, action: "would-link" });
-        continue;
+    for (const [ide, targetPath] of Object.entries(targetMap)) {
+      const skillRoots = [targetPath];
+      for (const extraPath of getExtraProjectSkillPaths(ide, projectDir)) {
+        if (!skillRoots.includes(extraPath)) {
+          skillRoots.push(extraPath);
+        }
       }
-      const linkResult = linkSkillIntoIde(storePath, idePath, {
-        forceCopy,
-        forceSymlink,
-        preferCopyOnWindows
-      });
-      manifest.skills[name] = {
-        ...(manifest.skills[name] || {}),
-        linkMode: linkResult.mode,
-        linkedAt: new Date().toISOString()
-      };
-      results.push({ name, idePath, ...linkResult });
+
+      for (const skillRoot of skillRoots) {
+        const idePath = path.join(skillRoot, name);
+        const copyForIde = shouldForceCopyForIde(ide, { forceSymlink });
+        if (dryRun) {
+          results.push({ name, ide, idePath, action: "would-link" });
+          continue;
+        }
+        const linkResult = linkSkillIntoIde(storePath, idePath, {
+          forceCopy: forceCopy || copyForIde,
+          forceSymlink,
+          preferCopyOnWindows
+        });
+        manifest.skills[name] = {
+          ...(manifest.skills[name] || {}),
+          linkMode: linkResult.mode,
+          linkedAt: new Date().toISOString()
+        };
+        results.push({ name, ide, idePath, ...linkResult });
+      }
     }
   }
 
@@ -1793,14 +2087,16 @@ function adoptCatalogSkills(options = {}) {
       forceCopy,
       forceSymlink,
       preferCopyOnWindows,
-      dryRun: false
+      dryRun: false,
+      projectDir: options.projectDir || null
     });
   } else {
     relinkSkillsToIdes(adoptNames, targetMap, {
       forceCopy,
       forceSymlink,
       preferCopyOnWindows,
-      dryRun: true
+      dryRun: true,
+      projectDir: options.projectDir || null
     });
   }
 
@@ -1927,6 +2223,42 @@ function ensureParentDir(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
 
+function readMcpServersFromIdeConfig(targetPath, ide) {
+  const kind = getMcpIdeConfigKind(ide);
+  if (kind === "nested") {
+    if (!fs.existsSync(targetPath)) {
+      return { doc: {}, mcpServers: {} };
+    }
+    try {
+      const doc = JSON.parse(fs.readFileSync(targetPath, "utf8"));
+      if (!doc || typeof doc !== "object") {
+        return { doc: {}, mcpServers: {} };
+      }
+      if (!doc.mcpServers || typeof doc.mcpServers !== "object") {
+        doc.mcpServers = {};
+      }
+      return { doc, mcpServers: doc.mcpServers };
+    } catch {
+      return { doc: {}, mcpServers: {} };
+    }
+  }
+
+  const doc = readMcpDocument(targetPath);
+  return { doc, mcpServers: doc.mcpServers || {} };
+}
+
+function writeMcpServersToIdeConfig(targetPath, ide, doc, mcpServers) {
+  const kind = getMcpIdeConfigKind(ide);
+  if (kind === "nested") {
+    doc.mcpServers = mcpServers;
+    ensureParentDir(targetPath);
+    fs.writeFileSync(targetPath, `${JSON.stringify(doc, null, 2)}\n`, "utf8");
+    return;
+  }
+  doc.mcpServers = mcpServers;
+  writeMcpDocument(targetPath, doc);
+}
+
 function mergeMcpServerEntries(existing, incoming, { force = false } = {}) {
   const merged = { ...existing };
   const added = [];
@@ -2011,39 +2343,16 @@ function installMcpToIdes(mcpTargetMap, targetIdes, options = {}) {
       continue;
     }
 
-    if (ide === "claude" && targetPath.endsWith(".claude.json")) {
-      const claudeDoc = fs.existsSync(targetPath)
-        ? JSON.parse(fs.readFileSync(targetPath, "utf8"))
-        : {};
-      if (!claudeDoc.mcpServers || typeof claudeDoc.mcpServers !== "object") {
-        claudeDoc.mcpServers = {};
-      }
-      const { merged, added, updated, skipped } = mergeMcpServerEntries(
-        claudeDoc.mcpServers,
-        incoming,
-        { force }
-      );
-      claudeDoc.mcpServers = merged;
-      fs.writeFileSync(targetPath, `${JSON.stringify(claudeDoc, null, 2)}\n`, "utf8");
-      results.push({
-        ide,
-        targetPath,
-        action: "merged",
-        added,
-        updated,
-        skipped
-      });
-      continue;
-    }
-
-    const existingDoc = readMcpDocument(targetPath);
+    const { doc: existingDoc, mcpServers: existingServers } = readMcpServersFromIdeConfig(
+      targetPath,
+      ide
+    );
     const { merged, added, updated, skipped } = mergeMcpServerEntries(
-      existingDoc.mcpServers,
+      existingServers,
       incoming,
       { force }
     );
-    existingDoc.mcpServers = merged;
-    writeMcpDocument(targetPath, existingDoc);
+    writeMcpServersToIdeConfig(targetPath, ide, existingDoc, merged);
     results.push({
       ide,
       targetPath,
@@ -2095,27 +2404,12 @@ function uninstallMcpFromIdes(mcpTargetMap, targetIdes, options = {}) {
       continue;
     }
 
-    if (ide === "claude" && targetPath.endsWith(".claude.json")) {
-      let claudeDoc;
-      try {
-        claudeDoc = JSON.parse(fs.readFileSync(targetPath, "utf8"));
-      } catch {
-        continue;
-      }
-      if (!claudeDoc.mcpServers) continue;
-      for (const name of serverNames) {
-        delete claudeDoc.mcpServers[name];
-      }
-      fs.writeFileSync(targetPath, `${JSON.stringify(claudeDoc, null, 2)}\n`, "utf8");
-      results.push({ ide, targetPath, action: "removed-servers" });
-      continue;
-    }
-
-    const doc = readMcpDocument(targetPath);
+    const { doc, mcpServers } = readMcpServersFromIdeConfig(targetPath, ide);
+    if (!mcpServers || typeof mcpServers !== "object") continue;
     for (const name of serverNames) {
-      delete doc.mcpServers[name];
+      delete mcpServers[name];
     }
-    writeMcpDocument(targetPath, doc);
+    writeMcpServersToIdeConfig(targetPath, ide, doc, mcpServers);
     results.push({ ide, targetPath, action: "removed-servers" });
   }
 
@@ -2191,13 +2485,8 @@ function listKenmarkServersInMcpConfig(targetPath, serverNames, ide) {
     return [];
   }
   try {
-    if (ide === "claude" && targetPath.endsWith(".claude.json")) {
-      const doc = JSON.parse(fs.readFileSync(targetPath, "utf8"));
-      const mcp = doc.mcpServers || {};
-      return serverNames.filter((name) => Boolean(mcp[name]));
-    }
-    const doc = readMcpDocument(targetPath);
-    return serverNames.filter((name) => Boolean(doc.mcpServers[name]));
+    const { mcpServers } = readMcpServersFromIdeConfig(targetPath, ide);
+    return serverNames.filter((name) => Boolean(mcpServers[name]));
   } catch {
     return [];
   }
@@ -2373,6 +2662,33 @@ function runDoctor(options = {}) {
     }
   }
 
+  const geminiCodexDuplicates = findGeminiCodexDuplicateSkills(targetMap, {
+    storeDir,
+    manifest
+  });
+  if (geminiCodexDuplicates.length) {
+    warnings.push(
+      `Gemini/Codex duplicate skills: ${geminiCodexDuplicates.length} Kenmark skill(s) exist in both ${targetMap.gemini} and ${targetMap.codex}. Re-run npx kenmark-skills setup --global --ide <your-ides> -y to remove ~/.gemini/skills duplicates.`
+    );
+  }
+
+  const agyGeminiDuplicates = findAntigravityCliGeminiDuplicateSkills(targetMap, {
+    storeDir,
+    manifest
+  });
+  if (agyGeminiDuplicates.length) {
+    warnings.push(
+      `Antigravity CLI/Gemini duplicate skills: ${agyGeminiDuplicates.length} Kenmark skill(s) exist in both ${targetMap.gemini} and ${targetMap["antigravity-cli"]}. Re-run npx kenmark-skills setup --global --ide <your-ides> -y to remove ~/.gemini/skills duplicates.`
+    );
+  }
+
+  const antigravitySymlinks = findAntigravitySymlinkSkills(targetMap);
+  if (antigravitySymlinks.length) {
+    warnings.push(
+      `Antigravity IDE symlink skills: ${antigravitySymlinks.length} skill(s) under ${targetMap.antigravity} are symlinks (IDE may not discover them). Re-run with --copy, or add an absolute path to ~/.agents/skills in Antigravity Settings → Customizations → Skill Custom Paths.`
+    );
+  }
+
   const storeSkillNames = storeExists
     ? fs
         .readdirSync(storeDir, { withFileTypes: true })
@@ -2469,6 +2785,9 @@ function runDoctor(options = {}) {
 
 module.exports = {
   DEFAULT_AGENT_IDES,
+  MCP_CAPABLE_IDES,
+  MCP_IDE_CONFIG_KIND,
+  getMcpIdeConfigKind,
   VENDORED_PREFIXES,
   AGENT_VENDORED_PREFIXES,
   AGENT_IDE_SCAN_PRIORITY,
@@ -2497,6 +2816,20 @@ module.exports = {
   getAgentStoreDir,
   getManifestPath,
   getAgentManifestPath,
+  GEMINI_CODEX_ALIAS,
+  ANTIGRAVITY_CLI_GEMINI_ALIAS,
+  hadGeminiCodexAliasOverlap,
+  hadAntigravityCliGeminiAliasOverlap,
+  dedupeAliasTargetIdes,
+  formatAliasTargetNote,
+  findGeminiCodexDuplicateSkills,
+  findAntigravityCliGeminiDuplicateSkills,
+  removeGeminiCodexDuplicateLinks,
+  removeAntigravityCliGeminiDuplicateLinks,
+  removeAliasDuplicateLinks,
+  getExtraProjectSkillPaths,
+  shouldForceCopyForIde,
+  findAntigravitySymlinkSkills,
   buildGlobalTargets,
   buildProjectTargets,
   buildInventoryRoots,
@@ -2559,6 +2892,8 @@ module.exports = {
   uninstallKenmarkFromIdes,
   removeManagedSkillsForCleanup,
   readMcpDocument,
+  readMcpServersFromIdeConfig,
+  writeMcpServersToIdeConfig,
   installMcpToStore,
   installMcpToIdes,
   uninstallMcpFromIdes,

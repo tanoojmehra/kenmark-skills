@@ -12,7 +12,7 @@ Status: reviewed
 | `init` | **Recommended first install** — Kenmark skills + optional packs + IDE + MCP wizard |
 | `setup` | Legacy: Kenmark skills only via `setup-skills.js` |
 | `uninstall` | Remove Kenmark links from IDE paths; optional `--keep-store`; removes Kenmark MCP unless `--mcp-only` |
-| `mcp uninstall` | Remove MCP from Cursor/Claude configs + clear store MCP manifest |
+| `mcp uninstall` | Remove MCP from IDE MCP configs + clear store MCP manifest |
 | `install-recommended` | Install curated third-party packs from catalog |
 | `update` | Refresh Kenmark and/or recommended installs |
 | `adopt` | Consolidate adoptable catalog skills on disk into store + relink |
@@ -37,7 +37,7 @@ Status: reviewed
 | Flag | Purpose |
 | --- | --- |
 | `--global` / `--project` | User home vs current repo IDE paths |
-| `--ide <target>` | `cursor`, `claude`, `codex`, `all`, comma-separated |
+| `--ide <target>` | `cursor`, `claude`, `codex`, `antigravity-cli`, `antigravity`, `all`, comma-separated |
 | `-y` | Skip interactive prompts |
 | `--skip-recommended` | Kenmark skills only on `init` |
 | `--skip-npm` | Skip CLI version check / global upgrade on `init`; skip npm step on `update` |
@@ -59,7 +59,9 @@ Status: reviewed
 | Cursor | `~/.cursor/skills` |
 | Codex / agents | `~/.agents/skills` |
 | Claude Code | `~/.claude/skills` |
-| Gemini CLI | `~/.gemini/skills` |
+| Gemini CLI | `~/.gemini/skills` (or `~/.agents/skills` when Codex is also selected — Gemini aliases both) |
+| Antigravity CLI | `~/.gemini/antigravity-cli/skills` (or deduped away from `~/.gemini/skills` when Gemini is also selected) |
+| Antigravity IDE | `~/.gemini/antigravity/skills` |
 | OpenCode | `~/.opencode/skills` |
 | Kiro | `~/.kiro/skills` |
 | Trae / Trae CN | `~/.trae/skills`, `~/.trae-cn/skills` |
@@ -67,9 +69,17 @@ Status: reviewed
 | Qoder | `~/.qoder/skills` |
 | MiniMax Code | `~/.minimax/skills` |
 
-Project scope: same relative paths under repo root (`.cursor/skills`, etc.).
+Project scope: same relative paths under repo root (`.cursor/skills`, `.agents/skills`, etc.).
 
-### MCP (Cursor + Claude only)
+**Antigravity IDE project:** Kenmark links to both `.agent/skills` (IDE-native) and `.agents/skills` (CLI/Codex-compatible). Skills are **copied** (not symlinked) because Antigravity IDE does not discover symlinked skill dirs.
+
+**Gemini + Codex:** Gemini CLI discovers both `~/.gemini/skills` and `~/.agents/skills` and prefers the latter. When `--ide` includes both `codex` and `gemini`, Kenmark links once to `~/.agents/skills` and removes Kenmark-managed duplicates from `~/.gemini/skills` to avoid startup conflict warnings.
+
+**Antigravity CLI + Gemini:** Antigravity CLI also reads `~/.gemini/skills` as a shared path. When both are in `--ide`, Kenmark links once to `~/.gemini/antigravity-cli/skills` and prunes duplicates from `~/.gemini/skills`.
+
+### MCP (JSON mcpServers IDEs)
+
+**MCP-capable:** cursor, claude, gemini, antigravity-cli, antigravity, kiro, trae, trae-cn, rovo, qoder. Codex, OpenCode, and minimax receive skills only until format adapters land.
 
 **Bundled servers** (`config/mcp-servers.json`):
 
@@ -83,12 +93,7 @@ Project scope: same relative paths under repo root (`.cursor/skills`, etc.).
 
 **Profiles** (`config/mcp-profiles.json`): `none` (default), `web`, `research`, `deep`, `all`.
 
-**Config merge targets:**
-
-| Scope | Cursor | Claude Code |
-| --- | --- | --- |
-| Global | `~/.cursor/mcp.json` | `~/.claude.json` → `mcpServers` |
-| Project | `.cursor/mcp.json` | `.mcp.json` at repo root |
+**Config merge targets:** see [features/003-mcp-integration.md](features/003-mcp-integration.md) for per-IDE global/project paths.
 
 Interactive `init`/`setup`/`update` prompt for individual server names. Non-interactive: `--mcp-servers playwright,context7` or `--mcp-profile web`.
 
@@ -101,6 +106,8 @@ Examples:
 ```bash
 npx kenmark-skills init --global --skip-recommended -y
 npx kenmark-skills init --global --ide cursor --skip-recommended --mcp-servers playwright,context7 -y
+npx kenmark-skills init --global --ide antigravity-cli --mcp-profile web -y
+npx kenmark-skills init --project --ide antigravity --mcp-servers playwright,context7 -y
 npx kenmark-skills update --both --global -y
 npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y
 ```
@@ -113,7 +120,7 @@ npx kenmark-skills install-recommended --ids impeccable,code-review-skill --glob
 
 ## Assumptions
 
-- Other IDEs in `--ide all` receive skill links but not MCP config merges yet.
+- Codex, OpenCode, and minimax in `--ide all` receive skill links but not MCP merges until TOML/schema adapters exist.
 
 ## Maintenance notes
 

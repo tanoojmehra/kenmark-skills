@@ -10,7 +10,7 @@ No global install required — `npx` downloads and runs the CLI (or uses your np
 
 The **init** wizard walks you through Kenmark skills, optional curated packs, IDE targets, and MCP server selection — all interactively. To refresh an existing install, use **`update`** (do not run `init` again for upgrades).
 
-**41 first-party skills**, a **12-command CLI**, and a **curated catalog** of optional third-party packs. Agent skills and CLI for Cursor, Codex, Claude Code, and other harnesses that read `SKILL.md` files.
+**41 first-party skills**, a **12-command CLI**, and a **curated catalog** of optional third-party packs. Agent skills and CLI for Cursor, Codex, Claude Code, Antigravity CLI/IDE, Gemini CLI, OpenCode, and other harnesses that read `SKILL.md` files.
 
 Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-skills). Created by **Tanooj Mehra** and **Adwait Date**.
 
@@ -36,7 +36,7 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 | Kenmark skills | 41 | Bundled in `skills/user-skills/` |
 | CLI commands | 12 | [brain/kb/05-api-and-integrations.md](brain/kb/05-api-and-integrations.md) |
 | Recommended packs | 6 | Impeccable, code review, Graphify, SEO, ECC — [brain/kb/features/004-recommended-packs.md](brain/kb/features/004-recommended-packs.md) |
-| MCP servers | 5 | Opt-in; Cursor + Claude — [brain/kb/features/003-mcp-integration.md](brain/kb/features/003-mcp-integration.md) |
+| MCP servers | 5 | Opt-in; 8 JSON IDE targets — [brain/kb/features/003-mcp-integration.md](brain/kb/features/003-mcp-integration.md) |
 
 Skills install once under `~/.kenmark/store` and link into each IDE's skills directory. See [brain/kb/features/005-kenmark-hub-store.md](brain/kb/features/005-kenmark-hub-store.md).
 
@@ -63,7 +63,7 @@ For scripts, CI, and agents, see [Agents and automation](#agents-and-automation-
 ## Requirements
 
 - **Node.js** 18+
-- An agent environment that discovers skills from disk (Cursor, Codex CLI, Claude Code, Gemini CLI, OpenCode, etc.)
+- An agent environment that discovers skills from disk (Cursor, Codex CLI, Claude Code, Antigravity CLI/IDE, Gemini CLI, OpenCode, etc.)
 
 ### Windows note
 

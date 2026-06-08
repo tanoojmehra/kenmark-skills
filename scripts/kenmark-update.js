@@ -283,7 +283,7 @@ async function run() {
       if (!args.skipMcp && !args.withMcp && !args.mcpProfile && !args.mcpServers) {
         const picked = await promptMcpServers(listMcpServersForPrompt(repoRoot), {
           installPrompt:
-            "Refresh or install bundled MCP servers into Cursor / Claude configs?"
+            "Refresh or install bundled MCP servers into your selected IDE MCP configs?"
         });
         if (picked.length) {
           mcpServers = picked.join(",");

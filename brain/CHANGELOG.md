@@ -2,6 +2,25 @@
 
 Brain knowledge base
 
+## v2026.06.08-antigravity-platform
+
+- **kenmark-hub.js:** `antigravity-cli` and `antigravity` IDE targets in `buildGlobalTargets`, `buildProjectTargets`, `buildMcp*Targets`, `MCP_CAPABLE_IDES`. Antigravity-cli+Gemini alias dedupe; IDE copy-default and dual project paths (`.agent/skills` + `.agents/skills`).
+- **setup/packs/adopt:** `removeAliasDuplicateLinks`, `projectDir` for extra IDE paths.
+- **test-antigravity-dedupe.js** in `test:cli`.
+- **KB:** `003-mcp-integration`, `05-api-and-integrations`, `11-known-risks-and-decisions` updated.
+
+## v2026.06.08-mcp-ide-expansion
+
+- **kenmark-hub.js:** `MCP_CAPABLE_IDES`, `MCP_IDE_CONFIG_KIND`, expanded `buildMcp*Targets`, `readMcpServersFromIdeConfig` / `writeMcpServersToIdeConfig`.
+- **setup-skills.js:** MCP filters from requested `--ide` list (gemini MCP when codex+gemini selected).
+- **KB:** `003-mcp-integration`, `05-api-and-integrations`, `11-known-risks-and-decisions` updated.
+
+## v2026.06.08-gemini-codex-dedupe
+
+- **kenmark-hub.js:** `dedupeAliasTargetIdes`, `removeGeminiCodexDuplicateLinks`; doctor warns on Gemini/Codex duplicate skills.
+- **setup/packs/adopt:** Link once when Codex+Gemini selected; prune `~/.gemini/skills` duplicates after relink.
+- **test-gemini-codex-dedupe.js** in `test:cli`.
+
 ## v2026.06.08-plans-tracker
 
 - **Plans family:** `kenmark-plans-setup`, `list`, `check`, `maintain`, `execute`; tiered `kenmark-plan` writes `brain/plans/`.
