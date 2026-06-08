@@ -9,14 +9,14 @@ Use **frontmatter** for logical grouping instead:
 
 | Field | Values |
 | --- | --- |
-| `category` | `onboarding`, `workflow`, `git`, `issues`, `admin`, `testing` |
+| `category` | `onboarding`, `workflow`, `git`, `issues`, `plans`, `admin`, `testing` |
 | `scope` | `universal` (default install via `setup`) or `project-specific` (excluded from `setup`; maintain in the target repo) |
 | `project` | Optional when `scope: project-specific` — target repo or product id |
 
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (36)
+skills/user-skills/          ← bundled universal skills (41)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow
@@ -49,6 +49,11 @@ skills/user-skills/          ← bundled universal skills (36)
   kenmark-issues-scan/               category: issues (scan codebase, file issues)
   kenmark-issues-maintain/
   kenmark-issues-fix-and-ship/   category: workflow (phase: ship)
+  kenmark-plans-setup/               category: plans (bootstrap brain/plans/ docs)
+  kenmark-plans-list/
+  kenmark-plans-check/
+  kenmark-plans-maintain/
+  kenmark-plans-execute/
   kenmark-packs/ category: admin
   kenmark-update/
   kenmark-maintain/
@@ -124,12 +129,14 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Situation | Skill |
 | --- | --- |
 | Problem unclear? | `kenmark-troubleshoot` |
-| Need a plan before work? | `kenmark-plan` |
+| Need a plan before work? | `kenmark-plan` (tiered; writes `brain/plans/`) |
 | Need parallel/specialist tracks? | `kenmark-subagents` |
 | Need complete final deliverable? | `kenmark-output` |
-| Need issue tracker docs (`brain/issues/`)? | `kenmark-issues-setup` (or opt in during `kenmark-init`) |
+| Need issue tracker docs (`brain/issues/`)? | `kenmark-issues-setup` (or `kenmark-init`) |
 | Find bugs/gaps to file as issues? | `kenmark-issues-scan` |
 | Scan, fix, commit, and ship issues? | `kenmark-issues-fix-and-ship` |
+| Need plan tracker docs (`brain/plans/`)? | `kenmark-plans-setup` (or `kenmark-init`) |
+| Execute an approved plan? | `kenmark-plans-execute` |
 | Need skill choice? | `kenmark-router` |
 | Repo health (see table above) | `kenmark-repo-*` family |
 | Security review / auth / RBAC / injection / SSRF? | `kenmark-security-review` |

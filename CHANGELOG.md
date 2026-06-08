@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## v2.3.15 — Plans tracker (2026-06-08)
+
+### Feature
+
+- **Plans tracker:** Five new `kenmark-plans-*` skills (`setup`, `list`, `check`, `maintain`, `execute`) plus tiered **`kenmark-plan`** (Quick, Prototype, Full Feature, Dig Deep, ULTRATHINK) that writes indexed files to `brain/plans/`.
+- **`kenmark-init`:** Bootstraps `brain/issues/` and `brain/plans/` INDEX by default (opt out with "brain only, no trackers").
+- **Git policy:** `brain/issues/` and `brain/plans/` tracked in git by default; teams may gitignore locally.
+
+### Docs
+
+- Bundled skill count **41**; router, `skills/README.md`, and brain KB updated for plans family.
+
 ## v2.3.14 — Init CLI upgrade check (2026-06-08)
 
 ### Feature
