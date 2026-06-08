@@ -1,6 +1,22 @@
 # CHANGELOG
 
-## Unreleased
+## v2.3.16 — Antigravity platform (2026-06-08)
+
+### Feature
+
+- **Antigravity platform support:** New `--ide` targets `antigravity-cli` and `antigravity` (IDE) for skills linking and MCP merge. CLI global skills at `~/.gemini/antigravity-cli/skills`; IDE at `~/.gemini/antigravity/skills` with copy-default (symlinks not discovered). Project scope links both `.agent/skills` and `.agents/skills` for IDE. MCP at standalone `mcp_config.json` paths. Antigravity-cli + Gemini shared-path dedupe (parallel to Codex/Gemini).
+
+- **MCP IDE expansion:** Bundled MCP servers merge into ten JSON `mcpServers` IDEs — cursor, claude, gemini, antigravity-cli, antigravity, kiro, trae, trae-cn, rovo, qoder — with standalone and nested config handling in `kenmark-hub.js`. Codex, OpenCode, and minimax remain skills-only.
+
+### Fix
+
+- **Gemini/Codex dedupe:** When both `codex` and `gemini` are in `--ide`, skills link once to `~/.agents/skills` (Gemini’s preferred alias). Setup/adopt/packs prune Kenmark-managed duplicates from `~/.gemini/skills`. Doctor warns on remaining duplicates. MCP still targets `~/.gemini/settings.json` when gemini is in `--ide`.
+
+### Test
+
+- **test-antigravity-dedupe.js:** Antigravity-cli+Gemini dedupe, CLI-only path, IDE project dual-path copy, MCP dry-run.
+- **test-gemini-codex-dedupe.js:** Codex+Gemini and Gemini-only install paths.
+- **test-cli-smoke.js:** Dry-run MCP for gemini+kiro, codex+gemini, and antigravity-cli+antigravity partial targeting.
 
 ## v2.3.15 — Plans tracker (2026-06-08)
 
