@@ -1,7 +1,6 @@
 # Keep in sync with .npmignore
 
 /temp/
-/brain/issues/
 .DS_Store
 
 # Local IDE installs from `kenmark-skills setup --project` (canonical: skills/user-skills/)

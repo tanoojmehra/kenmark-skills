@@ -1,6 +1,13 @@
 # CHANGELOG
 
 Brain knowledge base
+
+## v2026.06.08-plans-tracker
+
+- **Plans family:** `kenmark-plans-setup`, `list`, `check`, `maintain`, `execute`; tiered `kenmark-plan` writes `brain/plans/`.
+- **Trackers:** `brain/issues/` and `brain/plans/` tracked in git; seeded `INDEX.md` scaffolds.
+- **init:** Step 1b/1c bootstrap both trackers by default.
+
 ## v2026.06.08-release-2.3.13
 
 - **Release:** package **2.3.13** (2026-06-08). PR #16 — legacy cleanup canonical false-positive; cleanup scope prompt wording.

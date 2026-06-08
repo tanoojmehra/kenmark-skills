@@ -4,7 +4,7 @@ version: 1.3.0
 category: onboarding
 scope: universal
 phase: setup
-description: "Initialize brain/ (numbered KB under brain/kb/, modular rules) and optionally bootstrap brain/issues/ issue-tracker docs and install cross-IDE pointer stubs (or full embed) in CLAUDE.md, AGENTS.md, .cursorrules, .cursor/rules/, GEMINI.md. On init, inspect the repo and document confirmed facts in brain/kb/. Use when applying workspace rules, creating project standards, or enforcing team conventions."
+description: "Initialize brain/ (numbered KB under brain/kb/, modular rules) and bootstrap brain/issues/ and brain/plans/ tracker docs; install cross-IDE pointer stubs (or full embed) in CLAUDE.md, AGENTS.md, .cursorrules, .cursor/rules/, GEMINI.md. On init, inspect the repo and document confirmed facts in brain/kb/. Use when applying workspace rules, creating project standards, or enforcing team conventions."
 triggers:
   - init brain
   - initialize brain
@@ -78,7 +78,7 @@ Before writing, read only the agent files the user selected (if they already exi
 ## Step 1 — Create brain scaffold
 
 ```bash
-mkdir -p brain/rules brain/kb/features brain/kb/decisions brain/issues/completed temp
+mkdir -p brain/rules brain/kb/features brain/kb/decisions brain/issues/completed brain/plans/completed temp
 touch temp/.gitkeep
 ```
 
@@ -112,7 +112,8 @@ Project knowledge base for humans and AI agents.
 | [kb/10-testing-and-quality.md](kb/10-testing-and-quality.md) | Test strategy and quality gates |
 | [kb/11-known-risks-and-decisions.md](kb/11-known-risks-and-decisions.md) | Risks, tradeoffs, architecture decisions |
 | [CHANGELOG.md](CHANGELOG.md) | Versioned log of brain, KB, and standards changes |
-| [issues/INDEX.md](issues/INDEX.md) | Active/completed issue tracker (optional; created in Step 1b or via `kenmark-issues-setup`) |
+| [issues/INDEX.md](issues/INDEX.md) | Active/completed issue tracker (Step 1b or `kenmark-issues-setup`) |
+| [plans/INDEX.md](plans/INDEX.md) | Active/completed plan tracker (Step 1c or `kenmark-plans-setup`) |
 
 ## Maintenance
 
@@ -240,20 +241,31 @@ When initializing brain, inspect the current repository and document the project
 
 ---
 
-## Step 1b — Optional issue tracking (`brain/issues/`)
+## Step 1b — Issue tracking (`brain/issues/`)
 
-**Ask the user:** "Need issue tracking?" unless they already specified in the same request:
+Bootstrap by default unless the user explicitly says **"brain only, no trackers"**.
 
-- "with issues", "including issue tracker", "bootstrap issues" → **yes**
-- "brain only" / "just the brain folder" with no mention of issues → ask (default **no** if they decline)
-
-| Answer | Action |
+| Condition | Action |
 | --- | --- |
-| **Yes** and `brain/issues/INDEX.md` is **missing** | Follow **`kenmark-issues-setup`** Steps 2–4 (write full `INDEX.md` template). Step 1 already created `brain/issues/` and `brain/issues/completed/`. |
-| **Yes** and `INDEX.md` **exists** | Skip setup; report existing tracker. |
-| **No** | Leave empty dirs only; do not write `INDEX.md`. |
+| `brain/issues/INDEX.md` **missing** | Follow **`kenmark-issues-setup`** Steps 2–4 (write full `INDEX.md` template). Step 1 already created `brain/issues/` and `brain/issues/completed/`. |
+| `INDEX.md` **exists** | Skip setup; report existing tracker. |
+| User said **brain only, no trackers** | Leave empty dirs only; do not write `INDEX.md`. |
 
 **Not for discovering bugs** — filing issues from the codebase is **`kenmark-issues-scan`**, after tracker docs exist.
+
+---
+
+## Step 1c — Plan tracking (`brain/plans/`)
+
+Bootstrap by default unless the user explicitly says **"brain only, no trackers"**.
+
+| Condition | Action |
+| --- | --- |
+| `brain/plans/INDEX.md` **missing** | Follow **`kenmark-plans-setup`** Steps 2–4 (write full `INDEX.md` template). Step 1 already created `brain/plans/` and `brain/plans/completed/`. |
+| `INDEX.md` **exists** | Skip setup; report existing tracker. |
+| User said **brain only, no trackers** | Leave empty dirs only; do not write `INDEX.md`. |
+
+**Not for authoring plans** — creating plan files is **`kenmark-plan`**, after tracker docs exist.
 
 ---
 
@@ -427,7 +439,8 @@ Report to the user:
 - Which agent files were updated (selected targets only)
 - Skipped targets
 - Whether issue tracking was bootstrapped (`brain/issues/INDEX.md` created or skipped)
-- Whether `brain/issues/` dirs were left empty (no INDEX)
+- Whether plan tracking was bootstrapped (`brain/plans/INDEX.md` created or skipped)
+- Whether tracker dirs were left empty (user opted out with "brain only, no trackers")
 - Reminder: edit rules under `brain/rules/` and KB under `brain/kb/`; re-run kenmark-init to refresh stubs/embeds
 
 ---
@@ -437,7 +450,7 @@ Report to the user:
 - **Re-runnable:** Only replace content between `init-brain:START` and `init-brain:END` in **selected** files.
 - **Do not** create agent files the user did not select.
 - **Do not** remove user sections outside markers.
-- **Do not** delete `brain/` or issue files under `brain/issues/`.
+- **Do not** delete `brain/` or tracker files under `brain/issues/` or `brain/plans/`.
 - If any `brain/rules/*.md` already exists, **keep the repo file** unless the user asks to reset or modularize; sync from disk for `sync-full` (embeds `standards.md` only).
 - **Reset / modularize:** If the user asks to reset standards or migrate from a monolithic `standards.md`, replace `standards.md` with the lean template and add missing modular files from [Modular rule files](#modular-rule-files); offer to archive old content into `stack.md` / `workflow.md` if still useful. If `workflow.md` exists but lacks **Git branch policy**, merge that section from the template without wiping other content.
 - On re-run, **ask again** for targets and mode unless the user specified them in the request.
@@ -663,6 +676,9 @@ Optional — fill in per project.
 ## Related skills
 
 - `kenmark-commit` — reads `brain/rules/workflow.md` Git branch policy for protected deployment branches
-- `kenmark-issues-setup` — standalone bootstrap for `brain/issues/` docs (Step 1b runs the same workflow when user opts in)
+- `kenmark-issues-setup` — standalone bootstrap for `brain/issues/` docs (Step 1b runs the same workflow)
 - `kenmark-issues-scan` — scan codebase and **create issue files** (requires `INDEX.md`; not setup)
 - `kenmark-issues-check` — move resolved issues to `completed/` and refresh index
+- `kenmark-plans-setup` — standalone bootstrap for `brain/plans/` docs (Step 1c runs the same workflow)
+- `kenmark-plan` — create tiered plan files (requires `INDEX.md`)
+- `kenmark-plans-execute` — implement an approved plan end to end

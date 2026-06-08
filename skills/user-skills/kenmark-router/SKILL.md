@@ -71,9 +71,13 @@ When several bundled skills could apply, prefer this order:
 | Need a plan before doing work | **`kenmark-plan`** |
 | Need complete/no-missing-output enforcement | **`kenmark-output`** |
 | Need specialist/parallel investigation | **`kenmark-subagents`** |
-| Need issue tracker docs (`brain/issues/`) | **`kenmark-issues-setup`** (or opt in during **`kenmark-init`**) |
+| Need issue tracker docs (`brain/issues/`) | **`kenmark-issues-setup`** (or **`kenmark-init`**) |
 | Find bugs/gaps to file as issues | **`kenmark-issues-scan`** |
 | Full scan → fix → commit → merge workflow | **`kenmark-issues-fix-and-ship`** |
+| Need plan tracker docs (`brain/plans/`) | **`kenmark-plans-setup`** (or **`kenmark-init`**) |
+| Create tiered execution plan | **`kenmark-plan`** |
+| List or check plan status | **`kenmark-plans-list`** / **`kenmark-plans-check`** |
+| Execute an approved plan end to end | **`kenmark-plans-execute`** |
 | Need to pick which installed skill fits the task | **`kenmark-router`** (this skill) |
 | Repo clutter, scattered docs, dumps | **`kenmark-repo-hygiene`** |
 | Keys, secrets, credentials | **`kenmark-repo-secrets`** |
@@ -602,6 +606,7 @@ Do **not** use this skill for first-time Kenmark setup; use **`kenmark-setup`** 
 | --- | --- | --- |
 | Commits, pushes, git workflow | `git`   | `kenmark-commit` |
 | Issue tracking, brain/issues | `issues` | `kenmark-issues-list`, `kenmark-issues-check`, `kenmark-issues-scan`, `kenmark-issues-fix-and-ship` |
+| Plan tracking, brain/plans | `plans` | `kenmark-plan`, `kenmark-plans-list`, `kenmark-plans-check`, `kenmark-plans-execute`, `kenmark-plans-maintain` |
 | Search, rankings, metadata, structured data | `seo` | `seo-audit`, `seo-technical`, `seo-schema` |
 | UI polish, layout, visual design, MUI | `design` | `impeccable`, `design-taste-frontend` |
 | APIs, services, frameworks, languages | `backend` | `backend-patterns`, `django-patterns` |

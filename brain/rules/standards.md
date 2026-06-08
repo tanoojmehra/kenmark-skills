@@ -10,7 +10,7 @@ Universal rules for **kenmark-skills** (npm CLI + bundled skills). Stack, workfl
 
 ## Project layout
 
-- **Canonical skills:** `skills/user-skills/` (36 Kenmark skills + `recommended-catalog.json`).
+- **Canonical skills:** `skills/user-skills/` (41 Kenmark skills + `recommended-catalog.json`).
 - **CLI:** `scripts/cli.js` dispatches to focused modules (`setup-skills.js`, `kenmark-hub.js`, etc.).
 - **Config:** `config/mcp-servers.json`, `config/mcp-profiles.json`.
 - Never delete the `brain/` folder — project knowledge base for this repo.
@@ -33,4 +33,4 @@ Universal rules for **kenmark-skills** (npm CLI + bundled skills). Stack, workfl
 ## Safety
 
 - Do not commit secrets, tokens, or local IDE folders (`.cursor/`, `.claude/`, `.agents/`).
-- Do not commit `brain/issues/` — local issue tracking only (gitignored).
+- `brain/issues/` and `brain/plans/` are part of the tracked brain — commit them with other `brain/` docs. Teams may add local `.gitignore` entries if they choose not to push trackers.

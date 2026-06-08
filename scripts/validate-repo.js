@@ -58,6 +58,7 @@ const VALID_CATEGORIES = new Set([
   "workflow",
   "git",
   "issues",
+  "plans",
   "admin",
   "testing"
 ]);
@@ -888,6 +889,14 @@ const ISSUES_SCAN_ID_MARKERS = [
   "Never reuse an ID"
 ];
 
+/** kenmark-plan must enforce global plan ID ledger (regression guard). */
+const PLAN_ID_MARKERS = [
+  "brain/plans/INDEX.md",
+  "completed",
+  "Last Assigned ID",
+  "Never reuse IDs"
+];
+
 /** Core OS workflow skills — must appear in README routing tables (regression guard). */
 const CORE_WORKFLOW_ROUTING_MARKERS = [
   "kenmark-plan",
@@ -1089,6 +1098,29 @@ function validateIssuesIdLedger() {
   }
   console.log(
     "  ✓ issues ID ledger — kenmark-issues-scan documents global ID rules (INDEX, completed, Last Assigned ID, never reuse)"
+  );
+}
+
+function validatePlansIdLedger() {
+  const planPath = path.join(userSkillsDir, "kenmark-plan", "SKILL.md");
+  if (!fs.existsSync(planPath)) {
+    fail("skills/user-skills/kenmark-plan/SKILL.md missing (plan ID ledger validation skipped)");
+    return;
+  }
+  let text;
+  try {
+    text = fs.readFileSync(planPath, "utf8");
+  } catch (err) {
+    fail(`kenmark-plan/SKILL.md: unreadable (${err.message})`);
+    return;
+  }
+  for (const marker of PLAN_ID_MARKERS) {
+    if (!text.includes(marker)) {
+      fail(`kenmark-plan/SKILL.md: missing required ID ledger marker "${marker}"`);
+    }
+  }
+  console.log(
+    "  ✓ plans ID ledger — kenmark-plan documents global ID rules (INDEX, completed, Last Assigned ID, never reuse)"
   );
 }
 
@@ -1502,6 +1534,7 @@ function main() {
   validateCatalogBehavior();
   validateInitBrainKb();
   validateIssuesIdLedger();
+  validatePlansIdLedger();
   validatePackageJson();
   validateClaudeWrapperPolicy();
   findLegacySkillNameReferences();

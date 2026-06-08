@@ -14,7 +14,7 @@ Status: reviewed
 ## Important files inspected
 
 - `package.json` — scripts, `files`, engines
-- `.gitignore` — excludes `node_modules/`, local IDE dirs, `temp/`, `brain/issues/`
+- `.gitignore` — excludes `node_modules/`, local IDE dirs, `temp/`; `brain/issues/` and `brain/plans/` are tracked (teams may gitignore locally)
 - `.npmignore` — excludes `brain/`, IDE dirs from npm pack
 
 ## Assumptions

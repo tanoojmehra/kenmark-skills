@@ -4,7 +4,7 @@ version: 1.3.0
 category: issues
 scope: universal
 phase: setup
-description: "Bootstrap brain/issues/ documentation structure: create brain/issues/, brain/issues/completed/, and brain/issues/INDEX.md with ID ledger and templates. Not for scanning the codebase — use kenmark-issues-scan to find bugs and file issues. Redundant if kenmark-init already opted into issue tracking. Use when asked to \"setup issues\", \"init issues\", or \"bootstrap issues directory\"."
+description: "Bootstrap brain/issues/ documentation structure: create brain/issues/, brain/issues/completed/, and brain/issues/INDEX.md with ID ledger and templates. Not for scanning the codebase — use kenmark-issues-scan to find bugs and file issues. Redundant if kenmark-init already bootstrapped issue tracking. Use when asked to \"setup issues\", \"init issues\", or \"bootstrap issues directory\"."
 triggers:
   - setup issues
   - init issues
@@ -39,7 +39,7 @@ Creates:
 ## Relationship to `kenmark-init`
 
 - **`kenmark-init`** always creates empty `brain/issues/` and `brain/issues/completed/` dirs as part of the brain scaffold.
-- When the user opts in to issue tracking during init (Step 1b), init runs **this skill's Steps 2–4** to write `INDEX.md`.
+- During init (Step 1b), init runs **this skill's Steps 2–4** to write `INDEX.md` when missing (unless user opts out with "brain only, no trackers").
 - **If `brain/issues/INDEX.md` already exists** (from a prior init or this skill), stop — setup is complete; suggest **`kenmark-issues-scan`** to populate issues or **`kenmark-issues-list`** to view the tracker.
 
 ---
@@ -212,7 +212,7 @@ Then suggest next steps: use **`kenmark-issues-scan`** to discover bugs/gaps and
 
 ## Related skills
 
-- **`kenmark-init`** — optional Step 1b runs this setup when the user opts in during brain bootstrap
+- **`kenmark-init`** — Step 1b runs this setup when `INDEX.md` is missing
 - **`kenmark-issues-scan`** — find bugs/gaps and file issues (requires `INDEX.md` from this skill or init)
 - **`kenmark-issues-list`** — view open issues dashboard
 - **`kenmark-issues-maintain`** — fix tracker structural drift (duplicates, stale index)
