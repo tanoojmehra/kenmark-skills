@@ -49,7 +49,7 @@ function printUsage() {
   console.log("");
   console.log("Scope:");
   console.log("  --global | --project      Scope (default: global when non-interactive)");
-  console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, auto, all, …");
+  console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, antigravity-ide, auto, all, …");
   console.log("  --include-store           Also remove matching entries from ~/.kenmark/store (+ manifest)");
   console.log("  --dry-run                 List what would be removed");
   console.log("  -y, --yes                 Skip confirmation prompts");

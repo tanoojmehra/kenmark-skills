@@ -70,10 +70,15 @@ function main() {
       deduped.includes("antigravity-cli") && !deduped.includes("gemini"),
       `dedupe should drop gemini when antigravity-cli present: ${deduped.join(",")}`
     );
-    const extras = getExtraProjectSkillPaths("antigravity", "/tmp/proj");
+    const agyExtras = getExtraProjectSkillPaths("antigravity", "/tmp/proj");
     assert(
-      extras.length === 1 && extras[0].endsWith(path.join(".agents", "skills")),
-      `expected .agents/skills extra path, got ${extras.join(",")}`
+      agyExtras.length === 1 && agyExtras[0].endsWith(path.join(".agents", "skills")),
+      `expected .agents/skills extra path for antigravity, got ${agyExtras.join(",")}`
+    );
+    const ideExtras = getExtraProjectSkillPaths("antigravity-ide", "/tmp/proj");
+    assert(
+      ideExtras.length === 1 && ideExtras[0].endsWith(path.join(".agent", "skills")),
+      `expected .agent/skills extra path for antigravity-ide, got ${ideExtras.join(",")}`
     );
     console.log("  ✓ dedupeAliasTargetIdes / getExtraProjectSkillPaths unit checks");
   } catch (err) {
@@ -172,6 +177,72 @@ function main() {
     rmDirSafe(projectDir);
   }
 
+  const ideHome = path.join(
+    os.tmpdir(),
+    `kenmark-agy-ide-${process.pid}-${Date.now()}`
+  );
+  try {
+    fs.mkdirSync(ideHome, { recursive: true });
+    fs.mkdirSync(path.join(ideHome, ".gemini", "antigravity-ide"), { recursive: true });
+    fs.writeFileSync(
+      path.join(ideHome, ".gemini", "antigravity-ide", "installation_id"),
+      "test-install\n"
+    );
+    const ideRun = runSetup(
+      ["--global", "--ide", "antigravity-ide", "-y", "--skip-adopt"],
+      ideHome
+    );
+    if (ideRun.status !== 0) {
+      failures.push(`antigravity-ide setup exited ${ideRun.status}`);
+    } else {
+      const targets = buildGlobalTargets(ideHome);
+      const ideInit = path.join(targets["antigravity-ide"], "kenmark-init", "SKILL.md");
+      assert(fs.existsSync(ideInit), "kenmark-init missing under ~/.gemini/antigravity-ide/skills");
+      const ideStat = fs.lstatSync(path.join(targets["antigravity-ide"], "kenmark-init"));
+      assert(!ideStat.isSymbolicLink(), "antigravity-ide skill should be copied, not symlinked");
+      console.log("  ✓ antigravity-ide global install copies to ~/.gemini/antigravity-ide/skills");
+    }
+  } catch (err) {
+    failures.push(err.message);
+  } finally {
+    rmDirSafe(ideHome);
+  }
+
+  const ideProjectHome = path.join(
+    os.tmpdir(),
+    `kenmark-agy-ide-project-${process.pid}-${Date.now()}`
+  );
+  const ideProjectDir = path.join(
+    os.tmpdir(),
+    `kenmark-agy-ide-projdir-${process.pid}-${Date.now()}`
+  );
+  try {
+    fs.mkdirSync(ideProjectHome, { recursive: true });
+    fs.mkdirSync(ideProjectDir, { recursive: true });
+    const ideProjRun = runSetup(
+      ["--project", "--ide", "antigravity-ide", "-y", "--skip-adopt"],
+      ideProjectHome,
+      ideProjectDir
+    );
+    if (ideProjRun.status !== 0) {
+      failures.push(`antigravity-ide project setup exited ${ideProjRun.status}`);
+    } else {
+      const targets = buildProjectTargets(ideProjectDir);
+      const agentsInit = path.join(targets["antigravity-ide"], "kenmark-init", "SKILL.md");
+      const agentInit = path.join(ideProjectDir, ".agent", "skills", "kenmark-init", "SKILL.md");
+      assert(fs.existsSync(agentsInit), "kenmark-init missing under .agents/skills");
+      assert(fs.existsSync(agentInit), "kenmark-init missing under .agent/skills");
+      const agentsStat = fs.lstatSync(path.join(targets["antigravity-ide"], "kenmark-init"));
+      assert(!agentsStat.isSymbolicLink(), "antigravity-ide project skill should be copied");
+      console.log("  ✓ antigravity-ide project install copies to .agents/skills and .agent/skills");
+    }
+  } catch (err) {
+    failures.push(err.message);
+  } finally {
+    rmDirSafe(ideProjectHome);
+    rmDirSafe(ideProjectDir);
+  }
+
   const mcpDryHome = path.join(
     os.tmpdir(),
     `kenmark-agy-mcp-${process.pid}-${Date.now()}`
@@ -186,7 +257,7 @@ function main() {
         "--dry-run",
         "--global",
         "--ide",
-        "antigravity-cli,antigravity",
+        "antigravity-cli,antigravity,antigravity-ide",
         "--mcp-profile",
         "web",
         "-y"
@@ -207,9 +278,13 @@ function main() {
       );
       assert(
         out.includes(".gemini/antigravity/skills"),
-        "dry-run output should mention antigravity IDE skills path"
+        "dry-run output should mention antigravity 2.0 skills path"
       );
-      console.log("  ✓ antigravity-cli+antigravity MCP dry-run plan");
+      assert(
+        out.includes(".gemini/antigravity-ide/skills"),
+        "dry-run output should mention antigravity-ide skills path"
+      );
+      console.log("  ✓ antigravity-cli+antigravity+antigravity-ide MCP dry-run plan");
     }
   } catch (err) {
     failures.push(err.message);

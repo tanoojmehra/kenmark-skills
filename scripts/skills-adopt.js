@@ -33,7 +33,7 @@ function printUsage() {
   console.log("");
   console.log("Options:");
   console.log("  --global | --project      Scope (default: global)");
-  console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, all, …");
+  console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, antigravity-ide, all, …");
   console.log("  --copy                    Copy into IDE paths instead of symlinks");
   console.log("  --symlink                 Force symlinks (Windows: junction) instead of copy");
   console.log("  --force                   Overwrite store when source differs (--adopt-overwrite alias)");

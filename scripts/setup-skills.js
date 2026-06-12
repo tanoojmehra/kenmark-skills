@@ -86,7 +86,7 @@ function printUsage() {
   console.log("Options:");
   console.log("  --install | --uninstall   Action (default: install)");
   console.log("  --global | --project      Install scope (default: global when non-interactive)");
-  console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, all, …");
+  console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, antigravity-ide, all, …");
   console.log("  --copy                    Copy into IDE paths instead of symlinks");
   console.log("  --symlink                 Force symlinks (Windows: junction) instead of copy");
   console.log("  --prefer-copy-on-windows  Copy on Windows (default: on)");
@@ -430,7 +430,7 @@ function executeInstall(targetMap, requestedTargetIdes, action, options) {
             !loggedAntigravityCopyNote
           ) {
             console.log(
-              "antigravity IDE: using copy (symlinks not discovered by Antigravity IDE)"
+              "Antigravity: using copy (symlinks not discovered by Antigravity CLI/IDE)"
             );
             loggedAntigravityCopyNote = true;
           }

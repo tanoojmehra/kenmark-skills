@@ -37,7 +37,7 @@ Status: reviewed
 | Flag | Purpose |
 | --- | --- |
 | `--global` / `--project` | User home vs current repo IDE paths |
-| `--ide <target>` | `cursor`, `claude`, `codex`, `antigravity-cli`, `antigravity`, `all`, comma-separated |
+| `--ide <target>` | `cursor`, `claude`, `codex`, `antigravity-cli`, `antigravity`, `antigravity-ide`, `all`, comma-separated |
 | `-y` | Skip interactive prompts |
 | `--skip-recommended` | Kenmark skills only on `init` |
 | `--skip-npm` | Skip CLI version check / global upgrade on `init`; skip npm step on `update` |
@@ -61,7 +61,8 @@ Status: reviewed
 | Claude Code | `~/.claude/skills` |
 | Gemini CLI | `~/.gemini/skills` (or `~/.agents/skills` when Codex is also selected — Gemini aliases both) |
 | Antigravity CLI | `~/.gemini/antigravity-cli/skills` (or deduped away from `~/.gemini/skills` when Gemini is also selected) |
-| Antigravity IDE | `~/.gemini/antigravity/skills` |
+| Antigravity 2.0 Manager | `~/.gemini/antigravity/skills` |
+| Antigravity IDE (standalone app) | `~/.gemini/antigravity-ide/skills` |
 | OpenCode | `~/.opencode/skills` |
 | Kiro | `~/.kiro/skills` |
 | Trae / Trae CN | `~/.trae/skills`, `~/.trae-cn/skills` |
@@ -71,7 +72,11 @@ Status: reviewed
 
 Project scope: same relative paths under repo root (`.cursor/skills`, `.agents/skills`, etc.).
 
-**Antigravity IDE project:** Kenmark links to both `.agent/skills` (IDE-native) and `.agents/skills` (CLI/Codex-compatible). Skills are **copied** (not symlinked) because Antigravity IDE does not discover symlinked skill dirs.
+**Antigravity surfaces:** CLI, 2.0 Manager (`antigravity`), and standalone IDE (`antigravity-ide`) all default to **copy** (not symlink) because Antigravity does not discover symlinked skill dirs.
+
+**Antigravity 2.0 project:** Kenmark links to `.agent/skills` and mirrors `.agents/skills` for CLI compatibility.
+
+**Antigravity IDE project:** Kenmark links to `.agents/skills` and mirrors `.agent/skills` for backward compatibility.
 
 **Gemini + Codex:** Gemini CLI discovers both `~/.gemini/skills` and `~/.agents/skills` and prefers the latter. When `--ide` includes both `codex` and `gemini`, Kenmark links once to `~/.agents/skills` and removes Kenmark-managed duplicates from `~/.gemini/skills` to avoid startup conflict warnings.
 
@@ -79,7 +84,7 @@ Project scope: same relative paths under repo root (`.cursor/skills`, `.agents/s
 
 ### MCP (JSON mcpServers IDEs)
 
-**MCP-capable:** cursor, claude, gemini, antigravity-cli, antigravity, kiro, trae, trae-cn, rovo, qoder. Codex, OpenCode, and minimax receive skills only until format adapters land.
+**MCP-capable:** cursor, claude, gemini, antigravity-cli, antigravity, antigravity-ide, kiro, trae, trae-cn, rovo, qoder. Codex, OpenCode, and minimax receive skills only until format adapters land.
 
 **Bundled servers** (`config/mcp-servers.json`):
 
@@ -107,6 +112,7 @@ Examples:
 npx kenmark-skills init --global --skip-recommended -y
 npx kenmark-skills init --global --ide cursor --skip-recommended --mcp-servers playwright,context7 -y
 npx kenmark-skills init --global --ide antigravity-cli --mcp-profile web -y
+npx kenmark-skills init --global --ide antigravity-ide --mcp-profile web -y
 npx kenmark-skills init --project --ide antigravity --mcp-servers playwright,context7 -y
 npx kenmark-skills update --both --global -y
 npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y

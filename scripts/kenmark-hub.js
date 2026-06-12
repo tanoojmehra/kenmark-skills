@@ -44,6 +44,7 @@ const IDE_SCAN_PRIORITY = [
   "gemini",
   "antigravity-cli",
   "antigravity",
+  "antigravity-ide",
   "codex",
   "opencode",
   "minimax",
@@ -60,6 +61,7 @@ const AGENT_IDE_SCAN_PRIORITY = [
   "gemini",
   "antigravity-cli",
   "antigravity",
+  "antigravity-ide",
   "codex",
   "opencode",
   "minimax",
@@ -238,6 +240,7 @@ const MCP_CAPABLE_IDES = [
   "gemini",
   "antigravity-cli",
   "antigravity",
+  "antigravity-ide",
   "kiro",
   "trae",
   "trae-cn",
@@ -252,6 +255,7 @@ const MCP_IDE_CONFIG_KIND = {
   gemini: "nested",
   "antigravity-cli": "standalone",
   antigravity: "standalone",
+  "antigravity-ide": "standalone",
   kiro: "standalone",
   trae: "standalone",
   "trae-cn": "standalone",
@@ -308,6 +312,7 @@ function buildMcpGlobalTargets(homeDir = os.homedir()) {
     gemini: path.join(homeDir, ".gemini", "settings.json"),
     "antigravity-cli": path.join(homeDir, ".gemini", "antigravity-cli", "mcp_config.json"),
     antigravity: path.join(homeDir, ".gemini", "config", "mcp_config.json"),
+    "antigravity-ide": path.join(homeDir, ".gemini", "antigravity-ide", "mcp_config.json"),
     kiro: path.join(homeDir, ".kiro", "settings", "mcp.json"),
     trae: path.join(homeDir, ".trae", "mcp.json"),
     "trae-cn": path.join(homeDir, ".trae-cn", "mcp.json"),
@@ -323,6 +328,7 @@ function buildMcpProjectTargets(projectDir = process.cwd()) {
     gemini: path.join(projectDir, ".gemini", "settings.json"),
     "antigravity-cli": path.join(projectDir, ".agents", "mcp_config.json"),
     antigravity: path.join(projectDir, ".agent", "mcp_config.json"),
+    "antigravity-ide": path.join(projectDir, ".agents", "mcp_config.json"),
     kiro: path.join(projectDir, ".kiro", "settings", "mcp.json"),
     trae: path.join(projectDir, ".trae", "mcp.json"),
     "trae-cn": path.join(projectDir, ".trae-cn", "mcp.json"),
@@ -351,6 +357,7 @@ function buildGlobalTargets(homeDir = os.homedir()) {
     gemini: path.join(homeDir, ".gemini", "skills"),
     "antigravity-cli": path.join(homeDir, ".gemini", "antigravity-cli", "skills"),
     antigravity: path.join(homeDir, ".gemini", "antigravity", "skills"),
+    "antigravity-ide": path.join(homeDir, ".gemini", "antigravity-ide", "skills"),
     opencode: path.join(homeDir, ".opencode", "skills"),
     kiro: path.join(homeDir, ".kiro", "skills"),
     trae: path.join(homeDir, ".trae", "skills"),
@@ -369,6 +376,7 @@ function buildProjectTargets(projectDir = process.cwd()) {
     gemini: path.join(projectDir, ".gemini", "skills"),
     "antigravity-cli": path.join(projectDir, ".agents", "skills"),
     antigravity: path.join(projectDir, ".agent", "skills"),
+    "antigravity-ide": path.join(projectDir, ".agents", "skills"),
     opencode: path.join(projectDir, ".opencode", "skills"),
     kiro: path.join(projectDir, ".kiro", "skills"),
     trae: path.join(projectDir, ".trae", "skills"),
@@ -565,33 +573,52 @@ function removeAliasDuplicateLinks(targetMap, options = {}) {
   };
 }
 
+/** Antigravity surfaces do not discover symlinked skill dirs — copy unless --symlink. */
+const ANTIGRAVITY_COPY_IDES = ["antigravity-cli", "antigravity", "antigravity-ide"];
+
 /** Extra project skill roots when an IDE discovers multiple workspace paths. */
 function getExtraProjectSkillPaths(ide, projectDir) {
-  if (ide !== "antigravity" || !projectDir) return [];
-  const agentsPath = path.join(projectDir, ".agents", "skills");
-  const primaryPath = path.join(projectDir, ".agent", "skills");
-  if (agentsPath === primaryPath) return [];
-  return [agentsPath];
+  if (!projectDir) return [];
+
+  if (ide === "antigravity") {
+    const agentsPath = path.join(projectDir, ".agents", "skills");
+    const primaryPath = path.join(projectDir, ".agent", "skills");
+    if (agentsPath === primaryPath) return [];
+    return [agentsPath];
+  }
+
+  if (ide === "antigravity-ide") {
+    const agentPath = path.join(projectDir, ".agent", "skills");
+    const primaryPath = path.join(projectDir, ".agents", "skills");
+    if (agentPath === primaryPath) return [];
+    return [agentPath];
+  }
+
+  return [];
 }
 
 function shouldForceCopyForIde(ide, { forceSymlink = false } = {}) {
-  return ide === "antigravity" && !forceSymlink;
+  return ANTIGRAVITY_COPY_IDES.includes(ide) && !forceSymlink;
 }
 
 function findAntigravitySymlinkSkills(targetMap) {
-  const agyPath = targetMap?.antigravity;
-  if (!agyPath || !fs.existsSync(agyPath)) return [];
-
   const symlinks = [];
-  try {
-    for (const ent of fs.readdirSync(agyPath, { withFileTypes: true })) {
-      if (!ent.isSymbolicLink()) continue;
-      if (ent.name === KENMARK_MANAGED_MARKER) continue;
-      symlinks.push({ name: ent.name, path: path.join(agyPath, ent.name) });
+
+  for (const ide of ANTIGRAVITY_COPY_IDES) {
+    const skillPath = targetMap?.[ide];
+    if (!skillPath || !fs.existsSync(skillPath)) continue;
+
+    try {
+      for (const ent of fs.readdirSync(skillPath, { withFileTypes: true })) {
+        if (!ent.isSymbolicLink()) continue;
+        if (ent.name === KENMARK_MANAGED_MARKER) continue;
+        symlinks.push({ ide, name: ent.name, path: path.join(skillPath, ent.name) });
+      }
+    } catch {
+      // skip unreadable roots
     }
-  } catch {
-    return [];
   }
+
   return symlinks;
 }
 
@@ -604,6 +631,7 @@ function buildInventoryRoots(homeDir = os.homedir()) {
     { id: "gemini", path: path.join(homeDir, ".gemini", "skills") },
     { id: "antigravity-cli", path: path.join(homeDir, ".gemini", "antigravity-cli", "skills") },
     { id: "antigravity", path: path.join(homeDir, ".gemini", "antigravity", "skills") },
+    { id: "antigravity-ide", path: path.join(homeDir, ".gemini", "antigravity-ide", "skills") },
     { id: "codex", path: path.join(homeDir, ".codex", "skills") },
     { id: "opencode", path: path.join(homeDir, ".opencode", "skills") },
     { id: "minimax", path: path.join(homeDir, ".minimax", "skills") },
@@ -1113,6 +1141,12 @@ function hasRealIdeInstallEvidence(ide, targetPath) {
 
   if (ide === "antigravity") {
     if (fs.existsSync(path.join(configRoot, "config", "mcp_config.json"))) {
+      return true;
+    }
+  }
+
+  if (ide === "antigravity-ide") {
+    if (fs.existsSync(path.join(parent, "installation_id"))) {
       return true;
     }
   }
@@ -2684,8 +2718,15 @@ function runDoctor(options = {}) {
 
   const antigravitySymlinks = findAntigravitySymlinkSkills(targetMap);
   if (antigravitySymlinks.length) {
+    const byIde = {};
+    for (const entry of antigravitySymlinks) {
+      byIde[entry.ide] = (byIde[entry.ide] || 0) + 1;
+    }
+    const summary = Object.entries(byIde)
+      .map(([ide, count]) => `${count} under ${targetMap[ide]}`)
+      .join("; ");
     warnings.push(
-      `Antigravity IDE symlink skills: ${antigravitySymlinks.length} skill(s) under ${targetMap.antigravity} are symlinks (IDE may not discover them). Re-run with --copy, or add an absolute path to ~/.agents/skills in Antigravity Settings → Customizations → Skill Custom Paths.`
+      `Antigravity symlink skills: ${summary} (CLI/IDE may not discover symlinks). Re-run with --copy, or add an absolute skill path in Antigravity Settings → Customizations → Skill Custom Paths.`
     );
   }
 
@@ -2829,6 +2870,7 @@ module.exports = {
   removeAliasDuplicateLinks,
   getExtraProjectSkillPaths,
   shouldForceCopyForIde,
+  ANTIGRAVITY_COPY_IDES,
   findAntigravitySymlinkSkills,
   buildGlobalTargets,
   buildProjectTargets,

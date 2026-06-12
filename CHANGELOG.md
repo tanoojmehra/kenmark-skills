@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v2.3.17 — Antigravity IDE target (2026-06-11)
+
+### Feature
+
+- **`antigravity-ide` platform:** New `--ide` target for the standalone Antigravity IDE app (`~/.gemini/antigravity-ide/skills` global; `.agents/skills` + `.agent/skills` project). MCP merges to `~/.gemini/antigravity-ide/mcp_config.json`. Clarifies `antigravity` as Antigravity 2.0 Manager (not the IDE app).
+
+### Fix
+
+- **Antigravity copy-default:** `antigravity-cli`, `antigravity`, and `antigravity-ide` all default to copy mode (symlinks not discovered by Antigravity surfaces). Doctor warns per-surface when symlinks remain.
+
+### Test
+
+- **test-antigravity-dedupe.js:** Global/project `antigravity-ide` install paths; MCP dry-run includes all three Antigravity targets.
+
 ## v2.3.16 — Antigravity platform (2026-06-08)
 
 ### Feature
