@@ -10,7 +10,7 @@ Status: reviewed
 - Binaries: `kenmark-skills` → `scripts/cli.js`, `kenmark-skills-setup` → `scripts/setup-skills.js` (legacy).
 - Recommended first install for humans: `npx kenmark-skills init` (interactive wizard).
 - Skills install to `~/.kenmark/store/skills/` and link into IDE skill directories; optional third-party packs from `recommended-catalog.json`.
-- MCP server install is **opt-in** (JSON `mcpServers` IDEs: cursor, claude, gemini, antigravity-cli, antigravity, kiro, trae, trae-cn, rovo, qoder).
+- MCP server install is **opt-in** (JSON `mcpServers` IDEs: cursor, claude, gemini, antigravity-cli, antigravity, antigravity-ide, kiro, trae, trae-cn, rovo, qoder).
 - Authors: Kenmark ITan Solutions; contributors Tanooj Mehra, Adwait Date.
 - Repository: https://github.com/tanoojmehra/kenmark-skills
 

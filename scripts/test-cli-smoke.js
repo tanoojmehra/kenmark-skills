@@ -26,7 +26,7 @@ const COMMANDS = [
     "--dry-run",
     "--global",
     "--ide",
-    "antigravity-cli,antigravity",
+    "antigravity-cli,antigravity,antigravity-ide",
     "--mcp-profile",
     "web",
     "-y"
@@ -203,7 +203,7 @@ const ASSERTIONS = [
       "--dry-run",
       "--global",
       "--ide",
-      "antigravity-cli,antigravity",
+      "antigravity-cli,antigravity,antigravity-ide",
       "--mcp-profile",
       "web",
       "-y"

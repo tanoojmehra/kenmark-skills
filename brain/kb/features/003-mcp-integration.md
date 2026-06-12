@@ -1,13 +1,13 @@
 # MCP integration
 
-Last updated: 2026-06-08
+Last updated: 2026-06-11
 Status: reviewed
 
 ## Summary
 
 Five bundled MCP servers, opt-in on `init` / legacy `setup` / `update`. Installed into JSON `mcpServers`-compatible IDE configs; canonical copy in `~/.kenmark/store/mcp.json`.
 
-**MCP-capable IDEs:** cursor, claude, gemini, antigravity-cli, antigravity, kiro, trae, trae-cn, rovo, qoder.
+**MCP-capable IDEs:** cursor, claude, gemini, antigravity-cli, antigravity, antigravity-ide, kiro, trae, trae-cn, rovo, qoder.
 
 **Not yet:** codex (TOML `~/.codex/config.toml`), opencode (different `mcp` schema), minimax — skills only.
 
@@ -46,6 +46,7 @@ Five bundled MCP servers, opt-in on `init` / legacy `setup` / `update`. Installe
 | gemini | `~/.gemini/settings.json` | `.gemini/settings.json` | nested |
 | antigravity-cli | `~/.gemini/antigravity-cli/mcp_config.json` | `.agents/mcp_config.json` | standalone |
 | antigravity | `~/.gemini/config/mcp_config.json` | `.agent/mcp_config.json` | standalone |
+| antigravity-ide | `~/.gemini/antigravity-ide/mcp_config.json` | `.agents/mcp_config.json` | standalone |
 | kiro | `~/.kiro/settings/mcp.json` | `.kiro/settings/mcp.json` | standalone |
 | trae | `~/.trae/mcp.json` | `.trae/mcp.json` | standalone |
 | trae-cn | `~/.trae-cn/mcp.json` | `.trae-cn/mcp.json` | standalone |

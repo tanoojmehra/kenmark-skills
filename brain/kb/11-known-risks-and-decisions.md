@@ -1,6 +1,6 @@
 # Known risks and decisions
 
-Last updated: 2026-06-08 (Antigravity platform support)
+Last updated: 2026-06-11 (Antigravity IDE target)
 Status: reviewed
 
 ## Confirmed facts / decisions
@@ -10,9 +10,10 @@ Status: reviewed
 | Flat `skills/user-skills/` layout | CLI scans direct children only — no nested category folders |
 | `init` over `setup` | Single recommended path; setup kept for legacy flags |
 | MCP opt-in default | Avoid mutating IDE MCP configs without consent |
-| MCP JSON IDEs only (10 targets) | cursor, claude, gemini, antigravity-cli, antigravity, kiro, trae, trae-cn, rovo, qoder; Codex/OpenCode need format adapters |
-| Antigravity IDE copy default | IDE does not discover symlinked skills — Kenmark copies into `~/.gemini/antigravity/skills` unless `--symlink` |
-| Antigravity IDE dual project paths | Project install links both `.agent/skills` and `.agents/skills` when `antigravity` is in `--ide` |
+| MCP JSON IDEs only (11 targets) | cursor, claude, gemini, antigravity-cli, antigravity, antigravity-ide, kiro, trae, trae-cn, rovo, qoder; Codex/OpenCode need format adapters |
+| Antigravity copy default | CLI/2.0/IDE do not discover symlinked skills — Kenmark copies into Antigravity skill dirs unless `--symlink` |
+| Antigravity 2.0 dual project paths | `antigravity` project install links `.agent/skills` and mirrors `.agents/skills` |
+| Antigravity IDE dual project paths | `antigravity-ide` project install links `.agents/skills` and mirrors `.agent/skills` |
 | Windows copy default | Symlinks often fail; copy/junction fallback in hub |
 | Catalog v5 selectable installs | Default lean (impeccable + code-review); heavy packs opt-in |
 | `validate` vs `doctor` split | CI-safe repo checks vs local install diagnostics |
@@ -27,7 +28,8 @@ Status: reviewed
 - **Legacy cleanup scope:** `listLegacyKenmarkSkillPaths()` must not include canonical bundled names when `kenmark-${old}` equals the rename target (fixed issue 010).
 - **Gemini/Codex duplicate skills (fixed 011):** Installing to both `~/.agents/skills` and `~/.gemini/skills` caused Gemini CLI conflict warnings — dedupe on link + prune duplicates on setup/adopt.
 - **Antigravity CLI/Gemini shared path:** Antigravity CLI reads `~/.gemini/skills` alongside `~/.gemini/antigravity-cli/skills` — dedupe when both `antigravity-cli` and `gemini` are in `--ide`.
-- **Antigravity IDE symlinks:** Symlinked skills under `~/.gemini/antigravity/skills` may not load — doctor warns; use `--copy` or add absolute `~/.agents/skills` in IDE Skill Custom Paths.
+- **Antigravity symlinks:** Symlinked skills under any Antigravity skill root may not load — doctor warns; copy is default; or add an absolute skill path in Antigravity Settings → Skill Custom Paths.
+- **Three Antigravity surfaces:** `antigravity-cli` (terminal), `antigravity` (2.0 Manager harness), `antigravity-ide` (standalone VS Code app at `~/.gemini/antigravity-ide/skills`) — pass all needed targets in `--ide`.
 
 ## Important files inspected
 

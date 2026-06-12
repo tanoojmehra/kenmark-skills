@@ -2,6 +2,13 @@
 
 Brain knowledge base
 
+## v2026.06.11-antigravity-ide
+
+- **kenmark-hub.js:** `antigravity-ide` target (`~/.gemini/antigravity-ide/skills`, MCP at `mcp_config.json`). `ANTIGRAVITY_COPY_IDES` covers CLI, 2.0, and IDE. `antigravity` relabeled as 2.0 Manager in prompts.
+- **interactive.js:** IDE labels for all three Antigravity surfaces.
+- **test-antigravity-dedupe.js:** Global/project antigravity-ide coverage.
+- **KB:** `05-api-and-integrations`, `003-mcp-integration`, `11-known-risks-and-decisions` updated.
+
 ## v2026.06.08-antigravity-platform
 
 - **kenmark-hub.js:** `antigravity-cli` and `antigravity` IDE targets in `buildGlobalTargets`, `buildProjectTargets`, `buildMcp*Targets`, `MCP_CAPABLE_IDES`. Antigravity-cli+Gemini alias dedupe; IDE copy-default and dual project paths (`.agent/skills` + `.agents/skills`).
