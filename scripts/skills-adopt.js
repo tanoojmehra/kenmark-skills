@@ -7,7 +7,8 @@ const {
   wantsInteractive,
   confirmPlan,
   banner,
-  rejectProjectScopeInArgv
+  rejectProjectScopeInArgv,
+  normalizeCliArgv
 } = require("./interactive");
 const {
   buildGlobalTargets,
@@ -31,7 +32,6 @@ function printUsage() {
   console.log("Adopt Kenmark + recommended-catalog skills into ~/.kenmark/store and relink IDEs.");
   console.log("");
   console.log("Options:");
-  console.log("  --global                  Scope (global only; default)");
   console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, antigravity-ide, all, …");
   console.log("  --copy                    Copy into IDE paths instead of symlinks");
   console.log("  --symlink                 Force symlinks (Windows: junction) instead of copy");
@@ -75,11 +75,6 @@ function parseArgs(argv) {
       args.explicitMode = true;
       continue;
     }
-    if (token === "--global") {
-      args.mode = "global";
-      args.explicitMode = true;
-      continue;
-    }
     if (token === "--copy") {
       args.forceCopy = true;
       continue;
@@ -118,9 +113,8 @@ function resolveTargetIdes(args, targetMap) {
 }
 
 async function run() {
-  const argv = process.argv.slice(2);
-  rejectProjectScopeInArgv(argv);
-  const args = parseArgs(argv);
+  rejectProjectScopeInArgv(process.argv.slice(2));
+  const args = parseArgs(normalizeCliArgv(process.argv.slice(2)));
   if (args.help) {
     printUsage();
     process.exit(0);

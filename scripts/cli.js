@@ -19,26 +19,26 @@ function printUsage() {
   console.log("Install scope is global only (~/.kenmark/store, ~/.cursor, ~/.claude, …).");
   console.log("");
   console.log("Usage:");
-  console.log("  kenmark-skills init [--global] [--ide <target>] [--skip-recommended] [-y]");
+  console.log("  kenmark-skills init [--ide <target>] [--skip-recommended] [-y]");
   console.log("  kenmark-skills setup …          (legacy alias — prefer init)");
-  console.log("  kenmark-skills uninstall [--global] [--ide <target>] [--mcp-only] [-y]");
-  console.log("  kenmark-skills mcp uninstall [--global] [--ide <target>] [-y]");
+  console.log("  kenmark-skills uninstall [--ide <target>] [--mcp-only] [-y]");
+  console.log("  kenmark-skills mcp uninstall [--ide <target>] [-y]");
   console.log("  kenmark-skills inventory [--json path] [--markdown path] [--include-plugins]");
   console.log("  kenmark-skills subagents-inventory [--json path] [--markdown path] [--include-plugins] [--include-marketplaces]");
-  console.log("  kenmark-skills install-recommended [--list] [--suggest] [--explain [id]] [--ids a,b] [--preset id] [--profile id] [--global] [-y]");
-  console.log("  kenmark-skills update [--kenmark-only|--recommended-only|--both] [--global] [-y]");
-  console.log("  kenmark-skills adopt [--global] [--ide <target>] [--dry-run] [-y]");
+  console.log("  kenmark-skills install-recommended [--list] [--suggest] [--explain [id]] [--ids a,b] [--preset id] [--profile id] [-y]");
+  console.log("  kenmark-skills update [--kenmark-only|--recommended-only|--both] [-y]");
+  console.log("  kenmark-skills adopt [--ide <target>] [--dry-run] [-y]");
   console.log("  kenmark-skills validate");
   console.log("  kenmark-skills doctor [--soft] [--no-fail] [--json path]");
-  console.log("  kenmark-skills cleanup [--global] [--ide <target>] [--kenmark|--recommended|--all-managed|--full] [--dry-run] [-y]");
+  console.log("  kenmark-skills cleanup [--ide <target>] [--kenmark|--recommended|--all-managed|--full] [--dry-run] [-y]");
   console.log("  kenmark-skills version");
   console.log("  kenmark-skills help");
   console.log("");
   console.log("Examples:");
   console.log("  npx kenmark-skills init");
-  console.log("  npx kenmark-skills init --global --skip-recommended -y");
-  console.log("  npx kenmark-skills uninstall --global --ide claude -y");
-  console.log("  npx kenmark-skills mcp uninstall --global --ide cursor -y");
+  console.log("  npx kenmark-skills init --skip-recommended -y");
+  console.log("  npx kenmark-skills uninstall --ide claude -y");
+  console.log("  npx kenmark-skills mcp uninstall --ide cursor -y");
 }
 
 if (!command || command === "help" || command === "--help" || command === "-h") {
@@ -81,15 +81,15 @@ if (command === "mcp") {
     console.log("kenmark-skills mcp");
     console.log("");
     console.log("Usage:");
-    console.log("  kenmark-skills mcp uninstall [--global|--project] [--ide <target>] [-y]");
+    console.log("  kenmark-skills mcp uninstall [--ide <target>] [-y]");
     console.log("");
     console.log("Removes Kenmark-managed MCP server entries from IDE MCP configs");
     console.log("and clears ~/.kenmark/store/mcp.json. Does not remove skill links.");
     console.log("");
     console.log("Examples:");
-    console.log("  npx kenmark-skills mcp uninstall --global --ide cursor -y");
-    console.log("  npx kenmark-skills mcp uninstall --global -y");
-    console.log("  npx kenmark-skills mcp uninstall --global --ide all -y   # advanced: every detected IDE path");
+    console.log("  npx kenmark-skills mcp uninstall --ide cursor -y");
+    console.log("  npx kenmark-skills mcp uninstall -y");
+    console.log("  npx kenmark-skills mcp uninstall --ide all -y   # advanced: every detected IDE path");
     process.exit(sub && sub !== "help" ? 1 : 0);
   }
   if (sub === "uninstall") {

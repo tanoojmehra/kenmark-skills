@@ -58,7 +58,7 @@ function parseScopeChoice(answer) {
 }
 
 const PROJECT_SCOPE_REMOVED =
-  "Project scope is not supported. Kenmark-skills installs globally only (~/.kenmark/store, ~/.cursor, ~/.claude, …). Use --global or omit the scope flag.";
+  "Project scope is not supported. Kenmark-skills installs globally only (~/.kenmark/store, ~/.cursor, ~/.claude, …). Omit scope flags.";
 
 function rejectProjectScopeInArgv(argv) {
   const args = Array.isArray(argv) ? argv : [];
@@ -68,11 +68,30 @@ function rejectProjectScopeInArgv(argv) {
       console.error(PROJECT_SCOPE_REMOVED);
       process.exit(1);
     }
-    if (token === "--scope" && args[i + 1] === "project") {
-      console.error(PROJECT_SCOPE_REMOVED);
-      process.exit(1);
+    if (token === "--scope") {
+      const value = (args[i + 1] || "").toLowerCase();
+      if (value === "project") {
+        console.error(PROJECT_SCOPE_REMOVED);
+        process.exit(1);
+      }
     }
   }
+}
+
+/** Drop deprecated scope flags; installs are always global. */
+function normalizeCliArgv(argv) {
+  const args = Array.isArray(argv) ? argv : [];
+  const out = [];
+  for (let i = 0; i < args.length; i += 1) {
+    const token = args[i];
+    if (token === "--global") continue;
+    if (token === "--scope" && (args[i + 1] || "").toLowerCase() === "global") {
+      i += 1;
+      continue;
+    }
+    out.push(token);
+  }
+  return out;
 }
 
 const SCOPE_PROMPTS = {
@@ -632,6 +651,7 @@ module.exports = {
   getScopePromptLines,
   promptScope,
   rejectProjectScopeInArgv,
+  normalizeCliArgv,
   PROJECT_SCOPE_REMOVED,
   promptAction,
   promptIde,

@@ -92,7 +92,7 @@ function main() {
   try {
     fs.mkdirSync(bothHome, { recursive: true });
     const bothRun = runSetup(
-      ["--global", "--ide", "antigravity-cli,gemini", "-y", "--skip-adopt"],
+      ["--ide", "antigravity-cli,gemini", "-y", "--skip-adopt"],
       bothHome
     );
     if (bothRun.status !== 0) {
@@ -125,7 +125,7 @@ function main() {
   try {
     fs.mkdirSync(agyOnlyHome, { recursive: true });
     const agyRun = runSetup(
-      ["--global", "--ide", "antigravity-cli", "-y", "--skip-adopt"],
+      ["--ide", "antigravity-cli", "-y", "--skip-adopt"],
       agyOnlyHome
     );
     if (agyRun.status !== 0) {
@@ -186,7 +186,7 @@ function main() {
       "test-install\n"
     );
     const ideRun = runSetup(
-      ["--global", "--ide", "antigravity-ide", "-y", "--skip-adopt"],
+      ["--ide", "antigravity-ide", "-y", "--skip-adopt"],
       ideHome
     );
     if (ideRun.status !== 0) {
@@ -217,7 +217,6 @@ function main() {
         cliPath,
         "setup",
         "--dry-run",
-        "--global",
         "--ide",
         "antigravity-cli,antigravity,antigravity-ide",
         "--mcp-profile",

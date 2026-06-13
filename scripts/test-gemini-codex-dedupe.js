@@ -75,7 +75,7 @@ function main() {
   try {
     fs.mkdirSync(bothHome, { recursive: true });
     const bothRun = runSetup(
-      ["--global", "--ide", "codex,gemini", "-y", "--skip-adopt"],
+      ["--ide", "codex,gemini", "-y", "--skip-adopt"],
       bothHome
     );
     if (bothRun.status !== 0) {
@@ -108,7 +108,7 @@ function main() {
   try {
     fs.mkdirSync(geminiOnlyHome, { recursive: true });
     const geminiRun = runSetup(
-      ["--global", "--ide", "gemini", "-y", "--skip-adopt"],
+      ["--ide", "gemini", "-y", "--skip-adopt"],
       geminiOnlyHome
     );
     if (geminiRun.status !== 0) {

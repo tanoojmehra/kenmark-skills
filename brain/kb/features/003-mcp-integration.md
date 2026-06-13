@@ -60,8 +60,8 @@ Merge behavior: existing server entries with same name left unchanged unless `--
 ## Uninstall MCP only
 
 ```bash
-npx kenmark-skills mcp uninstall --global --ide cursor -y
-npx kenmark-skills uninstall --mcp-only --global -y
+npx kenmark-skills mcp uninstall --ide cursor -y
+npx kenmark-skills uninstall --mcp-only -y
 ```
 
 Skills and store skills are untouched.

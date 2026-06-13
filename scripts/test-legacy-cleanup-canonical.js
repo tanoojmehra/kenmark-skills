@@ -65,7 +65,7 @@ function main() {
   try {
     fs.mkdirSync(tempHome, { recursive: true });
 
-    const setup = runCli(["setup", "--global", "--ide", "claude", "-y"], tempHome);
+    const setup = runCli(["setup", "--ide", "claude", "-y"], tempHome);
     assert(setup.status === 0, `setup exited with ${setup.status}\n${setup.stderr}`);
 
     const storeSkills = path.join(tempHome, ".kenmark", "store", "skills");
@@ -81,7 +81,7 @@ function main() {
     }
 
     const cleanup = runCli(
-      ["cleanup", "--global", "--legacy-only", "--include-store", "-y"],
+      ["cleanup", "--legacy-only", "--include-store", "-y"],
       tempHome
     );
     assert(
@@ -90,7 +90,7 @@ function main() {
     );
     assertCanonicalSkillsPresent(storeSkills, "after legacy cleanup");
 
-    const setupAgain = runCli(["setup", "--global", "--ide", "claude", "-y"], tempHome);
+    const setupAgain = runCli(["setup", "--ide", "claude", "-y"], tempHome);
     assert(
       setupAgain.status === 0,
       `second setup exited with ${setupAgain.status}\n${setupAgain.stderr}`

@@ -40,5 +40,5 @@ No error is shown; exit code is 0, so users assume success or a silent failure.
 ## Suggested fix
 
 - Extend `wantsInteractive()` to require both `stdin.isTTY` and `stdout.isTTY`, or probe readline with a timeout/EOF check before entering the interactive branch.
-- On EOF during required prompts, print: `Non-interactive stdin detected. Re-run with explicit flags and -y, e.g. npx kenmark-skills init --global --ide auto -y`
+- On EOF during required prompts, print: `Non-interactive stdin detected. Re-run with explicit flags and -y, e.g. npx kenmark-skills init --ide auto -y`
 - Consider defaulting the first init question to `true` when Kenmark home is empty (first-time install).

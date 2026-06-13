@@ -65,7 +65,7 @@ function main() {
     const npxCommands = [
       ["kenmark-skills", "help"],
       ["kenmark-skills", "validate"],
-      ["kenmark-skills", "setup", "--dry-run", "--global", "--ide", "claude", "-y"]
+      ["kenmark-skills", "setup", "--dry-run", "--ide", "claude", "-y"]
     ];
 
     for (const args of npxCommands) {

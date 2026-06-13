@@ -9,7 +9,8 @@ const {
   parseCleanupCategoryChoice,
   confirmPlan,
   banner,
-  rejectProjectScopeInArgv
+  rejectProjectScopeInArgv,
+  normalizeCliArgv
 } = require("./interactive");
 const {
   buildGlobalTargets,
@@ -47,7 +48,6 @@ function printUsage() {
   console.log("  --full                    broken + legacy + all managed skills");
   console.log("");
   console.log("Scope:");
-  console.log("  --global                  Scope (global only; default)");
   console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, antigravity-ide, auto, all, …");
   console.log("  --include-store           Also remove matching entries from ~/.kenmark/store (+ manifest)");
   console.log("  --dry-run                 List what would be removed");
@@ -58,12 +58,12 @@ function printUsage() {
   console.log("cleanup lets you pick categories — e.g. recommended packs only, or broken links only.");
   console.log("");
   console.log("Examples:");
-  console.log("  npx kenmark-skills cleanup --global --ide auto");
-  console.log("  npx kenmark-skills cleanup --global --kenmark --dry-run -y");
-  console.log("  npx kenmark-skills cleanup --global --recommended --include-store -y");
-  console.log("  npx kenmark-skills cleanup --global --all-managed --ide cursor,claude -y");
-  console.log("  npx kenmark-skills cleanup --global --all -y    # broken + legacy hygiene");
-  console.log("  npx kenmark-skills cleanup --full --global --ide auto --dry-run -y");
+  console.log("  npx kenmark-skills cleanup --ide auto");
+  console.log("  npx kenmark-skills cleanup --kenmark --dry-run -y");
+  console.log("  npx kenmark-skills cleanup --recommended --include-store -y");
+  console.log("  npx kenmark-skills cleanup --all-managed --ide cursor,claude -y");
+  console.log("  npx kenmark-skills cleanup --all -y    # broken + legacy hygiene");
+  console.log("  npx kenmark-skills cleanup --full --ide auto --dry-run -y");
 }
 
 function parseArgs(argv) {
@@ -97,11 +97,6 @@ function parseArgs(argv) {
     }
     if (token === "--project") {
       args.mode = "project";
-      args.explicitMode = true;
-      continue;
-    }
-    if (token === "--global") {
-      args.mode = "global";
       args.explicitMode = true;
       continue;
     }
@@ -262,9 +257,8 @@ function countManagedResults(results, dryRun) {
 }
 
 async function run() {
-  const argv = process.argv.slice(2);
-  rejectProjectScopeInArgv(argv);
-  const args = parseArgs(argv);
+  rejectProjectScopeInArgv(process.argv.slice(2));
+  const args = parseArgs(normalizeCliArgv(process.argv.slice(2)));
   if (args.help) {
     printUsage();
     process.exit(0);

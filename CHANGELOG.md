@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2.3.20 — Drop redundant --global flag (2026-06-13)
+
+### Change
+
+- **CLI:** Removed `--global` from help, docs, and examples. Installs are always global; legacy scripts passing `--global` or `--scope global` still work (silently ignored).
+
 ## v2.3.19 — Global-only installs (2026-06-13)
 
 ### Change

@@ -57,7 +57,7 @@ function main() {
     fs.mkdirSync(geminiSkills, { recursive: true });
     fs.symlinkSync(missingTarget, path.join(geminiSkills, "stale-skill"), "dir");
 
-    const dryRun = runCleanup(["--global", "--ide", "gemini", "--dry-run", "-y"], home);
+    const dryRun = runCleanup(["--ide", "gemini", "--dry-run", "-y"], home);
     if (dryRun.status !== 0) {
       throw new Error(`cleanup --dry-run exited with ${dryRun.status}`);
     }
@@ -68,7 +68,7 @@ function main() {
       throw new Error("Dry-run should not remove the broken symlink");
     }
 
-    const cleanup = runCleanup(["--global", "--ide", "gemini", "-y"], home);
+    const cleanup = runCleanup(["--ide", "gemini", "-y"], home);
     if (cleanup.status !== 0) {
       console.error(cleanup.stdout);
       console.error(cleanup.stderr);
@@ -88,7 +88,7 @@ function main() {
     writeSkillDir(cursorSkills, "my-custom-skill");
 
     const kenmarkDry = runCleanup(
-      ["--global", "--ide", "cursor", "--kenmark", "--dry-run", "-y"],
+      ["--ide", "cursor", "--kenmark", "--dry-run", "-y"],
       home
     );
     if (kenmarkDry.status !== 0) {
@@ -101,7 +101,7 @@ function main() {
       throw new Error("Kenmark dry-run should not remove kenmark-commit");
     }
 
-    const kenmarkRun = runCleanup(["--global", "--ide", "cursor", "--kenmark", "-y"], home);
+    const kenmarkRun = runCleanup(["--ide", "cursor", "--kenmark", "-y"], home);
     if (kenmarkRun.status !== 0) {
       throw new Error(`cleanup --kenmark exited with ${kenmarkRun.status}`);
     }
@@ -115,7 +115,7 @@ function main() {
       throw new Error("my-custom-skill should never be removed by cleanup");
     }
 
-    const packsRun = runCleanup(["--global", "--ide", "cursor", "--packs", "-y"], home);
+    const packsRun = runCleanup(["--ide", "cursor", "--packs", "-y"], home);
     if (packsRun.status !== 0) {
       throw new Error(`cleanup --packs exited with ${packsRun.status}`);
     }

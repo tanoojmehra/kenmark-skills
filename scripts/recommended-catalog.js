@@ -853,8 +853,8 @@ function printSuggest(catalog, cwd = process.cwd()) {
 
   const defaults = defaultSelectedIds(catalog);
   console.log(`Default selection (if you press Enter): ${defaults.join(", ")}`);
-  console.log("\nInstall: npx kenmark-skills install-recommended --ids <id,...> --global -y");
-  console.log("Presets (advanced): npx kenmark-skills install-recommended --profile core-next --global -y");
+  console.log("\nInstall: npx kenmark-skills install-recommended --ids <id,...> -y");
+  console.log("Presets (advanced): npx kenmark-skills install-recommended --profile core-next -y");
 }
 
 function explainPack(pack, catalog, cwd = process.cwd()) {

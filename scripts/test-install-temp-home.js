@@ -51,7 +51,7 @@ function main() {
 
     const result = spawnSync(
       process.execPath,
-      [cliPath, "setup", "--global", "--ide", "claude", "-y"],
+      [cliPath, "setup", "--ide", "claude", "-y"],
       {
         cwd: repoRoot,
         stdio: "inherit",

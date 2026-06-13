@@ -32,7 +32,7 @@ One guided flow for **new users**: install Kenmark skills globally, optionally i
 | Audience | How to run |
 | --- | --- |
 | **Human** | `npx kenmark-skills init` — interactive prompts in the terminal |
-| **Agent** | `npx kenmark-skills init --global --skip-recommended -y` (or `--ide cursor,claude,codex`, `--ids`, `--recommended-only`) |
+| **Agent** | `npx kenmark-skills init --skip-recommended -y` (or `--ide cursor,claude,codex`, `--ids`, `--recommended-only`) |
 
 Set `KENMARK_SKILLS_NONINTERACTIVE=1` to force non-interactive behavior without `-y`.
 
@@ -60,25 +60,25 @@ Kenmark skills land in **`~/.kenmark/store/skills`** first; IDE folders are syml
 
 ```bash
 # Kenmark skills only, global, no prompts (defaults to cursor, claude, codex when none detected)
-npx kenmark-skills init --global --skip-recommended -y
+npx kenmark-skills init --skip-recommended -y
 
 # Repo-aware suggestions only (no install)
 npx kenmark-skills init --suggest
 
 # Kenmark + specific packs (defaults: impeccable + simplify)
-npx kenmark-skills init --global --ids impeccable,simplify -y
+npx kenmark-skills init --ids impeccable,simplify -y
 
 # Explicit IDE targets
-# npx kenmark-skills init --global --ide cursor,claude,codex --skip-recommended -y
+# npx kenmark-skills init --ide cursor,claude,codex --skip-recommended -y
 
 # Advanced — every detected harness path (may create clutter)
-# npx kenmark-skills init --global --ide all --skip-recommended -y
+# npx kenmark-skills init --ide all --skip-recommended -y
 
 # Kenmark only, Cursor
-npx kenmark-skills init --global --ide cursor --skip-recommended -y
+npx kenmark-skills init --ide cursor --skip-recommended -y
 
 # Recommended packs only (no Kenmark copy)
-npx kenmark-skills init --recommended-only --global --ids impeccable -y
+npx kenmark-skills init --recommended-only --ids impeccable -y
 
 # Preview commands
 npx kenmark-skills init --dry-run -y

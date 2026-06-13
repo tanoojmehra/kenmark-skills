@@ -10,6 +10,7 @@ const {
   getScopePromptLines,
   promptScope,
   rejectProjectScopeInArgv,
+  normalizeCliArgv,
   PROJECT_SCOPE_REMOVED
 } = require("./interactive");
 
@@ -58,7 +59,18 @@ async function main() {
     "PROJECT_SCOPE_REMOVED should mention global-only"
   );
 
+  assert(
+    normalizeCliArgv(["init", "--global", "--scope", "global", "--ide", "cursor"]).join(" ") ===
+      "init --ide cursor",
+    "normalizeCliArgv should strip deprecated scope flags"
+  );
+
   const setupScript = path.join(__dirname, "setup-skills.js");
+  const legacy = spawnSync(process.execPath, [setupScript, "--global", "--help"], {
+    encoding: "utf8"
+  });
+  assert(legacy.status === 0, "setup --global --help should succeed (deprecated flag ignored)");
+
   const result = spawnSync(process.execPath, [setupScript, "--project", "--help"], {
     encoding: "utf8"
   });

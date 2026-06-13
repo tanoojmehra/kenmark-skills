@@ -2,6 +2,11 @@
 
 Brain knowledge base
 
+## v2026.06.13-drop-global-flag
+
+- **CLI:** Removed documented `--global` flag; `normalizeCliArgv` strips deprecated scope flags for backward compatibility.
+- **KB/skills:** Examples updated to omit `--global`.
+
 ## v2026.06.13-global-only-install
 
 - **CLI:** Project scope removed; `--project` rejected. Interactive scope prompts removed.

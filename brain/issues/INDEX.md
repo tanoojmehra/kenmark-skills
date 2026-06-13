@@ -4,8 +4,8 @@
 
 | Field | Value |
 |------|-------|
-| Last Assigned ID | 002 |
-| Next ID | 003 |
+| Last Assigned ID | 012 |
+| Next ID | 013 |
 
 ## Ledger Rules
 
@@ -20,8 +20,8 @@
 | Category | Count |
 |----------|-------|
 | Active issues | 0 |
-| Completed | 2 |
-| **Total** | **2** |
+| Completed | 3 |
+| **Total** | **3** |
 
 ## Completed Issues
 
@@ -29,6 +29,7 @@
 |----|-------|-----------|
 | 001 | Replace Awesome Code Review with Simplify in recommended catalog | 2026-06-13 |
 | 002 | Remove project scope; global-only Kenmark installs | 2026-06-13 |
+| 012 | Remove redundant --global flag from CLI | 2026-06-13 |
 
 ## Active Issues by Priority
 

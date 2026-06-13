@@ -1,6 +1,6 @@
 {
   "name": "kenmark-skills",
-  "version": "2.3.19",
+  "version": "2.3.20",
   "description": "41 universal Kenmark agent skills + 12-command CLI for Cursor, Claude Code, Codex, and other SKILL.md-compatible agents. Includes setup, init, update, adopt, cleanup, validate, doctor, inventory, mcp, selectable optional packs with repo-aware suggestions, kenmark-repo-* maintenance skills, kenmark-security-review, kenmark-performance, and kenmark-test-* testing suite skills.",
   "license": "MIT",
   "private": false,

@@ -45,7 +45,7 @@ Updating Kenmark skills does **not** remove third-party skills. Re-running recom
 | Audience | How to run |
 | --- | --- |
 | **Human** | `npx kenmark-skills update` — prompts for what to refresh, scope, npm update |
-| **Agent** | `npx kenmark-skills update --kenmark-only --global --ide auto -y` (add `--both`, `--ids` only when needed) |
+| **Agent** | `npx kenmark-skills update --kenmark-only --ide auto -y` (add `--both`, `--ids` only when needed) |
 
 ## Step 1 — Interactive CLI (preferred)
 
@@ -68,13 +68,13 @@ Prompts (in order):
 
 ```bash
 # Full refresh (Kenmark + default recommended packs), global
-npx kenmark-skills update --both --global -y
+npx kenmark-skills update --both -y
 
 # Kenmark skills only, global
-npx kenmark-skills update --kenmark-only --global -y
+npx kenmark-skills update --kenmark-only -y
 
 # Reinstall recommended packs only
-npx kenmark-skills update --recommended-only --global --ids impeccable,ecc -y
+npx kenmark-skills update --recommended-only --ids impeccable,ecc -y
 
 # Upgrade global npm package only
 npx kenmark-skills update --npm-only -y
@@ -83,10 +83,10 @@ npx kenmark-skills update --npm-only -y
 npx kenmark-skills update --dry-run -y
 
 # Refresh without consolidating into ~/.kenmark/store
-npx kenmark-skills update --both --global --skip-adopt -y
+npx kenmark-skills update --both --skip-adopt -y
 
 # Adopt only (store + relink)
-npx kenmark-skills adopt --global -y
+npx kenmark-skills adopt -y
 ```
 
 From a **local checkout** of this repo:
@@ -101,8 +101,8 @@ If the CLI is unavailable, run the underlying commands:
 
 ```bash
 npm update -g kenmark-skills
-npx kenmark-skills setup --global -y
-npx kenmark-skills install-recommended --all --global -y
+npx kenmark-skills setup -y
+npx kenmark-skills install-recommended --all -y
 ```
 
 ## Step 4 — Verify
