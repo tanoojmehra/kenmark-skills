@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v2.3.21 — Non-interactive stdin guard (2026-06-13)
+
+### Fix
+
+- **CLI:** `init` and `update` detect TTY stdin without readable input (agent pseudo-TTY) and exit non-zero with guidance to re-run with flags and `-y`, instead of silently exiting with "Nothing selected."
+- **`wantsInteractive()`** now requires both stdin and stdout TTY.
+- **Test:** `scripts/test-interactive-noninteractive-stdin.js` added to `test:cli`.
+
+## v2.3.20 — Drop redundant --global flag (2026-06-13)
+
+### Change
+
+- **CLI:** Removed `--global` from help, docs, and examples. Installs are always global; legacy scripts passing `--global` or `--scope global` still work (silently ignored).
+
 ## v2.3.19 — Global-only installs (2026-06-13)
 
 ### Change

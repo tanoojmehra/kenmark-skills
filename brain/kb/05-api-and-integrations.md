@@ -36,8 +36,7 @@ Status: reviewed
 
 | Flag | Purpose |
 | --- | --- |
-| `--global` | User home IDE paths (only supported scope; default) |
-| `--ide <target>` | `cursor`, `claude`, `codex`, `antigravity-cli`, `antigravity`, `antigravity-ide`, `all`, comma-separated |
+| `--ide <target>` | User home IDE paths: `cursor`, `claude`, `codex`, … |
 | `-y` | Skip interactive prompts |
 | `--skip-recommended` | Kenmark skills only on `init` |
 | `--skip-npm` | Skip CLI version check / global upgrade on `init`; skip npm step on `update` |
@@ -104,18 +103,18 @@ Interactive `init`/`setup`/`update` prompt for individual server names. Non-inte
 
 ### Non-interactive agents / CI
 
-Set `KENMARK_SKILLS_NONINTERACTIVE=1` or pass `-y` with explicit flags.
+Set `KENMARK_SKILLS_NONINTERACTIVE=1` or pass `-y` with explicit flags. If `init`/`update` print "Non-interactive stdin detected", the shell is a pseudo-TTY without input — re-run with flags and `-y`.
 
 Examples:
 
 ```bash
-npx kenmark-skills init --global --skip-recommended -y
-npx kenmark-skills init --global --ide cursor --skip-recommended --mcp-servers playwright,context7 -y
-npx kenmark-skills init --global --ide antigravity-cli --mcp-profile web -y
-npx kenmark-skills init --global --ide antigravity-ide --mcp-profile web -y
-npx kenmark-skills init --global --ide antigravity --mcp-servers playwright,context7 -y
-npx kenmark-skills update --both --global -y
-npx kenmark-skills install-recommended --ids impeccable,simplify --global -y
+npx kenmark-skills init --skip-recommended -y
+npx kenmark-skills init --ide cursor --skip-recommended --mcp-servers playwright,context7 -y
+npx kenmark-skills init --ide antigravity-cli --mcp-profile web -y
+npx kenmark-skills init --ide antigravity-ide --mcp-profile web -y
+npx kenmark-skills init --ide antigravity --mcp-servers playwright,context7 -y
+npx kenmark-skills update --both -y
+npx kenmark-skills install-recommended --ids impeccable,simplify -y
 ```
 
 ## Important files inspected

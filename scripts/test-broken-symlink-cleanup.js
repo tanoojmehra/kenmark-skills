@@ -47,7 +47,7 @@ function main() {
 
     const result = spawnSync(
       process.execPath,
-      [cliPath, "setup", "--global", "--ide", "cursor", "-y", "--skip-adopt"],
+      [cliPath, "setup", "--ide", "cursor", "-y", "--skip-adopt"],
       {
         cwd: repoRoot,
         env: { ...process.env, HOME: home },

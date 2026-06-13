@@ -20,10 +20,10 @@ Status: reviewed
 
 ## Known risks
 
-- **TTY + EOF:** `init`/`update` may exit 0 with "Nothing selected" when stdin is TTY but EOF (agent subprocesses) — see `brain/issues/` tracker if present.
+- **TTY + EOF (fixed 006):** `assertInteractiveStdin()` and stricter `wantsInteractive()` exit non-zero with re-run guidance when stdin is TTY but EOF (agent subprocesses).
 - **WSL vs native Windows:** Installs into WSL home are invisible to native Windows IDEs — doctor warns.
 - **Adopt overwrite:** Hash mismatches require explicit `--adopt-overwrite` / `--force`.
-- **Impeccable script paths:** Upstream `SKILL.md` uses `node ./scripts/*.mjs` (skill-relative). Agents run shell from project CWD — kenmark adopt rewrites these to absolute store paths; re-run `npx kenmark-skills adopt --global --ide all -y` after upgrading kenmark-skills if impeccable setup still fails.
+- **Impeccable script paths:** Upstream `SKILL.md` uses `node ./scripts/*.mjs` (skill-relative). Agents run shell from project CWD — kenmark adopt rewrites these to absolute store paths; re-run `npx kenmark-skills adopt --ide all -y` after upgrading kenmark-skills if impeccable setup still fails.
 - **Legacy cleanup scope:** `listLegacyKenmarkSkillPaths()` must not include canonical bundled names when `kenmark-${old}` equals the rename target (fixed issue 010).
 - **Gemini/Codex duplicate skills (fixed 011):** Installing to both `~/.agents/skills` and `~/.gemini/skills` caused Gemini CLI conflict warnings — dedupe on link + prune duplicates on setup/adopt.
 - **Antigravity CLI/Gemini shared path:** Antigravity CLI reads `~/.gemini/skills` alongside `~/.gemini/antigravity-cli/skills` — dedupe when both `antigravity-cli` and `gemini` are in `--ide`.

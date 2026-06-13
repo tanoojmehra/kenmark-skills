@@ -32,7 +32,7 @@ See [features/002-skills-catalog.md](features/002-skills-catalog.md) for full ca
 
 ```bash
 npx kenmark-skills update          # interactive
-npx kenmark-skills update --both --global -y   # non-interactive
+npx kenmark-skills update --both -y   # non-interactive
 ```
 
 Do **not** re-run `init` for routine skill refreshes — use `update`. Re-run `init` when you want the first-install wizard again or after upgrading a stale global CLI.
@@ -42,8 +42,8 @@ Do **not** re-run `init` for routine skill refreshes — use `update`. Re-run `i
 After install or when `doctor` reports non-portable paths:
 
 ```bash
-npx kenmark-skills adopt --global -y
-npx kenmark-skills adopt --global --adopt-overwrite -y   # when review-required
+npx kenmark-skills adopt -y
+npx kenmark-skills adopt --adopt-overwrite -y   # when review-required
 ```
 
 ### Cleanup vs uninstall

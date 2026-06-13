@@ -4,10 +4,12 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 const {
   wantsInteractive,
+  assertInteractiveStdin,
   promptMcpServers,
   confirmPlan,
   banner,
-  rejectProjectScopeInArgv
+  rejectProjectScopeInArgv,
+  normalizeCliArgv
 } = require("./interactive");
 const readline = require("readline");
 const {
@@ -36,7 +38,6 @@ function printUsage() {
   console.log("  --kenmark-only        Update Kenmark skills only (re-copy from package)");
   console.log("  --recommended-only    Re-run recommended pack installs only");
   console.log("  --both                Update Kenmark skills and recommended packs");
-  console.log("  --global              User-wide install paths (default; only supported scope)");
   console.log("  --ide <target>        IDE for Kenmark sync: cursor, claude, all, …");
   console.log("  --ids a,b             Recommended pack ids (default: defaultSelected)");
   console.log("  --all                 Refresh all recommended packs");
@@ -86,10 +87,6 @@ function parseArgs(argv) {
     }
     if (t === "--both") {
       args.mode = "both";
-      continue;
-    }
-    if (t === "--global") {
-      args.scope = "global";
       continue;
     }
     if (t === "--project") {
@@ -243,12 +240,15 @@ function runNodeScript(scriptPath, scriptArgs, dryRun, label) {
 }
 
 async function run() {
-  const argv = process.argv.slice(2);
-  rejectProjectScopeInArgv(argv);
-  const args = parseArgs(argv);
+  rejectProjectScopeInArgv(process.argv.slice(2));
+  const args = parseArgs(normalizeCliArgv(process.argv.slice(2)));
   if (args.help) {
     printUsage();
     process.exit(0);
+  }
+
+  if (wantsInteractive(args)) {
+    await assertInteractiveStdin();
   }
 
   const localVersion = readLocalPackageVersion(repoRoot);
@@ -369,7 +369,7 @@ async function run() {
   }
 
   if (mode === "kenmark" || mode === "both") {
-    const setupArgs = ["--global", "--install", "--ide", ide || "auto", "-y"];
+    const setupArgs = ["--install", "--ide", ide || "auto", "-y"];
     if (args.skipAdopt) setupArgs.push("--skip-adopt");
     if (args.eccProfile) setupArgs.push("--ecc-profile", args.eccProfile);
     if (args.skipMcp) setupArgs.push("--skip-mcp");
@@ -393,10 +393,7 @@ async function run() {
 
   if (mode === "recommended" || mode === "both") {
     const catalog = loadCatalog();
-    const recArgs = [
-      "--global",
-      "-y"
-    ];
+    const recArgs = ["-y"];
     if (args.ids?.length) {
       recArgs.push("--ids", args.ids.join(","));
     } else if (args.allPacks) {

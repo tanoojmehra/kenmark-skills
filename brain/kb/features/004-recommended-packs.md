@@ -31,18 +31,18 @@ Catalog `installRules.overlapCaps`: one primary pack per category (design, revie
 ```bash
 npx kenmark-skills install-recommended --list
 npx kenmark-skills install-recommended --suggest
-npx kenmark-skills install-recommended --ids impeccable,simplify --global -y
-npx kenmark-skills install-recommended --profile core-next --global -y
+npx kenmark-skills install-recommended --ids impeccable,simplify -y
+npx kenmark-skills install-recommended --profile core-next -y
 ```
 
 In chat: **kenmark-packs** (guided), **kenmark-maintain** (inventory, no auto-delete).
 
-After install/adopt, Kenmark rewrites impeccable `SKILL.md` script invocations from `./scripts/` to absolute store paths so agents can run setup scripts from any project directory. If impeccable setup fails with missing `scripts/context.mjs`, run `npx kenmark-skills adopt --global --ide all -y`.
+After install/adopt, Kenmark rewrites impeccable `SKILL.md` script invocations from `./scripts/` to absolute store paths so agents can run setup scripts from any project directory. If impeccable setup fails with missing `scripts/context.mjs`, run `npx kenmark-skills adopt --ide all -y`.
 
 ## Cleanup catalog packs
 
 ```bash
-npx kenmark-skills cleanup --global --recommended -y
+npx kenmark-skills cleanup --recommended -y
 ```
 
 Does not remove Kenmark bundled skills unless `--kenmark` or `--all-managed`.

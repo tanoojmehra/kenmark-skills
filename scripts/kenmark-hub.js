@@ -2702,7 +2702,7 @@ function runDoctor(options = {}) {
   });
   if (geminiCodexDuplicates.length) {
     warnings.push(
-      `Gemini/Codex duplicate skills: ${geminiCodexDuplicates.length} Kenmark skill(s) exist in both ${targetMap.gemini} and ${targetMap.codex}. Re-run npx kenmark-skills setup --global --ide <your-ides> -y to remove ~/.gemini/skills duplicates.`
+      `Gemini/Codex duplicate skills: ${geminiCodexDuplicates.length} Kenmark skill(s) exist in both ${targetMap.gemini} and ${targetMap.codex}. Re-run npx kenmark-skills setup --ide <your-ides> -y to remove ~/.gemini/skills duplicates.`
     );
   }
 
@@ -2712,7 +2712,7 @@ function runDoctor(options = {}) {
   });
   if (agyGeminiDuplicates.length) {
     warnings.push(
-      `Antigravity CLI/Gemini duplicate skills: ${agyGeminiDuplicates.length} Kenmark skill(s) exist in both ${targetMap.gemini} and ${targetMap["antigravity-cli"]}. Re-run npx kenmark-skills setup --global --ide <your-ides> -y to remove ~/.gemini/skills duplicates.`
+      `Antigravity CLI/Gemini duplicate skills: ${agyGeminiDuplicates.length} Kenmark skill(s) exist in both ${targetMap.gemini} and ${targetMap["antigravity-cli"]}. Re-run npx kenmark-skills setup --ide <your-ides> -y to remove ~/.gemini/skills duplicates.`
     );
   }
 

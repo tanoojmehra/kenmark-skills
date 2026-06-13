@@ -99,7 +99,7 @@ Help the user pick **caps** (e.g. "keep at most 3 SEO audit skills") if they wan
 When the report shows **adopt-candidate** for Kenmark bundled or catalog skills (e.g. `impeccable`):
 
 ```bash
-npx kenmark-skills adopt --global -y
+npx kenmark-skills adopt -y
 ```
 
 This copies adoptable skills into `~/.kenmark/store/skills` and relinks IDE paths. It does **not** auto-merge arbitrary duplicate trees (e.g. multiple distinct `issues-*` copies).
@@ -126,7 +126,7 @@ rm -rf ~/.claude/skills/gstack/.cursor/skills/gstack-browse
 
 1. Re-run inventory to confirm counts dropped
 2. Suggest **kenmark-packs** if they want a minimal curated set
-3. Remind: `npx kenmark-skills update` refreshes Kenmark skills and optional recommended packs; `npx kenmark-skills setup --global -y` syncs Kenmark only (`--ide all` only when every detected harness path is needed)
+3. Remind: `npx kenmark-skills update` refreshes Kenmark skills and optional recommended packs; `npx kenmark-skills setup -y` syncs Kenmark only (`--ide all` only when every detected harness path is needed)
 
 ## Maintenance
 

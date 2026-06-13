@@ -4,8 +4,9 @@ title: Legacy cleanup deletes canonical bundled kenmark-* skills
 severity: P0
 area: cli
 source: cleanup verification
-status: open
+status: completed
 created: 2026-06-08
+completed: 2026-06-13
 files:
   - scripts/kenmark-hub.js
   - scripts/test-legacy-cleanup-canonical.js
@@ -30,7 +31,11 @@ related:
 
 ## Acceptance criteria
 
-- [ ] `listLegacyKenmarkSkillPaths()` excludes canonical bundled names.
-- [ ] Init/store install followed by legacy cleanup retains bundled skills.
-- [ ] `npm test` passes.
-- [ ] `brain/kb/` and CHANGELOG updated.
+- [x] `listLegacyKenmarkSkillPaths()` excludes canonical bundled names.
+- [x] Init/store install followed by legacy cleanup retains bundled skills.
+- [x] `npm test` passes.
+- [x] `brain/kb/` and CHANGELOG updated.
+
+## Resolution
+
+`listLegacyKenmarkSkillPaths()` skips `kenmark-${old}` when it equals the canonical rename target. `scripts/test-legacy-cleanup-canonical.js` regression test passes.

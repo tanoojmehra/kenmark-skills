@@ -5,6 +5,7 @@ const os = require("os");
 const { spawnSync } = require("child_process");
 const {
   wantsInteractive,
+  assertInteractiveStdin,
   promptIde,
   promptYesNo,
   promptSelectOptionalPacks,
@@ -12,7 +13,8 @@ const {
   promptMcpServers,
   confirmPlan,
   banner,
-  rejectProjectScopeInArgv
+  rejectProjectScopeInArgv,
+  normalizeCliArgv
 } = require("./interactive");
 const {
   loadCatalog,
@@ -51,7 +53,6 @@ function printUsage() {
   console.log("Interactive first-time setup: Kenmark skills + optional recommended packs.");
   console.log("");
   console.log("Options:");
-  console.log("  --global              Global scope (default; only supported scope)");
   console.log("  --ide <target>        IDE: cursor, claude, all, …");
   console.log("  --skip-recommended    Only install Kenmark skills (non-interactive)");
   console.log("  --recommended-only    Only install recommended packs (non-interactive)");
@@ -97,10 +98,6 @@ function parseArgs(argv) {
     }
     if (t === "--dry-run") {
       args.dryRun = true;
-      continue;
-    }
-    if (t === "--global") {
-      args.scope = "global";
       continue;
     }
     if (t === "--project") {
@@ -245,12 +242,15 @@ async function maybeUpgradeCliBeforeInit(args) {
 }
 
 async function run() {
-  const argv = process.argv.slice(2);
-  rejectProjectScopeInArgv(argv);
-  const args = parseArgs(argv);
+  rejectProjectScopeInArgv(process.argv.slice(2));
+  const args = parseArgs(normalizeCliArgv(process.argv.slice(2)));
   if (args.help) {
     printUsage();
     process.exit(0);
+  }
+
+  if (wantsInteractive(args)) {
+    await assertInteractiveStdin();
   }
 
   banner(
@@ -417,7 +417,7 @@ async function run() {
   if (args.dryRun) console.log("\n(dry-run — commands only)\n");
 
   if (installKenmark) {
-    const setupArgs = ["--global", "--install", "-y"];
+    const setupArgs = ["--install", "-y"];
     if (ideArg) setupArgs.push("--ide", ideArg);
     if (args.skipMcp) setupArgs.push("--skip-mcp");
     if (args.withMcp) setupArgs.push("--with-mcp");
@@ -435,7 +435,7 @@ async function run() {
   }
 
   if (installRecommended) {
-    const recArgs = ["--global"];
+    const recArgs = [];
     if (selectedPreset) {
       recArgs.push("--profile", selectedPreset);
     } else {

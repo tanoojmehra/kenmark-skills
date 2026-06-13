@@ -62,7 +62,7 @@ function main() {
   const failures = [];
 
   const dryRun = runPacks(
-    ["--ids", "impeccable", "--global", "--dry-run", "-y", "--skip-adopt"],
+    ["--ids", "impeccable", "--dry-run", "-y", "--skip-adopt"],
     {}
   );
   const dryStdout = (dryRun.stdout || "") + (dryRun.stderr || "");
@@ -90,7 +90,7 @@ function main() {
     fs.writeFileSync(agentsSkill, "# impeccable\n");
 
     const skipRun = runPacks(
-      ["--ids", "impeccable", "--global", "-y", "--skip-adopt"],
+      ["--ids", "impeccable", "-y", "--skip-adopt"],
       { HOME: tempHome }
     );
     const skipStdout = (skipRun.stdout || "") + (skipRun.stderr || "");
@@ -111,7 +111,6 @@ function main() {
         "install-recommended",
         "--ids",
         "impeccable",
-        "--global",
         "--ide",
         "claude",
         "-y",
@@ -131,7 +130,7 @@ function main() {
     }
 
     const forceRun = runPacks(
-      ["--ids", "impeccable", "--global", "-y", "--skip-adopt", "--force", "--dry-run"],
+      ["--ids", "impeccable", "-y", "--skip-adopt", "--force", "--dry-run"],
       { HOME: tempHome }
     );
     const forceStdout = (forceRun.stdout || "") + (forceRun.stderr || "");
@@ -150,7 +149,6 @@ function main() {
         "install-recommended",
         "--ids",
         "impeccable",
-        "--global",
         "--ide",
         "claude",
         "-y",
@@ -190,7 +188,6 @@ function main() {
         [
           "--ids",
           "simplify",
-          "--global",
           "-y",
           "--ide",
           "cursor,codex,gemini,opencode,minimax"

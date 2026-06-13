@@ -33,10 +33,59 @@ function ask(rl, question) {
   return new Promise((resolve) => rl.question(question, (ans) => resolve(ans.trim())));
 }
 
+const NONINTERACTIVE_STDIN_HINT =
+  "Non-interactive stdin detected (TTY without readable input). " +
+  "Re-run with explicit flags and -y, e.g. npx kenmark-skills init --ide auto -y\n" +
+  "Or set KENMARK_SKILLS_NONINTERACTIVE=1 to skip interactive mode.";
+
+function stdinEnded() {
+  return Boolean(
+    process.stdin.readableEnded || process.stdin.closed || process.stdin.destroyed
+  );
+}
+
 function wantsInteractive(parsed) {
   if (parsed.yes) return false;
   if (process.env.KENMARK_SKILLS_NONINTERACTIVE === "1") return false;
-  return Boolean(process.stdin.isTTY);
+  return Boolean(process.stdin.isTTY && process.stdout.isTTY);
+}
+
+/**
+ * Exit with guidance when stdin is a TTY but will not deliver input (agent pseudo-TTY).
+ */
+async function assertInteractiveStdin() {
+  if (!process.stdin.isTTY) return;
+  if (!process.stdout.isTTY || stdinEnded()) {
+    console.error(NONINTERACTIVE_STDIN_HINT);
+    process.exit(1);
+  }
+
+  const immediateEof = await new Promise((resolve) => {
+    let settled = false;
+    const done = (eof) => {
+      if (settled) return;
+      settled = true;
+      process.stdin.removeListener("end", onEnd);
+      process.stdin.removeListener("close", onClose);
+      clearTimeout(timer);
+      resolve(eof);
+    };
+    const onEnd = () => done(true);
+    const onClose = () => done(true);
+    process.stdin.once("end", onEnd);
+    process.stdin.once("close", onClose);
+    if (stdinEnded()) {
+      done(true);
+      return;
+    }
+    process.stdin.resume();
+    const timer = setTimeout(() => done(false), 0);
+  });
+
+  if (immediateEof) {
+    console.error(NONINTERACTIVE_STDIN_HINT);
+    process.exit(1);
+  }
 }
 
 async function promptYesNo(message, defaultYes = true) {
@@ -44,6 +93,10 @@ async function promptYesNo(message, defaultYes = true) {
   const hint = defaultYes ? "[Y/n]" : "[y/N]";
   const answer = await ask(rl, `${message} ${hint} `);
   rl.close();
+  if (!answer && stdinEnded()) {
+    console.error(NONINTERACTIVE_STDIN_HINT);
+    process.exit(1);
+  }
   if (!answer) return defaultYes;
   const lower = answer.toLowerCase();
   if (lower === "y" || lower === "yes") return true;
@@ -58,7 +111,7 @@ function parseScopeChoice(answer) {
 }
 
 const PROJECT_SCOPE_REMOVED =
-  "Project scope is not supported. Kenmark-skills installs globally only (~/.kenmark/store, ~/.cursor, ~/.claude, …). Use --global or omit the scope flag.";
+  "Project scope is not supported. Kenmark-skills installs globally only (~/.kenmark/store, ~/.cursor, ~/.claude, …). Omit scope flags.";
 
 function rejectProjectScopeInArgv(argv) {
   const args = Array.isArray(argv) ? argv : [];
@@ -68,11 +121,30 @@ function rejectProjectScopeInArgv(argv) {
       console.error(PROJECT_SCOPE_REMOVED);
       process.exit(1);
     }
-    if (token === "--scope" && args[i + 1] === "project") {
-      console.error(PROJECT_SCOPE_REMOVED);
-      process.exit(1);
+    if (token === "--scope") {
+      const value = (args[i + 1] || "").toLowerCase();
+      if (value === "project") {
+        console.error(PROJECT_SCOPE_REMOVED);
+        process.exit(1);
+      }
     }
   }
+}
+
+/** Drop deprecated scope flags; installs are always global. */
+function normalizeCliArgv(argv) {
+  const args = Array.isArray(argv) ? argv : [];
+  const out = [];
+  for (let i = 0; i < args.length; i += 1) {
+    const token = args[i];
+    if (token === "--global") continue;
+    if (token === "--scope" && (args[i + 1] || "").toLowerCase() === "global") {
+      i += 1;
+      continue;
+    }
+    out.push(token);
+  }
+  return out;
 }
 
 const SCOPE_PROMPTS = {
@@ -628,10 +700,14 @@ module.exports = {
   createRl,
   ask,
   wantsInteractive,
+  assertInteractiveStdin,
+  NONINTERACTIVE_STDIN_HINT,
+  stdinEnded,
   promptYesNo,
   getScopePromptLines,
   promptScope,
   rejectProjectScopeInArgv,
+  normalizeCliArgv,
   PROJECT_SCOPE_REMOVED,
   promptAction,
   promptIde,

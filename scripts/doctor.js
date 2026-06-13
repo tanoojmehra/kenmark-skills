@@ -139,12 +139,12 @@ function run() {
 
   if (Object.values(report.brokenSymlinksByIde).some((items) => items.length)) {
     console.log("\nSuggested fix:");
-    console.log("  npx kenmark-skills cleanup --global --ide auto -y");
-    console.log("  npx kenmark-skills cleanup --global --kenmark --dry-run   # preview kenmark-* removal");
-    console.log("  npx kenmark-skills cleanup --global --all --dry-run   # preview legacy + broken");
+    console.log("  npx kenmark-skills cleanup --ide auto -y");
+    console.log("  npx kenmark-skills cleanup --kenmark --dry-run   # preview kenmark-* removal");
+    console.log("  npx kenmark-skills cleanup --all --dry-run   # preview legacy + broken");
     const copyFlag = report.platform === "win32" ? " --copy" : "";
     console.log("  To refresh working links after cleanup:");
-    console.log(`  npx kenmark-skills setup --global --ide auto${copyFlag} -y`);
+    console.log(`  npx kenmark-skills setup --ide auto${copyFlag} -y`);
   }
 
   if (report.platform === "win32") {
@@ -152,7 +152,7 @@ function run() {
     if (cursorCount === 0 && report.storeSkillCount > 0) {
       console.log("\nWindows tip:");
       console.log(
-        "  npx kenmark-skills setup --global --ide cursor --copy --skip-adopt -y"
+        "  npx kenmark-skills setup --ide cursor --copy --skip-adopt -y"
       );
       console.log("  Then restart Cursor (Developer: Reload Window or full quit).");
     }
@@ -178,7 +178,7 @@ function run() {
       console.log(`  • ${issue}`);
     }
     console.log("\nSuggested fix for portability / installation issues:");
-    console.log("  npx kenmark-skills adopt --global --ide all -y");
+    console.log("  npx kenmark-skills adopt --ide all -y");
   }
 
   if (args.jsonPath) {

@@ -2,6 +2,17 @@
 
 Brain knowledge base
 
+## v2026.06.13-noninteractive-stdin
+
+- **CLI:** `assertInteractiveStdin()` and stricter `wantsInteractive()` guard init/update against TTY+EOF silent exit.
+- **Tests:** `test-interactive-noninteractive-stdin.js` in `test:cli`.
+- **Issues:** Closed 006, 009, 010.
+
+## v2026.06.13-drop-global-flag
+
+- **CLI:** Removed documented `--global` flag; `normalizeCliArgv` strips deprecated scope flags for backward compatibility.
+- **KB/skills:** Examples updated to omit `--global`.
+
 ## v2026.06.13-global-only-install
 
 - **CLI:** Project scope removed; `--project` rejected. Interactive scope prompts removed.

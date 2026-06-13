@@ -9,7 +9,8 @@ const {
   promptEccProfile,
   confirmPlan,
   banner,
-  rejectProjectScopeInArgv
+  rejectProjectScopeInArgv,
+  normalizeCliArgv
 } = require("./interactive");
 const {
   loadCatalog,
@@ -64,7 +65,6 @@ function printUsage() {
   console.log("  --profile <id>      Alias for --preset (backward compatible)");
   console.log("  --all               Install every pack (legacy)");
   console.log("  --ids a,b           Install specific pack ids");
-  console.log("  --global            Install to user home (default; only supported scope)");
   console.log("  --ecc-profile <id>  Override ECC profile (minimal, core, full)");
   console.log("  --ide <target>      Limit adopt/relink: cursor, cursor,codex,claude, all, …");
   console.log("  --skip-adopt        Skip post-install catalog adoption");
@@ -148,17 +148,8 @@ function parseArgs(argv) {
       args.yes = true;
       continue;
     }
-    if (t === "--global") {
-      args.scope = "global";
-      continue;
-    }
     if (t === "--project") {
       args.scope = "project";
-      continue;
-    }
-    if (t === "--scope") {
-      args.scope = (argv[i + 1] || "").trim().toLowerCase();
-      i += 1;
       continue;
     }
     if (t === "--ecc-profile") {
@@ -219,7 +210,7 @@ function printPresets(catalog) {
     if (p.requiresConfirmation) console.log("    ⚠ requires confirmation (high bloat)");
     console.log("");
   }
-  console.log("Install: npx kenmark-skills install-recommended --preset <id> --global -y");
+  console.log("Install: npx kenmark-skills install-recommended --preset <id> -y");
 }
 
 function applyEccOverride(installPlan, eccProfileOverride) {
@@ -281,9 +272,8 @@ function verifyPack(pack, entry) {
 }
 
 async function run() {
-  const argv = process.argv.slice(2);
-  rejectProjectScopeInArgv(argv);
-  const args = parseArgs(argv);
+  rejectProjectScopeInArgv(process.argv.slice(2));
+  const args = parseArgs(normalizeCliArgv(process.argv.slice(2)));
   if (args.help) {
     printUsage();
     process.exit(0);

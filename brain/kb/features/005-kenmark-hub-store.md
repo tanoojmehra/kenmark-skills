@@ -40,8 +40,8 @@ When copying to store, hardcoded IDE anchor paths in `SKILL.md` and `scripts/*.{
 ## Uninstall vs keep store
 
 ```bash
-npx kenmark-skills uninstall --global --keep-store   # remove links only
-npx kenmark-skills uninstall --global                # links + MCP; store skills remain unless user deletes ~/.kenmark
+npx kenmark-skills uninstall --keep-store   # remove links only
+npx kenmark-skills uninstall                # links + MCP; store skills remain unless user deletes ~/.kenmark
 ```
 
 ## Maintenance

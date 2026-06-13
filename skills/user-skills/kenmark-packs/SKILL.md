@@ -76,7 +76,7 @@ Do **not** install multiple overlapping packs for the same purpose unless the us
 | Audience | How to run |
 | --- | --- |
 | **Human** | `npx kenmark-skills install-recommended` — checklist + repo suggestions, scope, confirm |
-| **Agent** | `npx kenmark-skills install-recommended --ids impeccable,simplify --global -y` or `--profile core-next` |
+| **Agent** | `npx kenmark-skills install-recommended --ids impeccable,simplify -y` or `--profile core-next` |
 
 ## Step 1 — Suggest or list
 
@@ -91,16 +91,16 @@ Interactive flow shows weight, bloat, and stack-specific suggestions before conf
 ## Step 2 — Install selected packs (preferred)
 
 ```bash
-npx kenmark-skills install-recommended --ids impeccable,simplify --global -y
-npx kenmark-skills install-recommended --ids impeccable,simplify,graphify --global -y
+npx kenmark-skills install-recommended --ids impeccable,simplify -y
+npx kenmark-skills install-recommended --ids impeccable,simplify,graphify -y
 ```
 
 ## Step 3 — Presets (advanced / CI)
 
 ```bash
-npx kenmark-skills install-recommended --profile core-next --global -y
-npx kenmark-skills install-recommended --profile growth-seo --global -y
-npx kenmark-skills install-recommended --profile lean --global -y
+npx kenmark-skills install-recommended --profile core-next -y
+npx kenmark-skills install-recommended --profile growth-seo -y
+npx kenmark-skills install-recommended --profile lean -y
 ```
 
 ## Step 4 — Verify
@@ -118,7 +118,7 @@ Run **kenmark-maintain** inventory to catch duplicate explosion.
 Kenmark skills are the **curator OS** (router, maintain, install-recommended, update, kenmark-init, kenmark-commit, issues-*):
 
 ```bash
-npx kenmark-skills setup --global -y
+npx kenmark-skills setup -y
 ```
 
 ## CLI reference
@@ -126,8 +126,8 @@ npx kenmark-skills setup --global -y
 ```bash
 npx kenmark-skills install-recommended --suggest
 npx kenmark-skills install-recommended --list
-npx kenmark-skills install-recommended --ids impeccable --global -y
-npx kenmark-skills install-recommended --profile core-next --global -y
+npx kenmark-skills install-recommended --ids impeccable -y
+npx kenmark-skills install-recommended --profile core-next -y
 npx kenmark-skills install-recommended   # interactive checklist
 ```
 

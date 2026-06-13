@@ -10,7 +10,8 @@ const {
   promptMcpServers,
   confirmPlan,
   banner,
-  rejectProjectScopeInArgv
+  rejectProjectScopeInArgv,
+  normalizeCliArgv
 } = require("./interactive");
 const {
   buildGlobalTargets,
@@ -80,7 +81,6 @@ function printUsage() {
   console.log("");
   console.log("Options:");
   console.log("  --install | --uninstall   Action (default: install)");
-  console.log("  --global                  Install scope (global only; default)");
   console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, antigravity-ide, all, …");
   console.log("  --copy                    Copy into IDE paths instead of symlinks");
   console.log("  --symlink                 Force symlinks (Windows: junction) instead of copy");
@@ -101,16 +101,16 @@ function printUsage() {
   console.log("");
   console.log("Examples:");
   console.log("  npx kenmark-skills setup");
-  console.log("  npx kenmark-skills setup --global -y");
-  console.log("  npx kenmark-skills setup --global --ide cursor,claude,codex -y");
-  console.log("  npx kenmark-skills setup --skip-adopt --global --ide cursor -y");
-  console.log("  npx kenmark-skills setup --mcp-profile web --global --ide cursor -y");
-  console.log("  npx kenmark-skills setup --mcp-servers playwright,context7 --global --ide cursor -y");
-  console.log("  npx kenmark-skills setup --with-mcp --global --ide cursor,claude,codex -y");
-  console.log("  npx kenmark-skills uninstall --global --ide claude");
-  console.log("  npx kenmark-skills uninstall --mcp-only --global --ide cursor -y");
-  console.log("  npx kenmark-skills mcp uninstall --global --ide cursor -y");
-  console.log("  npx kenmark-skills setup --global --ide all -y   # advanced: every detected IDE path");
+  console.log("  npx kenmark-skills setup -y");
+  console.log("  npx kenmark-skills setup --ide cursor,claude,codex -y");
+  console.log("  npx kenmark-skills setup --skip-adopt --ide cursor -y");
+  console.log("  npx kenmark-skills setup --mcp-profile web --ide cursor -y");
+  console.log("  npx kenmark-skills setup --mcp-servers playwright,context7 --ide cursor -y");
+  console.log("  npx kenmark-skills setup --with-mcp --ide cursor,claude,codex -y");
+  console.log("  npx kenmark-skills uninstall --ide claude");
+  console.log("  npx kenmark-skills uninstall --mcp-only --ide cursor -y");
+  console.log("  npx kenmark-skills mcp uninstall --ide cursor -y");
+  console.log("  npx kenmark-skills setup --ide all -y   # advanced: every detected IDE path");
 }
 
 function parseArgs(argv) {
@@ -151,11 +151,6 @@ function parseArgs(argv) {
     }
     if (token === "--project") {
       args.mode = "project";
-      args.explicitMode = true;
-      continue;
-    }
-    if (token === "--global") {
-      args.mode = "global";
       args.explicitMode = true;
       continue;
     }
@@ -611,9 +606,8 @@ function executeInstall(targetMap, requestedTargetIdes, action, options) {
 }
 
 async function run() {
-  const argv = process.argv.slice(2);
-  rejectProjectScopeInArgv(argv);
-  const args = parseArgs(argv);
+  rejectProjectScopeInArgv(process.argv.slice(2));
+  const args = parseArgs(normalizeCliArgv(process.argv.slice(2)));
   if (args.help) {
     printUsage();
     process.exit(0);

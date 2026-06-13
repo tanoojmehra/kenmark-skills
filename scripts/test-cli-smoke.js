@@ -16,26 +16,24 @@ const COMMANDS = [
   ["--version"],
   ["-v"],
   ["validate"],
-  ["setup", "--dry-run", "--global", "--ide", "claude", "-y"],
-  ["setup", "--dry-run", "--global", "--ide", "cursor", "--mcp-profile", "web", "-y"],
-  ["setup", "--dry-run", "--global", "--ide", "cursor", "--mcp-servers", "playwright,fetch", "-y"],
-  ["setup", "--dry-run", "--global", "--ide", "gemini,kiro", "--mcp-profile", "web", "-y"],
-  ["setup", "--dry-run", "--global", "--ide", "codex,gemini", "--mcp-servers", "playwright", "-y"],
+  ["setup", "--dry-run", "--ide", "claude", "-y"],
+  ["setup", "--dry-run", "--ide", "cursor", "--mcp-profile", "web", "-y"],
+  ["setup", "--dry-run", "--ide", "cursor", "--mcp-servers", "playwright,fetch", "-y"],
+  ["setup", "--dry-run", "--ide", "gemini,kiro", "--mcp-profile", "web", "-y"],
+  ["setup", "--dry-run", "--ide", "codex,gemini", "--mcp-servers", "playwright", "-y"],
   [
     "setup",
     "--dry-run",
-    "--global",
     "--ide",
     "antigravity-cli,antigravity,antigravity-ide",
     "--mcp-profile",
     "web",
     "-y"
   ],
-  ["init", "--dry-run", "--global", "--ide", "claude", "--skip-recommended", "-y"],
+  ["init", "--dry-run", "--ide", "claude", "--skip-recommended", "-y"],
   [
     "init",
     "--dry-run",
-    "--global",
     "--ide",
     "cursor",
     "--skip-recommended",
@@ -49,7 +47,6 @@ const COMMANDS = [
     "--preset",
     "core-next",
     "--dry-run",
-    "--global",
     "--ide",
     "claude",
     "-y"
@@ -59,7 +56,6 @@ const COMMANDS = [
     "--profile",
     "lean",
     "--dry-run",
-    "--global",
     "--ide",
     "claude",
     "-y"
@@ -69,15 +65,13 @@ const COMMANDS = [
     "--ids",
     "impeccable",
     "--dry-run",
-    "--global",
     "--skip-adopt",
     "-y"
   ],
-  ["update", "--kenmark-only", "--global", "--ide", "auto", "-y", "--dry-run"],
+  ["update", "--kenmark-only", "--ide", "auto", "-y", "--dry-run"],
   [
     "update",
     "--kenmark-only",
-    "--global",
     "--ide",
     "auto",
     "--mcp-profile",
@@ -85,17 +79,17 @@ const COMMANDS = [
     "-y",
     "--dry-run"
   ],
-  ["update", "--both", "--global", "--ide", "auto", "--dry-run", "-y"],
+  ["update", "--both", "--ide", "auto", "--dry-run", "-y"],
   ["doctor", "--soft", "--no-fail"],
-  ["cleanup", "--dry-run", "--global", "-y"]
+  ["cleanup", "--dry-run", "-y"]
 ];
 
 /** @type {{ args: string[], expectStdout?: RegExp[], expectStderr?: RegExp[], rejectStdout?: RegExp[] }[]} */
 const ASSERTIONS = [
   {
-    args: ["update", "--kenmark-only", "--global", "--ide", "auto", "-y", "--dry-run"],
+    args: ["update", "--kenmark-only", "--ide", "auto", "-y", "--dry-run"],
     expectStdout: [
-      /setup-skills\.js --global --install --ide auto -y/,
+      /setup-skills\.js --install --ide auto -y/,
       /Kenmark skills/
     ],
     rejectStdout: [/Recommended packs/, /kenmark-packs\.js/, /--all/, /--mcp-profile/]
@@ -104,7 +98,6 @@ const ASSERTIONS = [
     args: [
       "update",
       "--kenmark-only",
-      "--global",
       "--ide",
       "auto",
       "--mcp-profile",
@@ -113,7 +106,7 @@ const ASSERTIONS = [
       "--dry-run"
     ],
     expectStdout: [
-      /setup-skills\.js --global --install --ide auto -y --mcp-profile web/,
+      /setup-skills\.js --install --ide auto -y --mcp-profile web/,
       /MCP servers \(browsermcp, playwright\)/
     ]
   },
@@ -121,7 +114,6 @@ const ASSERTIONS = [
     args: [
       "init",
       "--dry-run",
-      "--global",
       "--ide",
       "cursor",
       "--skip-recommended",
@@ -130,7 +122,7 @@ const ASSERTIONS = [
       "-y"
     ],
     expectStdout: [
-      /setup-skills\.js --global --install -y --ide cursor --mcp-profile research/,
+      /setup-skills\.js --install -y --ide cursor --mcp-profile research/,
       /MCP servers \(context7, fetch\)/
     ]
   },
@@ -138,7 +130,6 @@ const ASSERTIONS = [
     args: [
       "init",
       "--dry-run",
-      "--global",
       "--ide",
       "cursor",
       "--skip-recommended",
@@ -147,12 +138,12 @@ const ASSERTIONS = [
       "-y"
     ],
     expectStdout: [
-      /setup-skills\.js --global --install -y --ide cursor --mcp-servers playwright,context7/,
+      /setup-skills\.js --install -y --ide cursor --mcp-servers playwright,context7/,
       /MCP servers \(context7, playwright\)/
     ]
   },
   {
-    args: ["setup", "--dry-run", "--global", "--ide", "cursor", "--mcp-profile", "web", "-y"],
+    args: ["setup", "--dry-run", "--ide", "cursor", "--mcp-profile", "web", "-y"],
     expectStdout: [/MCP servers \(browsermcp, playwright\)/, /browsermcp/],
     expectStderr: [/prefer `npx kenmark-skills init --skip-recommended -y`/]
   },
@@ -160,7 +151,6 @@ const ASSERTIONS = [
     args: [
       "setup",
       "--dry-run",
-      "--global",
       "--ide",
       "cursor",
       "--mcp-servers",
@@ -173,7 +163,6 @@ const ASSERTIONS = [
     args: [
       "setup",
       "--dry-run",
-      "--global",
       "--ide",
       "gemini,kiro",
       "--mcp-profile",
@@ -188,7 +177,6 @@ const ASSERTIONS = [
     args: [
       "setup",
       "--dry-run",
-      "--global",
       "--ide",
       "codex,gemini",
       "--mcp-servers",
@@ -201,7 +189,6 @@ const ASSERTIONS = [
     args: [
       "setup",
       "--dry-run",
-      "--global",
       "--ide",
       "antigravity-cli,antigravity,antigravity-ide",
       "--mcp-profile",
@@ -213,10 +200,10 @@ const ASSERTIONS = [
     ]
   },
   {
-    args: ["update", "--both", "--global", "--ide", "auto", "--dry-run", "-y"],
+    args: ["update", "--both", "--ide", "auto", "--dry-run", "-y"],
     expectStdout: [
-      /setup-skills\.js --global --install --ide auto -y/,
-      /kenmark-packs\.js --global -y --ids /
+      /setup-skills\.js --install --ide auto -y/,
+      /kenmark-packs\.js -y --ids /
     ],
     rejectStdout: [/--all/]
   },
@@ -226,7 +213,6 @@ const ASSERTIONS = [
       "--ids",
       "impeccable",
       "--dry-run",
-      "--global",
       "--skip-adopt",
       "-y"
     ],

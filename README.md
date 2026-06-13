@@ -109,9 +109,9 @@ Full flag tables and MCP profiles: [brain/kb/05-api-and-integrations.md](brain/k
 ### First install
 
 ```bash
-npx kenmark-skills init --global --skip-recommended -y
-npx kenmark-skills init --global --ide cursor --skip-recommended -y
-npx kenmark-skills init --global --ids impeccable,simplify -y
+npx kenmark-skills init --skip-recommended -y
+npx kenmark-skills init --ide cursor --skip-recommended -y
+npx kenmark-skills init --ids impeccable,simplify -y
 ```
 
 ### MCP (non-interactive)
@@ -119,27 +119,27 @@ npx kenmark-skills init --global --ids impeccable,simplify -y
 Plain install does not touch MCP configs. Opt in with:
 
 ```bash
-npx kenmark-skills init --global --skip-recommended --mcp-servers playwright,context7 -y
-npx kenmark-skills init --global --skip-recommended --mcp-profile web -y
-npx kenmark-skills init --with-mcp --global --skip-recommended -y   # all servers
+npx kenmark-skills init --skip-recommended --mcp-servers playwright,context7 -y
+npx kenmark-skills init --skip-recommended --mcp-profile web -y
+npx kenmark-skills init --with-mcp --skip-recommended -y   # all servers
 ```
 
 ### Update, packs, adopt, cleanup, uninstall
 
 ```bash
-npx kenmark-skills update --both --global -y
-npx kenmark-skills install-recommended --ids impeccable,simplify --global -y
-npx kenmark-skills adopt --global -y
+npx kenmark-skills update --both -y
+npx kenmark-skills install-recommended --ids impeccable,simplify -y
+npx kenmark-skills adopt -y
 npx kenmark-skills doctor --json ./doctor.json --no-fail
-npx kenmark-skills cleanup --global --recommended -y
-npx kenmark-skills uninstall --global -y
-npx kenmark-skills mcp uninstall --global --ide cursor -y
+npx kenmark-skills cleanup --recommended -y
+npx kenmark-skills uninstall -y
+npx kenmark-skills mcp uninstall --ide cursor -y
 ```
 
 Legacy **`setup`** remains for `--copy`, `--force`, `--skip-adopt` not exposed on `init`:
 
 ```bash
-npx kenmark-skills setup --global --ide cursor --copy --skip-adopt -y
+npx kenmark-skills setup --ide cursor --copy --skip-adopt -y
 ```
 
 Migration: `setup -y` → `init --skip-recommended -y`. Legacy `setup` runs **Install 41 Kenmark skills** via `setup-skills.js`.
