@@ -36,12 +36,12 @@ Read from:
 
 **Mode:** `selectable` (v5+)
 
-**Default selection:** `impeccable` + `code-review-skill` only — heavy packs are opt-in.
+**Default selection:** `impeccable` + `simplify` only — heavy packs are opt-in.
 
 | Pack | Role |
 | --- | --- |
 | `impeccable` | UI/design polish (default-on) |
-| `code-review-skill` | PR/code review (default-on) |
+| `simplify` | Post-generation code simplification (default-on) |
 | `graphify` | Large-repo navigation |
 | `seo-geo-selected` | Six SEO/GEO skills (not full suite) |
 | `seo-geo-full` | Full 20-skill SEO/GEO (explicit opt-in) |
@@ -76,7 +76,7 @@ Do **not** install multiple overlapping packs for the same purpose unless the us
 | Audience | How to run |
 | --- | --- |
 | **Human** | `npx kenmark-skills install-recommended` — checklist + repo suggestions, scope, confirm |
-| **Agent** | `npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y` or `--profile core-next` |
+| **Agent** | `npx kenmark-skills install-recommended --ids impeccable,simplify --global -y` or `--profile core-next` |
 
 ## Step 1 — Suggest or list
 
@@ -91,8 +91,8 @@ Interactive flow shows weight, bloat, and stack-specific suggestions before conf
 ## Step 2 — Install selected packs (preferred)
 
 ```bash
-npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y
-npx kenmark-skills install-recommended --ids impeccable,code-review-skill,graphify --global -y
+npx kenmark-skills install-recommended --ids impeccable,simplify --global -y
+npx kenmark-skills install-recommended --ids impeccable,simplify,graphify --global -y
 ```
 
 ## Step 3 — Presets (advanced / CI)

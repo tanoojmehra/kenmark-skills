@@ -1,18 +1,18 @@
 # Recommended catalog packs
 
-Last updated: 2026-06-07
+Last updated: 2026-06-13
 Status: reviewed
 
 ## Summary
 
-Optional third-party skills installed via `install-recommended` / `init` wizard. Catalog: `skills/user-skills/recommended-catalog.json` (v5, **selectable** mode).
+Optional third-party skills installed via `install-recommended` / `init` wizard. Catalog: `skills/user-skills/recommended-catalog.json` (v7, **selectable**, **global-only**).
 
 ## Pack IDs
 
 | ID | Name | Category | Default selected |
 | --- | --- | --- | --- |
 | `impeccable` | Impeccable | design | yes |
-| `code-review-skill` | Awesome Code Review | review | yes |
+| `simplify` | Simplify | review | yes |
 | `graphify` | Graphify | navigation | no |
 | `seo-geo-selected` | SEO/GEO (selected skills) | seo | no |
 | `seo-geo-full` | SEO/GEO (full suite) | seo | no |
@@ -31,7 +31,7 @@ Catalog `installRules.overlapCaps`: one primary pack per category (design, revie
 ```bash
 npx kenmark-skills install-recommended --list
 npx kenmark-skills install-recommended --suggest
-npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y
+npx kenmark-skills install-recommended --ids impeccable,simplify --global -y
 npx kenmark-skills install-recommended --profile core-next --global -y
 ```
 

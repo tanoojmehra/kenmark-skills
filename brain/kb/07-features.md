@@ -16,8 +16,8 @@ Status: reviewed
 ## Confirmed facts
 
 - 41 bundled Kenmark skills under `skills/user-skills/` (flat directories).
-- 6 optional catalog pack IDs: `impeccable`, `code-review-skill`, `graphify`, `seo-geo-selected`, `seo-geo-full`, `ecc`.
-- Default catalog selection: **impeccable** + **code-review-skill** only.
+- 6 optional catalog pack IDs: `impeccable`, `simplify`, `graphify`, `seo-geo-selected`, `seo-geo-full`, `ecc`.
+- Default catalog selection: **impeccable** + **simplify** only.
 
 ## Documentation gaps
 

@@ -527,18 +527,13 @@ function packHasInstallMetadata(pack) {
     return Boolean(
       inst.repoUrl &&
         inst.global &&
-        typeof inst.global.target === "string" &&
-        inst.project &&
-        typeof inst.project.target === "string"
+        typeof inst.global.target === "string"
     );
   }
 
   if (strategy === "manual") {
-    function manualScopeOk(block) {
-      if (!block || typeof block !== "object") return false;
-      return block.manual === true;
-    }
-    return manualScopeOk(inst.global) && manualScopeOk(inst.project);
+    const block = inst.global;
+    return Boolean(block && block.manual === true);
   }
 
   function scopeOk(block) {
@@ -549,7 +544,7 @@ function packHasInstallMetadata(pack) {
     );
   }
 
-  return scopeOk(inst.global) && scopeOk(inst.project);
+  return scopeOk(inst.global);
 }
 
 function validateCatalog() {
@@ -586,14 +581,24 @@ function validateCatalog() {
       fail(`recommended-catalog.json: duplicate pack id "${pack.id}"`);
     }
     packIds.add(pack.id);
+    if (pack.install?.project) {
+      fail(
+        `recommended-catalog.json: pack "${pack.id}" must be global-only; remove install.project`
+      );
+    }
     if (!packHasInstallMetadata(pack)) {
       fail(
-        `recommended-catalog.json: pack "${pack.id}" missing install metadata (global+project command/target, manual scopes, or git-sync repoUrl+targets)`
+        `recommended-catalog.json: pack "${pack.id}" missing global install metadata (command/target, manual global scope, or git-sync repoUrl+global target)`
       );
     }
     const strategy = pack.installStrategy || pack.install?.strategy;
     if (strategy === "manual") {
-      for (const scope of ["global", "project"]) {
+      if (pack.install?.project) {
+        fail(
+          `recommended-catalog.json: pack "${pack.id}" is manual/global-only but defines install.project`
+        );
+      }
+      for (const scope of ["global"]) {
         if (pack.install?.[scope]?.command) {
           fail(
             `recommended-catalog.json: pack "${pack.id}" installStrategy is manual but install.${scope}.command is set`
@@ -757,7 +762,7 @@ function validateCatalogBehavior() {
       if (entry.missing) {
         fail(`catalog behavior: preset "${preset.id}" references missing pack "${entry.packId}"`);
       }
-      for (const scope of ["global", "project"]) {
+      for (const scope of ["global"]) {
         const cmds = resolveInstallCommands(entry, scope, catalog);
         const strategy =
           entry.pack?.installStrategy || entry.pack?.install?.strategy;
@@ -835,7 +840,7 @@ function validateCatalogBehavior() {
         );
       }
     }
-    for (const scope of ["global", "project"]) {
+    for (const scope of ["global"]) {
       const cmds = resolveInstallCommands(entry, scope, catalog);
       for (const cmd of cmds) {
         if (cmd.command && stringContainsUndefinedLiteral(cmd.command, `SEO install ${pack.id}`)) {

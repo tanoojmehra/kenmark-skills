@@ -5,15 +5,14 @@ const path = require("path");
 const os = require("os");
 const {
   wantsInteractive,
-  promptScope,
   promptCleanupCategories,
   parseCleanupCategoryChoice,
   confirmPlan,
-  banner
+  banner,
+  rejectProjectScopeInArgv
 } = require("./interactive");
 const {
   buildGlobalTargets,
-  buildProjectTargets,
   resolveExplicitTargetIdes,
   buildTargetMapForIdes,
   findBrokenSymlinks,
@@ -48,7 +47,7 @@ function printUsage() {
   console.log("  --full                    broken + legacy + all managed skills");
   console.log("");
   console.log("Scope:");
-  console.log("  --global | --project      Scope (default: global when non-interactive)");
+  console.log("  --global                  Scope (global only; default)");
   console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, antigravity-ide, auto, all, …");
   console.log("  --include-store           Also remove matching entries from ~/.kenmark/store (+ manifest)");
   console.log("  --dry-run                 List what would be removed");
@@ -263,7 +262,9 @@ function countManagedResults(results, dryRun) {
 }
 
 async function run() {
-  const args = parseArgs(process.argv.slice(2));
+  const argv = process.argv.slice(2);
+  rejectProjectScopeInArgv(argv);
+  const args = parseArgs(argv);
   if (args.help) {
     printUsage();
     process.exit(0);
@@ -274,10 +275,7 @@ async function run() {
     banner("kenmark-skills cleanup", "Surgical removal by category — broken, legacy, kenmark, packs");
   }
 
-  let mode = args.mode || "global";
-  if (interactive && !args.explicitMode) {
-    mode = await promptScope(mode, { purpose: "cleanup" });
-  }
+  const mode = "global";
 
   let categories = resolveCleanupCategories(args);
   if (interactive && !args.explicitCategory && !args.yes) {
@@ -285,8 +283,7 @@ async function run() {
   }
 
   const homeDir = os.homedir();
-  const fullTargetMap =
-    mode === "project" ? buildProjectTargets(process.cwd()) : buildGlobalTargets(homeDir);
+  const fullTargetMap = buildGlobalTargets(homeDir);
   const targetIdes = resolveTargetIdes(args, fullTargetMap);
   const targetMap = buildTargetMapForIdes(fullTargetMap, targetIdes);
 

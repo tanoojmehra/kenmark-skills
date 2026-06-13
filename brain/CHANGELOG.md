@@ -2,6 +2,18 @@
 
 Brain knowledge base
 
+## v2026.06.13-global-only-install
+
+- **CLI:** Project scope removed; `--project` rejected. Interactive scope prompts removed.
+- **recommended-catalog.json (v7):** Global install/verify only for all packs.
+- **KB:** `05-api-and-integrations`, `004-recommended-packs`, `11-known-risks-and-decisions` updated.
+
+## v2026.06.13-simplify-catalog
+
+- **recommended-catalog.json (v6):** Replaced default `code-review-skill` (Awesome Code Review) with `simplify` (brianlovin/claude-config). Defaults and presets now `impeccable` + `simplify`.
+- **KB:** `004-recommended-packs`, `05-api-and-integrations`, `07-features`, `11-known-risks-and-decisions` updated.
+- **Skills:** `kenmark-setup`, `kenmark-packs` default pack references updated.
+
 ## v2026.06.11-antigravity-ide
 
 - **kenmark-hub.js:** `antigravity-ide` target (`~/.gemini/antigravity-ide/skills`, MCP at `mcp_config.json`). `ANTIGRAVITY_COPY_IDES` covers CLI, 2.0, and IDE. `antigravity` relabeled as 2.0 Manager in prompts.

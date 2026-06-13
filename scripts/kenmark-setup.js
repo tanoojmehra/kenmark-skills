@@ -5,14 +5,14 @@ const os = require("os");
 const { spawnSync } = require("child_process");
 const {
   wantsInteractive,
-  promptScope,
   promptIde,
   promptYesNo,
   promptSelectOptionalPacks,
   promptEccProfile,
   promptMcpServers,
   confirmPlan,
-  banner
+  banner,
+  rejectProjectScopeInArgv
 } = require("./interactive");
 const {
   loadCatalog,
@@ -23,7 +23,6 @@ const {
 } = require("./recommended-catalog");
 const {
   buildGlobalTargets,
-  buildProjectTargets,
   detectInstalledIdes,
   detectManagedIdes,
   listMcpServersForPrompt,
@@ -52,8 +51,7 @@ function printUsage() {
   console.log("Interactive first-time setup: Kenmark skills + optional recommended packs.");
   console.log("");
   console.log("Options:");
-  console.log("  --global              Force global scope (skip scope prompt)");
-  console.log("  --project             Force project scope");
+  console.log("  --global              Global scope (default; only supported scope)");
   console.log("  --ide <target>        IDE: cursor, claude, all, …");
   console.log("  --skip-recommended    Only install Kenmark skills (non-interactive)");
   console.log("  --recommended-only    Only install recommended packs (non-interactive)");
@@ -247,7 +245,9 @@ async function maybeUpgradeCliBeforeInit(args) {
 }
 
 async function run() {
-  const args = parseArgs(process.argv.slice(2));
+  const argv = process.argv.slice(2);
+  rejectProjectScopeInArgv(argv);
+  const args = parseArgs(argv);
   if (args.help) {
     printUsage();
     process.exit(0);
@@ -261,7 +261,7 @@ async function run() {
   await maybeUpgradeCliBeforeInit(args);
 
   const interactive = wantsInteractive(args);
-  let scope = args.scope;
+  let scope = "global";
   let ideArg = args.ide;
   let installKenmark = false;
   let installRecommended = false;
@@ -307,14 +307,8 @@ async function run() {
         }
       }
     }
-    if (installKenmark || installRecommended) {
-      if (!scope) scope = await promptScope("global", { required: true });
-    }
     if (installKenmark && !ideArg) {
-      const targetMap =
-        scope === "project"
-          ? buildProjectTargets(process.cwd())
-          : buildGlobalTargets(os.homedir());
+      const targetMap = buildGlobalTargets(os.homedir());
       const targetKeys = Object.keys(targetMap);
       const detected = detectInstalledIdes(targetMap);
       const managed = detectManagedIdes(targetMap);
@@ -372,7 +366,7 @@ async function run() {
         process.exit(1);
       }
     }
-    scope = scope || "global";
+    scope = "global";
   }
 
   const plan = [];
@@ -423,11 +417,7 @@ async function run() {
   if (args.dryRun) console.log("\n(dry-run — commands only)\n");
 
   if (installKenmark) {
-    const setupArgs = [
-      scope === "project" ? "--project" : "--global",
-      "--install",
-      "-y"
-    ];
+    const setupArgs = ["--global", "--install", "-y"];
     if (ideArg) setupArgs.push("--ide", ideArg);
     if (args.skipMcp) setupArgs.push("--skip-mcp");
     if (args.withMcp) setupArgs.push("--with-mcp");
@@ -445,7 +435,7 @@ async function run() {
   }
 
   if (installRecommended) {
-    const recArgs = [scope === "project" ? "--project" : "--global"];
+    const recArgs = ["--global"];
     if (selectedPreset) {
       recArgs.push("--profile", selectedPreset);
     } else {

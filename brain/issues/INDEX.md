@@ -4,8 +4,8 @@
 
 | Field | Value |
 |------|-------|
-| Last Assigned ID | 000 |
-| Next ID | 001 |
+| Last Assigned ID | 002 |
+| Next ID | 003 |
 
 ## Ledger Rules
 
@@ -20,14 +20,15 @@
 | Category | Count |
 |----------|-------|
 | Active issues | 0 |
-| Completed | 0 |
-| **Total** | **0** |
+| Completed | 2 |
+| **Total** | **2** |
 
 ## Completed Issues
 
 | ID | Title | Completed |
 |----|-------|-----------|
-| _none yet_ | | |
+| 001 | Replace Awesome Code Review with Simplify in recommended catalog | 2026-06-13 |
+| 002 | Remove project scope; global-only Kenmark installs | 2026-06-13 |
 
 ## Active Issues by Priority
 
@@ -49,55 +50,8 @@
 |----|-------|
 | _none_ | |
 
-## Issue Structure
-
-Each issue file contains:
-
-```yaml
----
-id: XXX
-title: ...
-severity: P0|P1|P2
-area: frontend|backend|api|database|auth|security|ui|testing|performance|dx|infra|docs|workflow|unknown
-source: how-the-issue-was-found
-status: open|completed
-created: YYYY-MM-DD
-files:
-  - relevant-files
-related:
-  - related-issue-ids
----
-
-## Summary
-
-## Evidence
-
-## Suggested fix
-
-## Acceptance criteria
-```
-
-## Areas
-
-| Area | Description |
-|------|-------------|
-| frontend | Web/mobile UI, components, pages, client routing |
-| backend | Server logic, services, domain layer (non-route HTTP) |
-| api | HTTP/API routes, handlers, webhooks, GraphQL |
-| database | Schema, migrations, ORM, persistence |
-| auth | Sessions, OAuth, permissions, identity |
-| security | Hardening, crypto, rate limits, input validation |
-| ui | Visual design, layout, accessibility, UX polish |
-| testing | Test gaps, flaky tests, missing coverage |
-| performance | Latency, bundle size, caching, Core Web Vitals |
-| dx | Tooling, refactors, dead code, developer ergonomics |
-| infra | CI/CD, deploy, config, observability |
-| docs | README, API docs, comments, onboarding |
-| workflow | Scripts, automation, issue/process tooling |
-| unknown | Area unclear until triaged |
-
 ## Workstreams
 
 | Workstream | Issues |
 |-----------|--------|
-| _none yet_ | |
+| _none_ | |

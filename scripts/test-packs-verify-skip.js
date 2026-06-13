@@ -180,16 +180,16 @@ function main() {
         wireHome,
         ".claude",
         "skills",
-        "code-review-skill",
+        "simplify",
         "SKILL.md"
       );
       fs.mkdirSync(path.dirname(claudeOnlySkill), { recursive: true });
-      fs.writeFileSync(claudeOnlySkill, "# code-review-skill\n");
+      fs.writeFileSync(claudeOnlySkill, "# simplify\n");
 
       const wireRun = runPacks(
         [
           "--ids",
-          "code-review-skill",
+          "simplify",
           "--global",
           "-y",
           "--ide",
@@ -201,17 +201,17 @@ function main() {
       if (wireRun.status !== 0) {
         failures.push(`wire skip run exited ${wireRun.status}`);
       } else if (
-        !/Already installed: code-review-skill — skipping install/.test(wireStdout)
+        !/Already installed: simplify — skipping install/.test(wireStdout)
       ) {
-        failures.push("wire run did not skip install for code-review-skill");
+        failures.push("wire run did not skip install for simplify");
       } else {
         const ides = ["cursor", "codex", "gemini", "opencode", "minimax"];
         const missing = ides.filter(
-          (ide) => !skillPresent(wireHome, ide, "code-review-skill", ides)
+          (ide) => !skillPresent(wireHome, ide, "simplify", ides)
         );
         if (missing.length) {
           failures.push(
-            `wire run did not link code-review-skill to: ${missing.join(", ")}`
+            `wire run did not link simplify to: ${missing.join(", ")}`
           );
         } else {
           const storeSkill = path.join(
@@ -219,11 +219,11 @@ function main() {
             ".kenmark",
             "store",
             "skills",
-            "code-review-skill",
+            "simplify",
             "SKILL.md"
           );
           if (!fs.existsSync(storeSkill)) {
-            failures.push("wire run did not adopt code-review-skill into store");
+            failures.push("wire run did not adopt simplify into store");
           } else {
             console.log(
               "  ✓ already-installed pack wires to all selected IDEs"

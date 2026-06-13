@@ -12,10 +12,9 @@ Status: reviewed
 | MCP opt-in default | Avoid mutating IDE MCP configs without consent |
 | MCP JSON IDEs only (11 targets) | cursor, claude, gemini, antigravity-cli, antigravity, antigravity-ide, kiro, trae, trae-cn, rovo, qoder; Codex/OpenCode need format adapters |
 | Antigravity copy default | CLI/2.0/IDE do not discover symlinked skills — Kenmark copies into Antigravity skill dirs unless `--symlink` |
-| Antigravity 2.0 dual project paths | `antigravity` project install links `.agent/skills` and mirrors `.agents/skills` |
-| Antigravity IDE dual project paths | `antigravity-ide` project install links `.agents/skills` and mirrors `.agent/skills` |
+| Global-only installs | Kenmark CLI rejects `--project`; catalog v7 is global-only |
 | Windows copy default | Symlinks often fail; copy/junction fallback in hub |
-| Catalog v5 selectable installs | Default lean (impeccable + code-review); heavy packs opt-in |
+| Catalog v6 selectable installs | Default lean (impeccable + simplify); heavy packs opt-in |
 | `validate` vs `doctor` split | CI-safe repo checks vs local install diagnostics |
 | brain/ in git, not npm | Dev KB for this repo; consumers get their own brain via kenmark-init |
 

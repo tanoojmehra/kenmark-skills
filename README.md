@@ -111,8 +111,7 @@ Full flag tables and MCP profiles: [brain/kb/05-api-and-integrations.md](brain/k
 ```bash
 npx kenmark-skills init --global --skip-recommended -y
 npx kenmark-skills init --global --ide cursor --skip-recommended -y
-npx kenmark-skills init --project --skip-recommended -y
-npx kenmark-skills init --global --ids impeccable,code-review-skill -y
+npx kenmark-skills init --global --ids impeccable,simplify -y
 ```
 
 ### MCP (non-interactive)
@@ -129,7 +128,7 @@ npx kenmark-skills init --with-mcp --global --skip-recommended -y   # all server
 
 ```bash
 npx kenmark-skills update --both --global -y
-npx kenmark-skills install-recommended --ids impeccable,code-review-skill --global -y
+npx kenmark-skills install-recommended --ids impeccable,simplify --global -y
 npx kenmark-skills adopt --global -y
 npx kenmark-skills doctor --json ./doctor.json --no-fail
 npx kenmark-skills cleanup --global --recommended -y

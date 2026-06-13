@@ -58,7 +58,7 @@ npx kenmark-skills update
 Prompts (in order):
 
 1. **What to update** — Kenmark only (default), recommended only, or both
-2. **Scope** — `global` (default) vs `project` (current repo)
+2. **Scope** — global only (`~/.kenmark/store` + IDE home folders)
 3. **npm update** — optional `npm update -g kenmark-skills` if the package is installed globally
 4. **IDE** — Kenmark target (`cursor`, `claude`, `all`, or empty for auto-detect)
 5. **Recommended packs** — ids, `defaults`, or `all` (when refreshing recommended)
@@ -72,9 +72,6 @@ npx kenmark-skills update --both --global -y
 
 # Kenmark skills only, global
 npx kenmark-skills update --kenmark-only --global -y
-
-# Project-local Kenmark sync in current repo
-npx kenmark-skills update --kenmark-only --project -y
 
 # Reinstall recommended packs only
 npx kenmark-skills update --recommended-only --global --ids impeccable,ecc -y
@@ -106,13 +103,6 @@ If the CLI is unavailable, run the underlying commands:
 npm update -g kenmark-skills
 npx kenmark-skills setup --global -y
 npx kenmark-skills install-recommended --all --global -y
-```
-
-Project scope:
-
-```bash
-npx kenmark-skills setup --project -y
-npx kenmark-skills install-recommended --all --project -y
 ```
 
 ## Step 4 — Verify
