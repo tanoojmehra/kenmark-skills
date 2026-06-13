@@ -15,7 +15,7 @@ Status: reviewed
 | Antigravity 2.0 dual project paths | `antigravity` project install links `.agent/skills` and mirrors `.agents/skills` |
 | Antigravity IDE dual project paths | `antigravity-ide` project install links `.agents/skills` and mirrors `.agent/skills` |
 | Windows copy default | Symlinks often fail; copy/junction fallback in hub |
-| Catalog v5 selectable installs | Default lean (impeccable + code-review); heavy packs opt-in |
+| Catalog v6 selectable installs | Default lean (impeccable + simplify); heavy packs opt-in |
 | `validate` vs `doctor` split | CI-safe repo checks vs local install diagnostics |
 | brain/ in git, not npm | Dev KB for this repo; consumers get their own brain via kenmark-init |
 

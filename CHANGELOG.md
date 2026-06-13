@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2.3.18 — Simplify replaces Awesome Code Review (2026-06-13)
+
+### Change
+
+- **recommended-catalog.json (v6):** Default lean pack is now **Simplify** (`brianlovin/claude-config`) instead of Awesome Code Review (`code-review-skill`). Install via `npx skills add … -s simplify`. Presets, docs, and KB updated.
+
 ## v2.3.17 — Antigravity IDE target (2026-06-11)
 
 ### Feature

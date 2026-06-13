@@ -1,17 +1,17 @@
 {
-  "version": 5,
+  "version": 6,
   "mode": "selectable",
-  "updatedAt": "2026-06-03",
+  "updatedAt": "2026-06-13",
   "notes": "Selectable optional third-party installs with repo-aware suggestions. Presets are power-user/CI shortcuts only.",
   "defaults": {
     "scope": "global",
-    "selectedIds": ["impeccable", "code-review-skill"]
+    "selectedIds": ["impeccable", "simplify"]
   },
   "installRules": {
     "guidance": "Do not install multiple overlapping packs for the same purpose unless the user explicitly asks.",
     "overlapCaps": [
       { "category": "design", "maxPrimary": 1, "note": "One primary UI/design pack (e.g. Impeccable)" },
-      { "category": "review", "maxPrimary": 1, "note": "One primary code-review pack" },
+      { "category": "review", "maxPrimary": 1, "note": "One primary code-quality pack (e.g. Simplify)" },
       { "category": "seo", "maxPrimary": 1, "note": "Prefer selected SEO skills; full pack only on request" },
       { "category": "harness", "maxPrimary": 1, "note": "ECC minimal by default; avoid stacking with plugin install" },
       { "category": "navigation", "maxPrimary": 1, "note": "Graphify for medium/large repos only" }
@@ -21,14 +21,14 @@
     {
       "id": "lean",
       "name": "Lean Daily Coding",
-      "description": "Impeccable + code review — same as default selection.",
-      "packIds": ["impeccable", "code-review-skill"]
+      "description": "Impeccable + Simplify — same as default selection.",
+      "packIds": ["impeccable", "simplify"]
     },
     {
       "id": "core-next-lite",
       "name": "Core Next.js Lite",
       "description": "Next.js essentials without Graphify or ECC.",
-      "packIds": ["impeccable", "code-review-skill"]
+      "packIds": ["impeccable", "simplify"]
     },
     {
       "id": "core-next",
@@ -54,8 +54,8 @@
     {
       "id": "audit-review",
       "name": "Audit / Review",
-      "description": "Code review + Graphify without default UI design skills.",
-      "packIds": ["code-review-skill", "graphify"]
+      "description": "Simplify + Graphify without default UI design skills.",
+      "packIds": ["simplify", "graphify"]
     },
     {
       "id": "experimental-heavy",
@@ -65,7 +65,7 @@
       "requiresConfirmation": true,
       "packIds": [
         "impeccable",
-        "code-review-skill",
+        "simplify",
         "graphify",
         { "id": "ecc", "profile": "core" },
         "seo-geo-full"
@@ -113,43 +113,40 @@
       }
     },
     {
-      "id": "code-review-skill",
-      "name": "Awesome Code Review",
+      "id": "simplify",
+      "name": "Simplify",
       "category": "review",
       "weight": "light",
       "bloatScore": 1,
       "recommended": true,
       "defaultSelected": true,
-      "helpsWith": ["PR review", "correctness", "multi-language review"],
-      "bestFor": ["PR review", "correctness", "multi-language codebases"],
+      "helpsWith": ["code simplification", "readability", "post-generation cleanup"],
+      "bestFor": ["refactoring after generation", "readability passes", "reducing complexity"],
       "avoidWhen": [],
       "suggestiveTest": {
-        "question": "Will agents review or refactor code in this repo?",
+        "question": "Will agents write or refactor code in this repo?",
         "signals": ["git-repo", "typescript-project", "multi-language-src"],
         "recommendWhen": "any",
         "recommendation": "recommended"
       },
-      "url": "https://github.com/awesome-skills/code-review-skill",
-      "description": "Modular code-review skill for Claude Code — 19+ languages/frameworks loaded progressively with a four-phase review process.",
-      "warning": "Git-based install (not npx). Re-runs clone once, then `git pull --ff-only`.",
-      "installStrategy": "git-sync",
+      "url": "https://github.com/brianlovin/claude-config",
+      "description": "Simplify and refine recently modified code for clarity and consistency — use after generating or editing code without changing functionality.",
       "install": {
-        "repoUrl": "https://github.com/awesome-skills/code-review-skill.git",
         "global": {
-          "target": "$HOME/.claude/skills/code-review-skill",
-          "summary": "Sync the repo into the user's global Claude skills directory"
+          "command": "npx --yes skills add brianlovin/claude-config -g -y -s simplify",
+          "summary": "User-wide simplify skill (Claude/Cursor agents paths via skills CLI)"
         },
         "project": {
-          "target": ".claude/skills/code-review-skill",
+          "command": "npx --yes skills add brianlovin/claude-config -y -s simplify",
           "cwd": "project",
-          "summary": "Sync the repo into the current project's .claude/skills/ directory"
+          "summary": "Project-local simplify skill from current directory"
         },
         "alternatives": [
-          "Windows (PowerShell): git clone https://github.com/awesome-skills/code-review-skill.git \"$env:USERPROFILE\\.claude\\skills\\code-review-skill\""
+          "Manual: copy skills/simplify/SKILL.md from brianlovin/claude-config into ~/.claude/skills/simplify/"
         ],
         "verify": {
-          "global": "test -f \"$HOME/.claude/skills/code-review-skill/SKILL.md\"",
-          "project": "test -f \".claude/skills/code-review-skill/SKILL.md\""
+          "global": "test -f \"$HOME/.agents/skills/simplify/SKILL.md\" || test -f \"$HOME/.cursor/skills/simplify/SKILL.md\" || test -f \"$HOME/.claude/skills/simplify/SKILL.md\"",
+          "project": "test -f \".agents/skills/simplify/SKILL.md\" || test -f \".cursor/skills/simplify/SKILL.md\" || test -f \".claude/skills/simplify/SKILL.md\""
         }
       }
     },

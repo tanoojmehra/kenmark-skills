@@ -4,8 +4,8 @@
 
 | Field | Value |
 |------|-------|
-| Last Assigned ID | 000 |
-| Next ID | 001 |
+| Last Assigned ID | 001 |
+| Next ID | 002 |
 
 ## Ledger Rules
 
@@ -20,14 +20,14 @@
 | Category | Count |
 |----------|-------|
 | Active issues | 0 |
-| Completed | 0 |
-| **Total** | **0** |
+| Completed | 1 |
+| **Total** | **1** |
 
 ## Completed Issues
 
 | ID | Title | Completed |
 |----|-------|-----------|
-| _none yet_ | | |
+| 001 | Replace Awesome Code Review with Simplify in recommended catalog | 2026-06-13 |
 
 ## Active Issues by Priority
 
@@ -100,4 +100,4 @@ related:
 
 | Workstream | Issues |
 |-----------|--------|
-| _none yet_ | |
+| _none_ | |

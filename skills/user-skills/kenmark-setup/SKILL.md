@@ -19,7 +19,7 @@ disable-model-invocation: true
 
 # Kenmark Setup
 
-One guided flow for **new users**: install Kenmark skills, optionally install **selectable third-party packs** (defaults: Impeccable + Awesome Code Review only; Graphify, SEO, ECC are opt-in), with **repo-aware suggestions**, then pick **scope** and **IDEs**. No profile/preset is chosen by default.
+One guided flow for **new users**: install Kenmark skills, optionally install **selectable third-party packs** (defaults: Impeccable + Simplify only; Graphify, SEO, ECC are opt-in), with **repo-aware suggestions**, then pick **scope** and **IDEs**. No profile/preset is chosen by default.
 
 ## When to use
 
@@ -46,7 +46,7 @@ Prompts (nothing is pre-selected — you must choose each step):
 
 1. Install Kenmark skills? (default **no**)
 2. Install optional recommended packs? (default **no**)
-3. If packs: checklist with repo suggestions (`--suggest` shows the same analysis non-interactively); Enter accepts defaults (**impeccable**, **code-review-skill**)
+3. If packs: checklist with repo suggestions (`--suggest` shows the same analysis non-interactively); Enter accepts defaults (**impeccable**, **simplify**)
 4. ECC profile prompt when ECC is selected
 5. Scope — global vs project (**required**)
 6. IDE targets — auto, all, or numbered list (**required** when installing Kenmark)
@@ -65,8 +65,8 @@ npx kenmark-skills init --global --skip-recommended -y
 # Repo-aware suggestions only (no install)
 npx kenmark-skills init --suggest
 
-# Kenmark + specific packs (defaults: impeccable + code-review-skill)
-npx kenmark-skills init --global --ids impeccable,code-review-skill -y
+# Kenmark + specific packs (defaults: impeccable + simplify)
+npx kenmark-skills init --global --ids impeccable,simplify -y
 
 # Explicit IDE targets
 # npx kenmark-skills init --global --ide cursor,claude,codex --skip-recommended -y
