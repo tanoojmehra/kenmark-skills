@@ -4,6 +4,7 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 const {
   wantsInteractive,
+  assertInteractiveStdin,
   promptMcpServers,
   confirmPlan,
   banner,
@@ -244,6 +245,10 @@ async function run() {
   if (args.help) {
     printUsage();
     process.exit(0);
+  }
+
+  if (wantsInteractive(args)) {
+    await assertInteractiveStdin();
   }
 
   const localVersion = readLocalPackageVersion(repoRoot);

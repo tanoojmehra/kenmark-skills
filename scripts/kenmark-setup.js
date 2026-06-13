@@ -5,6 +5,7 @@ const os = require("os");
 const { spawnSync } = require("child_process");
 const {
   wantsInteractive,
+  assertInteractiveStdin,
   promptIde,
   promptYesNo,
   promptSelectOptionalPacks,
@@ -246,6 +247,10 @@ async function run() {
   if (args.help) {
     printUsage();
     process.exit(0);
+  }
+
+  if (wantsInteractive(args)) {
+    await assertInteractiveStdin();
   }
 
   banner(
