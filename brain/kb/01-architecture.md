@@ -37,7 +37,8 @@ Default IDE targets for new installs: **cursor**, **claude**, **codex** (`DEFAUL
 
 ### Interactive vs non-interactive
 
-- Terminal TTY → interactive wizards (`scripts/interactive.js`).
+- Terminal TTY (stdin **and** stdout) → interactive wizards (`scripts/interactive.js`).
+- Pseudo-TTY with EOF (agent subprocesses) → `assertInteractiveStdin()` exits non-zero with `-y` / flag guidance.
 - Flags + `-y` or `KENMARK_SKILLS_NONINTERACTIVE=1` → scripted installs (see `kb/05-api-and-integrations.md`).
 
 ## Important files inspected

@@ -103,7 +103,7 @@ Interactive `init`/`setup`/`update` prompt for individual server names. Non-inte
 
 ### Non-interactive agents / CI
 
-Set `KENMARK_SKILLS_NONINTERACTIVE=1` or pass `-y` with explicit flags.
+Set `KENMARK_SKILLS_NONINTERACTIVE=1` or pass `-y` with explicit flags. If `init`/`update` print "Non-interactive stdin detected", the shell is a pseudo-TTY without input — re-run with flags and `-y`.
 
 Examples:
 

@@ -20,7 +20,7 @@ Status: reviewed
 
 ## Known risks
 
-- **TTY + EOF:** `init`/`update` may exit 0 with "Nothing selected" when stdin is TTY but EOF (agent subprocesses) — see `brain/issues/` tracker if present.
+- **TTY + EOF (fixed 006):** `assertInteractiveStdin()` and stricter `wantsInteractive()` exit non-zero with re-run guidance when stdin is TTY but EOF (agent subprocesses).
 - **WSL vs native Windows:** Installs into WSL home are invisible to native Windows IDEs — doctor warns.
 - **Adopt overwrite:** Hash mismatches require explicit `--adopt-overwrite` / `--force`.
 - **Impeccable script paths:** Upstream `SKILL.md` uses `node ./scripts/*.mjs` (skill-relative). Agents run shell from project CWD — kenmark adopt rewrites these to absolute store paths; re-run `npx kenmark-skills adopt --ide all -y` after upgrading kenmark-skills if impeccable setup still fails.

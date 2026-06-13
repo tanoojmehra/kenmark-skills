@@ -4,8 +4,9 @@ title: Cleanup scope prompt reuses install wording
 severity: P2
 area: cli
 source: user feedback
-status: open
+status: completed
 created: 2026-06-08
+completed: 2026-06-13
 files:
   - scripts/interactive.js
   - scripts/kenmark-cleanup.js
@@ -31,7 +32,11 @@ Interactive `cleanup` calls shared `promptScope`, which always asks "Where shoul
 
 ## Acceptance criteria
 
-- [ ] Cleanup wizard asks where cleanup should run, not where skills should be installed.
-- [ ] Init/setup/update/packs/adopt prompts unchanged.
-- [ ] `npm test` passes.
-- [ ] `brain/kb/` updated.
+- [x] Cleanup wizard asks where cleanup should run, not where skills should be installed.
+- [x] Init/setup/update/packs/adopt prompts unchanged.
+- [x] `npm test` passes.
+- [x] `brain/kb/` updated.
+
+## Resolution
+
+Global-only refactor removed interactive scope prompts; cleanup hardcodes `mode = "global"`. `getScopePromptLines("cleanup")` provides cleanup-specific copy; `test-interactive-scope-prompt.js` asserts install vs cleanup strings.
