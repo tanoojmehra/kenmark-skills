@@ -4,10 +4,10 @@ const path = require("path");
 const { spawnSync } = require("child_process");
 const {
   wantsInteractive,
-  promptScope,
   promptMcpServers,
   confirmPlan,
-  banner
+  banner,
+  rejectProjectScopeInArgv
 } = require("./interactive");
 const readline = require("readline");
 const {
@@ -36,8 +36,7 @@ function printUsage() {
   console.log("  --kenmark-only        Update Kenmark skills only (re-copy from package)");
   console.log("  --recommended-only    Re-run recommended pack installs only");
   console.log("  --both                Update Kenmark skills and recommended packs");
-  console.log("  --global              User-wide install paths (default)");
-  console.log("  --project             Current project directory only");
+  console.log("  --global              User-wide install paths (default; only supported scope)");
   console.log("  --ide <target>        IDE for Kenmark sync: cursor, claude, all, …");
   console.log("  --ids a,b             Recommended pack ids (default: defaultSelected)");
   console.log("  --all                 Refresh all recommended packs");
@@ -244,7 +243,9 @@ function runNodeScript(scriptPath, scriptArgs, dryRun, label) {
 }
 
 async function run() {
-  const args = parseArgs(process.argv.slice(2));
+  const argv = process.argv.slice(2);
+  rejectProjectScopeInArgv(argv);
+  const args = parseArgs(argv);
   if (args.help) {
     printUsage();
     process.exit(0);
@@ -254,7 +255,7 @@ async function run() {
   console.log(`kenmark-skills update (package in this tree: v${localVersion})`);
 
   let mode = args.mode;
-  let scope = args.scope;
+  let scope = "global";
   let runNpm = false;
   let ide = args.ide;
   let mcpProfile = args.mcpProfile;
@@ -274,7 +275,6 @@ async function run() {
   } else if (interactive) {
     banner("kenmark-skills update", "Refresh installs · flags + -y for agents");
     mode = await promptMode(mode);
-    scope = await promptScope(scope || "global");
     if (mode === "kenmark" || mode === "both") {
       if (!args.skipNpm && globalKenmarkInstalled()) {
         runNpm = await promptNpmUpdate(false);
@@ -306,7 +306,7 @@ async function run() {
     }
   } else {
     mode = mode || "kenmark";
-    scope = scope || "global";
+    scope = "global";
     runNpm = !args.skipNpm && (mode === "kenmark" || mode === "both") && globalKenmarkInstalled();
     if (!mcpProfile && !mcpServers && args.withMcp) {
       mcpProfile = "all";
@@ -369,13 +369,7 @@ async function run() {
   }
 
   if (mode === "kenmark" || mode === "both") {
-    const setupArgs = [
-      scope === "project" ? "--project" : "--global",
-      "--install",
-      "--ide",
-      ide || "auto",
-      "-y"
-    ];
+    const setupArgs = ["--global", "--install", "--ide", ide || "auto", "-y"];
     if (args.skipAdopt) setupArgs.push("--skip-adopt");
     if (args.eccProfile) setupArgs.push("--ecc-profile", args.eccProfile);
     if (args.skipMcp) setupArgs.push("--skip-mcp");
@@ -400,7 +394,7 @@ async function run() {
   if (mode === "recommended" || mode === "both") {
     const catalog = loadCatalog();
     const recArgs = [
-      scope === "project" ? "--project" : "--global",
+      "--global",
       "-y"
     ];
     if (args.ids?.length) {

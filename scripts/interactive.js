@@ -54,69 +54,51 @@ async function promptYesNo(message, defaultYes = true) {
 function parseScopeChoice(answer) {
   const lower = answer.toLowerCase();
   if (lower === "1" || lower === "global" || lower === "g") return "global";
-  if (lower === "2" || lower === "project" || lower === "p") return "project";
   return null;
+}
+
+const PROJECT_SCOPE_REMOVED =
+  "Project scope is not supported. Kenmark-skills installs globally only (~/.kenmark/store, ~/.cursor, ~/.claude, …). Use --global or omit the scope flag.";
+
+function rejectProjectScopeInArgv(argv) {
+  const args = Array.isArray(argv) ? argv : [];
+  for (let i = 0; i < args.length; i += 1) {
+    const token = args[i];
+    if (token === "--project") {
+      console.error(PROJECT_SCOPE_REMOVED);
+      process.exit(1);
+    }
+    if (token === "--scope" && args[i + 1] === "project") {
+      console.error(PROJECT_SCOPE_REMOVED);
+      process.exit(1);
+    }
+  }
 }
 
 const SCOPE_PROMPTS = {
   install: {
-    title: "Where should skills be installed?",
-    global: "all projects on this machine (~/.cursor, ~/.claude, …)",
-    project: "only this repo (.cursor/, .claude/, … in cwd)"
+    title: "Install scope",
+    global: "global — all projects on this machine (~/.cursor, ~/.claude, …)"
   },
   cleanup: {
-    title: "Where should cleanup run?",
-    global: "user home IDE folders on this machine (~/.cursor, ~/.claude, …)",
-    project: "only this repo (.cursor/, .claude/, … in cwd)"
+    title: "Cleanup scope",
+    global: "global — user home IDE folders on this machine (~/.cursor, ~/.claude, …)"
   }
 };
 
 /**
  * @param {"install"|"cleanup"} purpose
- * @param {{ required?: boolean }} opts
  */
-function getScopePromptLines(purpose = "install", opts = {}) {
+function getScopePromptLines(purpose = "install") {
   const config = SCOPE_PROMPTS[purpose] || SCOPE_PROMPTS.install;
-  const required = opts.required === true;
-  const defaultSuffix = required ? "" : " [default]";
   return {
     title: config.title,
-    lines: [
-      `  1) global  — ${config.global}${defaultSuffix}`,
-      `  2) project — ${config.project}`
-    ]
+    lines: [`  ${config.global}`]
   };
 }
 
-async function promptScope(defaultScope = "global", opts = {}) {
-  const required = opts.required === true;
-  const purpose = opts.purpose === "cleanup" ? "cleanup" : "install";
-  const { title, lines } = getScopePromptLines(purpose, opts);
-  const rl = createRl();
-  console.log(`\n${title}`);
-  console.log(`${lines[0]}`);
-  console.log(`${lines[1]}\n`);
-  const hint = required
-    ? "Choose scope [1/2 or global/project] (required): "
-    : `Choose scope [1/2 or global/project] (default ${defaultScope}): `;
-  const answer = await ask(rl, hint);
-  rl.close();
-  const lower = answer.toLowerCase();
-  if (!lower) {
-    if (required) {
-      console.log("Please choose 1 (global) or 2 (project).");
-      return promptScope(defaultScope, opts);
-    }
-    return defaultScope;
-  }
-  const parsed = parseScopeChoice(lower);
-  if (parsed) return parsed;
-  if (required) {
-    console.log('Invalid choice. Enter 1, 2, "global", or "project".');
-    return promptScope(defaultScope, opts);
-  }
-  console.log(`Using default scope: ${defaultScope}`);
-  return defaultScope;
+async function promptScope(defaultScope = "global", _opts = {}) {
+  return "global";
 }
 
 async function promptAction(defaultAction = "install") {
@@ -649,6 +631,8 @@ module.exports = {
   promptYesNo,
   getScopePromptLines,
   promptScope,
+  rejectProjectScopeInArgv,
+  PROJECT_SCOPE_REMOVED,
   promptAction,
   promptIde,
   promptSelectPacks,

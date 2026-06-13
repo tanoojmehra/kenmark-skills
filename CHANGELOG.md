@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v2.3.19 — Global-only installs (2026-06-13)
+
+### Change
+
+- **CLI:** Removed project scope — `--project` errors with a clear message. All commands (`init`, `setup`, `install-recommended`, `update`, `adopt`, `cleanup`) install globally only.
+- **recommended-catalog.json (v7):** Pack install/verify metadata is global-only. All six packs still support global install; none removed.
+
 ## v2.3.18 — Simplify replaces Awesome Code Review (2026-06-13)
 
 ### Change

@@ -1,8 +1,8 @@
 {
-  "version": 6,
+  "version": 7,
   "mode": "selectable",
   "updatedAt": "2026-06-13",
-  "notes": "Selectable optional third-party installs with repo-aware suggestions. Presets are power-user/CI shortcuts only.",
+  "notes": "Selectable optional third-party installs with repo-aware suggestions. Global install only — no project scope.",
   "defaults": {
     "scope": "global",
     "selectedIds": ["impeccable", "simplify"]
@@ -98,17 +98,11 @@
           "command": "npx --yes skills add pbakaus/impeccable -g -y",
           "summary": "User-wide skill (Claude/Cursor agents paths via skills CLI)"
         },
-        "project": {
-          "command": "npx --yes impeccable skills install",
-          "cwd": "project",
-          "summary": "Project-local install from current directory"
-        },
         "alternatives": [
           "Claude plugin: /plugin marketplace add pbakaus/impeccable"
         ],
         "verify": {
-          "global": "test -f \"$HOME/.agents/skills/impeccable/SKILL.md\" || test -f \"$HOME/.cursor/skills/impeccable/SKILL.md\" || test -L \"$HOME/.claude/skills/impeccable\"",
-          "project": "test -f \".agents/skills/impeccable/SKILL.md\" || test -f \".cursor/skills/impeccable/SKILL.md\" || test -L \".claude/skills/impeccable\""
+          "global": "test -f \"$HOME/.agents/skills/impeccable/SKILL.md\" || test -f \"$HOME/.cursor/skills/impeccable/SKILL.md\" || test -L \"$HOME/.claude/skills/impeccable\""
         }
       }
     },
@@ -136,17 +130,11 @@
           "command": "npx --yes skills add brianlovin/claude-config -g -y -s simplify",
           "summary": "User-wide simplify skill (Claude/Cursor agents paths via skills CLI)"
         },
-        "project": {
-          "command": "npx --yes skills add brianlovin/claude-config -y -s simplify",
-          "cwd": "project",
-          "summary": "Project-local simplify skill from current directory"
-        },
         "alternatives": [
           "Manual: copy skills/simplify/SKILL.md from brianlovin/claude-config into ~/.claude/skills/simplify/"
         ],
         "verify": {
-          "global": "test -f \"$HOME/.agents/skills/simplify/SKILL.md\" || test -f \"$HOME/.cursor/skills/simplify/SKILL.md\" || test -f \"$HOME/.claude/skills/simplify/SKILL.md\"",
-          "project": "test -f \".agents/skills/simplify/SKILL.md\" || test -f \".cursor/skills/simplify/SKILL.md\" || test -f \".claude/skills/simplify/SKILL.md\""
+          "global": "test -f \"$HOME/.agents/skills/simplify/SKILL.md\" || test -f \"$HOME/.cursor/skills/simplify/SKILL.md\" || test -f \"$HOME/.claude/skills/simplify/SKILL.md\""
         }
       }
     },
@@ -175,17 +163,11 @@
           "command": "uv tool install graphifyy && graphify install",
           "summary": "Install graphifyy via uv, then register the skill with global agents"
         },
-        "project": {
-          "command": "uv tool install graphifyy && graphify install --project",
-          "cwd": "project",
-          "summary": "Install the package globally, then register into the current project"
-        },
         "alternatives": [
           "pipx install graphifyy && graphify install"
         ],
         "verify": {
-          "global": "test -f \"$HOME/.claude/skills/graphify/SKILL.md\" || test -f \"$HOME/.agents/skills/graphify/SKILL.md\"",
-          "project": "test -f \".claude/skills/graphify/SKILL.md\" || test -f \".agents/skills/graphify/SKILL.md\""
+          "global": "test -f \"$HOME/.claude/skills/graphify/SKILL.md\" || test -f \"$HOME/.agents/skills/graphify/SKILL.md\""
         }
       }
     },
@@ -225,39 +207,23 @@
           "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -g -y",
           "summary": "Full pack command (use batch selected-skills install at runtime)"
         },
-        "project": {
-          "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -y",
-          "cwd": "project",
-          "summary": "Full pack command (use batch selected-skills install at runtime)"
-        },
         "skillInstall": {
           "global": {
             "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -g -y -s {{skill}}",
             "summary": "Install one SEO/GEO skill globally"
-          },
-          "project": {
-            "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -y -s {{skill}}",
-            "cwd": "project",
-            "summary": "Install one SEO/GEO skill into the current project"
           }
         },
         "batchSkillInstall": {
           "global": {
             "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -g -y -s {{skills}}",
             "summary": "Install selected SEO/GEO skills globally in one run"
-          },
-          "project": {
-            "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -y -s {{skills}}",
-            "cwd": "project",
-            "summary": "Install selected SEO/GEO skills into the current project in one run"
           }
         },
         "alternatives": [
           "Claude plugin: /plugin marketplace add aaron-he-zhu/seo-geo-claude-skills"
         ],
         "verify": {
-          "global": "test -f \"$HOME/.agents/skills/keyword-research/SKILL.md\" || test -f \"$HOME/.claude/skills/keyword-research/SKILL.md\"",
-          "project": "test -f \".agents/skills/keyword-research/SKILL.md\" || test -f \".claude/skills/keyword-research/SKILL.md\""
+          "global": "test -f \"$HOME/.agents/skills/keyword-research/SKILL.md\" || test -f \"$HOME/.claude/skills/keyword-research/SKILL.md\""
         }
       }
     },
@@ -287,17 +253,11 @@
           "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -g -y",
           "summary": "Install all 20 SEO/GEO skills globally"
         },
-        "project": {
-          "command": "npx --yes skills add aaron-he-zhu/seo-geo-claude-skills -y",
-          "cwd": "project",
-          "summary": "Install all 20 SEO/GEO skills into the current project"
-        },
         "alternatives": [
           "Claude plugin: /plugin marketplace add aaron-he-zhu/seo-geo-claude-skills"
         ],
         "verify": {
-          "global": "test -d \"$HOME/.agents/skills/seo-geo-claude-skills\" || test -d \"$HOME/.claude/skills/seo-geo-claude-skills\"",
-          "project": "test -d \".agents/skills/seo-geo-claude-skills\" || test -d \".claude/skills/seo-geo-claude-skills\""
+          "global": "test -d \"$HOME/.agents/skills/seo-geo-claude-skills\" || test -d \"$HOME/.claude/skills/seo-geo-claude-skills\""
         }
       }
     },
@@ -336,18 +296,12 @@
           "manual": true,
           "summary": "Install ECC with the selected profile into global Claude config"
         },
-        "project": {
-          "manual": true,
-          "cwd": "project",
-          "summary": "Install ECC with the selected profile for the current project"
-        },
         "alternatives": [
           "Plugin: /plugin marketplace add https://github.com/affaan-m/ECC && /plugin install ecc@ecc",
           "Override: --ecc-profile minimal|core|full on install-recommended"
         ],
         "verify": {
-          "global": "{ ls \"$HOME/.claude/agents\"/ecc-*.md 2>/dev/null; ls -d \"$HOME/.claude/skills\"/ecc-*/ 2>/dev/null; } | grep -q .",
-          "project": "{ ls .claude/agents/ecc-*.md 2>/dev/null; ls -d .claude/skills/ecc-*/ 2>/dev/null; } | grep -q ."
+          "global": "{ ls \"$HOME/.claude/agents\"/ecc-*.md 2>/dev/null; ls -d \"$HOME/.claude/skills\"/ecc-*/ 2>/dev/null; } | grep -q ."
         }
       }
     }

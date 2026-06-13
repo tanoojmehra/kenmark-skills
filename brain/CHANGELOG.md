@@ -2,6 +2,12 @@
 
 Brain knowledge base
 
+## v2026.06.13-global-only-install
+
+- **CLI:** Project scope removed; `--project` rejected. Interactive scope prompts removed.
+- **recommended-catalog.json (v7):** Global install/verify only for all packs.
+- **KB:** `05-api-and-integrations`, `004-recommended-packs`, `11-known-risks-and-decisions` updated.
+
 ## v2026.06.13-simplify-catalog
 
 - **recommended-catalog.json (v6):** Replaced default `code-review-skill` (Awesome Code Review) with `simplify` (brianlovin/claude-config). Defaults and presets now `impeccable` + `simplify`.

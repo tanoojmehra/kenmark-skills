@@ -36,7 +36,7 @@ Status: reviewed
 
 | Flag | Purpose |
 | --- | --- |
-| `--global` / `--project` | User home vs current repo IDE paths |
+| `--global` | User home IDE paths (only supported scope; default) |
 | `--ide <target>` | `cursor`, `claude`, `codex`, `antigravity-cli`, `antigravity`, `antigravity-ide`, `all`, comma-separated |
 | `-y` | Skip interactive prompts |
 | `--skip-recommended` | Kenmark skills only on `init` |
@@ -70,7 +70,7 @@ Status: reviewed
 | Qoder | `~/.qoder/skills` |
 | MiniMax Code | `~/.minimax/skills` |
 
-Project scope: same relative paths under repo root (`.cursor/skills`, `.agents/skills`, etc.).
+Project scope was removed — all installs target `~/.kenmark/store` and global IDE folders.
 
 **Antigravity surfaces:** CLI, 2.0 Manager (`antigravity`), and standalone IDE (`antigravity-ide`) all default to **copy** (not symlink) because Antigravity does not discover symlinked skill dirs.
 
@@ -113,7 +113,7 @@ npx kenmark-skills init --global --skip-recommended -y
 npx kenmark-skills init --global --ide cursor --skip-recommended --mcp-servers playwright,context7 -y
 npx kenmark-skills init --global --ide antigravity-cli --mcp-profile web -y
 npx kenmark-skills init --global --ide antigravity-ide --mcp-profile web -y
-npx kenmark-skills init --project --ide antigravity --mcp-servers playwright,context7 -y
+npx kenmark-skills init --global --ide antigravity --mcp-servers playwright,context7 -y
 npx kenmark-skills update --both --global -y
 npx kenmark-skills install-recommended --ids impeccable,simplify --global -y
 ```

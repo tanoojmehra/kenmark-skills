@@ -5,18 +5,16 @@ const path = require("path");
 const os = require("os");
 const {
   wantsInteractive,
-  promptScope,
   promptAction,
   promptIde,
   promptMcpServers,
   confirmPlan,
-  banner
+  banner,
+  rejectProjectScopeInArgv
 } = require("./interactive");
 const {
   buildGlobalTargets,
-  buildProjectTargets,
   buildMcpGlobalTargets,
-  buildMcpProjectTargets,
   getStoreDir,
   getMcpStorePath,
   getBundledMcpPath,
@@ -54,15 +52,12 @@ const {
 } = require("./kenmark-hub");
 
 const homeDir = os.homedir();
-const projectDir = process.cwd();
 const repoRoot = path.resolve(__dirname, "..");
 const sourceDir = path.join(repoRoot, "skills", "user-skills");
 const catalogPath = path.join(sourceDir, "recommended-catalog.json");
 
 const globalTargets = buildGlobalTargets(homeDir);
-const projectTargets = buildProjectTargets(projectDir);
 const globalMcpTargets = buildMcpGlobalTargets(homeDir);
-const projectMcpTargets = buildMcpProjectTargets(projectDir);
 const bundledMcpPath = getBundledMcpPath(repoRoot);
 
 const MCP_CAPABLE_IDE_SET = new Set(MCP_CAPABLE_IDES);
@@ -85,7 +80,7 @@ function printUsage() {
   console.log("");
   console.log("Options:");
   console.log("  --install | --uninstall   Action (default: install)");
-  console.log("  --global | --project      Install scope (default: global when non-interactive)");
+  console.log("  --global                  Install scope (global only; default)");
   console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, antigravity-ide, all, …");
   console.log("  --copy                    Copy into IDE paths instead of symlinks");
   console.log("  --symlink                 Force symlinks (Windows: junction) instead of copy");
@@ -616,7 +611,9 @@ function executeInstall(targetMap, requestedTargetIdes, action, options) {
 }
 
 async function run() {
-  const args = parseArgs(process.argv.slice(2));
+  const argv = process.argv.slice(2);
+  rejectProjectScopeInArgv(argv);
+  const args = parseArgs(argv);
   if (args.help) {
     printUsage();
     process.exit(0);
@@ -633,7 +630,7 @@ async function run() {
     banner("kenmark-skills setup", "Interactive · flags + -y for agents");
   }
 
-  let mode = args.mode;
+  let mode = "global";
   let action = args.action;
   let targetIdes = resolveTargetIdes(args, globalTargets);
 
@@ -641,14 +638,10 @@ async function run() {
     if (!args.explicitAction) {
       action = await promptAction(action || "install");
     }
-    if (!args.explicitMode) {
-      mode = await promptScope(mode || "global");
-    }
-    const targetMapPreview = mode === "project" ? projectTargets : globalTargets;
     if (!args.explicitIde) {
-      const detected = detectInstalledIdes(targetMapPreview);
-      const managed = detectManagedIdes(targetMapPreview);
-      targetIdes = await promptIde(Object.keys(targetMapPreview), detected, {
+      const detected = detectInstalledIdes(globalTargets);
+      const managed = detectManagedIdes(globalTargets);
+      targetIdes = await promptIde(Object.keys(globalTargets), detected, {
         managedIdes: managed
       });
     }
@@ -667,7 +660,6 @@ async function run() {
   }
 
   action = action || "install";
-  mode = mode || "global";
 
   if (args.mcpOnly && action !== "uninstall") {
     console.error("--mcp-only is only valid with uninstall (e.g. npx kenmark-skills mcp uninstall -y)");
@@ -677,8 +669,8 @@ async function run() {
     action = "uninstall";
   }
 
-  const targetMap = mode === "project" ? projectTargets : globalTargets;
-  const mcpTargetMap = mode === "project" ? projectMcpTargets : globalMcpTargets;
+  const targetMap = globalTargets;
+  const mcpTargetMap = globalMcpTargets;
 
   if (!targetIdes) {
     targetIdes = resolveTargetIdes(args, targetMap);
@@ -721,7 +713,7 @@ async function run() {
     mcpOnly: args.mcpOnly,
     eccProfile: args.eccProfile,
     mcpTargetMap,
-    projectDir: mode === "project" ? projectDir : null
+    projectDir: null
   });
 
   console.log(`Operating system: ${process.platform}`);

@@ -5,11 +5,11 @@ const path = require("path");
 const os = require("os");
 const {
   wantsInteractive,
-  promptScope,
   promptSelectOptionalPacks,
   promptEccProfile,
   confirmPlan,
-  banner
+  banner,
+  rejectProjectScopeInArgv
 } = require("./interactive");
 const {
   loadCatalog,
@@ -32,7 +32,6 @@ const {
 } = require("./recommended-catalog");
 const {
   buildGlobalTargets,
-  buildProjectTargets,
   adoptCatalogSkills,
   formatAdoptPassSummary,
   resolveExplicitTargetIdes,
@@ -65,9 +64,7 @@ function printUsage() {
   console.log("  --profile <id>      Alias for --preset (backward compatible)");
   console.log("  --all               Install every pack (legacy)");
   console.log("  --ids a,b           Install specific pack ids");
-  console.log("  --global            Install to user home (default)");
-  console.log("  --project           Install into current project directory");
-  console.log("  --scope global|project");
+  console.log("  --global            Install to user home (default; only supported scope)");
   console.log("  --ecc-profile <id>  Override ECC profile (minimal, core, full)");
   console.log("  --ide <target>      Limit adopt/relink: cursor, cursor,codex,claude, all, …");
   console.log("  --skip-adopt        Skip post-install catalog adoption");
@@ -269,23 +266,24 @@ function runInstallCommand(cmdEntry, dryRun, packId) {
   return runShell(cmdEntry.command, dryRun, cmdEntry.cwd);
 }
 
-function verifyPack(pack, scope, entry) {
-  const cmd = resolveVerifyCommand(pack, scope, entry);
+function verifyPack(pack, entry) {
+  const cmd = resolveVerifyCommand(pack, "global", entry);
   if (!cmd) return null;
-  const cwd = scope === "project" ? process.cwd() : undefined;
   const home = process.env.HOME || os.homedir();
   const result = spawnSync(cmd, {
     shell: true,
     encoding: "utf8",
     stdio: "pipe",
-    cwd: cwd || process.cwd(),
+    cwd: process.cwd(),
     env: { ...process.env, HOME: home }
   });
   return result.status === 0;
 }
 
 async function run() {
-  const args = parseArgs(process.argv.slice(2));
+  const argv = process.argv.slice(2);
+  rejectProjectScopeInArgv(argv);
+  const args = parseArgs(argv);
   if (args.help) {
     printUsage();
     process.exit(0);
@@ -326,12 +324,7 @@ async function run() {
     process.exit(0);
   }
 
-  let scope = args.scope;
-  if (scope && scope !== "global" && scope !== "project") {
-    console.error('Invalid --scope (use "global" or "project")');
-    process.exit(1);
-  }
-
+  const scope = "global";
   let resolved = null;
   let selectedIds = args.ids || [];
 
@@ -369,7 +362,6 @@ async function run() {
       "kenmark-skills install-recommended",
       "Optional third-party installs — select what you want"
     );
-    scope = await promptScope(catalog.defaults?.scope || "global", { required: true });
     const suggestions = suggestPacks(catalog, process.cwd());
     selectedIds = await promptSelectOptionalPacks(packs, suggestions, {
       defaultIds: defaultSelectedIds(catalog)
@@ -381,11 +373,7 @@ async function run() {
     resolved = planFromPackIds(selectedIds, catalog, null);
     const w = weightLabel(resolved.installPlan);
     console.log(`\nSelected ${selectedIds.length} pack(s) · estimated weight: ${w.label} (bloat ${w.total})`);
-  } else if (!scope) {
-    scope = catalog.defaults?.scope || "global";
-  }
-
-  if (!resolved && selectedIds.length > 0) {
+  } else if (!resolved && selectedIds.length > 0) {
     resolved = planFromPackIds(selectedIds, catalog, args.eccProfile);
   }
 
@@ -413,8 +401,7 @@ async function run() {
     );
   }
 
-  const fullTargetMap =
-    scope === "project" ? buildProjectTargets(process.cwd()) : buildGlobalTargets(os.homedir());
+  const fullTargetMap = buildGlobalTargets(os.homedir());
   let requestedTargetIdes;
   if (args.explicitIde && args.ide) {
     try {
@@ -475,9 +462,6 @@ async function run() {
     `\nInstalling ${installPlan.length} pack(s) · scope "${scope}"${presetId ? ` · preset ${presetId}` : ""}`
   );
   if (eccEntry) console.log(`ECC profile: ${eccProfile}`);
-  if (scope === "project") {
-    console.log(`Project directory: ${process.cwd()}`);
-  }
   if (args.dryRun) console.log("(dry-run — commands only)\n");
 
   for (const entry of installPlan) {
@@ -492,7 +476,7 @@ async function run() {
       hasVerify &&
       !args.force &&
       !args.dryRun &&
-      verifyPack(pack, scope, entry);
+      verifyPack(pack, entry);
 
     if (alreadyInstalled) {
       console.log(
@@ -536,7 +520,7 @@ async function run() {
       }
     }
     if (!args.dryRun && hasVerify) {
-      const okVerify = verifyPack(pack, scope, entry);
+      const okVerify = verifyPack(pack, entry);
       const verifyHint =
         entry.seoSkills?.length > 1
           ? ` (${entry.seoSkills.length} SEO/GEO skills)`
@@ -570,7 +554,7 @@ async function run() {
         forceSymlink: args.forceSymlink,
         preferCopyOnWindows: args.preferCopyOnWindows,
         dryRun: false,
-        projectDir: scope === "project" ? process.cwd() : null
+        projectDir: null
       });
       const adoptSummary = formatAdoptPassSummary(adoptResult.results);
       console.log(adoptSummary.line);

@@ -19,7 +19,7 @@ disable-model-invocation: true
 
 # Kenmark Setup
 
-One guided flow for **new users**: install Kenmark skills, optionally install **selectable third-party packs** (defaults: Impeccable + Simplify only; Graphify, SEO, ECC are opt-in), with **repo-aware suggestions**, then pick **scope** and **IDEs**. No profile/preset is chosen by default.
+One guided flow for **new users**: install Kenmark skills globally, optionally install **selectable third-party packs** (defaults: Impeccable + Simplify only; Graphify, SEO, ECC are opt-in), with **repo-aware suggestions**, then pick **IDEs**. Kenmark installs to `~/.kenmark/store` and links into IDE home folders — not per-repo.
 
 ## When to use
 
@@ -32,7 +32,7 @@ One guided flow for **new users**: install Kenmark skills, optionally install **
 | Audience | How to run |
 | --- | --- |
 | **Human** | `npx kenmark-skills init` — interactive prompts in the terminal |
-| **Agent** | `npx kenmark-skills init --global --skip-recommended -y` (or `--project`, `--ide cursor,claude,codex`, `--ids`, `--recommended-only`) |
+| **Agent** | `npx kenmark-skills init --global --skip-recommended -y` (or `--ide cursor,claude,codex`, `--ids`, `--recommended-only`) |
 
 Set `KENMARK_SKILLS_NONINTERACTIVE=1` to force non-interactive behavior without `-y`.
 
@@ -48,7 +48,7 @@ Prompts (nothing is pre-selected — you must choose each step):
 2. Install optional recommended packs? (default **no**)
 3. If packs: checklist with repo suggestions (`--suggest` shows the same analysis non-interactively); Enter accepts defaults (**impeccable**, **simplify**)
 4. ECC profile prompt when ECC is selected
-5. Scope — global vs project (**required**)
+5. Scope — **global only** (no project installs)
 6. IDE targets — auto, all, or numbered list (**required** when installing Kenmark)
 7. Confirm plan (**yes** required to proceed), then runs `setup` + `install-recommended` as chosen
 
@@ -74,8 +74,8 @@ npx kenmark-skills init --global --ids impeccable,simplify -y
 # Advanced — every detected harness path (may create clutter)
 # npx kenmark-skills init --global --ide all --skip-recommended -y
 
-# Kenmark only, project-local, Cursor
-npx kenmark-skills init --project --ide cursor --skip-recommended -y
+# Kenmark only, Cursor
+npx kenmark-skills init --global --ide cursor --skip-recommended -y
 
 # Recommended packs only (no Kenmark copy)
 npx kenmark-skills init --recommended-only --global --ids impeccable -y

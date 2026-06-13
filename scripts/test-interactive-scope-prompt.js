@@ -1,66 +1,77 @@
 #!/usr/bin/env node
 
 /**
- * Unit tests for scope prompt copy (install vs cleanup).
+ * Unit tests for global-only scope behavior.
  */
 
-const { getScopePromptLines } = require("./interactive");
+const { spawnSync } = require("child_process");
+const path = require("path");
+const {
+  getScopePromptLines,
+  promptScope,
+  rejectProjectScopeInArgv,
+  PROJECT_SCOPE_REMOVED
+} = require("./interactive");
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function main() {
+async function main() {
   const install = getScopePromptLines("install");
+  assert(install.title === "Install scope", `install title mismatch: ${install.title}`);
   assert(
-    install.title === "Where should skills be installed?",
-    `install title mismatch: ${install.title}`
+    install.lines[0].includes("global"),
+    "install line should describe global scope"
   );
-  assert(
-    install.lines[0].includes("all projects on this machine"),
-    "install global line should mention all projects"
-  );
-  assert(
-    !install.lines[0].includes("user home IDE folders"),
-    "install global line must not use cleanup wording"
-  );
-
-  const installRequired = getScopePromptLines("install", { required: true });
-  assert(
-    !installRequired.lines[0].includes("[default]"),
-    "required install prompt should omit [default]"
-  );
+  assert(install.lines.length === 1, "install prompt should be global-only");
 
   const cleanup = getScopePromptLines("cleanup");
+  assert(cleanup.title === "Cleanup scope", `cleanup title mismatch: ${cleanup.title}`);
   assert(
-    cleanup.title === "Where should cleanup run?",
-    `cleanup title mismatch: ${cleanup.title}`
-  );
-  assert(
-    cleanup.lines[0].includes("user home IDE folders"),
-    "cleanup global line should mention user home IDE folders"
-  );
-  assert(
-    !cleanup.title.includes("installed"),
-    "cleanup title must not mention installed"
-  );
-  assert(
-    cleanup.lines[0].includes("[default]"),
-    "default cleanup prompt should mark global as default"
+    cleanup.lines[0].includes("global"),
+    "cleanup line should describe global scope"
   );
 
-  const cleanupRequired = getScopePromptLines("cleanup", { required: true });
+  const scope = await promptScope();
+  assert(scope === "global", "promptScope should always return global");
+
+  let rejected = false;
+  const originalExit = process.exit;
+  const originalError = console.error;
+  process.exit = (code) => {
+    rejected = code === 1;
+    throw new Error("exit");
+  };
+  console.error = () => {};
+  try {
+    rejectProjectScopeInArgv(["--project"]);
+  } catch (err) {
+    if (err.message !== "exit") throw err;
+  } finally {
+    process.exit = originalExit;
+    console.error = originalError;
+  }
+  assert(rejected, "rejectProjectScopeInArgv should exit on --project");
   assert(
-    !cleanupRequired.lines[0].includes("[default]"),
-    "required cleanup prompt should omit [default]"
+    PROJECT_SCOPE_REMOVED.includes("global"),
+    "PROJECT_SCOPE_REMOVED should mention global-only"
   );
 
-  console.log("interactive scope prompt tests passed.");
+  const setupScript = path.join(__dirname, "setup-skills.js");
+  const result = spawnSync(process.execPath, [setupScript, "--project", "--help"], {
+    encoding: "utf8"
+  });
+  assert(result.status === 1, "setup --project should exit 1");
+  assert(
+    (result.stderr || "").includes("Project scope is not supported"),
+    "setup --project should print global-only message"
+  );
+
+  console.log("interactive global-only scope tests passed.");
 }
 
-try {
-  main();
-} catch (err) {
-  console.error(`interactive scope prompt tests failed: ${err.message}`);
+main().catch((err) => {
+  console.error(`interactive global-only scope tests failed: ${err.message}`);
   process.exit(1);
-}
+});

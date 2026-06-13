@@ -142,39 +142,36 @@ function main() {
     rmDirSafe(agyOnlyHome);
   }
 
-  const projectHome = path.join(
+  const rejectHome = path.join(
     os.tmpdir(),
-    `kenmark-agy-project-${process.pid}-${Date.now()}`
-  );
-  const projectDir = path.join(
-    os.tmpdir(),
-    `kenmark-agy-projdir-${process.pid}-${Date.now()}`
+    `kenmark-project-reject-${process.pid}-${Date.now()}`
   );
   try {
-    fs.mkdirSync(projectHome, { recursive: true });
-    fs.mkdirSync(projectDir, { recursive: true });
-    const projRun = runSetup(
-      ["--project", "--ide", "antigravity", "-y", "--skip-adopt"],
-      projectHome,
-      projectDir
+    fs.mkdirSync(rejectHome, { recursive: true });
+    const rejectRun = spawnSync(
+      process.execPath,
+      [cliPath, "setup", "--project", "--ide", "cursor", "-y", "--skip-adopt"],
+      {
+        cwd: repoRoot,
+        encoding: "utf8",
+        env: { ...process.env, HOME: rejectHome, NO_COLOR: "1" }
+      }
     );
-    if (projRun.status !== 0) {
-      failures.push(`antigravity project setup exited ${projRun.status}`);
+    if (rejectRun.status === 0) {
+      failures.push("setup --project should exit non-zero");
+    } else if (
+      !/Project scope is not supported/.test(
+        `${rejectRun.stdout || ""}${rejectRun.stderr || ""}`
+      )
+    ) {
+      failures.push("setup --project should print global-only error");
     } else {
-      const targets = buildProjectTargets(projectDir);
-      const agentInit = path.join(targets.antigravity, "kenmark-init", "SKILL.md");
-      const agentsInit = path.join(targets["antigravity-cli"], "kenmark-init", "SKILL.md");
-      assert(fs.existsSync(agentInit), "kenmark-init missing under .agent/skills");
-      assert(fs.existsSync(agentsInit), "kenmark-init missing under .agents/skills");
-      const agentStat = fs.lstatSync(path.join(targets.antigravity, "kenmark-init"));
-      assert(!agentStat.isSymbolicLink(), "antigravity IDE skill should be copied, not symlinked");
-      console.log("  ✓ antigravity project install copies to .agent/skills and .agents/skills");
+      console.log("  ✓ --project is rejected with global-only message");
     }
   } catch (err) {
     failures.push(err.message);
   } finally {
-    rmDirSafe(projectHome);
-    rmDirSafe(projectDir);
+    rmDirSafe(rejectHome);
   }
 
   const ideHome = path.join(
@@ -206,41 +203,6 @@ function main() {
     failures.push(err.message);
   } finally {
     rmDirSafe(ideHome);
-  }
-
-  const ideProjectHome = path.join(
-    os.tmpdir(),
-    `kenmark-agy-ide-project-${process.pid}-${Date.now()}`
-  );
-  const ideProjectDir = path.join(
-    os.tmpdir(),
-    `kenmark-agy-ide-projdir-${process.pid}-${Date.now()}`
-  );
-  try {
-    fs.mkdirSync(ideProjectHome, { recursive: true });
-    fs.mkdirSync(ideProjectDir, { recursive: true });
-    const ideProjRun = runSetup(
-      ["--project", "--ide", "antigravity-ide", "-y", "--skip-adopt"],
-      ideProjectHome,
-      ideProjectDir
-    );
-    if (ideProjRun.status !== 0) {
-      failures.push(`antigravity-ide project setup exited ${ideProjRun.status}`);
-    } else {
-      const targets = buildProjectTargets(ideProjectDir);
-      const agentsInit = path.join(targets["antigravity-ide"], "kenmark-init", "SKILL.md");
-      const agentInit = path.join(ideProjectDir, ".agent", "skills", "kenmark-init", "SKILL.md");
-      assert(fs.existsSync(agentsInit), "kenmark-init missing under .agents/skills");
-      assert(fs.existsSync(agentInit), "kenmark-init missing under .agent/skills");
-      const agentsStat = fs.lstatSync(path.join(targets["antigravity-ide"], "kenmark-init"));
-      assert(!agentsStat.isSymbolicLink(), "antigravity-ide project skill should be copied");
-      console.log("  ✓ antigravity-ide project install copies to .agents/skills and .agent/skills");
-    }
-  } catch (err) {
-    failures.push(err.message);
-  } finally {
-    rmDirSafe(ideProjectHome);
-    rmDirSafe(ideProjectDir);
   }
 
   const mcpDryHome = path.join(

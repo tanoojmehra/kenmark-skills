@@ -5,13 +5,12 @@ const path = require("path");
 const os = require("os");
 const {
   wantsInteractive,
-  promptScope,
   confirmPlan,
-  banner
+  banner,
+  rejectProjectScopeInArgv
 } = require("./interactive");
 const {
   buildGlobalTargets,
-  buildProjectTargets,
   getStoreDir,
   adoptCatalogSkills,
   formatAdoptPassSummary,
@@ -32,7 +31,7 @@ function printUsage() {
   console.log("Adopt Kenmark + recommended-catalog skills into ~/.kenmark/store and relink IDEs.");
   console.log("");
   console.log("Options:");
-  console.log("  --global | --project      Scope (default: global)");
+  console.log("  --global                  Scope (global only; default)");
   console.log("  --ide <target>            cursor, claude, codex, antigravity-cli, antigravity, antigravity-ide, all, …");
   console.log("  --copy                    Copy into IDE paths instead of symlinks");
   console.log("  --symlink                 Force symlinks (Windows: junction) instead of copy");
@@ -119,7 +118,9 @@ function resolveTargetIdes(args, targetMap) {
 }
 
 async function run() {
-  const args = parseArgs(process.argv.slice(2));
+  const argv = process.argv.slice(2);
+  rejectProjectScopeInArgv(argv);
+  const args = parseArgs(argv);
   if (args.help) {
     printUsage();
     process.exit(0);
@@ -130,13 +131,7 @@ async function run() {
     banner("kenmark-skills adopt", "Consolidate catalog skills into ~/.kenmark/store");
   }
 
-  let mode = args.mode || "global";
-  if (interactive && !args.explicitMode) {
-    mode = await promptScope(mode);
-  }
-
-  const fullTargetMap =
-    mode === "project" ? buildProjectTargets(process.cwd()) : buildGlobalTargets(os.homedir());
+  const fullTargetMap = buildGlobalTargets(os.homedir());
   const requestedTargetIdes = resolveTargetIdes(args, fullTargetMap);
   const linkTargetIdes = dedupeAliasTargetIdes(requestedTargetIdes);
   const targetMap = buildTargetMapForIdes(fullTargetMap, linkTargetIdes);
@@ -168,7 +163,7 @@ async function run() {
     forceSymlink: args.forceSymlink,
     preferCopyOnWindows: args.preferCopyOnWindows,
     dryRun: args.dryRun,
-    projectDir: mode === "project" ? process.cwd() : null
+    projectDir: null
   });
 
   console.log(`Adoptable names (${adoptNames.length}): ${adoptNames.join(", ")}`);

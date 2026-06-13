@@ -5,7 +5,7 @@ Status: reviewed
 
 ## Summary
 
-Optional third-party skills installed via `install-recommended` / `init` wizard. Catalog: `skills/user-skills/recommended-catalog.json` (v6, **selectable** mode).
+Optional third-party skills installed via `install-recommended` / `init` wizard. Catalog: `skills/user-skills/recommended-catalog.json` (v7, **selectable**, **global-only**).
 
 ## Pack IDs
 
