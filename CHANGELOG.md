@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.3.29 — Plan Option B and tracker skill activation (2026-06-15)
+
+### Changed
+
+- **kenmark-plan:** Manual-only with explicit durable triggers; removed from core auto skills in router/docs.
+- **Tracker skills:** `kenmark-plans-check`, `kenmark-issues-check`, `kenmark-plans-setup`, `kenmark-issues-setup` are manual-only.
+- **kenmark-test-\*:** Removed duplicate package-manager and safety sections; reference `skills/shared/testing-contract.md` only.
+
 ## v2.3.28 — Plan consolidation, Headroom init wiring, issues dashboard (2026-06-15)
 
 ### Added

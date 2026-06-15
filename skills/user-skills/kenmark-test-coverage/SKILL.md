@@ -28,7 +28,7 @@ disable-model-invocation: false
 
 ## Purpose
 
-Before writing or running tests, follow the shared testing contract: `skills/shared/testing-contract.md`.
+Before writing or running tests, follow `skills/shared/testing-contract.md`.
 
 Use this skill to audit whether the repo has meaningful test coverage.
 
@@ -41,35 +41,6 @@ It checks:
 - whether E2E flows cover core journeys
 
 ---
-
-## Package manager rule
-
-Detect package manager from lockfile:
-
-| Lockfile | Package manager |
-| --- | --- |
-| `pnpm-lock.yaml` | `pnpm` |
-| `yarn.lock` | `yarn` |
-| `bun.lockb` | `bun` |
-| `package-lock.json` | `npm` |
-
-Prefer package scripts and repo-local binaries before `npx`.
-
-Do not use `npx` to fetch tools unless:
-- the tool is already listed in dependencies/devDependencies, or
-- the user approves adding/fetching it.
-
----
-
-## Testing safety contract
-
-- Do not use production data or production credentials.
-- Do not hit paid/external services unless explicitly approved.
-- Do not add new frameworks when the repo already has a good one.
-- Prefer existing scripts and conventions.
-- Run the smallest relevant test first.
-- Document any env vars or setup needed.
-- Update `brain/kb/` when testing setup changes materially.
 
 ---
 
@@ -118,7 +89,7 @@ find . -maxdepth 4 -type f \( -name "coverage-final.json" -o -name "lcov.info" -
 
 **Command safety:** Run coverage only if the command exists and does not require production services. If the coverage command is absent, propose scripts/config instead of running arbitrary tools.
 
-Use existing command (detect package manager — see Package manager rule):
+Use existing command (detect package manager — see `skills/shared/testing-contract.md`):
 
 ```bash
 $PM run test:coverage
