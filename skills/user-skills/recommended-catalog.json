@@ -1,5 +1,5 @@
 {
-  "version": 8,
+  "version": 9,
   "mode": "selectable",
   "updatedAt": "2026-06-15",
   "notes": "Selectable optional third-party installs with repo-aware suggestions. Global install only — no project scope.",
@@ -41,9 +41,9 @@
     {
       "id": "core-next-agentic",
       "name": "Core Next.js Agentic",
-      "description": "core-next plus ECC minimal (manual install) and Headroom context compression.",
+      "description": "core-next plus ECC minimal (manual install).",
       "extends": "core-next",
-      "packIds": [{ "id": "ecc", "profile": "minimal" }, "headroom"]
+      "packIds": [{ "id": "ecc", "profile": "minimal" }]
     },
     {
       "id": "growth-seo",
@@ -312,7 +312,7 @@
       "category": "context",
       "weight": "medium",
       "bloatScore": 2,
-      "recommended": true,
+      "recommended": false,
       "defaultSelected": false,
       "helpsWith": [
         "context compression",
@@ -340,7 +340,7 @@
           "repo-file-count-high"
         ],
         "recommendWhen": "any",
-        "recommendation": "recommended"
+        "recommendation": "optional"
       },
       "url": "https://github.com/chopratejas/headroom",
       "description": "Context compression layer for AI agents — compress tool outputs, logs, files, and RAG chunks before they reach the LLM (library, proxy, MCP, agent wrap).",

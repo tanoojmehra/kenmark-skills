@@ -13,6 +13,7 @@ const {
   promptMcpServers,
   confirmPlan,
   banner,
+  promptHeadroomAfterInit,
   rejectProjectScopeInArgv,
   normalizeCliArgv
 } = require("./interactive");
@@ -27,6 +28,7 @@ const {
   buildGlobalTargets,
   detectInstalledIdes,
   detectManagedIdes,
+  resolveExplicitTargetIdes,
   listMcpServersForPrompt,
   formatMcpPlanLine,
   resolveMcpInstall
@@ -50,7 +52,7 @@ const {
 function printUsage() {
   console.log("Usage: node scripts/kenmark-setup.js [options]");
   console.log("");
-  console.log("Interactive first-time setup: Kenmark skills + optional recommended packs.");
+  console.log("Interactive first-time setup: Kenmark skills + optional recommended packs + optional Headroom wrap.");
   console.log("");
   console.log("Options:");
   console.log("  --ide <target>        IDE: cursor, claude, all, …");
@@ -452,6 +454,17 @@ async function run() {
   console.log("\n✓ Init complete.");
   console.log("Next: open your IDE, start a new agent chat, and try /kenmark-router or kenmark-init.");
   console.log("Restart the IDE if skills do not appear immediately.");
+
+  if (interactive && installKenmark && ideArg) {
+    const targetMap = buildGlobalTargets(os.homedir());
+    let selectedIdes = [];
+    try {
+      selectedIdes = resolveExplicitTargetIdes(ideArg, targetMap);
+    } catch {
+      selectedIdes = [];
+    }
+    await promptHeadroomAfterInit(selectedIdes, { dryRun: args.dryRun });
+  }
 }
 
 run().catch((err) => {

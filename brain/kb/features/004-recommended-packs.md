@@ -17,7 +17,9 @@ Optional third-party skills installed via `install-recommended` / `init` wizard.
 | `seo-geo-selected` | SEO/GEO (selected skills) | seo | no |
 | `seo-geo-full` | SEO/GEO (full suite) | seo | no |
 | `ecc` | Everything Claude Code | harness | no (profiles: minimal/core/full) |
-| `headroom` | Headroom | context | no |
+| `headroom` | Headroom | context | no (opt-in; interactive init offers `headroom wrap`) |
+
+**Headroom usage (built-in models):** [005-headroom-built-in-usage.md](005-headroom-built-in-usage.md) — also shipped as `kenmark-packs/references/headroom-usage.md`.
 
 ## Overlap rules
 

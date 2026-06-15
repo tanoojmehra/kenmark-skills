@@ -696,6 +696,70 @@ async function promptMcpProfile(profiles, opts = {}) {
   return defaultProfile;
 }
 
+/**
+ * Optional post-init Headroom wrap setup (interactive init only).
+ * @param {string[]} selectedIdeIds Kenmark IDE ids from init (--ide)
+ * @param {{ dryRun?: boolean }} opts
+ */
+async function promptHeadroomAfterInit(selectedIdeIds, opts = {}) {
+  const {
+    getWrapAgentsForIdes,
+    isHeadroomAvailable,
+    installHeadroom,
+    headroomPrepareWrap,
+    printHeadroomUsageHints
+  } = require("./headroom-init");
+
+  const wrapAgents = getWrapAgentsForIdes(selectedIdeIds);
+  if (!wrapAgents.length) {
+    return;
+  }
+
+  const agentList = wrapAgents.join(", ");
+  const want = await promptYesNo(
+    `Set up Headroom context compression (headroom wrap) for ${agentList}?`,
+    false
+  );
+  if (!want) {
+    return;
+  }
+
+  if (!isHeadroomAvailable()) {
+    const install = await promptYesNo(
+      "Headroom CLI not found. Install now with uv? (Python 3.10+, large download)",
+      true
+    );
+    if (!install) {
+      console.log("\nInstall later: npx kenmark-skills install-recommended --ids headroom -y");
+      printHeadroomUsageHints(wrapAgents);
+      return;
+    }
+    if (!installHeadroom({ dryRun: opts.dryRun })) {
+      console.log("Headroom install did not complete — skip wrap setup.");
+      return;
+    }
+  }
+
+  console.log("\nHeadroom wrap setup (prepare-only — does not launch your agent):\n");
+  for (const agent of wrapAgents) {
+    const result = headroomPrepareWrap(agent, { dryRun: opts.dryRun });
+    if (!result.ok) {
+      console.log(`  ⚠ headroom wrap ${agent} --prepare-only exited non-zero (you can retry manually)`);
+    }
+  }
+
+  if (wrapAgents.includes("cursor")) {
+    console.log(
+      "\nCursor (built-in/Auto): rtk is in this project's .cursorrules — prefix shell commands with `rtk`."
+    );
+    console.log(
+      "Cursor (BYOK only): run `headroom wrap cursor` for proxy base URL in model settings."
+    );
+  }
+
+  printHeadroomUsageHints(wrapAgents);
+}
+
 module.exports = {
   IDE_LABELS,
   createRl,
@@ -723,5 +787,6 @@ module.exports = {
   promptMcpProfile,
   promptMcpServers,
   confirmPlan,
-  banner
+  banner,
+  promptHeadroomAfterInit
 };

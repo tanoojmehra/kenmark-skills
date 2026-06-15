@@ -49,7 +49,9 @@ Read from:
 | `ecc` | Everything Claude Code — manual install |
 | `headroom` | Context compression CLI (proxy, MCP, agent wrap) |
 
-**Presets (advanced):** `lean`, `core-next`, `core-next-agentic` (+ Headroom), `growth-seo`, `audit-review`, `experimental-heavy`, …
+**Presets (advanced):** `lean`, `core-next`, `core-next-agentic`, `growth-seo`, `audit-review`, `experimental-heavy`, …
+
+**Headroom:** optional catalog pack (`install-recommended --ids headroom`). Interactive `init` can also offer `headroom wrap` setup after Kenmark skills install (not default-on). **Usage with built-in models:** [references/headroom-usage.md](references/headroom-usage.md).
 
 ```bash
 npx kenmark-skills install-recommended --suggest
