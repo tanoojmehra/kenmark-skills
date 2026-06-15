@@ -1,23 +1,17 @@
 ---
 name: kenmark-plan
-version: 1.2.0
+version: 1.3.0
 category: plans
 scope: universal
 phase: plan
-description: "Kenmark planning workflow that always writes indexed plan files to brain/plans/ and updates INDEX.md. Asks for plan tier (Quick, Prototype, Full Feature, Dig Deep, ULTRATHINK). Use when asked to plan, break down work, create a roadmap, or prepare before coding."
+description: "Manual durable planning workflow that writes indexed plan files to brain/plans/ and updates INDEX.md. Use only when the user explicitly asks to create/save a plan in brain/plans or invoke kenmark-plan."
 triggers:
   - kenmark-plan
-  - plan this
-  - create a plan
-  - make a plan
-  - quick plan
-  - break this down
-  - implementation outline
-  - roadmap sketch
-  - before coding
-  - how should we approach this
+  - create plan file
   - save plan
   - brain/plans
+  - durable plan
+  - source of truth plan
 allowed-tools:
   - Bash
   - Read
@@ -28,7 +22,7 @@ allowed-tools:
   - TodoWrite
   - AskUserQuestion
 risk: write-files
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Kenmark Plan

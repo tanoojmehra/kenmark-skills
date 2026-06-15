@@ -27,7 +27,7 @@ Policy for **kenmark-router** and humans — all skills remain installed; tiers 
 
 ### Core daily
 
-May use freely: `kenmark-plan`, `kenmark-troubleshoot`, `kenmark-output`, `kenmark-init`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-repo-kb`, `kenmark-commit`, `kenmark-maintain`, `kenmark-security-review`, `kenmark-performance`.
+May use freely: `kenmark-troubleshoot`, `kenmark-output`, `kenmark-issues-list`, `kenmark-plans-list`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-repo-kb`, `kenmark-maintain`, `kenmark-security-review`, `kenmark-performance`.
 
 ### Specialist
 

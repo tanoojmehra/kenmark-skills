@@ -75,7 +75,7 @@ Run `npx kenmark-skills init` from **PowerShell** or **CMD** if you use native W
 
 **Setup (once):** `npx kenmark-skills init` → **kenmark-init** in your project repo.
 
-**Day-to-day:** start with **kenmark-troubleshoot** when the problem is unclear; **kenmark-plan** before large work (always saves to `brain/plans/`); **kenmark-plans-execute** (explicit) to implement an approved plan; **kenmark-subagents** (explicit) for parallel specialist tracks; **kenmark-output** for complete deliverables; **kenmark-router** (explicit) when the domain is clear but the skill is not; **kenmark-commit** (explicit) when shipping changes. Issue and plan trackers live under `brain/issues/` and `brain/plans/` (bootstrapped by **kenmark-init**).
+**Day-to-day:** start with **kenmark-troubleshoot** when the problem is unclear; **kenmark-plan** (explicit) to save a tiered plan to `brain/plans/`; **kenmark-plans-execute** (explicit) to implement an approved plan; **kenmark-subagents** (explicit) for parallel specialist tracks; **kenmark-output** for complete deliverables; **kenmark-router** (explicit) when the domain is clear but the skill is not; **kenmark-commit** (explicit) when shipping changes. Issue and plan trackers live under `brain/issues/` and `brain/plans/` (bootstrapped by **kenmark-init**).
 
 Full skill catalog, activation tiers, and routing tables: [brain/kb/features/002-skills-catalog.md](brain/kb/features/002-skills-catalog.md) and [brain/kb/08-flows-and-workflows.md](brain/kb/08-flows-and-workflows.md).
 

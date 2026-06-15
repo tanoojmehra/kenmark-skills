@@ -4,8 +4,8 @@
 
 | Field | Value |
 |------|-------|
-| Last Assigned ID | 018 |
-| Next ID | 019 |
+| Last Assigned ID | 022 |
+| Next ID | 023 |
 
 ## Ledger Rules
 
@@ -20,8 +20,8 @@
 | Category | Count |
 |----------|-------|
 | Active issues | 0 |
-| Completed | 20 |
-| **Total** | **20** |
+| Completed | 24 |
+| **Total** | **24** |
 
 > **Note:** IDs 001 and 002 each have two completed issue files (different work shipped under the same numeric ID before ledger discipline). Both files remain in `completed/`; do not delete or renumber.
 
@@ -49,6 +49,10 @@
 | 016 | Make heavy orchestration skills manual-only | 2026-06-15 |
 | 017 | Align repo hygiene and docs skills with read-only audit mode | 2026-06-15 |
 | 018 | Rename simplify-scan and extract shared testing contract | 2026-06-15 |
+| 019 | Make kenmark-plan manual-only with explicit durable triggers (Option B) | 2026-06-15 |
+| 020 | Make issues-check and plans-check manual-only | 2026-06-15 |
+| 021 | Make issues-setup and plans-setup manual-only | 2026-06-15 |
+| 022 | Remove duplicated testing contract sections from kenmark-test skills | 2026-06-15 |
 
 ## Active Issues by Priority
 
