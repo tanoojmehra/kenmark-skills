@@ -67,8 +67,8 @@ function main() {
       "claude"
     ]);
     assert(
-      deduped.includes("antigravity-cli") && !deduped.includes("gemini"),
-      `dedupe should drop gemini when antigravity-cli present: ${deduped.join(",")}`
+      deduped.includes("gemini") && !deduped.includes("antigravity-cli"),
+      `dedupe should drop antigravity-cli when gemini present: ${deduped.join(",")}`
     );
     const agyExtras = getExtraProjectSkillPaths("antigravity", "/tmp/proj");
     assert(
@@ -101,16 +101,16 @@ function main() {
       const targets = buildGlobalTargets(bothHome);
       const agyInit = path.join(targets["antigravity-cli"], "kenmark-init", "SKILL.md");
       const geminiInit = path.join(targets.gemini, "kenmark-init", "SKILL.md");
-      assert(fs.existsSync(agyInit), "kenmark-init missing under ~/.gemini/antigravity-cli/skills");
-      assert(!fs.existsSync(geminiInit), "kenmark-init should not be under ~/.gemini/skills");
-      const geminiNames = listSkillDirNames(targets.gemini);
+      assert(fs.existsSync(geminiInit), "kenmark-init missing under ~/.gemini/skills");
+      assert(!fs.existsSync(agyInit), "kenmark-init should not be under ~/.gemini/antigravity-cli/skills");
+      const agyNames = listSkillDirNames(targets["antigravity-cli"]);
       assert(
-        geminiNames.length === 0,
-        `expected empty ~/.gemini/skills, found: ${geminiNames.join(", ")}`
+        agyNames.length === 0,
+        `expected empty ~/.gemini/antigravity-cli/skills, found: ${agyNames.join(", ")}`
       );
       const dupes = findAntigravityCliGeminiDuplicateSkills(targets);
       assert(dupes.length === 0, `duplicate scan found ${dupes.length} skill(s)`);
-      console.log("  ✓ antigravity-cli+gemini install links once to ~/.gemini/antigravity-cli/skills");
+      console.log("  ✓ antigravity-cli+gemini install links once to ~/.gemini/skills");
     }
   } catch (err) {
     failures.push(err.message);

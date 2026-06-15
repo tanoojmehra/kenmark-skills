@@ -393,10 +393,10 @@ const GEMINI_CODEX_ALIAS = {
   secondary: "gemini"
 };
 
-/** Antigravity CLI also discovers ~/.gemini/skills as a shared path — link once when both selected. */
+/** Antigravity CLI also reads ~/.gemini/skills — link there when both selected (Gemini cannot read antigravity-cli path). */
 const ANTIGRAVITY_CLI_GEMINI_ALIAS = {
-  primary: "antigravity-cli",
-  secondary: "gemini"
+  primary: "gemini",
+  secondary: "antigravity-cli"
 };
 
 function hadGeminiCodexAliasOverlap(targetIdes) {
@@ -437,10 +437,10 @@ function formatAliasTargetNote(requestedIdes, targetMap) {
     }
   }
   if (hadAntigravityCliGeminiAliasOverlap(requestedIdes)) {
-    const agyPath = targetMap?.[ANTIGRAVITY_CLI_GEMINI_ALIAS.primary];
-    if (agyPath) {
+    const geminiPath = targetMap?.[ANTIGRAVITY_CLI_GEMINI_ALIAS.primary];
+    if (geminiPath) {
       notes.push(
-        `gemini uses ${agyPath} (shared with antigravity-cli — avoids Antigravity CLI skill conflicts)`
+        `antigravity-cli uses ${geminiPath} (shared with gemini — Antigravity CLI also reads ~/.gemini/skills)`
       );
     }
   }
@@ -528,8 +528,8 @@ function findAntigravityCliGeminiDuplicateSkills(targetMap, context = {}) {
   );
   return dupes.map((dup) => ({
     name: dup.name,
-    geminiSkillPath: dup.secondarySkillPath,
-    antigravityCliSkillPath: dup.primarySkillPath
+    geminiSkillPath: dup.primarySkillPath,
+    antigravityCliSkillPath: dup.secondarySkillPath
   }));
 }
 
@@ -2712,7 +2712,7 @@ function runDoctor(options = {}) {
   });
   if (agyGeminiDuplicates.length) {
     warnings.push(
-      `Antigravity CLI/Gemini duplicate skills: ${agyGeminiDuplicates.length} Kenmark skill(s) exist in both ${targetMap.gemini} and ${targetMap["antigravity-cli"]}. Re-run npx kenmark-skills setup --ide <your-ides> -y to remove ~/.gemini/skills duplicates.`
+      `Antigravity CLI/Gemini duplicate skills: ${agyGeminiDuplicates.length} Kenmark skill(s) exist in both ${targetMap.gemini} and ${targetMap["antigravity-cli"]}. Re-run npx kenmark-skills setup --ide <your-ides> -y to remove ~/.gemini/antigravity-cli/skills duplicates.`
     );
   }
 

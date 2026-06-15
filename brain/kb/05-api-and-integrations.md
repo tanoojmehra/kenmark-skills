@@ -59,7 +59,7 @@ Status: reviewed
 | Codex / agents | `~/.agents/skills` |
 | Claude Code | `~/.claude/skills` |
 | Gemini CLI | `~/.gemini/skills` (or `~/.agents/skills` when Codex is also selected — Gemini aliases both) |
-| Antigravity CLI | `~/.gemini/antigravity-cli/skills` (or deduped away from `~/.gemini/skills` when Gemini is also selected) |
+| Antigravity CLI | `~/.gemini/antigravity-cli/skills` (or deduped away from `~/.gemini/antigravity-cli/skills` when Gemini is also selected — Antigravity CLI also reads `~/.gemini/skills`) |
 | Antigravity 2.0 Manager | `~/.gemini/antigravity/skills` |
 | Antigravity IDE (standalone app) | `~/.gemini/antigravity-ide/skills` |
 | OpenCode | `~/.opencode/skills` |
@@ -79,7 +79,7 @@ Project scope was removed — all installs target `~/.kenmark/store` and global 
 
 **Gemini + Codex:** Gemini CLI discovers both `~/.gemini/skills` and `~/.agents/skills` and prefers the latter. When `--ide` includes both `codex` and `gemini`, Kenmark links once to `~/.agents/skills` and removes Kenmark-managed duplicates from `~/.gemini/skills` to avoid startup conflict warnings.
 
-**Antigravity CLI + Gemini:** Antigravity CLI also reads `~/.gemini/skills` as a shared path. When both are in `--ide`, Kenmark links once to `~/.gemini/antigravity-cli/skills` and prunes duplicates from `~/.gemini/skills`.
+**Antigravity CLI + Gemini:** Antigravity CLI reads both `~/.gemini/skills` and `~/.gemini/antigravity-cli/skills`. Gemini CLI only reads `~/.gemini/skills` (and `~/.agents/skills`). When both are in `--ide`, Kenmark links once to `~/.gemini/skills` and prunes duplicates from `~/.gemini/antigravity-cli/skills`.
 
 ### MCP (JSON mcpServers IDEs)
 

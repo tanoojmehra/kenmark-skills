@@ -13,7 +13,8 @@ const IDE_LABELS = {
   claude: "Claude Code (.claude/skills)",
   codex: "Codex (.agents/skills)",
   gemini: "Gemini (.gemini/skills; shares ~/.agents/skills when Codex is also selected)",
-  "antigravity-cli": "Antigravity CLI (~/.gemini/antigravity-cli/skills)",
+  "antigravity-cli":
+    "Antigravity CLI (~/.gemini/antigravity-cli/skills; shares ~/.gemini/skills when Gemini is also selected)",
   antigravity: "Antigravity 2.0 Manager (~/.gemini/antigravity/skills)",
   "antigravity-ide": "Antigravity IDE (~/.gemini/antigravity-ide/skills)",
   opencode: "OpenCode (.opencode/skills)",
