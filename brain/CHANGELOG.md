@@ -2,6 +2,10 @@
 
 Brain knowledge base
 
+## v2026.06.15-v2.3.28
+
+- **Release v2.3.28:** Headroom init scripts shipped; plan-lite removed; issues-list GFM tables; version bump.
+
 ## v2026.06.15-remove-plan-lite
 
 - **Planning:** Removed `kenmark-plan-lite`; `kenmark-plan-durable` renamed back to **`kenmark-plan`** (always persists to `brain/plans/`). Count 47 → 46.

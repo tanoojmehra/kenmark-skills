@@ -1,11 +1,15 @@
 # CHANGELOG
 
-## v2.3.27 — Remove plan-lite; all plans go to brain/plans (2026-06-15)
+## v2.3.28 — Plan consolidation, Headroom init wiring, issues dashboard (2026-06-15)
+
+### Added
+
+- **init:** Ship `headroom-init.js` and interactive optional Headroom `wrap` prompt after Kenmark install (completes v2.3.25 catalog/docs wiring).
 
 ### Changed
 
-- **Planning:** Removed `kenmark-plan-lite`. Renamed `kenmark-plan-durable` back to **`kenmark-plan`** — every plan is persisted to `brain/plans/`.
-- **Docs:** Bundled skill count 47 → 46.
+- **Planning:** Removed `kenmark-plan-lite`; single **`kenmark-plan`** always persists to `brain/plans/` (bundled count 47 → 46).
+- **kenmark-issues-list:** Dashboard uses GFM markdown tables for correct rendering in chat UIs.
 
 ## v2.3.26 — Skill activation optimization (2026-06-15)
 
