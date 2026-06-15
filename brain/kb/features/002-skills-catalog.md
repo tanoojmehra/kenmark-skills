@@ -12,11 +12,11 @@ Status: reviewed
 | Category | Examples |
 | --- | --- |
 | onboarding | `kenmark-init`, `kenmark-setup` |
-| workflow | `kenmark-router`, `kenmark-plan`, `kenmark-troubleshoot`, `kenmark-repo-*`, `kenmark-security-review`, `kenmark-performance` |
+| workflow | `kenmark-plan-lite`, `kenmark-plan-durable`, `kenmark-troubleshoot`, `kenmark-troubleshoot`, `kenmark-repo-*`, `kenmark-security-review`, `kenmark-performance` |
 | testing | `kenmark-test-plan`, `kenmark-test-unit`, … `kenmark-test-ci` |
 | git | `kenmark-commit` |
-| issues | `kenmark-issues-setup`, … `kenmark-issues-fix-and-ship`, `kenmark-audit-loop`, `kenmark-simplify` |
-| plans | `kenmark-plans-setup`, `kenmark-plan`, … `kenmark-plans-execute` |
+| issues | `kenmark-issues-setup`, … `kenmark-issues-fix-and-ship`, `kenmark-audit-loop`, `kenmark-simplify-scan` |
+| plans | `kenmark-plans-setup`, `kenmark-plan-durable`, … `kenmark-plans-execute` |
 | admin | `kenmark-packs`, `kenmark-update`, `kenmark-maintain`, `kenmark-agents` |
 
 Full logical map: `skills/README.md`.
@@ -27,7 +27,7 @@ Policy for **kenmark-router** and humans — all skills remain installed; tiers 
 
 ### Core daily
 
-May use freely: `kenmark-router`, `kenmark-troubleshoot`, `kenmark-plan`, `kenmark-output`, `kenmark-init`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-repo-kb`, `kenmark-commit`, `kenmark-maintain`, `kenmark-security-review`, `kenmark-performance`.
+May use freely: `kenmark-plan-lite`, `kenmark-troubleshoot`, `kenmark-output`, `kenmark-output`, `kenmark-init`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-repo-kb`, `kenmark-commit`, `kenmark-maintain`, `kenmark-security-review`, `kenmark-performance`.
 
 ### Specialist
 

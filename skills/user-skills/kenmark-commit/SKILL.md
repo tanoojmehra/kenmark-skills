@@ -13,6 +13,7 @@ triggers:
   - commit logically
   - push commits
   - systematic commit
+  - kenmark-commit
 allowed-tools:
   - Bash
   - Read
@@ -20,7 +21,7 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 risk: git-write
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Kenmark Commit

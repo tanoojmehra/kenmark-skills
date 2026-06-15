@@ -137,6 +137,7 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/test-interactive-noninteractive-stdin.js",
   "scripts/test-gemini-codex-dedupe.js",
   "scripts/test-antigravity-dedupe.js",
+  "scripts/test-headroom-init.js",
   "scripts/test-packs-verify-skip.js",
   "scripts/test-install-temp-home.js",
   "scripts/test-pack.js",
@@ -897,7 +898,7 @@ const ISSUES_SCAN_ID_MARKERS = [
   "Never reuse an ID"
 ];
 
-/** kenmark-plan must enforce global plan ID ledger (regression guard). */
+/** kenmark-plan-durable must enforce global plan ID ledger (regression guard). */
 const PLAN_ID_MARKERS = [
   "brain/plans/INDEX.md",
   "completed",
@@ -907,7 +908,7 @@ const PLAN_ID_MARKERS = [
 
 /** Core OS workflow skills — must appear in README routing tables (regression guard). */
 const CORE_WORKFLOW_ROUTING_MARKERS = [
-  "kenmark-plan",
+  "kenmark-plan-lite",
   "kenmark-output",
   "kenmark-subagents"
 ];
@@ -950,7 +951,7 @@ function validateCoreWorkflowRouting() {
     }
   }
 
-  const coreDirs = ["kenmark-plan", "kenmark-output", "kenmark-subagents"];
+  const coreDirs = ["kenmark-plan-lite", "kenmark-output", "kenmark-subagents"];
   for (const dir of coreDirs) {
     const skillMd = path.join(userSkillsDir, dir, "SKILL.md");
     if (!fs.existsSync(skillMd)) {
@@ -959,7 +960,7 @@ function validateCoreWorkflowRouting() {
   }
 
   console.log(
-    "  ✓ core workflow routing — README.md and skills/README.md mention kenmark-plan, kenmark-output, kenmark-subagents"
+    "  ✓ core workflow routing — README.md and skills/README.md mention kenmark-plan-lite, kenmark-output, kenmark-subagents"
   );
 }
 
@@ -1110,25 +1111,29 @@ function validateIssuesIdLedger() {
 }
 
 function validatePlansIdLedger() {
-  const planPath = path.join(userSkillsDir, "kenmark-plan", "SKILL.md");
+  const planPath = path.join(userSkillsDir, "kenmark-plan-durable", "SKILL.md");
   if (!fs.existsSync(planPath)) {
-    fail("skills/user-skills/kenmark-plan/SKILL.md missing (plan ID ledger validation skipped)");
+    fail("skills/user-skills/kenmark-plan-durable/SKILL.md missing (plan ID ledger validation skipped)");
     return;
   }
   let text;
+  const persistRef = path.join(userSkillsDir, "kenmark-plan-durable", "references", "persist-plan.md");
   try {
     text = fs.readFileSync(planPath, "utf8");
+    if (fs.existsSync(persistRef)) {
+      text += "\n" + fs.readFileSync(persistRef, "utf8");
+    }
   } catch (err) {
-    fail(`kenmark-plan/SKILL.md: unreadable (${err.message})`);
+    fail(`kenmark-plan-durable/SKILL.md: unreadable (${err.message})`);
     return;
   }
   for (const marker of PLAN_ID_MARKERS) {
     if (!text.includes(marker)) {
-      fail(`kenmark-plan/SKILL.md: missing required ID ledger marker "${marker}"`);
+      fail(`kenmark-plan-durable/SKILL.md: missing required ID ledger marker "${marker}"`);
     }
   }
   console.log(
-    "  ✓ plans ID ledger — kenmark-plan documents global ID rules (INDEX, completed, Last Assigned ID, never reuse)"
+    "  ✓ plans ID ledger — kenmark-plan-durable documents global ID rules (INDEX, completed, Last Assigned ID, never reuse)"
   );
 }
 
@@ -1158,10 +1163,10 @@ function validatePackageJson() {
   }
   if (
     scripts["test:cli"] !==
-    "node scripts/test-cli-smoke.js && node scripts/test-interactive-scope-prompt.js && node scripts/test-interactive-noninteractive-stdin.js && node scripts/test-cli-package.js && node scripts/test-gemini-codex-dedupe.js && node scripts/test-antigravity-dedupe.js"
+    "node scripts/test-cli-smoke.js && node scripts/test-interactive-scope-prompt.js && node scripts/test-interactive-noninteractive-stdin.js && node scripts/test-cli-package.js && node scripts/test-gemini-codex-dedupe.js && node scripts/test-antigravity-dedupe.js && node scripts/test-headroom-init.js"
   ) {
     fail(
-      'package.json: scripts["test:cli"] must chain test-cli-smoke.js, test-interactive-scope-prompt.js, test-interactive-noninteractive-stdin.js, test-cli-package.js, test-gemini-codex-dedupe.js, and test-antigravity-dedupe.js'
+      'package.json: scripts["test:cli"] must chain test-cli-smoke.js, test-interactive-scope-prompt.js, test-interactive-noninteractive-stdin.js, test-cli-package.js, test-gemini-codex-dedupe.js, test-antigravity-dedupe.js, and test-headroom-init.js'
     );
   }
   if (scripts["test:packs-verify"] !== "node scripts/test-packs-verify-skip.js") {

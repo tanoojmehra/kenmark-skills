@@ -24,12 +24,14 @@ allowed-tools:
   - TodoWrite
   - AskUserQuestion
 risk: write-files
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Kenmark Test E2E
 
 ## Purpose
+
+Before writing or running tests, follow the shared testing contract: `skills/shared/testing-contract.md`.
 
 Use this skill to test complete user journeys.
 

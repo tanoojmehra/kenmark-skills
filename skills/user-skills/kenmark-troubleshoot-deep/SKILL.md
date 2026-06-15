@@ -1,30 +1,34 @@
 ---
-name: kenmark-troubleshoot
-version: 1.1.0
+name: kenmark-troubleshoot-deep
+version: 1.0.0
 category: workflow
 scope: universal
 phase: diagnose
-description: "Evidence-first troubleshooting for unclear bugs, failures, slowdowns, and root-cause analysis. Default mode is read-only and local-first."
+description: "Deep investigation mode for production issues, recurring bugs, unclear multi-system failures, research-heavy diagnosis, or sub-agent based root-cause analysis."
 triggers:
-  - kenmark-troubleshoot
-  - diagnose
-  - root cause
-  - why is this happening
-  - investigate this
-  - debug this
-  - figure out what is wrong
+  - deep investigation
+  - production incident
+  - recurring issue
+  - use research agent
+  - use subagents for diagnosis
+  - kenmark-troubleshoot-deep
 allowed-tools:
   - Bash
   - Read
   - Grep
   - Glob
-risk: read-only
-disable-model-invocation: false
+  - Task
+  - TodoWrite
+  - WebSearch
+  - WebFetch
+  - AskUserQuestion
+risk: write-files
+disable-model-invocation: true
 ---
 
-# Kenmark Troubleshoot
+# Kenmark Troubleshoot Deep
 
-Universal root-cause analysis and action planning for failures, slowdowns, and ambiguous problems.
+Deep investigation mode. Start with evidence framing from **`kenmark-troubleshoot`** (Steps 1–4), then use the sub-agent, research, and artifact sections below.
 
 ## Purpose
 
@@ -80,10 +84,10 @@ Choose the smallest mode that fits the request.
 | -------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------- |
 | `quick-triage`       | Simple, obvious, low-risk issue                                          | Fast diagnosis + 3–5 checks                             |
 | `standard-diagnosis` | Normal kenmark-troubleshooting request                                           | Evidence, hypotheses, ranked plan                       |
-| `deep-investigation` | Complex, high-impact, recurring, production | Use **`kenmark-troubleshoot-deep`** (explicit) |
+| `deep-investigation` | Complex, high-impact, unclear, recurring, expensive, or production issue | Sub-agents/research, decision matrix, test plan         |
 | `incident-response`  | Active outage, data loss risk, security concern, production failure      | Stabilize first, preserve evidence, avoid risky changes |
 
-If the user asks to “think deeply,” “use sub-agents,” “research,” “audit,” or needs production incident response, use **`kenmark-troubleshoot-deep`** instead of this skill.
+If the user asks to “think deeply,” “use sub-agents,” “research,” “audit,” “root cause,” or “best way to tackle it,” use `deep-investigation`.
 
 ---
 
@@ -253,11 +257,92 @@ Rules:
 
 ---
 
-For sub-agent tracks, web research, and durable investigation artifacts, use **`kenmark-troubleshoot-deep`**.
+## Step 5 — Use sub-agents for deep investigation
+
+If the harness supports sub-agents or task delegation, split the investigation into independent tracks.
+
+Recommended tracks:
+
+| Sub-agent          | Responsibility                                                                  |
+| ------------------ | ------------------------------------------------------------------------------- |
+| `evidence-agent`   | Collect logs, configs, versions, diffs, screenshots, reproduction details       |
+| `hypothesis-agent` | Generate likely root causes and falsification tests                             |
+| `research-agent`   | Look up current docs, known issues, changelogs, advisories, compatibility notes |
+| `systems-agent`    | Map dependencies, bottlenecks, resources, network, OS/runtime constraints       |
+| `code-agent`       | Inspect relevant code paths, tests, edge cases, error handling                  |
+| `risk-agent`       | Identify risky fixes, rollback plan, data/security impact                       |
+| `synthesis-agent`  | Merge findings, rank options, produce final plan                                |
+
+Sub-agent prompt template:
+
+```markdown
+You are the <track-name> for this kenmark-troubleshooting investigation.
+
+Problem:
+<problem summary>
+
+Your task:
+<specific track responsibility>
+
+Constraints:
+- Prefer evidence over guesses.
+- Mark confidence as Low/Medium/High.
+- Separate facts from assumptions.
+- Do not propose destructive changes.
+- Return concise findings with supporting evidence and next tests.
+
+Output:
+1. Key findings
+2. New or updated evidence bundle rows (`E#` — one line each)
+3. Hypotheses or risks (cite `E#` / `H#`)
+4. Recommended next step
+5. Confidence
+```
+
+If sub-agents are not available, emulate the same tracks sequentially:
+
+```text
+Track A — Evidence
+Track B — Hypotheses
+Track C — Research
+Track D — Risk
+Track E — Synthesis
+```
 
 ---
 
-## Step 5 — Run a test plan before recommending fixes
+## Step 6 — Research current or niche information
+
+Use research when:
+
+* The issue depends on current versions, APIs, products, libraries, outages, changelogs, vendor behavior
+* The user asks to research
+* A term/tool/version is unfamiliar or may have changed
+* Known issues or compatibility problems are likely
+
+Research targets:
+
+* Official documentation
+* Release notes / changelogs
+* GitHub issues / discussions
+* Status pages
+* Vendor docs
+* Package registry metadata
+* Security advisories
+
+Research output must distinguish:
+
+```text
+Confirmed by source
+Likely but not confirmed
+Speculation / needs local testing
+```
+
+Do not let web research override local evidence. Local logs and reproduction results are usually stronger.
+
+---
+
+## Step 7 — Run a test plan before recommending fixes
 
 ```markdown
 ## Test plan
@@ -279,7 +364,7 @@ Prefer tests that are:
 
 ---
 
-## Step 6 — Rank solutions
+## Step 8 — Rank solutions
 
 ```markdown
 ## Options
@@ -299,7 +384,7 @@ Ranking rules:
 
 ---
 
-## Step 7 — Final troubleshooting report
+## Step 9 — Final kenmark-troubleshooting report
 
 Lead with the **evidence bundle**, then cite IDs in causes and actions — keeps complex cases readable.
 
@@ -363,6 +448,65 @@ Lead with the **evidence bundle**, then cite IDs in causes and actions — keeps
 
 ---
 
+## Step 10 — Create an investigation artifact when useful
+
+For complex or recurring issues, suggest creating:
+
+```text
+brain/kenmark-troubleshooting/YYYY-MM-DD-short-problem.md
+```
+
+Artifact template:
+
+```markdown
+# Troubleshooting — <problem>
+
+Date: YYYY-MM-DD
+Status: investigating|mitigated|resolved|blocked
+Owner:
+
+## Problem frame
+
+## Timeline
+
+## Evidence bundle
+
+| ID | Evidence | Source | Supports | Confidence |
+| --- | --- | --- | --- | --- |
+
+## Evidence ↔ hypotheses
+
+- E1, E2 support H1
+- ...
+
+## Hypotheses
+
+## Tests run
+
+## Findings
+
+## Action plan
+
+## Resolution
+
+## Follow-up prevention
+```
+
+Only create the file after user approval, or when already in an explicit repo documentation workflow where durable tracking is expected.
+
+### Future CLI helper (not shipped yet)
+
+Planned Kenmark command (implementation target: `scripts/brain-template.js`, wired later as `kenmark-troubleshoot-template`):
+
+```bash
+npx kenmark-skills kenmark-troubleshoot-template --title "cursor slowdown"
+# → brain/kenmark-troubleshooting/2026-06-03-cursor-slowdown.md
+```
+
+Optional flags (planned): `--date YYYY-MM-DD`, `--cwd <repo>`, `--dry-run`, `--force` (overwrite). Until the CLI exists, create the path manually or ask the agent to write the Step 10 template after approval.
+
+---
+
 ## Anti-patterns to avoid
 
 * Jumping straight to “reinstall everything”
@@ -400,12 +544,38 @@ If not, next branch:
 
 ---
 
-## Related skills
+## Deep output for complex issues
+
+```markdown
+## Investigation plan
+
+- Mode: deep-investigation
+- Tracks: Evidence, Hypotheses, Research, Risk, Synthesis
+- Immediate goal: reduce uncertainty around <main unknown>
+
+## Parallel tracks
+
+| Track | Question | Output |
+| --- | --- | --- |
+| Evidence | What facts do we already have? | Evidence bundle (`E1`…) |
+| Hypotheses | What could explain this? | ... |
+| Research | Are there known/current issues? | ... |
+| Risk | What should we avoid breaking? | ... |
+| Synthesis | What should we do first? | ... |
+```
+
+Then run the tracks and synthesize.
+
+---
+
+## Delegation vs domain skills
 
 | Situation | Prefer |
 | --- | --- |
-| Deep investigation, sub-agents, research | **`kenmark-troubleshoot-deep`** |
-| Picking which skill to use | **`kenmark-router`** (explicit) |
+| Unclear problem, need evidence + ranked plan | This skill (`kenmark-troubleshoot`) |
+| User wants a specialist to implement fixes in code | Domain sub-agent (e.g. `senior-dev-kenmark-troubleshooter`, `build-error-resolver`) after diagnosis |
+| Vercel bill, caching, slow routes on a deployed app | `vercel-optimize` (metrics-first) |
+| Picking which installed skill to use | `kenmark-router` |
 | Dirty repo, scattered docs, dumps | `kenmark-repo-hygiene` |
 | Secrets, keys, tokens | `kenmark-repo-secrets` |
 | Make repo public | `kenmark-repo-public` |

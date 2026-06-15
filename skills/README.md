@@ -16,21 +16,25 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (43)
+skills/user-skills/          ← bundled universal skills (47)
   kenmark-init/                category: onboarding
   kenmark-setup/
-  kenmark-router/             category: workflow
-  kenmark-plan/               category: workflow (phase: plan)
-  kenmark-subagents/          category: workflow (phase: orchestrate)
+  kenmark-router/             category: workflow (manual)
+  kenmark-plan-lite/          category: workflow (phase: plan)
+  kenmark-plan-durable/       category: plans (phase: plan; manual)
+  kenmark-subagents/          category: workflow (phase: orchestrate; manual)
   kenmark-output/             category: workflow (phase: verify)
-  kenmark-troubleshoot/              category: workflow (phase: diagnose)
-  kenmark-repo-hygiene/              category: workflow (phase: audit)
+  kenmark-troubleshoot/       category: workflow (phase: diagnose)
+  kenmark-troubleshoot-deep/  category: workflow (phase: diagnose; manual)
+  kenmark-repo-hygiene/       category: workflow (phase: audit)
+  kenmark-repo-cleanup/       category: workflow (phase: maintain; manual)
   kenmark-repo-secrets/
   kenmark-repo-public/
   kenmark-security-review/         category: workflow (phase: audit)
   kenmark-performance/             category: workflow (phase: audit)
   kenmark-repo-kb/              category: workflow (phase: maintain)
   kenmark-repo-docs/
+  kenmark-repo-docs-fix/      category: workflow (phase: maintain; manual)
   kenmark-repo-structure/
   kenmark-repo-deps/     category: workflow (phase: verify)
   kenmark-repo-quality/        category: workflow (phase: verify)
@@ -48,7 +52,7 @@ skills/user-skills/          ← bundled universal skills (43)
   kenmark-issues-check/
   kenmark-issues-scan/               category: issues (scan codebase, file issues)
   kenmark-audit-loop/                category: issues (multi-pass audit until converged)
-  kenmark-simplify/                  category: issues (single-pass clarity audit)
+  kenmark-simplify-scan/             category: issues (manual)
   kenmark-issues-maintain/
   kenmark-issues-fix-and-ship/   category: workflow (phase: ship)
   kenmark-plans-setup/               category: plans (bootstrap brain/plans/ docs)
@@ -102,14 +106,17 @@ not in this package.
 
 | Skill | Purpose |
 | --- | --- |
-| `kenmark-plan` | Plan complex work before implementation |
+| `kenmark-plan-lite` | Chat-level planning before implementation |
+| `kenmark-plan-durable` | Durable plans in `brain/plans/` (explicit) |
 | `kenmark-output` | Enforce complete final outputs and deliverables |
-| `kenmark-subagents` | Split complex work into specialist investigation tracks |
-| `kenmark-repo-hygiene` | Audit clutter, scattered docs, orphan assets, dumps; cleanup after approval |
+| `kenmark-subagents` | Split complex work into specialist tracks (explicit) |
+| `kenmark-repo-hygiene` | Read-only clutter audit; cleanup plan only |
+| `kenmark-repo-cleanup` | Execute approved hygiene cleanup (explicit) |
 | `kenmark-repo-secrets` | Deep read-only secret/key/token scan with redaction |
 | `kenmark-repo-public` | Safe-to-publish gate before open-sourcing |
 | `kenmark-repo-kb` | Update `brain/kb/` after code changes |
-| `kenmark-repo-docs` | README, setup, env docs, KB freshness, broken links |
+| `kenmark-repo-docs` | README, setup, env docs, KB freshness, broken links (read-only) |
+| `kenmark-repo-docs-fix` | Apply approved doc fixes (explicit) |
 | `kenmark-repo-structure` | Folder layout and module boundaries |
 | `kenmark-repo-deps` | Package health, monorepo drift, lockfile/PM consistency, UI overlap |
 | `kenmark-repo-quality` | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
@@ -131,22 +138,23 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Situation | Skill |
 | --- | --- |
 | Problem unclear? | `kenmark-troubleshoot` |
-| Need a plan before work? | `kenmark-plan` (tiered; writes `brain/plans/`) |
-| Need parallel/specialist tracks? | `kenmark-subagents` |
+| Need a chat plan? | `kenmark-plan-lite` |
+| Save plan to `brain/plans/`? | `kenmark-plan-durable` (explicit) |
+| Need parallel/specialist tracks? | `kenmark-subagents` (explicit) |
 | Need complete final deliverable? | `kenmark-output` |
 | Need issue tracker docs (`brain/issues/`)? | `kenmark-issues-setup` (or `kenmark-init`) |
 | Find bugs/gaps to file as issues? | `kenmark-issues-scan` |
-| Multi-pass audit until no new issues? | `kenmark-audit-loop` |
-| Code clarity / simplification scan? | `kenmark-simplify` |
-| Scan, fix, commit, and ship issues? | `kenmark-issues-fix-and-ship` |
+| Multi-pass audit until no new issues? | `kenmark-audit-loop` (explicit) |
+| Code clarity / simplification scan? | `kenmark-simplify-scan` (explicit) |
+| Scan, fix, commit, and ship issues? | `kenmark-issues-fix-and-ship` (explicit) |
 | Need plan tracker docs (`brain/plans/`)? | `kenmark-plans-setup` (or `kenmark-init`) |
-| Execute an approved plan? | `kenmark-plans-execute` |
-| Need skill choice? | `kenmark-router` |
+| Execute an approved plan? | `kenmark-plans-execute` (explicit) |
+| Need skill choice? | `kenmark-router` (explicit) |
 | Repo health (see table above) | `kenmark-repo-*` family |
 | Security review / auth / RBAC / injection / SSRF? | `kenmark-security-review` |
 | Performance / slow routes / DB / bundle / hydration? | `kenmark-performance` |
 | Testing (see testing table above) | `kenmark-test-*` family |
 | Installed skills inventory? | `kenmark-maintain` |
-| Need commit? | `kenmark-commit` |
+| Need commit? | `kenmark-commit` (explicit) |
 
 See the root [README](../README.md) for trigger examples and setup steps.

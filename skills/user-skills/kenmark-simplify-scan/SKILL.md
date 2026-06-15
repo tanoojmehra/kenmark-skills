@@ -1,16 +1,14 @@
 ---
-name: kenmark-simplify
+name: kenmark-simplify-scan
 version: 1.0.0
 category: issues
 scope: universal
 phase: optimize
-description: "Scan the codebase to identify modules and code sections that can be simplified, raise issues in the brain/issues/ tracker, and document them. Focuses on nested ternaries, top-level arrow functions, missing return type annotations, redundant error handlers, and general code clarity, while preserving exact functionality. Use subagents to cover more ground."
+description: "Issue-filing scan for simplification opportunities. Does not modify source code."
 triggers:
   - scan for simplification opportunities
-  - simplify code scan
-  - find code to simplify
-  - run simplify audit
-  - kenmark-simplify
+  - simplify audit
+  - kenmark-simplify-scan
 allowed-tools:
   - Bash
   - Read
@@ -20,10 +18,10 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 risk: write-files
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
-# Kenmark Simplify
+# Kenmark Simplify Scan
 
 ## Purpose
 
@@ -110,7 +108,7 @@ For each high-value simplification opportunity found:
    - `title`: Short, clear summary
    - `severity`: P2 (or P1 if critical regression/bug)
    - `area`: dx / testing / ui / backend / etc.
-   - `source`: simplify
+   - `source`: kenmark-simplify-scan
    - `status`: open
    - `files`: array of relative paths
 3. Include clear evidence with clickable `file://` markdown links referencing line ranges.

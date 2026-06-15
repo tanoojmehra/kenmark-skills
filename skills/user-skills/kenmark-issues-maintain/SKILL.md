@@ -21,12 +21,14 @@ allowed-tools:
   - Glob
   - Grep
 risk: destructive-possible
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Kenmark Issues Maintain
 
 ## Purpose
+
+**Default mode: report-only.** Do not delete, move, or rewrite tracker files until the user approves a specific repair plan.
 
 Audit and fix structural problems in `brain/issues/` tracking. This skill
 catches the four categories of drift that accumulate over time:

@@ -4,19 +4,13 @@ version: 1.0.0
 category: workflow
 scope: universal
 phase: orchestrate
-description: "Universal sub-agent orchestration skill for splitting complex work into specialist tracks, running parallel/delegated investigation when supported, and synthesizing findings into a final decision or plan."
+description: "Manual orchestration skill for complex work that genuinely benefits from specialist tracks. Use only when the user explicitly asks for subagents/parallel tracks, or when a planning or diagnosis skill escalates to deep investigation."
 triggers:
   - kenmark-subagents
-  - use sub agents
   - use subagents
-  - delegate this
-  - split into agents
   - parallel investigation
-  - use specialist agents
-  - run multiple agents
-  - orchestrate agents
-  - agent team
-  - independent tracks
+  - split into agents
+  - specialist agents
 allowed-tools:
   - Task
   - Read
@@ -28,7 +22,7 @@ allowed-tools:
   - WebFetch
   - AskUserQuestion
 risk: write-files
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Kenmark Subagents

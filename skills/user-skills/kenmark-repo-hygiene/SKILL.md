@@ -1,10 +1,10 @@
 ---
 name: kenmark-repo-hygiene
-version: 1.1.0
+version: 1.2.0
 category: workflow
 scope: universal
 phase: audit
-description: "Audit a repository for clutter: scattered markdown, orphan assets, dumps, backups, generated files, and gitignore gaps. Produces a cleanup plan; moves/deletes only after explicit approval. For deep secrets use kenmark-repo-secrets; for public publish gate use kenmark-repo-public."
+description: "Read-only audit for repo clutter: scattered markdown, orphan assets, dumps, backups, generated files, and gitignore gaps. Produces cleanup plan only."
 triggers:
   - repo hygiene
   - clean repo
@@ -22,10 +22,8 @@ allowed-tools:
   - Read
   - Grep
   - Glob
-  - Write
-  - TodoWrite
   - AskUserQuestion
-risk: write-files
+risk: read-only
 disable-model-invocation: false
 ---
 
@@ -57,11 +55,7 @@ Use this skill when the user wants to audit a repository for **file clutter and 
 
 **Do not use this skill** when the user wants public-repo readiness (even if they say "sanitize repo"). Load **`kenmark-repo-public`** instead.
 
-Default behavior is **audit and recommend only**.
-
-In audit mode, do not use Write unless the user asks to create a report file.
-
-Do not delete, move, rewrite, or commit anything unless the user explicitly approves the cleanup plan.
+Default behavior is **audit and recommend only**. For approved moves/deletes, use **`kenmark-repo-cleanup`**.
 
 ---
 

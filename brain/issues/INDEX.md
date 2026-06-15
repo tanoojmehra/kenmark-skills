@@ -4,8 +4,8 @@
 
 | Field | Value |
 |------|-------|
-| Last Assigned ID | 012 |
-| Next ID | 013 |
+| Last Assigned ID | 018 |
+| Next ID | 019 |
 
 ## Ledger Rules
 
@@ -20,8 +20,8 @@
 | Category | Count |
 |----------|-------|
 | Active issues | 0 |
-| Completed | 14 |
-| **Total** | **14** |
+| Completed | 20 |
+| **Total** | **20** |
 
 > **Note:** IDs 001 and 002 each have two completed issue files (different work shipped under the same numeric ID before ledger discipline). Both files remain in `completed/`; do not delete or renumber.
 
@@ -43,6 +43,12 @@
 | 010 | Legacy cleanup deletes canonical bundled kenmark-* skills | 2026-06-13 |
 | 011 | Gemini CLI skill conflict warnings from duplicate Codex/Gemini links | 2026-06-08 |
 | 012 | Remove redundant --global flag from CLI | 2026-06-13 |
+| 013 | Split kenmark-plan into plan-lite and plan-durable | 2026-06-15 |
+| 014 | Thin kenmark-router and make manual-only | 2026-06-15 |
+| 015 | Split kenmark-troubleshoot default vs deep | 2026-06-15 |
+| 016 | Make heavy orchestration skills manual-only | 2026-06-15 |
+| 017 | Align repo hygiene and docs skills with read-only audit mode | 2026-06-15 |
+| 018 | Rename simplify-scan and extract shared testing contract | 2026-06-15 |
 
 ## Active Issues by Priority
 

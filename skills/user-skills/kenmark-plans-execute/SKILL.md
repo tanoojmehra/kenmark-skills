@@ -4,7 +4,7 @@ version: 1.0.0
 category: plans
 scope: universal
 phase: ship
-description: "End-to-end plan execution — pick an approved or in-progress plan from brain/plans/, implement phases, verify acceptance criteria, archive when done, commit. Use when the user says \"execute plan\", \"run the plan\", \"implement plan\", \"ship plan\", or references a plan ID to build."
+description: "Manual end-to-end ship workflow. Use only when the user explicitly asks to execute an approved plan / implement plan phases and ship."
 triggers:
   - execute plan
   - run the plan
@@ -23,7 +23,7 @@ allowed-tools:
   - AskUserQuestion
   - TodoWrite
 risk: git-write
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Kenmark Plans Execute
@@ -40,7 +40,7 @@ Load sibling skills for each phase:
 
 | Phase | Skill |
 | --- | --- |
-| Author plans | `kenmark-plan` |
+| Author plans | `kenmark-plan-durable` |
 | Verify / archive | `kenmark-plans-check` |
 | Index health | `kenmark-plans-maintain` (when INDEX disagrees with folders) |
 | Related issues | `kenmark-issues-check` (when plan lists `related_issues`) |
@@ -52,7 +52,7 @@ Load sibling skills for each phase:
 ## Hard rules (non-negotiable)
 
 1. **Read first:** `brain/rules/standards.md`, `brain/plans/INDEX.md`, and `brain/rules/workflow.md` when present.
-2. **Global plan IDs:** never reuse IDs; compute next ID from INDEX + active + `completed/` (see `kenmark-plan`).
+2. **Global plan IDs:** never reuse IDs; compute next ID from INDEX + active + `completed/` (see `kenmark-plan-durable`).
 3. **Feature branch:** never commit on protected branches unless the user explicitly approves.
 4. **No co-author trailers** — verify each commit with `git log -1 --format=%B`.
 5. **No force push**, **no `--no-verify`**, **no git config** changes.

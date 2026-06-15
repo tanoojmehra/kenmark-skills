@@ -10,7 +10,7 @@ No global install required — `npx` downloads and runs the CLI (or uses your np
 
 The **init** wizard walks you through Kenmark skills, optional curated packs, IDE targets, and MCP server selection — all interactively. To refresh an existing install, use **`update`** (do not run `init` again for upgrades).
 
-**43 first-party skills**, a **12-command CLI**, and a **curated catalog** of optional third-party packs. Agent skills and CLI for Cursor, Codex, Claude Code, Antigravity CLI/IDE, Gemini CLI, OpenCode, and other harnesses that read `SKILL.md` files.
+**47 first-party skills**, a **12-command CLI**, and a **curated catalog** of optional third-party packs. Agent skills and CLI for Cursor, Codex, Claude Code, Antigravity CLI/IDE, Gemini CLI, OpenCode, and other harnesses that read `SKILL.md` files.
 
 Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-skills). Created by **Tanooj Mehra** and **Adwait Date**.
 
@@ -33,7 +33,7 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 | Asset | Count | Detail |
 | --- | ---: | --- |
-| Kenmark skills | 43 | Bundled in `skills/user-skills/` |
+| Kenmark skills | 47 | Bundled in `skills/user-skills/` |
 | CLI commands | 12 | [brain/kb/05-api-and-integrations.md](brain/kb/05-api-and-integrations.md) |
 | Recommended packs | 7 | Impeccable, Simplify, Graphify, Headroom, SEO, ECC — [brain/kb/features/004-recommended-packs.md](brain/kb/features/004-recommended-packs.md) |
 | MCP servers | 5 | Opt-in; 8 JSON IDE targets — [brain/kb/features/003-mcp-integration.md](brain/kb/features/003-mcp-integration.md) |
@@ -75,7 +75,7 @@ Run `npx kenmark-skills init` from **PowerShell** or **CMD** if you use native W
 
 **Setup (once):** `npx kenmark-skills init` → **kenmark-init** in your project repo.
 
-**Day-to-day:** start with **kenmark-troubleshoot** when the problem is unclear; **kenmark-plan** before large work (tiered plans saved to `brain/plans/`); **kenmark-plans-execute** to implement an approved plan; **kenmark-subagents** for parallel specialist tracks; **kenmark-output** for complete deliverables; **kenmark-router** when the domain is clear but the skill is not; **kenmark-commit** when shipping changes. Issue and plan trackers live under `brain/issues/` and `brain/plans/` (bootstrapped by **kenmark-init**).
+**Day-to-day:** start with **kenmark-troubleshoot** when the problem is unclear; **kenmark-plan-lite** for chat plans; **kenmark-plan-durable** when saving to `brain/plans/`; **kenmark-plans-execute** (explicit) to implement an approved plan; **kenmark-subagents** (explicit) for parallel specialist tracks; **kenmark-output** for complete deliverables; **kenmark-router** (explicit) when the domain is clear but the skill is not; **kenmark-commit** (explicit) when shipping changes. Issue and plan trackers live under `brain/issues/` and `brain/plans/` (bootstrapped by **kenmark-init**).
 
 Full skill catalog, activation tiers, and routing tables: [brain/kb/features/002-skills-catalog.md](brain/kb/features/002-skills-catalog.md) and [brain/kb/08-flows-and-workflows.md](brain/kb/08-flows-and-workflows.md).
 
@@ -142,11 +142,11 @@ Legacy **`setup`** remains for `--copy`, `--force`, `--skip-adopt` not exposed o
 npx kenmark-skills setup --ide cursor --copy --skip-adopt -y
 ```
 
-Migration: `setup -y` → `init --skip-recommended -y`. Legacy `setup` runs **Install 43 Kenmark skills** via `setup-skills.js`.
+Migration: `setup -y` → `init --skip-recommended -y`. Legacy `setup` runs **Install 47 Kenmark skills** via `setup-skills.js`.
 
 | | `init` | `setup` |
 | --- | --- | --- |
-| **Installs** | Kenmark + optional packs | 43 Kenmark skills |
+| **Installs** | Kenmark + optional packs | 47 Kenmark skills |
 | **Later refreshes** | Use `update` | Use `update` |
 
 ### Testing skills (links)
@@ -160,7 +160,7 @@ kenmark-skills/
 ├── README.md
 ├── brain/                  # dev KB (git only; see brain/INDEX.md)
 ├── scripts/cli.js          # kenmark-skills binary
-└── skills/user-skills/     # 43 universal skills + recommended-catalog.json
+└── skills/user-skills/     # 47 universal skills + recommended-catalog.json
 ```
 
 ---

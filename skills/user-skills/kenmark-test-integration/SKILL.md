@@ -31,6 +31,8 @@ disable-model-invocation: false
 
 ## Purpose
 
+Before writing or running tests, follow the shared testing contract: `skills/shared/testing-contract.md`.
+
 Use this skill to test interactions between modules.
 
 Good targets:

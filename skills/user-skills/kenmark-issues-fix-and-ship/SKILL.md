@@ -4,7 +4,7 @@ version: 1.1.0
 category: workflow
 scope: universal
 phase: ship
-description: "End-to-end issues workflow — take a text blob, create issues, fix them in priority order, maintain status, commit, and merge to main (PR default). Use when the user pastes an issues blob or says \"fix issues end to end\", \"run the issues workflow\", \"blob to merge\", or \"scan, fix, commit, and merge\"."
+description: "Manual end-to-end ship workflow. Use only when the user explicitly asks to fix issues and ship / run the full issues blob workflow."
 triggers:
   - fix issues end to end
   - run the issues workflow
@@ -27,7 +27,7 @@ allowed-tools:
   - AskUserQuestion
   - TodoWrite
 risk: git-write
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Kenmark Issues Fix and Ship

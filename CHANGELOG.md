@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## v2.3.26 — Skill activation optimization (2026-06-15)
+
+### Changed
+
+- **Planning:** Split `kenmark-plan` into `kenmark-plan-lite` (chat-level, auto) and `kenmark-plan-durable` (writes `brain/plans/`, manual). Persistence logic in `references/persist-plan.md`.
+- **Troubleshoot:** Default `kenmark-troubleshoot` is read-only; deep mode in `kenmark-troubleshoot-deep` (manual).
+- **Router:** Thin manual `kenmark-router`; bootstrap and scoring in `references/`.
+- **Hygiene/docs:** Read-only `kenmark-repo-hygiene` / `kenmark-repo-docs`; execution via `kenmark-repo-cleanup` / `kenmark-repo-docs-fix`.
+- **Manual-only:** Ship/orchestration skills (`kenmark-commit`, `kenmark-plans-execute`, `kenmark-issues-fix-and-ship`, `kenmark-subagents`, `kenmark-audit-loop`, `kenmark-init`, maintain skills, `kenmark-simplify-scan`, `kenmark-test-e2e`, `kenmark-test-ci`).
+- **Testing:** Shared `skills/shared/testing-contract.md` for `kenmark-test-*`.
+- **Docs:** Bundled skill count 43 → 47; `validate-repo.js` core workflow markers updated.
+
+## v2.3.25 — Headroom opt-in + interactive wrap (2026-06-15)
+
+### Change
+
+- **init:** Interactive setup offers optional Headroom `wrap` configuration after Kenmark skills install (`headroom wrap <agent> --prepare-only` for cursor/claude/codex).
+- **recommended-catalog.json (v9):** Headroom removed from `core-next-agentic` preset; pack is opt-in (`recommended: false`).
+
 ## v2.3.24 — Headroom recommended pack (2026-06-15)
 
 ### Added

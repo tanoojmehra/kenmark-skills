@@ -4,7 +4,7 @@ version: 1.0.0
 category: plans
 scope: universal
 phase: setup
-description: "Bootstrap brain/plans/ documentation structure: create brain/plans/, brain/plans/completed/, and brain/plans/INDEX.md with ID ledger and templates. Not for authoring plans — use kenmark-plan to create plan files. Redundant if kenmark-init already bootstrapped plan tracking. Use when asked to \"setup plans\", \"init plans\", or \"bootstrap plans directory\"."
+description: "Bootstrap brain/plans/ documentation structure: create brain/plans/, brain/plans/completed/, and brain/plans/INDEX.md with ID ledger and templates. Not for authoring plans — use kenmark-plan-durable to create plan files. Redundant if kenmark-init already bootstrapped plan tracking. Use when asked to \"setup plans\", \"init plans\", or \"bootstrap plans directory\"."
 triggers:
   - setup plans
   - init plans
@@ -34,13 +34,13 @@ Creates:
 - `brain/plans/completed/` — archived completed/superseded/cancelled plans
 - `brain/plans/INDEX.md` — master index with ID ledger, status tables, and templates
 
-**Not this skill:** creating plan content is **`kenmark-plan`**.
+**Not this skill:** creating plan content is **`kenmark-plan-durable`**.
 
 ## Relationship to `kenmark-init`
 
 - **`kenmark-init`** always creates empty `brain/plans/` and `brain/plans/completed/` dirs as part of the brain scaffold.
 - During init (Step 1c), init runs **this skill's Steps 2–4** to write `INDEX.md` when missing.
-- **If `brain/plans/INDEX.md` already exists** (from a prior init or this skill), stop — setup is complete; suggest **`kenmark-plan`** to create plans or **`kenmark-plans-list`** to view the tracker.
+- **If `brain/plans/INDEX.md` already exists** (from a prior init or this skill), stop — setup is complete; suggest **`kenmark-plan-durable`** to create plans or **`kenmark-plans-list`** to view the tracker.
 
 ---
 
@@ -67,7 +67,7 @@ If `brain/plans/INDEX.md` already exists:
 [ -f "$PLANS_DIR/INDEX.md" ] && echo "SKIP: INDEX.md exists — setup already done"
 ```
 
-Report to the user and stop (or offer **`kenmark-plan`** / **`kenmark-plans-list`**).
+Report to the user and stop (or offer **`kenmark-plan-durable`** / **`kenmark-plans-list`**).
 
 ---
 
@@ -214,12 +214,12 @@ Report what was created:
 - `brain/plans/completed/` directory
 - `brain/plans/INDEX.md` with full template
 
-Then suggest next steps: use **`kenmark-plan`** to author a plan, or use **`kenmark-plans-list`** to see the empty tracker.
+Then suggest next steps: use **`kenmark-plan-durable`** to author a plan, or use **`kenmark-plans-list`** to see the empty tracker.
 
 ## Related skills
 
 - **`kenmark-init`** — Step 1c runs this setup when `INDEX.md` is missing
-- **`kenmark-plan`** — create plan files (requires `INDEX.md` from this skill or init)
+- **`kenmark-plan-durable`** — create plan files (requires `INDEX.md` from this skill or init)
 - **`kenmark-plans-list`** — view plans dashboard
 - **`kenmark-plans-maintain`** — fix tracker structural drift (duplicates, stale index)
 - **`kenmark-plans-execute`** — implement an approved plan end to end

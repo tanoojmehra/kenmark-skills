@@ -18,9 +18,8 @@ allowed-tools:
   - Read
   - Grep
   - Glob
-  - Write
   - AskUserQuestion
-risk: write-files
+risk: read-only
 disable-model-invocation: false
 ---
 

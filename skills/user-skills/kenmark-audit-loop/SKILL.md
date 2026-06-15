@@ -1,10 +1,10 @@
 ---
 name: kenmark-audit-loop
-version: 1.0.0
+version: 1.1.0
 category: issues
 scope: universal
 phase: discover
-description: "Run repeated audit passes on a chosen area (or all) until zero new unique issues are found. Rotates lenses, deduplicates findings, and files issues in brain/issues/. Use when asked to audit until clean, multi-pass audit, exhaustive bug scan, or kenmark-audit-loop."
+description: "Manual multi-pass audit loop that files unique issues until convergence. Heavy workflow; use only when explicitly requested."
 triggers:
   - audit until clean
   - multi-pass audit
@@ -21,7 +21,7 @@ allowed-tools:
   - AskUserQuestion
   - Task
 risk: write-files
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Kenmark Audit Loop
@@ -30,7 +30,7 @@ disable-model-invocation: false
 
 **Audit until converged** — run repeated passes on the user's chosen area (or the full repo), file **only new unique findings** in `brain/issues/`, and **stop when a full pass finds zero new issues**.
 
-This skill orchestrates existing audit lenses (`kenmark-issues-scan`, `kenmark-security-review`, `kenmark-simplify`, `kenmark-test-coverage`, `kenmark-performance`, `kenmark-repo-docs`, `kenmark-repo-deps`) rather than replacing them.
+This skill orchestrates existing audit lenses (`kenmark-issues-scan`, `kenmark-security-review`, `kenmark-simplify-scan`, `kenmark-test-coverage`, `kenmark-performance`, `kenmark-repo-docs`, `kenmark-repo-deps`) rather than replacing them.
 
 **Not setup.** If `brain/issues/INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or **`kenmark-init`**) first.
 
@@ -122,7 +122,7 @@ Each **pass** runs **one lens** not yet completed for the selected areas. Rotate
 | --- | --- | --- |
 | `bugs` | `all`, `bugs`, `api`, `backend`, `frontend` | `kenmark-issues-scan` Step 3 grep patterns |
 | `security` | `all`, `security`, `api`, `auth`, `backend` | `kenmark-security-review` checklist |
-| `simplify` | `all`, `simplify`, `frontend`, `backend`, `dx` | `kenmark-simplify` checklist |
+| `simplify` | `all`, `simplify`, `frontend`, `backend`, `dx` | `kenmark-simplify-scan` checklist |
 | `testing` | `all`, `testing` | `kenmark-test-coverage` critical-path audit |
 | `performance` | `all`, `performance`, `backend`, `api`, `frontend` | `kenmark-performance` patterns |
 | `docs` | `all`, `docs` | `kenmark-repo-docs` checklist |
@@ -264,7 +264,7 @@ When the loop stops, report:
 | Skill | Role |
 | --- | --- |
 | `kenmark-issues-scan` | Single-pass bug scan; one lens inside this loop |
-| `kenmark-simplify` | Single-pass clarity audit; one lens inside this loop |
+| `kenmark-simplify-scan` | Single-pass clarity audit; one lens inside this loop |
 | `kenmark-issues-fix-and-ship` | After audit loop — fix filed issues and ship |
 | `kenmark-subagents` | Optional; audit loop already delegates per pass |
 

@@ -25,12 +25,14 @@ allowed-tools:
   - TodoWrite
   - AskUserQuestion
 risk: write-files
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Kenmark Test CI
 
 ## Purpose
+
+Before writing or running tests, follow the shared testing contract: `skills/shared/testing-contract.md`.
 
 Use this skill to make tests run reliably in CI/CD.
 

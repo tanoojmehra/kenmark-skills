@@ -4,15 +4,12 @@ version: 1.3.0
 category: onboarding
 scope: universal
 phase: setup
-description: "Initialize brain/ (numbered KB under brain/kb/, modular rules) and bootstrap brain/issues/ and brain/plans/ tracker docs; install cross-IDE pointer stubs (or full embed) in CLAUDE.md, AGENTS.md, .cursorrules, .cursor/rules/, GEMINI.md. On init, inspect the repo and document confirmed facts in brain/kb/. Use when applying workspace rules, creating project standards, or enforcing team conventions."
+description: "Initialize brain/ (numbered KB, modular rules) and bootstrap brain/issues/ and brain/plans/ tracker docs; install cross-IDE pointer stubs. Use only when explicitly asked to init brain or setup cursor rules."
 triggers:
+  - kenmark-init
   - init brain
   - initialize brain
-  - apply workspace rules
-  - project standards
   - setup cursor rules
-  - kenmark-init
-  - kenmark-init skill
 allowed-tools:
   - Bash
   - Read
@@ -22,7 +19,7 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 risk: write-files
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Kenmark Init
@@ -265,7 +262,7 @@ Bootstrap by default unless the user explicitly says **"brain only, no trackers"
 | `INDEX.md` **exists** | Skip setup; report existing tracker. |
 | User said **brain only, no trackers** | Leave empty dirs only; do not write `INDEX.md`. |
 
-**Not for authoring plans** — creating plan files is **`kenmark-plan`**, after tracker docs exist.
+**Not for authoring plans** — creating plan files is **`kenmark-plan-lite`**, after tracker docs exist.
 
 ---
 
@@ -680,5 +677,5 @@ Optional — fill in per project.
 - `kenmark-issues-scan` — scan codebase and **create issue files** (requires `INDEX.md`; not setup)
 - `kenmark-issues-check` — move resolved issues to `completed/` and refresh index
 - `kenmark-plans-setup` — standalone bootstrap for `brain/plans/` docs (Step 1c runs the same workflow)
-- `kenmark-plan` — create tiered plan files (requires `INDEX.md`)
+- `kenmark-plan-lite` — create tiered plan files (requires `INDEX.md`)
 - `kenmark-plans-execute` — implement an approved plan end to end

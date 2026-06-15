@@ -16,7 +16,7 @@ Status: reviewed
 | Situation | Skill |
 | --- | --- |
 | Problem unclear | `kenmark-troubleshoot` |
-| Plan before coding | `kenmark-plan` (asks tier: Quick / Prototype / Full Feature / Dig Deep / ULTRATHINK; writes `brain/plans/`) |
+| Plan before coding | `kenmark-plan-lite` / `kenmark-plan-durable` (asks tier: Quick / Prototype / Full Feature / Dig Deep / ULTRATHINK; writes `brain/plans/`) |
 | Execute approved plan | `kenmark-plans-execute` |
 | List or archive plans | `kenmark-plans-list` / `kenmark-plans-check` |
 | Parallel investigation | `kenmark-subagents` |
@@ -59,7 +59,7 @@ npx kenmark-skills adopt --adopt-overwrite -y   # when review-required
 ### Plan tracker lifecycle (`brain/plans/`)
 
 1. **`kenmark-init`** or **`kenmark-plans-setup`** — create `INDEX.md` and `completed/`.
-2. **`kenmark-plan`** — ask tier, inspect repo, write `brain/plans/{id}-{slug}.md`, update INDEX.
+2. **`kenmark-plan-lite` / `kenmark-plan-durable`** — ask tier, inspect repo, write `brain/plans/{id}-{slug}.md`, update INDEX.
 3. **`kenmark-plans-execute`** — implement phases on a feature branch; verify; archive to `completed/`.
 4. **`kenmark-plans-check`** / **`kenmark-plans-maintain`** — sync acceptance criteria and fix INDEX drift.
 - **Explicit admin:** setup, packs, update, agents — only when user asks.

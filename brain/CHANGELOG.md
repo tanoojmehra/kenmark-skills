@@ -2,6 +2,20 @@
 
 Brain knowledge base
 
+## v2026.06.15-skill-activation-optimization
+
+- **Skills:** Split plan/troubleshoot; thin manual router; hygiene/docs cleanup split; `kenmark-simplify-scan`; shared testing contract. See `kb/features/006-skill-activation-optimization.md`.
+- **Count:** 43 → 47 bundled skills; heavy workflows manual-only.
+
+## v2026.06.15-issues-list-format
+
+- **kenmark-issues-list (v1.3.0):** Dashboard output uses GFM markdown tables instead of ASCII box-drawing inside code fences — fixes broken rendering in Cursor and other chat UIs.
+
+## v2026.06.15-headroom-init-wrap
+
+- **init:** Optional interactive Headroom wrap step after Kenmark skills install (`scripts/headroom-init.js`, `promptHeadroomAfterInit`).
+- **recommended-catalog.json (v9):** Headroom opt-in only — removed from `core-next-agentic` preset.
+
 ## v2026.06.15-headroom-pack
 
 - **recommended-catalog.json (v8):** Added `headroom` context-compression pack (`uv tool install 'headroom-ai[all]'`); `core-next-agentic` preset includes Headroom.
