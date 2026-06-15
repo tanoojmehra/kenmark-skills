@@ -2,10 +2,14 @@
 
 Brain knowledge base
 
+## v2026.06.15-remove-plan-lite
+
+- **Planning:** Removed `kenmark-plan-lite`; `kenmark-plan-durable` renamed back to **`kenmark-plan`** (always persists to `brain/plans/`). Count 47 → 46.
+
 ## v2026.06.15-skill-activation-optimization
 
 - **Skills:** Split plan/troubleshoot; thin manual router; hygiene/docs cleanup split; `kenmark-simplify-scan`; shared testing contract. See `kb/features/006-skill-activation-optimization.md`.
-- **Count:** 43 → 47 bundled skills; heavy workflows manual-only.
+- **Count:** 43 → 46 bundled skills; heavy workflows manual-only.
 
 ## v2026.06.15-issues-list-format
 

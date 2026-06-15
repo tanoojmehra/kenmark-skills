@@ -1,16 +1,23 @@
 # CHANGELOG
 
+## v2.3.27 — Remove plan-lite; all plans go to brain/plans (2026-06-15)
+
+### Changed
+
+- **Planning:** Removed `kenmark-plan-lite`. Renamed `kenmark-plan-durable` back to **`kenmark-plan`** — every plan is persisted to `brain/plans/`.
+- **Docs:** Bundled skill count 47 → 46.
+
 ## v2.3.26 — Skill activation optimization (2026-06-15)
 
 ### Changed
 
-- **Planning:** Split `kenmark-plan` into `kenmark-plan-lite` (chat-level, auto) and `kenmark-plan-durable` (writes `brain/plans/`, manual). Persistence logic in `references/persist-plan.md`.
+- **Planning:** Split `kenmark-plan` into lite + durable (superseded by v2.3.27).
 - **Troubleshoot:** Default `kenmark-troubleshoot` is read-only; deep mode in `kenmark-troubleshoot-deep` (manual).
 - **Router:** Thin manual `kenmark-router`; bootstrap and scoring in `references/`.
 - **Hygiene/docs:** Read-only `kenmark-repo-hygiene` / `kenmark-repo-docs`; execution via `kenmark-repo-cleanup` / `kenmark-repo-docs-fix`.
 - **Manual-only:** Ship/orchestration skills (`kenmark-commit`, `kenmark-plans-execute`, `kenmark-issues-fix-and-ship`, `kenmark-subagents`, `kenmark-audit-loop`, `kenmark-init`, maintain skills, `kenmark-simplify-scan`, `kenmark-test-e2e`, `kenmark-test-ci`).
 - **Testing:** Shared `skills/shared/testing-contract.md` for `kenmark-test-*`.
-- **Docs:** Bundled skill count 43 → 47; `validate-repo.js` core workflow markers updated.
+- **Docs:** Bundled skill count 43 → 46; `validate-repo.js` core workflow markers updated.
 
 ## v2.3.25 — Headroom opt-in + interactive wrap (2026-06-15)
 

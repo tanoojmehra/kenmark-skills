@@ -40,7 +40,7 @@ Load sibling skills for each phase:
 
 | Phase | Skill |
 | --- | --- |
-| Author plans | `kenmark-plan-durable` |
+| Author plans | `kenmark-plan` |
 | Verify / archive | `kenmark-plans-check` |
 | Index health | `kenmark-plans-maintain` (when INDEX disagrees with folders) |
 | Related issues | `kenmark-issues-check` (when plan lists `related_issues`) |
@@ -52,7 +52,7 @@ Load sibling skills for each phase:
 ## Hard rules (non-negotiable)
 
 1. **Read first:** `brain/rules/standards.md`, `brain/plans/INDEX.md`, and `brain/rules/workflow.md` when present.
-2. **Global plan IDs:** never reuse IDs; compute next ID from INDEX + active + `completed/` (see `kenmark-plan-durable`).
+2. **Global plan IDs:** never reuse IDs; compute next ID from INDEX + active + `completed/` (see `kenmark-plan`).
 3. **Feature branch:** never commit on protected branches unless the user explicitly approves.
 4. **No co-author trailers** — verify each commit with `git log -1 --format=%B`.
 5. **No force push**, **no `--no-verify`**, **no git config** changes.

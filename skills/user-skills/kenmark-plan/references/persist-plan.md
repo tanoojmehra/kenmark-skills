@@ -1,4 +1,4 @@
-# Persist plan file (mandatory for kenmark-plan-durable)
+# Persist plan file (mandatory for kenmark-plan)
 
 ## Compute next ID
 
@@ -41,7 +41,7 @@ title: {concise one-liner}
 tier: {quick|prototype|full-feature|dig-deep|ultrathink}
 type: {planning-type}
 status: proposed
-source: kenmark-plan-durable
+source: kenmark-plan
 created: {YYYY-MM-DD}
 files:
   - path/to/file

@@ -16,12 +16,11 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (47)
+skills/user-skills/          ← bundled universal skills (46)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow (manual)
-  kenmark-plan-lite/          category: workflow (phase: plan)
-  kenmark-plan-durable/       category: plans (phase: plan; manual)
+  kenmark-plan/               category: plans (phase: plan; writes brain/plans/)
   kenmark-subagents/          category: workflow (phase: orchestrate; manual)
   kenmark-output/             category: workflow (phase: verify)
   kenmark-troubleshoot/       category: workflow (phase: diagnose)
@@ -106,8 +105,7 @@ not in this package.
 
 | Skill | Purpose |
 | --- | --- |
-| `kenmark-plan-lite` | Chat-level planning before implementation |
-| `kenmark-plan-durable` | Durable plans in `brain/plans/` (explicit) |
+| `kenmark-plan` | Tiered planning; always writes `brain/plans/` |
 | `kenmark-output` | Enforce complete final outputs and deliverables |
 | `kenmark-subagents` | Split complex work into specialist tracks (explicit) |
 | `kenmark-repo-hygiene` | Read-only clutter audit; cleanup plan only |
@@ -138,8 +136,7 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Situation | Skill |
 | --- | --- |
 | Problem unclear? | `kenmark-troubleshoot` |
-| Need a chat plan? | `kenmark-plan-lite` |
-| Save plan to `brain/plans/`? | `kenmark-plan-durable` (explicit) |
+| Need a plan (writes `brain/plans/`)? | `kenmark-plan` |
 | Need parallel/specialist tracks? | `kenmark-subagents` (explicit) |
 | Need complete final deliverable? | `kenmark-output` |
 | Need issue tracker docs (`brain/issues/`)? | `kenmark-issues-setup` (or `kenmark-init`) |

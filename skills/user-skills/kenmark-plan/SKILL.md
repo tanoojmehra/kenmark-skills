@@ -1,18 +1,23 @@
 ---
-name: kenmark-plan-durable
-version: 1.0.0
+name: kenmark-plan
+version: 1.2.0
 category: plans
 scope: universal
 phase: plan
-description: "Durable Kenmark planning workflow that writes indexed plan files to brain/plans/, updates INDEX.md, chooses plan tier, and creates source-of-truth execution plans. Use only when the user explicitly asks to save/create/record a plan, use brain/plans, or create a source-of-truth plan."
+description: "Kenmark planning workflow that always writes indexed plan files to brain/plans/ and updates INDEX.md. Asks for plan tier (Quick, Prototype, Full Feature, Dig Deep, ULTRATHINK). Use when asked to plan, break down work, create a roadmap, or prepare before coding."
 triggers:
+  - kenmark-plan
+  - plan this
+  - create a plan
+  - make a plan
+  - quick plan
+  - break this down
+  - implementation outline
+  - roadmap sketch
+  - before coding
+  - how should we approach this
   - save plan
-  - create plan file
-  - write plan to brain
   - brain/plans
-  - source of truth plan
-  - durable plan
-  - kenmark-plan-durable
 allowed-tools:
   - Bash
   - Read
@@ -23,10 +28,10 @@ allowed-tools:
   - TodoWrite
   - AskUserQuestion
 risk: write-files
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
-# Kenmark Plan Durable
+# Kenmark Plan
 
 ## Purpose
 
@@ -37,7 +42,7 @@ This skill:
 - asks which **plan tier** to use (unless already clear from the request)
 - inspects repo context at tier-appropriate depth
 - produces a tier-scaled execution plan
-- **writes a durable plan file** to `brain/plans/` and updates `INDEX.md`
+- **always writes a durable plan file** to `brain/plans/` and updates `INDEX.md` (no chat-only plans)
 
 This skill does **not** implement by default. Use **`kenmark-plans-execute`** to implement an approved plan.
 
@@ -261,7 +266,7 @@ In chat, summarize:
 
 ## Output contract
 
-A valid `kenmark-plan-durable` response must include:
+A valid `kenmark-plan` response must include:
 
 1. Plan tier
 2. Goal
@@ -297,7 +302,6 @@ A valid `kenmark-plan-durable` response must include:
 
 ## Related skills
 
-- **`kenmark-plan-lite`** — chat-level plans without file persistence
 - **`kenmark-plans-setup`** — bootstrap tracker when `INDEX.md` missing
 - **`kenmark-plans-list`** — view active plans dashboard
 - **`kenmark-plans-execute`** — implement an approved plan

@@ -5,7 +5,7 @@ Status: reviewed
 
 ## Confirmed facts
 
-- **kenmark-skills** is a public npm package (MIT) that ships **47 first-party Kenmark agent skills** and a **12-command CLI** for Cursor, Claude Code, Codex, and other harnesses that read `SKILL.md` files.
+- **kenmark-skills** is a public npm package (MIT) that ships **46 first-party Kenmark agent skills** and a **12-command CLI** for Cursor, Claude Code, Codex, and other harnesses that read `SKILL.md` files.
 - Current version: **2.3.10** in `package.json`.
 - Binaries: `kenmark-skills` → `scripts/cli.js`, `kenmark-skills-setup` → `scripts/setup-skills.js` (legacy).
 - Recommended first install for humans: `npx kenmark-skills init` (interactive wizard).

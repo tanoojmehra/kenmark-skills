@@ -55,14 +55,14 @@
 | --- | --- | --- |
 | Commits, pushes, git workflow | `git`   | `kenmark-commit` |
 | Issue tracking, brain/issues | `issues` | `kenmark-issues-list`, `kenmark-issues-check`, `kenmark-issues-scan`, `kenmark-audit-loop`, `kenmark-simplify-scan`, `kenmark-issues-fix-and-ship` |
-| Plan tracking, brain/plans | `plans` | `kenmark-plan-lite`, `kenmark-plans-list`, `kenmark-plans-check`, `kenmark-plans-execute`, `kenmark-plans-maintain` |
+| Plan tracking, brain/plans | `plans` | `kenmark-plan`, `kenmark-plans-list`, `kenmark-plans-check`, `kenmark-plans-execute`, `kenmark-plans-maintain` |
 | Search, rankings, metadata, structured data | `seo` | `seo-audit`, `seo-technical`, `seo-schema` |
 | UI polish, layout, visual design, MUI | `design` | `impeccable`, `design-taste-frontend` |
 | APIs, services, frameworks, languages | `backend` | `backend-patterns`, `django-patterns` |
 | Tests, QA, verification, evals | `testing` | `kenmark-test-plan`, `kenmark-test-unit`, `kenmark-test-integration`, `kenmark-test-e2e`, `kenmark-test-mocks`, `kenmark-test-coverage`, `kenmark-test-ci` |
 | Skill install, update, packs (explicit admin only) | `admin` | `kenmark-setup`, `kenmark-packs`, `kenmark-update`, `kenmark-agents` |
 | Agent workflow, discovery, learning | `workflow` | `find-skills`, `continuous-learning`, `kenmark-router` |
-| Plan before implementation | `workflow` | `kenmark-plan-lite` |
+| Plan before implementation | `workflow` | `kenmark-plan` |
 | Complete final deliverables / no omissions | `workflow` | `kenmark-output` |
 | Specialist / parallel investigation | `workflow` | `kenmark-subagents` |
 | Troubleshoot, debug, root cause, investigate | `workflow` | `kenmark-troubleshoot` |

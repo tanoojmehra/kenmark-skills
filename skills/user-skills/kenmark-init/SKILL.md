@@ -262,7 +262,7 @@ Bootstrap by default unless the user explicitly says **"brain only, no trackers"
 | `INDEX.md` **exists** | Skip setup; report existing tracker. |
 | User said **brain only, no trackers** | Leave empty dirs only; do not write `INDEX.md`. |
 
-**Not for authoring plans** — creating plan files is **`kenmark-plan-lite`**, after tracker docs exist.
+**Not for authoring plans** — creating plan files is **`kenmark-plan`**, after tracker docs exist.
 
 ---
 
@@ -677,5 +677,5 @@ Optional — fill in per project.
 - `kenmark-issues-scan` — scan codebase and **create issue files** (requires `INDEX.md`; not setup)
 - `kenmark-issues-check` — move resolved issues to `completed/` and refresh index
 - `kenmark-plans-setup` — standalone bootstrap for `brain/plans/` docs (Step 1c runs the same workflow)
-- `kenmark-plan-lite` — create tiered plan files (requires `INDEX.md`)
+- `kenmark-plan` — create tiered plan files (requires `INDEX.md`)
 - `kenmark-plans-execute` — implement an approved plan end to end
