@@ -1,6 +1,6 @@
 # Features index
 
-Last updated: 2026-06-07
+Last updated: 2026-06-15
 Status: reviewed
 
 ## Feature index
@@ -15,8 +15,8 @@ Status: reviewed
 
 ## Confirmed facts
 
-- 41 bundled Kenmark skills under `skills/user-skills/` (flat directories).
-- 6 optional catalog pack IDs: `impeccable`, `simplify`, `graphify`, `seo-geo-selected`, `seo-geo-full`, `ecc`.
+- 43 bundled Kenmark skills under `skills/user-skills/` (flat directories).
+- 7 optional catalog pack IDs: `impeccable`, `simplify`, `graphify`, `seo-geo-selected`, `seo-geo-full`, `ecc`, `headroom`.
 - Default catalog selection: **impeccable** + **simplify** only.
 
 ## Documentation gaps

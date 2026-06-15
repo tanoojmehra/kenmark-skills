@@ -1,6 +1,6 @@
 # Recommended catalog packs
 
-Last updated: 2026-06-13
+Last updated: 2026-06-15
 Status: reviewed
 
 ## Summary
@@ -17,6 +17,7 @@ Optional third-party skills installed via `install-recommended` / `init` wizard.
 | `seo-geo-selected` | SEO/GEO (selected skills) | seo | no |
 | `seo-geo-full` | SEO/GEO (full suite) | seo | no |
 | `ecc` | Everything Claude Code | harness | no (profiles: minimal/core/full) |
+| `headroom` | Headroom | context | no |
 
 ## Overlap rules
 
