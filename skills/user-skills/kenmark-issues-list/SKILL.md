@@ -1,6 +1,6 @@
 ---
 name: kenmark-issues-list
-version: 1.2.1
+version: 1.3.0
 category: issues
 scope: universal
 phase: discover
@@ -53,46 +53,58 @@ Parse:
 Group issues by `area` tag. Within each area group, sort by priority
 (P0 → P1 → P2), then by ID ascending.
 
-Output format (example — populate from actual INDEX.md data):
+### Output rules (IDE-safe — follow exactly)
 
-```
-ISSUES DASHBOARD — {date}
-════════════════════════════════════════════════════════════════════
+These rules keep the dashboard readable in Cursor, Claude, Gemini, and other chat UIs:
 
-🔴 api (1 P0 | 0 P1 | 0 P2)
-─────────────────────────────────────────────────────────────────
- ID   Prio  Title
-───  ────  ───────────────────────────────────────────────────────
-001  P0    POST /users returns 500 when email already exists
+1. **Write plain markdown in the chat response** — never wrap the dashboard in a code fence.
+2. **Use GFM pipe tables** (`| col | col |`) — not ASCII columns or box-drawing lines.
+3. **Do not use** `═`, `─`, `│`, or space-padded fixed-width layouts.
+4. **One area per `###` heading**, then one table immediately below.
+5. If an area has no open issues, omit that section (do not print empty tables).
+6. If there are zero open issues, say so in one sentence and skip tables.
 
-🟡 database (0 P0 | 1 P1 | 0 P2)
-─────────────────────────────────────────────────────────────────
- ID   Prio  Title
-───  ────  ───────────────────────────────────────────────────────
-002  P1    Migration missing index on foreign key column
+**Area heading icons** (prefix the `###` heading):
 
-🟡 security (1 P0 | 1 P1 | 0 P2)
-─────────────────────────────────────────────────────────────────
- ID   Prio  Title
-───  ────  ───────────────────────────────────────────────────────
-003  P0    Auth middleware bypassed on nested route
-004  P1    Error responses leak stack traces in production
-
-🟡 ui (0 P0 | 0 P1 | 2 P2)
-─────────────────────────────────────────────────────────────────
- ID   Prio  Title
-───  ────  ───────────────────────────────────────────────────────
-005  P2    Settings form missing accessible labels
-006  P2    Empty state lacks primary action
-
-════════════════════════════════════════════════════════════════════
-Total open: {N} | Completed: {M}
-```
-
-**Area color coding:**
 - 🔴 = area has any P0 issues (critical — fix first)
 - 🟡 = area has P1/P2 only (high/medium priority)
-- ⚪ = area has no open issues
+- ⚪ = area has no open issues (only when listing all areas including empty)
+
+**Example output** — your chat response must match this structure as **plain markdown** (do not wrap it in a code fence). The block below is reference only:
+
+```markdown
+## Issues dashboard — {YYYY-MM-DD}
+
+**Total open:** {N} · **Completed:** {M}
+
+### 🔴 api (1 P0 · 0 P1 · 0 P2)
+
+| ID | Prio | Title |
+|----|------|-------|
+| 001 | P0 | POST /users returns 500 when email already exists |
+
+### 🟡 database (0 P0 · 1 P1 · 0 P2)
+
+| ID | Prio | Title |
+|----|------|-------|
+| 002 | P1 | Migration missing index on foreign key column |
+
+### 🟡 security (1 P0 · 1 P1 · 0 P2)
+
+| ID | Prio | Title |
+|----|------|-------|
+| 003 | P0 | Auth middleware bypassed on nested route |
+| 004 | P1 | Error responses leak stack traces in production |
+
+### 🟡 ui (0 P0 · 0 P1 · 2 P2)
+
+| ID | Prio | Title |
+|----|------|-------|
+| 005 | P2 | Settings form missing accessible labels |
+| 006 | P2 | Empty state lacks primary action |
+```
+
+Use middle dots (`·`) in count summaries, not pipe (`|`), so counts are not parsed as table syntax.
 
 ---
 
@@ -100,16 +112,21 @@ Total open: {N} | Completed: {M}
 
 At the bottom, show a compact workstream view grouping cross-area issues
 by root cause (derive from issue titles, `related:` frontmatter, and shared
-file paths — do not use a hardcoded template):
+file paths — do not use a hardcoded template).
 
+Use a `### Workstreams` heading and a single GFM table. Example (plain markdown in chat, not fenced):
+
+```markdown
+### Workstreams
+
+| Workstream | Issues |
+|------------|--------|
+| Auth & session handling | 003, 004 |
+| Database schema / migrations | 002 |
+| UI accessibility | 005, 006 |
 ```
-WORKSTREAMS
-─────────────────────────────────────────────────────────────────
- Auth & session handling                          003, 004
- Database schema / migrations                     002
- UI accessibility                                 005, 006
-════════════════════════════════════════════════════════════════════
-```
+
+If no workstreams apply, omit this section.
 
 ---
 
