@@ -73,6 +73,7 @@ When several bundled skills could apply, prefer this order:
 | Need specialist/parallel investigation | **`kenmark-subagents`** |
 | Need issue tracker docs (`brain/issues/`) | **`kenmark-issues-setup`** (or **`kenmark-init`**) |
 | Find bugs/gaps to file as issues | **`kenmark-issues-scan`** |
+| Multi-pass audit until no new unique issues | **`kenmark-audit-loop`** |
 | Full scan → fix → commit → merge workflow | **`kenmark-issues-fix-and-ship`** |
 | Need plan tracker docs (`brain/plans/`) | **`kenmark-plans-setup`** (or **`kenmark-init`**) |
 | Create tiered execution plan | **`kenmark-plan`** |
@@ -605,7 +606,7 @@ Do **not** use this skill for first-time Kenmark setup; use **`kenmark-setup`** 
 | If the task is about… | Prefer skills in category… | Examples |
 | --- | --- | --- |
 | Commits, pushes, git workflow | `git`   | `kenmark-commit` |
-| Issue tracking, brain/issues | `issues` | `kenmark-issues-list`, `kenmark-issues-check`, `kenmark-issues-scan`, `kenmark-issues-fix-and-ship` |
+| Issue tracking, brain/issues | `issues` | `kenmark-issues-list`, `kenmark-issues-check`, `kenmark-issues-scan`, `kenmark-audit-loop`, `kenmark-simplify`, `kenmark-issues-fix-and-ship` |
 | Plan tracking, brain/plans | `plans` | `kenmark-plan`, `kenmark-plans-list`, `kenmark-plans-check`, `kenmark-plans-execute`, `kenmark-plans-maintain` |
 | Search, rankings, metadata, structured data | `seo` | `seo-audit`, `seo-technical`, `seo-schema` |
 | UI polish, layout, visual design, MUI | `design` | `impeccable`, `design-taste-frontend` |
