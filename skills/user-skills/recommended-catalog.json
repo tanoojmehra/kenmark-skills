@@ -1,7 +1,7 @@
 {
-  "version": 7,
+  "version": 8,
   "mode": "selectable",
-  "updatedAt": "2026-06-13",
+  "updatedAt": "2026-06-15",
   "notes": "Selectable optional third-party installs with repo-aware suggestions. Global install only — no project scope.",
   "defaults": {
     "scope": "global",
@@ -14,7 +14,8 @@
       { "category": "review", "maxPrimary": 1, "note": "One primary code-quality pack (e.g. Simplify)" },
       { "category": "seo", "maxPrimary": 1, "note": "Prefer selected SEO skills; full pack only on request" },
       { "category": "harness", "maxPrimary": 1, "note": "ECC minimal by default; avoid stacking with plugin install" },
-      { "category": "navigation", "maxPrimary": 1, "note": "Graphify for medium/large repos only" }
+      { "category": "navigation", "maxPrimary": 1, "note": "Graphify for medium/large repos only" },
+      { "category": "context", "maxPrimary": 1, "note": "One context compression tool (e.g. Headroom)" }
     ]
   },
   "presets": [
@@ -40,9 +41,9 @@
     {
       "id": "core-next-agentic",
       "name": "Core Next.js Agentic",
-      "description": "core-next plus ECC minimal (manual install).",
+      "description": "core-next plus ECC minimal (manual install) and Headroom context compression.",
       "extends": "core-next",
-      "packIds": [{ "id": "ecc", "profile": "minimal" }]
+      "packIds": [{ "id": "ecc", "profile": "minimal" }, "headroom"]
     },
     {
       "id": "growth-seo",
@@ -302,6 +303,60 @@
         ],
         "verify": {
           "global": "{ ls \"$HOME/.claude/agents\"/ecc-*.md 2>/dev/null; ls -d \"$HOME/.claude/skills\"/ecc-*/ 2>/dev/null; } | grep -q ."
+        }
+      }
+    },
+    {
+      "id": "headroom",
+      "name": "Headroom",
+      "category": "context",
+      "weight": "medium",
+      "bloatScore": 2,
+      "recommended": true,
+      "defaultSelected": false,
+      "helpsWith": [
+        "context compression",
+        "token savings",
+        "large tool outputs",
+        "long agent sessions"
+      ],
+      "bestFor": [
+        "tool-heavy agent workflows",
+        "large repo exploration",
+        "MCP and proxy integrations"
+      ],
+      "avoidWhen": [
+        "one-shot scripts",
+        "environments without Python 3.10+",
+        "minimal harnesses only"
+      ],
+      "suggestiveTest": {
+        "question": "Do agents here read large tool outputs, logs, files, or RAG chunks?",
+        "signals": [
+          "git-repo",
+          "typescript-project",
+          "multi-language-src",
+          "monorepo-workspace",
+          "repo-file-count-high"
+        ],
+        "recommendWhen": "any",
+        "recommendation": "recommended"
+      },
+      "url": "https://github.com/chopratejas/headroom",
+      "description": "Context compression layer for AI agents — compress tool outputs, logs, files, and RAG chunks before they reach the LLM (library, proxy, MCP, agent wrap).",
+      "warning": "Python 3.10+. The [all] extra installs proxy, MCP, and ML dependencies (large download). Not a SKILL.md pack — after install use `headroom wrap <agent>`, `headroom proxy`, or Headroom MCP tools.",
+      "install": {
+        "global": {
+          "command": "uv tool install 'headroom-ai[all]'",
+          "summary": "Install Headroom CLI globally via uv (Python 3.10+)"
+        },
+        "alternatives": [
+          "pipx install 'headroom-ai[all]'",
+          "pip install 'headroom-ai[all]'",
+          "Claude plugin: /plugin marketplace add chopratejas/headroom"
+        ],
+        "verify": {
+          "global": "command -v headroom >/dev/null 2>&1"
         }
       }
     }

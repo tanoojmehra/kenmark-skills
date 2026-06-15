@@ -26,7 +26,7 @@ Status: reviewed
 - **Impeccable script paths:** Upstream `SKILL.md` uses `node ./scripts/*.mjs` (skill-relative). Agents run shell from project CWD — kenmark adopt rewrites these to absolute store paths; re-run `npx kenmark-skills adopt --ide all -y` after upgrading kenmark-skills if impeccable setup still fails.
 - **Legacy cleanup scope:** `listLegacyKenmarkSkillPaths()` must not include canonical bundled names when `kenmark-${old}` equals the rename target (fixed issue 010).
 - **Gemini/Codex duplicate skills (fixed 011):** Installing to both `~/.agents/skills` and `~/.gemini/skills` caused Gemini CLI conflict warnings — dedupe on link + prune duplicates on setup/adopt.
-- **Antigravity CLI/Gemini shared path:** Antigravity CLI reads `~/.gemini/skills` alongside `~/.gemini/antigravity-cli/skills` — dedupe when both `antigravity-cli` and `gemini` are in `--ide`.
+- **Antigravity CLI/Gemini shared path:** Antigravity CLI reads `~/.gemini/skills` alongside `~/.gemini/antigravity-cli/skills` — when both `antigravity-cli` and `gemini` are in `--ide`, link once to `~/.gemini/skills` (Gemini cannot read the antigravity-cli path).
 - **Antigravity symlinks:** Symlinked skills under any Antigravity skill root may not load — doctor warns; copy is default; or add an absolute skill path in Antigravity Settings → Skill Custom Paths.
 - **Three Antigravity surfaces:** `antigravity-cli` (terminal), `antigravity` (2.0 Manager harness), `antigravity-ide` (standalone VS Code app at `~/.gemini/antigravity-ide/skills`) — pass all needed targets in `--ide`.
 

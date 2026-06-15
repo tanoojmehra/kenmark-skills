@@ -4,12 +4,13 @@ version: 2.0.0
 category: admin
 scope: universal
 phase: setup
-description: Installs optional third-party skill packs from the Kenmark catalog with repo-aware suggestions. Use when installing recommended skills, impeccable, ECC, graphify, SEO/GEO, or curating a minimal skill set.
+description: Installs optional third-party skill packs from the Kenmark catalog with repo-aware suggestions. Use when installing recommended skills, impeccable, ECC, graphify, headroom, SEO/GEO, or curating a minimal skill set.
 triggers:
   - install recommended skills
   - install impeccable
   - install ECC
   - install graphify
+  - install headroom
   - curated skill packs
   - kenmark-packs
   - optional installs
@@ -46,8 +47,9 @@ Read from:
 | `seo-geo-selected` | Six SEO/GEO skills (not full suite) |
 | `seo-geo-full` | Full 20-skill SEO/GEO (explicit opt-in) |
 | `ecc` | Everything Claude Code — manual install |
+| `headroom` | Context compression CLI (proxy, MCP, agent wrap) |
 
-**Presets (advanced):** `lean`, `core-next`, `growth-seo`, `audit-review`, `experimental-heavy`, …
+**Presets (advanced):** `lean`, `core-next`, `core-next-agentic` (+ Headroom), `growth-seo`, `audit-review`, `experimental-heavy`, …
 
 ```bash
 npx kenmark-skills install-recommended --suggest
@@ -70,6 +72,7 @@ Do **not** install multiple overlapping packs for the same purpose unless the us
 - SEO/GEO: selected skills by default; full pack only on request
 - Agent harness: ECC **minimal** by default
 - Navigation: Graphify for medium/large repos
+- Context compression: Headroom for tool-heavy agent workflows (optional)
 
 ## Humans vs agents
 

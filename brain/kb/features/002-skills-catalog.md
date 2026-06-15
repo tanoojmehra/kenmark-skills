@@ -5,7 +5,7 @@ Status: reviewed
 
 ## Summary
 
-**41** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
+**43** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
 
 ## Categories
 
@@ -15,7 +15,7 @@ Status: reviewed
 | workflow | `kenmark-router`, `kenmark-plan`, `kenmark-troubleshoot`, `kenmark-repo-*`, `kenmark-security-review`, `kenmark-performance` |
 | testing | `kenmark-test-plan`, `kenmark-test-unit`, … `kenmark-test-ci` |
 | git | `kenmark-commit` |
-| issues | `kenmark-issues-setup`, … `kenmark-issues-fix-and-ship` |
+| issues | `kenmark-issues-setup`, … `kenmark-issues-fix-and-ship`, `kenmark-audit-loop`, `kenmark-simplify` |
 | plans | `kenmark-plans-setup`, `kenmark-plan`, … `kenmark-plans-execute` |
 | admin | `kenmark-packs`, `kenmark-update`, `kenmark-maintain`, `kenmark-agents` |
 

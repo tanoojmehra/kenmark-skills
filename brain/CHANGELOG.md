@@ -2,6 +2,21 @@
 
 Brain knowledge base
 
+## v2026.06.15-headroom-pack
+
+- **recommended-catalog.json (v8):** Added `headroom` context-compression pack (`uv tool install 'headroom-ai[all]'`); `core-next-agentic` preset includes Headroom.
+- **KB:** `004-recommended-packs`, `07-features`, `kenmark-packs` skill updated.
+
+## v2026.06.15-gemini-antigravity-dedupe
+
+- **CLI:** Antigravity CLI + Gemini dedupe now links to `~/.gemini/skills` and prunes `~/.gemini/antigravity-cli/skills` (was reversed — Gemini could not see skills when both IDEs were selected).
+- **KB:** `05-api-and-integrations`, `11-known-risks-and-decisions` updated.
+
+## v2026.06.13-audit-loop
+
+- **Skill:** Added `kenmark-audit-loop` — multi-pass audit with area selection (`all` or specific lenses), fingerprint dedup, convergence stop, and `brain/issues/` filing.
+- **Docs:** Skill count 41 → 43 (`kenmark-simplify` + `kenmark-audit-loop`); router and `skills/README.md` routing updated.
+
 ## v2026.06.13-noninteractive-stdin
 
 - **CLI:** `assertInteractiveStdin()` and stricter `wantsInteractive()` guard init/update against TTY+EOF silent exit.
