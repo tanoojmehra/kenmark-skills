@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## v2.3.24 — Headroom recommended pack (2026-06-15)
+
+### Added
+
+- **recommended-catalog.json (v8):** `headroom` pack — context compression CLI (`chopratejas/headroom`) via `uv tool install 'headroom-ai[all]'`. Included in `core-next-agentic` preset. New `context` overlap category.
+
+## v2.3.23 — Gemini + Antigravity CLI dedupe fix (2026-06-15)
+
+### Fix
+
+- **CLI:** When both `gemini` and `antigravity-cli` are in `--ide`, skills now link to `~/.gemini/skills` (Gemini's discovery path) and Kenmark-managed duplicates are pruned from `~/.gemini/antigravity-cli/skills`. Previously the paths were reversed, so Gemini CLI saw zero global skills while Antigravity CLI worked.
+
+## v2.3.22 — kenmark-audit-loop skill (2026-06-13)
+
+### Added
+
+- **Skill:** `kenmark-audit-loop` — multi-pass audit with area selection (`all` or specific lenses), fingerprint dedup, convergence stop, and `brain/issues/` filing.
+- **Docs:** Bundled skill count 41 → 43 (`kenmark-simplify` + `kenmark-audit-loop`); router and `skills/README.md` routing updated.
+
 ## v2.3.21 — Non-interactive stdin guard (2026-06-13)
 
 ### Fix

@@ -10,7 +10,7 @@ Universal rules for **kenmark-skills** (npm CLI + bundled skills). Stack, workfl
 
 ## Project layout
 
-- **Canonical skills:** `skills/user-skills/` (41 Kenmark skills + `recommended-catalog.json`).
+- **Canonical skills:** `skills/user-skills/` (43 Kenmark skills + `recommended-catalog.json`).
 - **CLI:** `scripts/cli.js` dispatches to focused modules (`setup-skills.js`, `kenmark-hub.js`, etc.).
 - **Config:** `config/mcp-servers.json`, `config/mcp-profiles.json`.
 - Never delete the `brain/` folder — project knowledge base for this repo.
