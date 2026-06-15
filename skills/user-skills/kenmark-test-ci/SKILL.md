@@ -32,7 +32,7 @@ disable-model-invocation: true
 
 ## Purpose
 
-Before writing or running tests, follow the shared testing contract: `skills/shared/testing-contract.md`.
+Before writing or running tests, follow `skills/shared/testing-contract.md`.
 
 Use this skill to make tests run reliably in CI/CD.
 
@@ -49,35 +49,6 @@ It covers:
 - DB service containers for integration tests
 
 ---
-
-## Package manager rule
-
-Detect package manager from lockfile:
-
-| Lockfile | Package manager |
-| --- | --- |
-| `pnpm-lock.yaml` | `pnpm` |
-| `yarn.lock` | `yarn` |
-| `bun.lockb` | `bun` |
-| `package-lock.json` | `npm` |
-
-Prefer package scripts and repo-local binaries before `npx`.
-
-Do not use `npx` to fetch tools unless:
-- the tool is already listed in dependencies/devDependencies, or
-- the user approves adding/fetching it.
-
----
-
-## Testing safety contract
-
-- Do not use production data or production credentials.
-- Do not hit paid/external services unless explicitly approved.
-- Do not add new frameworks when the repo already has a good one.
-- Prefer existing scripts and conventions.
-- Run the smallest relevant test first.
-- Document any env vars or setup needed.
-- Update `brain/kb/` when testing setup changes materially.
 
 ---
 

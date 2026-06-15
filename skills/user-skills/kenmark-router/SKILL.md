@@ -35,20 +35,20 @@ Then read the winner's `SKILL.md` and follow it.
 
 ## Skill activation tiers (summary)
 
-**Core auto skills (prefer for broad work):** `kenmark-plan`, `kenmark-troubleshoot`, `kenmark-output`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-security-review`, `kenmark-performance`.
+**Core auto skills (prefer for broad work):** `kenmark-troubleshoot`, `kenmark-output`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-security-review`, `kenmark-performance`.
 
-**Specialist (clear intent only):** `kenmark-subagents`, `kenmark-repo-*`, `kenmark-test-*`, `kenmark-issues-*`, `kenmark-plans-*`.
+**Specialist (clear intent only):** `kenmark-subagents`, `kenmark-repo-*`, `kenmark-test-*`, `kenmark-issues-*`, `kenmark-plans-list`, `kenmark-plans-check`, `kenmark-plans-execute`.
 
 **Explicit admin (never auto):** `kenmark-setup`, `kenmark-packs`, `kenmark-update`, `kenmark-agents`.
 
-**Manual heavy workflows:** `kenmark-router`, `kenmark-troubleshoot-deep`, `kenmark-plans-execute`, `kenmark-issues-fix-and-ship`, `kenmark-commit`, `kenmark-init`, `kenmark-audit-loop`.
+**Manual heavy workflows:** `kenmark-router`, `kenmark-plan`, `kenmark-troubleshoot-deep`, `kenmark-plans-execute`, `kenmark-issues-fix-and-ship`, `kenmark-commit`, `kenmark-init`, `kenmark-audit-loop`, `kenmark-plans-check`, `kenmark-issues-check`, `kenmark-issues-setup`, `kenmark-plans-setup`.
 
 ## Recommended flow
 
 | Situation | Skill |
 | --- | --- |
 | Unclear problem | **`kenmark-troubleshoot`** |
-| Plan before work (writes `brain/plans/`) | **`kenmark-plan`** |
+| Plan before work (writes `brain/plans/`) | **`kenmark-plan`** (explicit) |
 | Complete deliverables | **`kenmark-output`** |
 | Parallel tracks | **`kenmark-subagents`** (explicit) |
 | Ship commits | **`kenmark-commit`** (explicit) |

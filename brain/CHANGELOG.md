@@ -2,6 +2,10 @@
 
 Brain knowledge base
 
+## v2026.06.15-plan-option-b
+
+- **kenmark-plan:** Option B — manual-only durable planning; tracker check/setup skills manual; test contract dedupe (v2.3.29).
+
 ## v2026.06.15-v2.3.28
 
 - **Release v2.3.28:** Headroom init scripts shipped; plan-lite removed; issues-list GFM tables; version bump.

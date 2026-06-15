@@ -20,7 +20,7 @@ skills/user-skills/          ← bundled universal skills (46)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow (manual)
-  kenmark-plan/               category: plans (phase: plan; writes brain/plans/)
+  kenmark-plan/               category: plans (phase: plan; manual; writes brain/plans/)
   kenmark-subagents/          category: workflow (phase: orchestrate; manual)
   kenmark-output/             category: workflow (phase: verify)
   kenmark-troubleshoot/       category: workflow (phase: diagnose)
@@ -105,7 +105,7 @@ not in this package.
 
 | Skill | Purpose |
 | --- | --- |
-| `kenmark-plan` | Tiered planning; always writes `brain/plans/` |
+| `kenmark-plan` | Tiered planning to `brain/plans/` (explicit invocation) |
 | `kenmark-output` | Enforce complete final outputs and deliverables |
 | `kenmark-subagents` | Split complex work into specialist tracks (explicit) |
 | `kenmark-repo-hygiene` | Read-only clutter audit; cleanup plan only |
@@ -136,7 +136,7 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Situation | Skill |
 | --- | --- |
 | Problem unclear? | `kenmark-troubleshoot` |
-| Need a plan (writes `brain/plans/`)? | `kenmark-plan` |
+| Need a durable plan in `brain/plans/`? | `kenmark-plan` (explicit) |
 | Need parallel/specialist tracks? | `kenmark-subagents` (explicit) |
 | Need complete final deliverable? | `kenmark-output` |
 | Need issue tracker docs (`brain/issues/`)? | `kenmark-issues-setup` (or `kenmark-init`) |

@@ -19,7 +19,7 @@ allowed-tools:
   - Glob
   - AskUserQuestion
 risk: write-files
-disable-model-invocation: false
+disable-model-invocation: true
 ---
 
 # Kenmark Issues Setup
