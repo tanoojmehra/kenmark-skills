@@ -57,10 +57,10 @@ Do not jump straight to implementation unless the user explicitly asks.
 ```bash
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
 PLANS_DIR="$REPO_ROOT/brain/plans"
-test -f "$PLANS_DIR/INDEX.md" || echo "STOP: run kenmark-plans-setup or kenmark-init first"
+test -f "$PLANS_DIR/INDEX.md" || echo "STOP: run kenmark-tracker-setup or kenmark-init first"
 ```
 
-If `brain/plans/INDEX.md` is missing, run **`kenmark-plans-setup`** (or **`kenmark-init`**) before creating plan files.
+If `brain/plans/INDEX.md` is missing, run **`kenmark-tracker-setup`** (or **`kenmark-init`**) before creating plan files.
 
 ---
 
@@ -296,8 +296,8 @@ A valid `kenmark-plan` response must include:
 
 ## Related skills
 
-- **`kenmark-plans-setup`** — bootstrap tracker when `INDEX.md` missing
-- **`kenmark-plans-list`** — view active plans dashboard
+- **`kenmark-tracker-setup`** — bootstrap tracker when `INDEX.md` missing
+- **`kenmark-tracker-list`** — view active plans dashboard
 - **`kenmark-plans-execute`** — implement an approved plan
-- **`kenmark-plans-check`** — verify acceptance criteria and archive
-- **`kenmark-plans-maintain`** — fix INDEX drift
+- **`kenmark-tracker-check`** — verify acceptance criteria and archive
+- **`kenmark-tracker-maintain`** — fix INDEX drift

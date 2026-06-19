@@ -601,9 +601,9 @@ Node (pnpm) + Turborepo | …
 | --- | --- |
 | App security (auth, SSRF, injection) | `kenmark-security-review` |
 | Release before publish | `kenmark-repo-release` |
-| Structure / duplicate utils folders | `kenmark-repo-structure` |
+| Structure / duplicate utils folders | `kenmark-repo-hygiene` (structure-audit mode) |
 | Performance / bundle patterns in code | `kenmark-performance` |
-| Stack documented in KB | `kenmark-repo-kb` / `kenmark-init` |
+| Stack documented in KB | `kenmark-kb-sync` / `kenmark-init` |
 
 ---
 

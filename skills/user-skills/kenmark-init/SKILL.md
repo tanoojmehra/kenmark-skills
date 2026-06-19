@@ -109,8 +109,8 @@ Project knowledge base for humans and AI agents.
 | [kb/10-testing-and-quality.md](kb/10-testing-and-quality.md) | Test strategy and quality gates |
 | [kb/11-known-risks-and-decisions.md](kb/11-known-risks-and-decisions.md) | Risks, tradeoffs, architecture decisions |
 | [CHANGELOG.md](CHANGELOG.md) | Versioned log of brain, KB, and standards changes |
-| [issues/INDEX.md](issues/INDEX.md) | Active/completed issue tracker (Step 1b or `kenmark-issues-setup`) |
-| [plans/INDEX.md](plans/INDEX.md) | Active/completed plan tracker (Step 1c or `kenmark-plans-setup`) |
+| [issues/INDEX.md](issues/INDEX.md) | Active/completed issue tracker (Step 1b or `kenmark-tracker-setup`) |
+| [plans/INDEX.md](plans/INDEX.md) | Active/completed plan tracker (Step 1c or `kenmark-tracker-setup`) |
 
 ## Maintenance
 
@@ -244,7 +244,7 @@ Bootstrap by default unless the user explicitly says **"brain only, no trackers"
 
 | Condition | Action |
 | --- | --- |
-| `brain/issues/INDEX.md` **missing** | Follow **`kenmark-issues-setup`** Steps 2–4 (write full `INDEX.md` template). Step 1 already created `brain/issues/` and `brain/issues/completed/`. |
+| `brain/issues/INDEX.md` **missing** | Follow **`kenmark-tracker-setup`** Steps 2–4 (write full `INDEX.md` template). Step 1 already created `brain/issues/` and `brain/issues/completed/`. |
 | `INDEX.md` **exists** | Skip setup; report existing tracker. |
 | User said **brain only, no trackers** | Leave empty dirs only; do not write `INDEX.md`. |
 
@@ -258,7 +258,7 @@ Bootstrap by default unless the user explicitly says **"brain only, no trackers"
 
 | Condition | Action |
 | --- | --- |
-| `brain/plans/INDEX.md` **missing** | Follow **`kenmark-plans-setup`** Steps 2–4 (write full `INDEX.md` template). Step 1 already created `brain/plans/` and `brain/plans/completed/`. |
+| `brain/plans/INDEX.md` **missing** | Follow **`kenmark-tracker-setup`** Steps 2–4 (write full `INDEX.md` template). Step 1 already created `brain/plans/` and `brain/plans/completed/`. |
 | `INDEX.md` **exists** | Skip setup; report existing tracker. |
 | User said **brain only, no trackers** | Leave empty dirs only; do not write `INDEX.md`. |
 
@@ -673,9 +673,8 @@ Optional — fill in per project.
 ## Related skills
 
 - `kenmark-commit` — reads `brain/rules/workflow.md` Git branch policy for protected deployment branches
-- `kenmark-issues-setup` — standalone bootstrap for `brain/issues/` docs (Step 1b runs the same workflow)
+- `kenmark-tracker-setup` — standalone bootstrap for `brain/issues/` and `brain/plans/` docs (Step 1b/1c runs the same workflow)
 - `kenmark-issues-scan` — scan codebase and **create issue files** (requires `INDEX.md`; not setup)
-- `kenmark-issues-check` — move resolved issues to `completed/` and refresh index
-- `kenmark-plans-setup` — standalone bootstrap for `brain/plans/` docs (Step 1c runs the same workflow)
+- `kenmark-tracker-check` — move resolved items to `completed/` and refresh index
 - `kenmark-plan` — create tiered plan files (requires `INDEX.md`)
 - `kenmark-plans-execute` — implement an approved plan end to end

@@ -220,7 +220,7 @@ Do not hardcode these checks into other repos — use as a template for meta con
 | Secrets | `kenmark-repo-secrets` |
 | Docs drift | `kenmark-repo-docs` |
 | Commits and push | `kenmark-commit` |
-| KB updates | `kenmark-repo-kb` |
+| KB updates | `kenmark-kb-sync` |
 
 ---
 

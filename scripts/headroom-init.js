@@ -89,7 +89,7 @@ function printHeadroomUsageHints(wrapAgents) {
   if (wrapAgents.includes("codex")) {
     console.log("  Codex:         headroom wrap codex                 # launch through Headroom");
   }
-  console.log("  Gemini:        no wrap yet — Kenmark skills only; see kenmark-packs references/headroom-usage.md");
+  console.log("  Gemini:        no wrap yet — Kenmark skills only; see kenmark-setup references/headroom-usage.md");
   console.log("  headroom perf                                  # token savings report");
   console.log("  Docs: https://github.com/chopratejas/headroom");
 }

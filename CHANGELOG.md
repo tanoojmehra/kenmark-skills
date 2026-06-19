@@ -1,5 +1,33 @@
 # CHANGELOG
 
+## v2.3.33 — skill merges & renames (2026-06-19)
+
+### Changed
+
+- **Skill merges:** `kenmark-repo-structure` → `kenmark-repo-hygiene` (structure-audit mode), `kenmark-simplify-scan` → `kenmark-issues-scan` (simplify-scan mode), `kenmark-packs` → `kenmark-setup` (packs section).
+- **Unified tracker skills:** Created `kenmark-tracker-setup`, `kenmark-tracker-list`, `kenmark-tracker-check`, `kenmark-tracker-maintain` from 8 old issues/plans skills.
+- **Renames:** `kenmark-maintain` → `kenmark-skills-maintain`, `kenmark-repo-kb` → `kenmark-kb-sync`.
+- **Cross-references:** Updated all docs, scripts, and skill files to reflect new names.
+- **Skill count:** 46 → 38 bundled skills.
+
+## v2.3.32 — improve recommended pack (2026-06-18)
+
+### Added
+
+- **recommended-catalog.json (v12):** `improve` pack — [shadcn/improve](https://github.com/shadcn/improve) for audit-to-plan workflows with cheaper-model execution. New `audit` overlap category.
+
+## v2.3.31 — Ponytail recommended pack (2026-06-18)
+
+### Added
+
+- **recommended-catalog.json (v11):** `ponytail` pack — [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) for YAGNI-first agent coding (5 skills: ponytail, review, audit, debt, help).
+
+## v2.3.30 — draw.io recommended pack (2026-06-18)
+
+### Added
+
+- **recommended-catalog.json (v10):** `drawio-skill` pack — [Agents365-ai/drawio-skill](https://github.com/Agents365-ai/drawio-skill) for architecture/UML/flow diagrams via draw.io desktop CLI. New `diagram` overlap category.
+
 ## v2.3.29 — Plan Option B and tracker skill activation (2026-06-15)
 
 ### Changed

@@ -21,7 +21,7 @@ disable-model-invocation: true
 
 Refresh **Kenmark first-party skills** and optionally **reinstall recommended third-party packs** via npx. No git clone.
 
-Pair with **kenmark-maintain** if the machine has duplicate or stale skill trees before updating.
+Pair with **kenmark-skills-maintain** if the machine has duplicate or stale skill trees before updating.
 
 ## When to use
 
@@ -115,8 +115,8 @@ npx kenmark-skills install-recommended --all -y
 
 | Skill | Use when |
 | --- | --- |
-| **kenmark-maintain** | Audit duplicates before/after a large update |
-| **kenmark-packs** | First-time install of curated packs (not just refresh) |
+| **kenmark-skills-maintain** | Audit duplicates before/after a large update |
+| **kenmark-setup** (packs section) | First-time install of curated packs (not just refresh) |
 | **kenmark-router** | Pick the right skill after the registry is current |
 
 ## Scripts
@@ -125,4 +125,4 @@ npx kenmark-skills install-recommended --all -y
 - `scripts/kenmark-hub.js` — store, manifest, symlink, adopt
 - `scripts/setup-skills.js` — store + link (invoked by update)
 - `scripts/skills-adopt.js` — adopt catalog skills (invoked by update)
-- `scripts/kenmark-packs.js` — curated packs (invoked by update)
+- `scripts/kenmark-packs.js` — curated packs (invoked by update; packs section merged into kenmark-setup)

@@ -13,7 +13,7 @@ flowchart TD
   D --> E[Phase 3: Feature branch + fix loop]
   E --> F{Large/API fix?}
   F -->|yes| G[Ask user to confirm]
-  F -->|no| H[Phase 4: Complete — kenmark-issues-check]
+  F -->|no| H[Phase 4: Complete — kenmark-tracker-check]
   G --> H
   H --> I[Phase 5: typecheck + lint]
   I --> J[Phase 6: kenmark-commit + push]
@@ -154,7 +154,7 @@ Within the same priority, sort by ID ascending.
 | --- | --- |
 | >8 unrelated file paths in one fix | Ask user to confirm |
 | Public API change (routes, exports, env) | Ask user to confirm |
-| INDEX ledger drift | Run `kenmark-issues-maintain` |
+| INDEX ledger drift | Run `kenmark-tracker-maintain` |
 | Decryption/auth failures in agent runs | Verify `ENCRYPTION_KEY` identical in web and worker env |
 
 ---
@@ -228,9 +228,9 @@ C) Direct merge — I understand CI/CD may run
 
 | Trigger | Skill / action |
 | --- | --- |
-| INDEX disagrees with folders | `kenmark-issues-maintain` |
+| INDEX disagrees with folders | `kenmark-tracker-maintain` |
 | Protected branch, no override | Create feature branch |
 | Zero new issues from blob | Stop |
 | Ambiguous commit grouping | `AskUserQuestion` |
 | Large or API-breaking fix | Confirm with user |
-| Behavioral code change | `kenmark-repo-kb` |
+| Behavioral code change | `kenmark-kb-sync` |

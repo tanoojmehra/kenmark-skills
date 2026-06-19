@@ -27,8 +27,8 @@
    | `phase` wrong (e.g. setup skill for a ship task) | −2 |
    | `risk` too high for a read-only request | −2 |
    | `risk` too low for a write/destructive request and no safer alternative | −1 |
-   | **Explicit admin** skill (`kenmark-setup`, `kenmark-packs`, `kenmark-update`, `kenmark-agents`) without install/update/setup/prune/inventory intent | −6 |
-   | **Specialist** skill (`kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-structure`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, `kenmark-test-*`, `kenmark-issues-*`) on a broad/unclear coding task | −2 |
+   | **Explicit admin** skill (`kenmark-setup`, `kenmark-update`, `kenmark-agents`) without install/update/setup/prune/inventory intent | −6 |
+   | **Specialist** skill (`kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, `kenmark-test-*`, `kenmark-issues-scan`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship`, `kenmark-plan`, `kenmark-plans-execute`, `kenmark-tracker-list`, `kenmark-tracker-check`, `kenmark-tracker-maintain`) on a broad/unclear coding task | −2 |
    | **Core daily** skill when task is general coding/repo work | +1 |
 
 4. **Tie-break** (in order):
@@ -45,7 +45,7 @@
 
 5. **Load winner**: read the selected skill's `SKILL.md` and follow it for the rest of the task.
 
-6. **Multi-skill tasks**: if two skills score within 1 point and serve **different phases** (e.g. `kenmark-issues-scan` + `kenmark-issues-check`, or `ce-plan` + `tdd-workflow`), load the primary first and note the secondary for the next phase.
+6. **Multi-skill tasks**: if two skills score within 1 point and serve **different phases** (e.g. `kenmark-issues-scan` + `kenmark-tracker-check`, or `ce-plan` + `tdd-workflow`), load the primary first and note the secondary for the next phase.
 
 7. **No match (score < 3)**: use `find-skills` to search for installable skills, then proceed with general capabilities.
 
@@ -54,13 +54,13 @@
 | If the task is about… | Prefer skills in category… | Examples |
 | --- | --- | --- |
 | Commits, pushes, git workflow | `git`   | `kenmark-commit` |
-| Issue tracking, brain/issues | `issues` | `kenmark-issues-list`, `kenmark-issues-check`, `kenmark-issues-scan`, `kenmark-audit-loop`, `kenmark-simplify-scan`, `kenmark-issues-fix-and-ship` |
-| Plan tracking, brain/plans | `plans` | `kenmark-plan`, `kenmark-plans-list`, `kenmark-plans-check`, `kenmark-plans-execute`, `kenmark-plans-maintain` |
+| Issue tracking, brain/issues | `issues` | `kenmark-tracker-list`, `kenmark-tracker-check`, `kenmark-issues-scan`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship` |
+| Plan tracking, brain/plans | `plans` | `kenmark-plan`, `kenmark-tracker-list`, `kenmark-tracker-check`, `kenmark-plans-execute`, `kenmark-tracker-maintain` |
 | Search, rankings, metadata, structured data | `seo` | `seo-audit`, `seo-technical`, `seo-schema` |
 | UI polish, layout, visual design, MUI | `design` | `impeccable`, `design-taste-frontend` |
 | APIs, services, frameworks, languages | `backend` | `backend-patterns`, `django-patterns` |
 | Tests, QA, verification, evals | `testing` | `kenmark-test-plan`, `kenmark-test-unit`, `kenmark-test-integration`, `kenmark-test-e2e`, `kenmark-test-mocks`, `kenmark-test-coverage`, `kenmark-test-ci` |
-| Skill install, update, packs (explicit admin only) | `admin` | `kenmark-setup`, `kenmark-packs`, `kenmark-update`, `kenmark-agents` |
+| Skill install, update, packs (explicit admin only) | `admin` | `kenmark-setup`, `kenmark-update`, `kenmark-agents` |
 | Agent workflow, discovery, learning | `workflow` | `find-skills`, `continuous-learning`, `kenmark-router` |
 | Plan before implementation | `workflow` | `kenmark-plan` |
 | Complete final deliverables / no omissions | `workflow` | `kenmark-output` |
@@ -69,9 +69,9 @@
 | Repo clutter, scattered docs, dumps | `workflow` | `kenmark-repo-hygiene` |
 | Secrets, keys, tokens | `workflow` | `kenmark-repo-secrets` |
 | Public / open-source safety | `workflow` | `kenmark-repo-public` |
-| Brain KB after code change | `workflow` | `kenmark-repo-kb` |
+| Brain KB after code change | `workflow` | `kenmark-kb-sync` |
 | Documentation quality | `workflow` | `kenmark-repo-docs` |
-| Folder layout / structure | `workflow` | `kenmark-repo-structure` |
+| Folder layout / structure | `workflow` | `kenmark-repo-hygiene` (structure-audit mode) |
 | Package / dependency health | `workflow` | `kenmark-repo-deps` |
 | Dev/build/type/lint/format errors | `workflow` | `kenmark-repo-quality` |
 | Security review (auth, RBAC, injection, SSRF, CORS, rate limits) | `workflow` | `kenmark-security-review` |

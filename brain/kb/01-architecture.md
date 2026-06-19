@@ -15,7 +15,7 @@ Status: reviewed
 | `mcp uninstall` | `setup-skills.js --uninstall --mcp-only` |
 | `inventory` | `skills-inventory.js` |
 | `subagents-inventory` | `subagents-inventory.js` |
-| `install-recommended` | `kenmark-packs.js` |
+| `install-recommended` | `kenmark-packs.js` (packs section in kenmark-setup) |
 | `update` | `kenmark-update.js` |
 | `adopt` | `skills-adopt.js` |
 | `validate` | `validate.js` → `validate-repo.js` |

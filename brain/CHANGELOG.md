@@ -2,6 +2,25 @@
 
 Brain knowledge base
 
+## v2026.06.19-skill-merges
+
+- **Skill merges & renames:** Merged `kenmark-repo-structure` → `kenmark-repo-hygiene` (structure-audit mode), `kenmark-simplify-scan` → `kenmark-issues-scan` (simplify-scan mode), `kenmark-packs` → `kenmark-setup` (packs section). Created 4 unified tracker skills (`kenmark-tracker-setup`, `kenmark-tracker-list`, `kenmark-tracker-check`, `kenmark-tracker-maintain`) from 8 old issues/plans skills. Renamed `kenmark-maintain` → `kenmark-skills-maintain`, `kenmark-repo-kb` → `kenmark-kb-sync`. Updated all cross-references. Skill count: 46 → 38.
+
+## v2026.06.18-improve-pack
+
+- **recommended-catalog.json (v12):** Added `improve` audit pack ([shadcn/improve](https://github.com/shadcn/improve)); new `audit` overlap category.
+- **KB:** `004-recommended-packs`, `07-features`, `kenmark-packs` skill updated.
+
+## v2026.06.18-ponytail-pack
+
+- **recommended-catalog.json (v11):** Added `ponytail` review pack ([DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)); 5 adoptable skills.
+- **KB:** `004-recommended-packs`, `07-features`, `kenmark-packs` skill updated.
+
+## v2026.06.18-drawio-skill-pack
+
+- **recommended-catalog.json (v10):** Added `drawio-skill` diagram pack ([Agents365-ai/drawio-skill](https://github.com/Agents365-ai/drawio-skill)); new `diagram` overlap category.
+- **KB:** `004-recommended-packs`, `kenmark-packs` skill updated.
+
 ## v2026.06.15-plan-option-b
 
 - **kenmark-plan:** Option B — manual-only durable planning; tracker check/setup skills manual; test contract dedupe (v2.3.29).

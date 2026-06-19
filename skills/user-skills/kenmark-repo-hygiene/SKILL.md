@@ -17,6 +17,13 @@ triggers:
   - dirty repo
   - scattered markdown
   - orphan assets
+  - structure audit
+  - folder structure
+  - repo layout
+  - confusing repo
+  - misplaced files
+  - kenmark-repo-hygiene
+  - architecture folders
 allowed-tools:
   - Bash
   - Read
@@ -77,6 +84,7 @@ This skill must be safe for production and public-release preparation.
 | `standard-audit`   | Normal repo cleanup               | Full categorized report                   |
 | `cleanup-plan`     | User wants actions                | Recommend move/delete/convert actions     |
 | `approved-cleanup` | User approved specific actions    | Execute only approved changes             |
+| `structure-audit`  | Repo layout is confusing          | Folder layout, naming, boundary smells, dead folders |
 
 If the user asks about **making the repo public**, **open-sourcing**, **publish safety**, or **secrets**, stop and use the specialist instead of this skill:
 
@@ -86,6 +94,121 @@ If the user asks about **making the repo public**, **open-sourcing**, **publish 
 | check secrets, find keys, credential scan, secrets audit | **`kenmark-repo-secrets`** |
 
 If they say **"sanitize repo"** without clutter context, ask whether they mean **clutter cleanup** (this skill) or **public publish prep** (**`kenmark-repo-public`**).
+
+---
+
+## Structure audit mode
+
+Use this sub-mode when the user asks about **folder layout, naming, module boundaries, or a confusing repo structure**. It is a read-only review that produces Keep/Move/Merge/Rename/Delete recommendations.
+
+### Core principle
+
+```text
+Map tree → Compare to conventions → Recommend structure changes
+```
+
+### Step S1 — Resolve repo root and top-level map
+
+```bash
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$REPO_ROOT"
+ls -la
+find . -maxdepth 2 -type d ! -path './.git*' ! -path './node_modules' 2>/dev/null | head -60
+```
+
+Detect stack hints: `package.json`, `next.config.*`, `apps/`, `packages/`, `src/`, `internal/`.
+
+### Step S2 — Root clutter
+
+Flag non-standard root files (not README, LICENSE, config manifests, lockfiles):
+
+- Loose scripts, images, PDFs, notes
+- Duplicate config (`config.json` + `config/`)
+
+Recommend **Move** to `scripts/`, `docs/`, `assets/`, or `temp/`.
+
+### Step S3 — Naming consistency
+
+Check for mixed conventions in the same layer:
+
+- `utils` vs `utilities` vs `helpers`
+- `components` vs `Components`
+- `api` vs `API` vs `routes`
+
+Recommend **Rename** or **Merge** when duplicates serve the same role.
+
+### Step S4 — Boundary smells (framework-aware)
+
+#### Next.js / React
+
+- Server-only code under `app/` without `"use client"` discipline
+- Client hooks imported from `lib/` used only on server
+- Massive flat `components/` with no feature grouping
+
+#### Monorepo
+
+- Shared code duplicated in two `packages/` instead of one `shared/`
+- App-specific code in root `lib/`
+
+```bash
+find . -name '*.tsx' -path '*/components/*' 2>/dev/null | wc -l
+find . -name '*.ts' -path '*/lib/*' 2>/dev/null | wc -l
+```
+
+### Step S5 — Dead folders
+
+```bash
+find . -type d -empty ! -path './.git/*' 2>/dev/null | head -20
+```
+
+Recommend **Delete after approval** if empty and unreferenced.
+
+### Step S6 — Architecture note (optional)
+
+If findings are significant, recommend a short addition to `brain/kb/01-architecture.md` (do not write unless user approves KB update — or use **`kenmark-kb-sync`**).
+
+### Structure audit report template
+
+```markdown
+# Structure Audit
+
+## Summary
+
+<one paragraph>
+
+## Keep
+
+- …
+
+## Move
+
+| From | To | Reason |
+| --- | --- | --- |
+
+## Merge
+
+- …
+
+## Rename
+
+- …
+
+## Delete (after approval)
+
+- …
+
+## Module boundary notes
+
+- …
+```
+
+Optional: `brain/reports/kenmark-repo-hygiene-YYYY-MM-DD.md`
+
+### Structure audit anti-patterns
+
+- Do not mandate a greenfield structure that fights existing team conventions.
+- Do not move files in this mode — recommendations only.
+- Do not delete folders with tracked files without explicit approval.
 
 ---
 
@@ -526,14 +649,14 @@ Do not run the full public checklist here. Use **`kenmark-repo-public`** (verdic
 | --- | --- |
 | Deep secrets, keys, tokens | `kenmark-repo-secrets` |
 | Safe to make repo public | `kenmark-repo-public` |
-| Update brain after feature work | `kenmark-repo-kb` |
+| Update brain after feature work | `kenmark-kb-sync` |
 | Docs quality | `kenmark-repo-docs` |
-| Folder layout / structure | `kenmark-repo-structure` |
+| Folder layout / structure | `kenmark-repo-hygiene` (structure-audit mode) |
 | Package bloat / deps | `kenmark-repo-deps` |
 | App security review (auth, injection, SSRF) | `kenmark-security-review` |
 | Performance review (slow routes, bundle, hydration) | `kenmark-performance` |
 | npm publish / release | `kenmark-repo-release` |
-| Inventory installed agent skills (not repo files) | `kenmark-maintain` |
+| Inventory installed agent skills (not repo files) | `kenmark-skills-maintain` |
 | Pick which skill to run | `kenmark-router` |
 | Bootstrap `brain/` layout | `kenmark-init` |
 | Grouped commits after cleanup | `kenmark-commit` |

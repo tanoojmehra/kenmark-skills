@@ -4,13 +4,25 @@ version: 1.3.0
 category: issues
 scope: universal
 phase: discover
-description: "Scan the codebase for bugs, gaps, and inconsistencies; create new issue files in brain/issues/ with unique IDs. Requires brain/issues/INDEX.md from kenmark-issues-setup or kenmark-init — this skill does NOT bootstrap the tracker. Use when asked to \"scan for new issues\", \"find new issues\", or \"discover issues\"."
+description: "Scan the codebase for bugs, gaps, and inconsistencies; create new issue files in brain/issues/ with unique IDs. Requires brain/issues/INDEX.md from kenmark-tracker-setup or kenmark-init — this skill does NOT bootstrap the tracker. Use when asked to \"scan for new issues\", \"find new issues\", or \"discover issues\"."
 triggers:
   - scan for new issues
   - find new issues
   - discover issues
   - new issues
   - scan issues
+  - scan for simplification opportunities
+  - simplify audit
+  - kenmark-simplify-scan
+  - scan for simplification opportunities
+  - simplify audit
+  - kenmark-simplify-scan
+  - scan for simplification opportunities
+  - simplify audit
+  - kenmark-simplify-scan
+  - scan for simplification opportunities
+  - simplify audit
+  - kenmark-simplify-scan
 allowed-tools:
   - Bash
   - Read
@@ -29,7 +41,7 @@ disable-model-invocation: false
 
 **Scan and document** — find bugs, gaps, and inconsistencies in the codebase, then **create issue files** under `brain/issues/` with evidence and unique IDs.
 
-**Not setup.** This skill does not create the tracker layout. If `brain/issues/INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or **`kenmark-init`**) first.
+**Not setup.** This skill does not create the tracker layout. If `brain/issues/INDEX.md` is missing, stop and run **`kenmark-tracker-setup`** (or **`kenmark-init`**) first.
 
 Assign unique IDs (next available in the 3-digit sequence), populate with
 evidence, and optionally update INDEX.md.
@@ -44,8 +56,8 @@ evidence, and optionally update INDEX.md.
 4. Always include IDs already listed in `INDEX.md`, even if files are missing.
 5. Never reuse an ID.
 6. Never renumber issues.
-7. If `INDEX.md` and folders disagree, stop and run `kenmark-issues-maintain` before creating new issues.
-8. If `INDEX.md` is missing, stop and run `kenmark-issues-setup` (or `kenmark-init` with issue tracking) — do not invent a tracker inline.
+7. If `INDEX.md` and folders disagree, stop and run `kenmark-tracker-maintain` before creating new issues.
+8. If `INDEX.md` is missing, stop and run `kenmark-tracker-setup` (or `kenmark-init` with issue tracking) — do not invent a tracker inline.
 
 ---
 
@@ -95,7 +107,7 @@ echo "LAST_ID=$LAST_ID"
 echo "NEXT_ID=$NEXT_ID"
 ```
 
-Read `INDEX.md` **ID Ledger** (`Last Assigned ID`, `Next ID`) and reconcile with the command output. If they disagree, run `kenmark-issues-maintain` before creating issues.
+Read `INDEX.md` **ID Ledger** (`Last Assigned ID`, `Next ID`) and reconcile with the command output. If they disagree, run `kenmark-tracker-maintain` before creating issues.
 
 ---
 
@@ -204,6 +216,56 @@ find "$REPO_ROOT" -path '*/node_modules' -prune -o \
 grep -rn "redirect\|returnTo\|callback\|oauth" --include="*.ts" --include="*.py" \
   "$REPO_ROOT" 2>/dev/null | grep -v node_modules | head -20
 ```
+
+---
+
+## Simplify scan mode
+
+Use this sub-mode when the user asks to **scan for simplification opportunities** — nested ternaries, arrow functions, missing return types, redundant boilerplate. This mode focuses on code clarity and consistency without altering functionality.
+
+**Hard rules:**
+1. Never modify source code during the scan. Only document opportunities as issue files.
+2. Preserve exact functionality when proposing simplifications.
+3. Follow the global ID ledger rules in `brain/issues/INDEX.md`.
+
+### Simplification checklist
+
+Audit code against these standard project patterns:
+
+1. **Nested Ternaries:** Identify nested ternary operators (`? :` inside another `? :`). Propose standard `if/else` or `switch` statements instead.
+2. **Top-Level Arrow Functions:** Locate top-level function declarations defined using `const foo = () => ...`. Propose using the standard `function` keyword instead.
+3. **Missing Return Type Annotations:** Find top-level, helper, or middleware functions lacking explicit return type annotations. Propose adding clear return types (e.g., `: void`, `: Promise<void>`, `: string`).
+4. **Redundant Boilerplate & try/catch:** Spot duplicate database initialization, repeated environment loading, or unnecessarily nested try/catch blocks that can be refactored into a single shared helper or global hook.
+
+### Grep search examples
+
+```bash
+# Find arrow functions assigned to variables
+grep -rn "const [a-zA-Z0-9_]\+ = (.*) =>" src/ 2>/dev/null
+
+# Find nested ternaries in JSX/TSX
+grep -rn "?.*:.*:.*:" src/ 2>/dev/null
+
+# Find functions with missing return types
+grep -rn "function [a-zA-Z0-9_]\+(.*) {" src/ 2>/dev/null | grep -v ":"
+```
+
+### Documenting simplification findings
+
+For each high-value simplification opportunity found:
+1. Write a new issue file `brain/issues/NNN-slug.md`.
+2. Format the issue frontmatter with:
+   - `id`: NNN
+   - `title`: Short, clear summary
+   - `severity`: P2 (or P1 if critical regression/bug)
+   - `area`: dx / testing / ui / backend / etc.
+   - `source`: kenmark-issues-scan (simplify mode)
+   - `status`: open
+   - `files`: array of relative paths
+3. Include clear evidence with clickable `file://` markdown links referencing line ranges.
+4. Add clear acceptance criteria (e.g., `[ ] All functions in x.ts have return types`).
+5. Update `brain/issues/INDEX.md` active issues tables, active issue counts, and ledger parameters.
+6. Append a summary entry to `brain/CHANGELOG.md` describing the simplification audit pass.
 
 ---
 

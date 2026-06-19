@@ -22,7 +22,7 @@ disable-model-invocation: true
 
 Audit **all installed sub-agents** on this machine: list them, group by name, flag duplicates and vendored mirrors (gstack copies, plugin marketplace copies), and recommend **keep**, **dedupe**, **review**, or **remove-candidate**.
 
-Pairs with **kenmark-maintain** for the parallel skills cleanup and **kenmark-update** when refreshing Kenmark installs.
+Pairs with **kenmark-skills-maintain** for the parallel skills cleanup and **kenmark-update** when refreshing Kenmark installs.
 
 **CLI priority:** interactive prompts in a TTY for humans; flags + `-y` for agents (`KENMARK_SKILLS_NONINTERACTIVE=1` also forces non-interactive).
 
@@ -63,7 +63,7 @@ Optional flags:
 | `--roots claude,cursor,minimax` | Limit which IDE roots to scan |
 | `-y` | Non-interactive; skip path prompts |
 
-**Pair with `kenmark-maintain`** to do the same audit for skills — both inventories use the same output layout.
+**Pair with `kenmark-skills-maintain`** to do the same audit for skills — both inventories use the same output layout.
 
 ## Step 2 — Read the report
 
@@ -131,7 +131,7 @@ The walker detects these by **parent directory name** when the file lacks a YAML
 ## Step 6 — After cleanup
 
 1. Re-run inventory to confirm counts dropped
-2. Suggest **kenmark-maintain** if the skills tree is also bloated
+2. Suggest **kenmark-skills-maintain** if the skills tree is also bloated
 3. Remind: `npx kenmark-skills update` refreshes Kenmark skills; restart your IDE so agent registry changes take effect
 
 ## Maintenance
