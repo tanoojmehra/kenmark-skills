@@ -66,9 +66,9 @@ function main() {
       throw new Error("Expected stale dangling legacy symlink to be removed");
     }
 
-    const newLink = path.join(cursorSkills, "kenmark-issues-check");
+    const newLink = path.join(cursorSkills, "kenmark-tracker-check");
     if (!fs.existsSync(path.join(newLink, "SKILL.md"))) {
-      throw new Error("Expected new kenmark-issues-check link to resolve");
+      throw new Error("Expected new kenmark-tracker-check link to resolve");
     }
 
     console.log("Broken symlink cleanup test passed.");

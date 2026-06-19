@@ -45,9 +45,9 @@ Load sibling skills for each phase — do not reimplement their rules:
 | Phase | Skill |
 | --- | --- |
 | Discover / file issues | `kenmark-issues-scan` |
-| Verify / close issues | `kenmark-issues-check` |
-| Index health | `kenmark-issues-maintain` (when INDEX disagrees with folders) |
-| KB sync | `kenmark-repo-kb` |
+| Verify / close issues | `kenmark-tracker-check` |
+| Index health | `kenmark-tracker-maintain` (when INDEX disagrees with folders) |
+| KB sync | `kenmark-kb-sync` |
 | Commit / push | `kenmark-commit` |
 
 See `references/workflow.md` for phase detail and `references/merge-safety.md` for branch policy.
@@ -72,12 +72,12 @@ See `references/workflow.md` for phase detail and `references/merge-safety.md` f
 
 ```bash
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-test -f "$REPO_ROOT/brain/issues/INDEX.md" || echo "STOP: run kenmark-issues-setup first"
+test -f "$REPO_ROOT/brain/issues/INDEX.md" || echo "STOP: run kenmark-tracker-setup first"
 git rev-parse --abbrev-ref HEAD
 git status --short
 ```
 
-If `INDEX.md` is missing, run `kenmark-issues-setup` or stop. If INDEX ledger disagrees with folders, run `kenmark-issues-maintain` before creating issues.
+If `INDEX.md` is missing, run `kenmark-tracker-setup` or stop. If INDEX ledger disagrees with folders, run `kenmark-tracker-maintain` before creating issues.
 
 ---
 
@@ -145,7 +145,7 @@ pnpm lint        # or npm run lint
 pnpm test        # when tests exist and cover the change
 ```
 
-6. If INDEX drift appears, run `kenmark-issues-maintain` before closing issues.
+6. If INDEX drift appears, run `kenmark-tracker-maintain` before closing issues.
 
 **Pause gate:** if a single fix touches >8 unrelated file paths or changes a public API (exported types, route contracts, env vars), ask the user to confirm before proceeding.
 
@@ -153,13 +153,13 @@ pnpm test        # when tests exist and cover the change
 
 ## Phase 4 — Complete issues
 
-Follow `kenmark-issues-check`:
+Follow `kenmark-tracker-check`:
 
 1. Verify each fixed issue against the codebase (grep / read evidence paths).
 2. Move resolved files to `brain/issues/completed/`.
 3. Add `completed: YYYY-MM-DD` and `status: completed` to frontmatter; update `INDEX.md` active/completed tables.
 4. Skip `AskUserQuestion` when the user explicitly invoked this orchestrator for a full ship run and evidence is clear.
-5. Run `kenmark-issues-maintain` if counts or ledger drift after bulk closes.
+5. Run `kenmark-tracker-maintain` if counts or ledger drift after bulk closes.
 
 ---
 

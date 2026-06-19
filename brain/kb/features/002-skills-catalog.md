@@ -5,7 +5,7 @@ Status: reviewed
 
 ## Summary
 
-**46** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
+**39** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
 
 ## Categories
 
@@ -15,9 +15,9 @@ Status: reviewed
 | workflow | `kenmark-plan`, `kenmark-troubleshoot`, `kenmark-repo-*`, `kenmark-security-review`, `kenmark-performance` |
 | testing | `kenmark-test-plan`, `kenmark-test-unit`, … `kenmark-test-ci` |
 | git | `kenmark-commit` |
-| issues | `kenmark-issues-setup`, … `kenmark-issues-fix-and-ship`, `kenmark-audit-loop`, `kenmark-simplify-scan` |
-| plans | `kenmark-plans-setup`, `kenmark-plan`, … `kenmark-plans-execute` |
-| admin | `kenmark-packs`, `kenmark-update`, `kenmark-maintain`, `kenmark-agents` |
+| issues | `kenmark-issues-scan`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship` |
+| plans | `kenmark-plan`, `kenmark-plans-execute` |
+| admin | `kenmark-update`, `kenmark-skills-maintain`, `kenmark-agents` |
 
 Full logical map: `skills/README.md`.
 
@@ -27,15 +27,15 @@ Policy for **kenmark-router** and humans — all skills remain installed; tiers 
 
 ### Core daily
 
-May use freely: `kenmark-troubleshoot`, `kenmark-output`, `kenmark-issues-list`, `kenmark-plans-list`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-repo-kb`, `kenmark-maintain`, `kenmark-security-review`, `kenmark-performance`.
+May use freely: `kenmark-troubleshoot`, `kenmark-output`, `kenmark-tracker-list`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-kb-sync`, `kenmark-skills-maintain`, `kenmark-security-review`, `kenmark-performance`.
 
 ### Specialist
 
-Use when task clearly matches: `kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-structure`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, all `kenmark-test-*`, all `kenmark-issues-*`, all `kenmark-plans-*`.
+Use when task clearly matches: `kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, all `kenmark-test-*`, `kenmark-issues-scan`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship`, `kenmark-plan`, `kenmark-plans-execute`, `kenmark-tracker-setup`, `kenmark-tracker-check`, `kenmark-tracker-maintain`.
 
 ### Explicit admin
 
-User must ask: `kenmark-setup`, `kenmark-packs`, `kenmark-update`, `kenmark-agents`.
+User must ask: `kenmark-setup`, `kenmark-update`, `kenmark-agents`.
 
 ## Using skills in chat
 

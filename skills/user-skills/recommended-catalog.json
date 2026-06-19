@@ -1,7 +1,7 @@
 {
-  "version": 9,
+  "version": 12,
   "mode": "selectable",
-  "updatedAt": "2026-06-15",
+  "updatedAt": "2026-06-18",
   "notes": "Selectable optional third-party installs with repo-aware suggestions. Global install only — no project scope.",
   "defaults": {
     "scope": "global",
@@ -11,11 +11,13 @@
     "guidance": "Do not install multiple overlapping packs for the same purpose unless the user explicitly asks.",
     "overlapCaps": [
       { "category": "design", "maxPrimary": 1, "note": "One primary UI/design pack (e.g. Impeccable)" },
-      { "category": "review", "maxPrimary": 1, "note": "One primary code-quality pack (e.g. Simplify)" },
+      { "category": "review", "maxPrimary": 1, "note": "One primary code-quality pack (e.g. Simplify or Ponytail)" },
       { "category": "seo", "maxPrimary": 1, "note": "Prefer selected SEO skills; full pack only on request" },
       { "category": "harness", "maxPrimary": 1, "note": "ECC minimal by default; avoid stacking with plugin install" },
       { "category": "navigation", "maxPrimary": 1, "note": "Graphify for medium/large repos only" },
-      { "category": "context", "maxPrimary": 1, "note": "One context compression tool (e.g. Headroom)" }
+      { "category": "context", "maxPrimary": 1, "note": "One context compression tool (e.g. Headroom)" },
+      { "category": "diagram", "maxPrimary": 1, "note": "One primary diagram skill (e.g. draw.io)" },
+      { "category": "audit", "maxPrimary": 1, "note": "One primary audit-to-plan pack (e.g. improve)" }
     ]
   },
   "presets": [
@@ -136,6 +138,110 @@
         ],
         "verify": {
           "global": "test -f \"$HOME/.agents/skills/simplify/SKILL.md\" || test -f \"$HOME/.cursor/skills/simplify/SKILL.md\" || test -f \"$HOME/.claude/skills/simplify/SKILL.md\""
+        }
+      }
+    },
+    {
+      "id": "ponytail",
+      "name": "Ponytail",
+      "category": "review",
+      "weight": "medium",
+      "bloatScore": 3,
+      "recommended": true,
+      "defaultSelected": false,
+      "adoptSkillNames": [
+        "ponytail",
+        "ponytail-review",
+        "ponytail-audit",
+        "ponytail-debt",
+        "ponytail-help"
+      ],
+      "helpsWith": [
+        "YAGNI and minimal code",
+        "anti-over-engineering",
+        "stdlib-first solutions",
+        "diff and repo bloat review"
+      ],
+      "bestFor": [
+        "agents that over-build abstractions",
+        "keeping feature work small",
+        "reviewing diffs for unnecessary code"
+      ],
+      "avoidWhen": [
+        "Simplify is already your primary review pack",
+        "you need plugin hooks without separate Claude/Codex setup"
+      ],
+      "suggestiveTest": {
+        "question": "Do agents here tend to over-engineer or write more code than needed?",
+        "signals": ["git-repo", "typescript-project", "multi-language-src"],
+        "recommendWhen": "any",
+        "recommendation": "optional"
+      },
+      "url": "https://github.com/DietrichGebert/ponytail",
+      "description": "YAGNI-first coding discipline for agents — a six-rung ladder (skip, stdlib, platform, deps, one line, then minimum) plus review, audit, and debt skills. Lazy, not negligent: security, accessibility, and validation stay intact.",
+      "warning": "Installs 5 skills via npx. Overlaps with Simplify (review category) — pick one primary unless you want both. For always-on rules and Claude/Codex lifecycle hooks, install the plugin: /plugin marketplace add DietrichGebert/ponytail then /plugin install ponytail@ponytail. Cursor/Windsurf: copy rules from the repo. Node.js on PATH for plugin hooks.",
+      "install": {
+        "global": {
+          "command": "npx --yes skills add DietrichGebert/ponytail -g -y",
+          "summary": "User-wide ponytail pack (5 skills via skills CLI)"
+        },
+        "alternatives": [
+          "Claude plugin: /plugin marketplace add DietrichGebert/ponytail then /plugin install ponytail@ponytail",
+          "Codex: codex plugin marketplace add DietrichGebert/ponytail",
+          "Cursor: copy .cursor/rules/ from the repo into ~/.cursor/rules/"
+        ],
+        "verify": {
+          "global": "test -f \"$HOME/.agents/skills/ponytail/SKILL.md\" || test -f \"$HOME/.cursor/skills/ponytail/SKILL.md\" || test -f \"$HOME/.claude/skills/ponytail/SKILL.md\""
+        }
+      }
+    },
+    {
+      "id": "improve",
+      "name": "improve",
+      "category": "audit",
+      "weight": "medium",
+      "bloatScore": 2,
+      "recommended": true,
+      "defaultSelected": false,
+      "helpsWith": [
+        "codebase audits",
+        "implementation plans",
+        "model tier delegation",
+        "backlog reconciliation"
+      ],
+      "bestFor": [
+        "capable model audits + cheaper model execution",
+        "self-contained plans in plans/",
+        "security, perf, and tech-debt findings with evidence"
+      ],
+      "avoidWhen": [
+        "repos without git",
+        "teams that do not want a plans/ directory"
+      ],
+      "suggestiveTest": {
+        "question": "Would a structured audit → plan → execute workflow help this repo?",
+        "signals": [
+          "git-repo",
+          "monorepo-workspace",
+          "repo-file-count-high",
+          "typescript-project"
+        ],
+        "recommendWhen": ">=1",
+        "recommendation": "optional"
+      },
+      "url": "https://github.com/shadcn/improve",
+      "description": "Audit any codebase and write self-contained implementation plans for other agents to execute — expensive model advises, cheaper models ship. Never modifies source; writes only to plans/ and uses isolated worktrees for execute.",
+      "warning": "Writes plans to repo-root plans/ (not brain/plans/). Complements but differs from kenmark-plan. The skill never edits application source — only plans/ and disposable executor worktrees.",
+      "install": {
+        "global": {
+          "command": "npx --yes skills add shadcn/improve -g -y -s improve",
+          "summary": "User-wide improve skill (Claude/Cursor agents paths via skills CLI)"
+        },
+        "alternatives": [
+          "Claude plugin: /plugin marketplace add shadcn/improve then /plugin install improve"
+        ],
+        "verify": {
+          "global": "test -f \"$HOME/.agents/skills/improve/SKILL.md\" || test -f \"$HOME/.cursor/skills/improve/SKILL.md\" || test -f \"$HOME/.claude/skills/improve/SKILL.md\""
         }
       }
     },
@@ -303,6 +409,57 @@
         ],
         "verify": {
           "global": "{ ls \"$HOME/.claude/agents\"/ecc-*.md 2>/dev/null; ls -d \"$HOME/.claude/skills\"/ecc-*/ 2>/dev/null; } | grep -q ."
+        }
+      }
+    },
+    {
+      "id": "drawio-skill",
+      "name": "draw.io Diagrams",
+      "category": "diagram",
+      "weight": "medium",
+      "bloatScore": 2,
+      "recommended": true,
+      "defaultSelected": false,
+      "helpsWith": [
+        "architecture diagrams",
+        "UML and ERD",
+        "flowcharts",
+        "codebase structure maps"
+      ],
+      "bestFor": [
+        "stakeholder-ready diagrams",
+        "microservices and cloud architecture",
+        "exporting PNG/SVG/PDF from natural language"
+      ],
+      "avoidWhen": [
+        "README-embeddable diagrams-as-code only",
+        "environments without draw.io desktop CLI"
+      ],
+      "suggestiveTest": {
+        "question": "Would agents create architecture, flow, or UML diagrams in this repo?",
+        "signals": [
+          "git-repo",
+          "monorepo-workspace",
+          "multi-language-src",
+          "repo-file-count-high"
+        ],
+        "recommendWhen": ">=1",
+        "recommendation": "optional"
+      },
+      "url": "https://github.com/Agents365-ai/drawio-skill",
+      "description": "Generate draw.io diagrams from natural language — architecture, UML, ERD, flowcharts, ML layouts; vision self-check, codebase-to-diagram, 10k+ official shapes; exports PNG/SVG/PDF/JPG.",
+      "warning": "Requires draw.io desktop CLI (`brew install --cask drawio` on macOS). Optional Graphviz for auto-layout of large import graphs. The upstream skills CLI may report partial failures for unsupported harnesses (e.g. PromptScript). If verify is OK, drawio-skill is installed for supported agents.",
+      "install": {
+        "global": {
+          "command": "npx --yes skills add Agents365-ai/drawio-skill -g -y -s drawio-skill",
+          "summary": "User-wide drawio-skill (Claude/Cursor agents paths via skills CLI)"
+        },
+        "alternatives": [
+          "Claude plugin: /plugin marketplace add Agents365-ai/365-skills then /plugin install drawio",
+          "Manual: git clone https://github.com/Agents365-ai/drawio-skill.git into ~/.claude/skills/drawio-skill"
+        ],
+        "verify": {
+          "global": "test -f \"$HOME/.agents/skills/drawio-skill/SKILL.md\" || test -f \"$HOME/.cursor/skills/drawio-skill/SKILL.md\" || test -f \"$HOME/.claude/skills/drawio-skill/SKILL.md\""
         }
       }
     },

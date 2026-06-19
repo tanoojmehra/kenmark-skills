@@ -41,10 +41,10 @@ Load sibling skills for each phase:
 | Phase | Skill |
 | --- | --- |
 | Author plans | `kenmark-plan` |
-| Verify / archive | `kenmark-plans-check` |
-| Index health | `kenmark-plans-maintain` (when INDEX disagrees with folders) |
-| Related issues | `kenmark-issues-check` (when plan lists `related_issues`) |
-| KB sync | `kenmark-repo-kb` |
+| Verify / archive | `kenmark-tracker-check` |
+| Index health | `kenmark-tracker-maintain` (when INDEX disagrees with folders) |
+| Related issues | `kenmark-tracker-check` (when plan lists `related_issues`) |
+| KB sync | `kenmark-kb-sync` |
 | Commit / push | `kenmark-commit` |
 
 ---
@@ -65,12 +65,12 @@ Load sibling skills for each phase:
 
 ```bash
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-test -f "$REPO_ROOT/brain/plans/INDEX.md" || echo "STOP: run kenmark-plans-setup first"
+test -f "$REPO_ROOT/brain/plans/INDEX.md" || echo "STOP: run kenmark-tracker-setup first"
 git rev-parse --abbrev-ref HEAD
 git status --short
 ```
 
-If `INDEX.md` is missing, run `kenmark-plans-setup` or stop. If INDEX ledger disagrees with folders, run `kenmark-plans-maintain` first.
+If `INDEX.md` is missing, run `kenmark-tracker-setup` or stop. If INDEX ledger disagrees with folders, run `kenmark-tracker-maintain` first.
 
 ---
 
@@ -119,14 +119,14 @@ For each phase in the plan file (in order):
 
 ## Phase 4 — Verify and archive
 
-Follow `kenmark-plans-check`:
+Follow `kenmark-tracker-check`:
 
 1. Verify all acceptance criteria against the codebase.
 2. Run plan verification commands.
 3. Move file to `brain/plans/completed/`.
 4. Set `status: done` and `completed: YYYY-MM-DD`.
 5. Update `INDEX.md` — remove from In progress; add to Completed table.
-6. Close related issues via `kenmark-issues-check` when `related_issues` are listed and work is done.
+6. Close related issues via `kenmark-tracker-check` when `related_issues` are listed and work is done.
 
 Skip `AskUserQuestion` when the user explicitly invoked this orchestrator and evidence is clear.
 

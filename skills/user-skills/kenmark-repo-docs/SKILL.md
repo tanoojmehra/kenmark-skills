@@ -110,7 +110,7 @@ git log -1 --format='%ci' -- brain/kb/ 2>/dev/null
 git log -1 --format='%ci' -- src/ app/ lib/ 2>/dev/null | head -1
 ```
 
-If code changed recently but KB did not, flag stale KB. Recommend **`kenmark-repo-kb`**.
+If code changed recently but KB did not, flag stale KB. Recommend **`kenmark-kb-sync`**.
 
 ---
 
@@ -175,7 +175,7 @@ Optional: `brain/reports/kenmark-repo-docs-YYYY-MM-DD.md`
 
 | Situation | Prefer |
 | --- | --- |
-| Update KB after code change | `kenmark-repo-kb` |
+| Update KB after code change | `kenmark-kb-sync` |
 | Scattered random markdown files | `kenmark-repo-hygiene` |
 | Public publish | `kenmark-repo-public` |
 | Release ship gate | `kenmark-repo-release` |

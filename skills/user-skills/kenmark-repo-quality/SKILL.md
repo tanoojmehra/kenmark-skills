@@ -401,7 +401,7 @@ Do not modify files unless the user chooses a fix path.
 
 ## Step 10 — Optional KB update
 
-If this skill reveals durable project knowledge, recommend updating `brain/kb/` via `kenmark-repo-kb`.
+If this skill reveals durable project knowledge, recommend updating `brain/kb/` via `kenmark-kb-sync`.
 
 Examples:
 

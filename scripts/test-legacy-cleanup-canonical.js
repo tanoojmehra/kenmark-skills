@@ -17,9 +17,9 @@ const cliPath = path.join(__dirname, "cli.js");
 const CANONICAL_GUARD_SKILLS = [
   "kenmark-troubleshoot",
   "kenmark-repo-hygiene",
-  "kenmark-issues-setup",
-  "kenmark-issues-list",
-  "kenmark-issues-check",
+  "kenmark-tracker-setup",
+  "kenmark-tracker-list",
+  "kenmark-tracker-check",
   "kenmark-issues-scan",
   "kenmark-issues-fix-and-ship"
 ];

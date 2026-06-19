@@ -30,9 +30,9 @@ disable-model-invocation: true
 
 **Audit until converged** — run repeated passes on the user's chosen area (or the full repo), file **only new unique findings** in `brain/issues/`, and **stop when a full pass finds zero new issues**.
 
-This skill orchestrates existing audit lenses (`kenmark-issues-scan`, `kenmark-security-review`, `kenmark-simplify-scan`, `kenmark-test-coverage`, `kenmark-performance`, `kenmark-repo-docs`, `kenmark-repo-deps`) rather than replacing them.
+This skill orchestrates existing audit lenses (`kenmark-issues-scan`, `kenmark-security-review`, `kenmark-test-coverage`, `kenmark-performance`, `kenmark-repo-docs`, `kenmark-repo-deps`) rather than replacing them.
 
-**Not setup.** If `brain/issues/INDEX.md` is missing, stop and run **`kenmark-issues-setup`** (or **`kenmark-init`**) first.
+**Not setup.** If `brain/issues/INDEX.md` is missing, stop and run **`kenmark-tracker-setup`** (or **`kenmark-init`**) first.
 
 ---
 
@@ -108,7 +108,7 @@ LAST_ID="$(tail -1 /tmp/kenmark_all_issue_ids.txt 2>/dev/null || echo 000)"
 NEXT_ID="$(printf "%03d" "$((10#$LAST_ID + 1))")"
 ```
 
-If `INDEX.md` and folders disagree, run `kenmark-issues-maintain` before continuing.
+If `INDEX.md` and folders disagree, run `kenmark-tracker-maintain` before continuing.
 
 Seed `fingerprints` from all open and completed issues (parse `files:` frontmatter + evidence `file:line` entries) so reruns do not re-file known work.
 
@@ -122,7 +122,7 @@ Each **pass** runs **one lens** not yet completed for the selected areas. Rotate
 | --- | --- | --- |
 | `bugs` | `all`, `bugs`, `api`, `backend`, `frontend` | `kenmark-issues-scan` Step 3 grep patterns |
 | `security` | `all`, `security`, `api`, `auth`, `backend` | `kenmark-security-review` checklist |
-| `simplify` | `all`, `simplify`, `frontend`, `backend`, `dx` | `kenmark-simplify-scan` checklist |
+| `simplify` | `all`, `simplify`, `frontend`, `backend`, `dx` | `kenmark-issues-scan` simplify mode |
 | `testing` | `all`, `testing` | `kenmark-test-coverage` critical-path audit |
 | `performance` | `all`, `performance`, `backend`, `api`, `frontend` | `kenmark-performance` patterns |
 | `docs` | `all`, `docs` | `kenmark-repo-docs` checklist |
@@ -253,7 +253,7 @@ When the loop stops, report:
 | New issues filed | count + IDs |
 | Stop reason | `converged` \| `max_passes` |
 | Deduped (skipped) | count |
-| Next steps | `kenmark-issues-list`, `kenmark-issues-fix-and-ship`, or fix P0s first |
+| Next steps | `kenmark-tracker-list`, `kenmark-issues-fix-and-ship`, or fix P0s first |
 
 **Converged** means the last full pass filed **zero** new unique issues — not that the repo has zero bugs globally.
 
@@ -264,7 +264,6 @@ When the loop stops, report:
 | Skill | Role |
 | --- | --- |
 | `kenmark-issues-scan` | Single-pass bug scan; one lens inside this loop |
-| `kenmark-simplify-scan` | Single-pass clarity audit; one lens inside this loop |
 | `kenmark-issues-fix-and-ship` | After audit loop — fix filed issues and ship |
 | `kenmark-subagents` | Optional; audit loop already delegates per pass |
 

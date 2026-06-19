@@ -15,7 +15,7 @@
 | `scripts/kenmark-setup.js` | `init` wizard orchestration |
 | `scripts/kenmark-hub.js` | Store, symlinks, MCP, IDE targets, adopt |
 | `scripts/kenmark-update.js` | Refresh Kenmark + recommended packs |
-| `scripts/kenmark-packs.js` | `install-recommended` |
+| `scripts/kenmark-packs.js` | `install-recommended` (packs section in kenmark-setup) |
 | `scripts/skills-adopt.js` | Standalone adopt |
 | `scripts/validate-repo.js` | Repo invariants (skills, catalog, package.json) |
 | `skills/user-skills/` | 41 bundled skills (flat dirs) |

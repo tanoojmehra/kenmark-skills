@@ -117,14 +117,14 @@ def infer_category(name: str, description: str, triggers: list[str]) -> str:
         return "issues"
     if name.startswith("kenmark-test-"):
         return "testing"
-    if name in ("kenmark-packs", "kenmark-update", "kenmark-maintain", "kenmark-agents"):
+    if name in ("kenmark-update", "kenmark-skills-maintain", "kenmark-agents"):
         return "admin"
     text = " ".join([name, description, " ".join(triggers)]).lower()
     if any(k in text for k in ["commit", "push", "git ", "branch", "merge request"]):
         return "git"
     if "brain/issues" in text or "issues " in text:
         return "issues"
-    if name.startswith("kenmark-packs") or name.startswith("kenmark-update") or "skill install" in text or "skill update" in text:
+    if name.startswith("kenmark-update") or "skill install" in text or "skill update" in text:
         return "admin"
     if "subagent" in text or "sub-agent" in text:
         return "admin"
@@ -171,7 +171,7 @@ def infer_phase(name: str, description: str, category: str) -> str:
         return "verify"
     if name == "kenmark-repo-release":
         return "ship"
-    if name == "kenmark-repo-kb":
+    if name == "kenmark-kb-sync":
         return "maintain"
     if name == "kenmark-repo-deps":
         return "verify"
@@ -240,17 +240,17 @@ def infer_risk(name: str, description: str, allowed_tools: list[str]) -> str:
     cli_skills = {
         "kenmark-setup",
         "kenmark-update",
-        "kenmark-maintain",
-        "kenmark-packs",
+        "kenmark-skills-maintain",
+        "kenmark-update",
         "kenmark-agents",
     }
     if name in cli_skills:
         return "shell"
     if name == "kenmark-commit":
         return "git-write"
-    if name == "kenmark-issues-maintain":
+    if name == "kenmark-tracker-maintain":
         return "destructive-possible"
-    if name == "kenmark-issues-list" or name == "kenmark-router":
+    if name == "kenmark-tracker-list" or name == "kenmark-router":
         return "read-only"
     if any(k in text for k in ["delete", "remove", "force push", "destructive", "drop table"]):
         return "destructive-possible"
