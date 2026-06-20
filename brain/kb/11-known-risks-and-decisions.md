@@ -11,6 +11,12 @@ Status: reviewed
 | `init` over `setup` | Single recommended path; setup kept for legacy flags |
 | MCP opt-in default | Avoid mutating IDE MCP configs without consent |
 | MCP JSON IDEs only (11 targets) | cursor, claude, gemini, antigravity-cli, antigravity, antigravity-ide, kiro, trae, trae-cn, rovo, qoder; Codex/OpenCode need format adapters |
+| Org: small=single-app, complex=monorepo | Pragmatic split — monorepo adds overhead; single app is simpler for small projects |
+| Org: mixed Radix/Base UI via shadcn-style composition | Best-of-both: Radix for complex a11y, Base UI for lightweight composite components |
+| Org: MongoDB primary DB | Existing team expertise; document model suits most app shapes |
+| Org: Prisma v6.x or Mongoose for MongoDB | Prisma v7 MongoDB support not yet shipped; verify connector status before standardizing |
+| Org: state management tiered (local→server→global→realtime→offline) with decision rules | Agents need clear tier guidance per project — not a one-size-fits-all pick |
+| Org: Ubuntu VPS + PM2 (not Vercel-first) | Full control, no platform lock-in, known stack |
 | Antigravity copy default | CLI/2.0/IDE do not discover symlinked skills — Kenmark copies into Antigravity skill dirs unless `--symlink` |
 | Global-only installs | Kenmark CLI rejects `--project`; catalog v7 is global-only |
 | Windows copy default | Symlinks often fail; copy/junction fallback in hub |

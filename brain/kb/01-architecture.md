@@ -54,6 +54,13 @@ Default IDE targets for new installs: **cursor**, **claude**, **codex** (`DEFAUL
 
 - Full adopt source-priority rules when store and IDE copies diverge (partially documented in README/hub).
 
+## Organizational defaults (for consumer projects)
+
+See `brain/rules/standards.md` → **Organizational defaults** section.
+
+- **Architecture:** small = single app, complex = monorepo.
+- **Deploy:** Ubuntu VPS + PM2 (not Vercel-first).
+
 ## Maintenance notes
 
 - New CLI commands: add route in `cli.js`, usage in `printUsage()`, KB `05`, root CHANGELOG.

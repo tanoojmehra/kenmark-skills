@@ -27,6 +27,12 @@ Status: reviewed
 
 - External CI for the GitHub repo (if added later) should mirror `npm test`.
 
+## Organizational defaults (for consumer projects)
+
+This file documents the **kenmark-skills repo's own deployment**. For consumer-project deployment defaults, see `brain/rules/standards.md` → **Organizational defaults**:
+
+- **Target:** Ubuntu VPS + PM2 (not Vercel-first).
+
 ## Maintenance notes
 
 - Add GitHub Actions workflow doc here if CI is added.

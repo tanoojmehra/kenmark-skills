@@ -34,3 +34,55 @@ Universal rules for **kenmark-skills** (npm CLI + bundled skills). Stack, workfl
 
 - Do not commit secrets, tokens, or local IDE folders (`.cursor/`, `.claude/`, `.agents/`).
 - `brain/issues/` and `brain/plans/` are part of the tracked brain — commit them with other `brain/` docs. Teams may add local `.gitignore` entries if they choose not to push trackers.
+
+---
+
+## Organizational defaults (consumer projects)
+
+These are the **default choices** for consumer projects built with Kenmark. They prevent agents from making random architecture/stack decisions when a project doesn't specify its own.
+
+### Architecture
+
+| Scale | Default |
+| --- | --- |
+| Small / simple | Single application |
+| Large / complex | Monorepo |
+
+### UI primitives
+
+Mixed **Radix / Base UI** approach via **shadcn-style composition**. Use shadcn/ui conventions when available; fall back to raw Radix or Base UI primitives when shadcn isn't suitable.
+
+### Database
+
+| Aspect | Default |
+| --- | --- |
+| Primary DB | **MongoDB** |
+| ORM / driver | **Prisma v6.x** (until v7 ships MongoDB support), or **Mongoose** — verify Prisma MongoDB connector status before standardizing on one approach per project |
+| Decision | Use Mongoose when the project needs full MongoDB feature depth; use Prisma when the project benefits from unified schema/typegen across non-Mongo services too |
+
+### State management
+
+Provide **local, server, global, realtime, and offline** options with usage guidance so agents can decide per project:
+
+| Category | When |
+| --- | --- |
+| **Local** (React state, URL params, form state) | Ephemeral UI state, forms, filters |
+| **Server** (React Server Components, server actions, SWR/React Query) | Server-cached data, background refetch, stale-while-revalidate |
+| **Global** (Zustand, Jotai, Context) | Cross-component shared state, user prefs, auth |
+| **Realtime** (WebSocket, Supabase Realtime, Liveblocks) | Live cursors, collaborative editing, push notifications |
+| **Offline** (IndexedDB, local-first, partial sync) | Progressive web apps, field data collection, low-connectivity use |
+
+### Deployment
+
+| Aspect | Default |
+| --- | --- |
+| Target | **Ubuntu VPS** |
+| Process manager | **PM2** |
+| Not Vercel-first | Vercel is evaluated per project only if it provides clear benefit over VPS |
+
+### When to override
+
+These are *defaults*, not mandates. Deviate when:
+- The project's own `brain/kb/`, `package.json`, or config files specify different choices.
+- The user explicitly overrides a choice in conversation.
+- A project constraint (client mandate, existing infra, team skill set) conflicts.

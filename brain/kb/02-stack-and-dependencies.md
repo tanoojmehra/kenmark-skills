@@ -25,6 +25,14 @@ Status: reviewed
 
 - Whether pnpm/yarn are supported for development (npm is canonical in docs).
 
+## Organizational defaults (for consumer projects)
+
+This file documents the **kenmark-skills repo's own stack**. For consumer-project stack defaults, see `brain/rules/standards.md` → **Organizational defaults**:
+
+- **Primary DB:** MongoDB (Prisma v6.x or Mongoose — verify Prisma v7 MongoDB connector before standardizing).
+- **UI primitives:** Mixed Radix/Base UI via shadcn-style composition.
+- **State management:** Provide local/server/global/realtime/offline options with usage guidance.
+
 ## Maintenance notes
 
 - If adding a runtime dependency, update `package.json`, validate-repo checks, and this file — strongly prefer zero-deps.

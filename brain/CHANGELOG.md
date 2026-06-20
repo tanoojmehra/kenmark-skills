@@ -2,6 +2,11 @@
 
 Brain knowledge base
 
+## v2026.06.20-organizational-defaults
+
+- **standards.md:** Added "Organizational defaults" section for consumer projects — architecture (single-app/monorepo), UI (mixed Radix/Base UI / shadcn), DB (MongoDB via Prisma v6.x or Mongoose), state management tier, deployment (Ubuntu VPS + PM2).
+- **KB:** 01 (architecture), 02 (stack), 09 (infra) now reference org defaults; 11 (decisions) records all new org decisions.
+
 ## v2026.06.19-skill-merges
 
 - **Skill merges & renames:** Merged `kenmark-repo-structure` → `kenmark-repo-hygiene` (structure-audit mode), `kenmark-simplify-scan` → `kenmark-issues-scan` (simplify-scan mode), `kenmark-packs` → `kenmark-setup` (packs section). Created 4 unified tracker skills (`kenmark-tracker-setup`, `kenmark-tracker-list`, `kenmark-tracker-check`, `kenmark-tracker-maintain`) from 8 old issues/plans skills. Renamed `kenmark-maintain` → `kenmark-skills-maintain`, `kenmark-repo-kb` → `kenmark-kb-sync`. Updated all cross-references. Skill count: 46 → 38.
