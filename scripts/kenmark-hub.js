@@ -356,8 +356,8 @@ function buildGlobalTargets(homeDir = os.homedir()) {
     claude: path.join(homeDir, ".claude", "skills"),
     gemini: path.join(homeDir, ".gemini", "skills"),
     "antigravity-cli": path.join(homeDir, ".gemini", "antigravity-cli", "skills"),
-    antigravity: path.join(homeDir, ".gemini", "antigravity", "skills"),
-    "antigravity-ide": path.join(homeDir, ".gemini", "antigravity-ide", "skills"),
+    antigravity: path.join(homeDir, ".gemini", "config", "skills"),
+    "antigravity-ide": path.join(homeDir, ".gemini", "config", "skills"),
     opencode: path.join(homeDir, ".opencode", "skills"),
     kiro: path.join(homeDir, ".kiro", "skills"),
     trae: path.join(homeDir, ".trae", "skills"),
@@ -630,8 +630,8 @@ function buildInventoryRoots(homeDir = os.homedir()) {
     { id: "claude", path: path.join(homeDir, ".claude", "skills") },
     { id: "gemini", path: path.join(homeDir, ".gemini", "skills") },
     { id: "antigravity-cli", path: path.join(homeDir, ".gemini", "antigravity-cli", "skills") },
-    { id: "antigravity", path: path.join(homeDir, ".gemini", "antigravity", "skills") },
-    { id: "antigravity-ide", path: path.join(homeDir, ".gemini", "antigravity-ide", "skills") },
+    { id: "antigravity", path: path.join(homeDir, ".gemini", "config", "skills") },
+    { id: "antigravity-ide", path: path.join(homeDir, ".gemini", "config", "skills") },
     { id: "codex", path: path.join(homeDir, ".codex", "skills") },
     { id: "opencode", path: path.join(homeDir, ".opencode", "skills") },
     { id: "minimax", path: path.join(homeDir, ".minimax", "skills") },
@@ -1747,7 +1747,12 @@ function removePathIfExists(targetPath) {
   const stat = lstatIfExists(targetPath);
   if (!stat) return;
 
-  if (stat.isSymbolicLink() || stat.isFile()) {
+  if (stat.isSymbolicLink()) {
+    fs.unlinkSync(targetPath);
+    return;
+  }
+
+  if (stat.isFile()) {
     fs.rmSync(targetPath, { force: true });
     return;
   }

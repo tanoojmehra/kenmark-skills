@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v2.3.35 — Node.js v24 symlink compatibility fix (2026-07-04)
+
+### Fixed
+
+- **CLI/Hub:** Resolved Node.js v24 EISDIR symlink compatibility bug by using `fs.unlinkSync` for symbolic links in `removePathIfExists`.
+
+## v2.3.34 — organizational defaults (2026-06-20)
+
+### Added
+
+- **standards:** Added organizational default choices for consumer projects: architecture (single-app/monorepo), UI (Radix/Base UI shadcn-style), DB (MongoDB via Prisma v6.x or Mongoose), state management tier, deployment (Ubuntu VPS + PM2). Update KB cross-references.
+
 ## v2.3.33 — skill merges & renames (2026-06-19)
 
 ### Changed

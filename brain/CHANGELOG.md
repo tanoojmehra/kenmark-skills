@@ -2,6 +2,16 @@
 
 Brain knowledge base
 
+## v2026.07.04-node24-symlink-compat
+
+- **CLI/Hub:** Resolved Node.js v24 EISDIR symlink compatibility bug by using `fs.unlinkSync` for symbolic links in `removePathIfExists`.
+- **INDEX/KB:** Registered and completed issue 023; updated known risks document.
+
+## v2026.06.22-specs
+
+- **Specs:** Added `brain/specs/` tracker and initial `001-brain-specs-workflow` living spec.
+- **Rules/KB:** Standards now require reading relevant specs before feature/workflow implementation; workflows and decisions document the minimal spec lifecycle.
+
 ## v2026.06.20-organizational-defaults
 
 - **standards.md:** Added "Organizational defaults" section for consumer projects — architecture (single-app/monorepo), UI (mixed Radix/Base UI / shadcn), DB (MongoDB via Prisma v6.x or Mongoose), state management tier, deployment (Ubuntu VPS + PM2).
