@@ -4,8 +4,8 @@
 
 | Field | Value |
 |------|-------|
-| Last Assigned ID | 022 |
-| Next ID | 023 |
+| Last Assigned ID | 023 |
+| Next ID | 024 |
 
 ## Ledger Rules
 
@@ -20,8 +20,8 @@
 | Category | Count |
 |----------|-------|
 | Active issues | 0 |
-| Completed | 24 |
-| **Total** | **24** |
+| Completed | 25 |
+| **Total** | **25** |
 
 > **Note:** IDs 001 and 002 each have two completed issue files (different work shipped under the same numeric ID before ledger discipline). Both files remain in `completed/`; do not delete or renumber.
 
@@ -53,6 +53,7 @@
 | 020 | Make issues-check and plans-check manual-only | 2026-06-15 |
 | 021 | Make issues-setup and plans-setup manual-only | 2026-06-15 |
 | 022 | Remove duplicated testing contract sections from kenmark-test skills | 2026-06-15 |
+| 023 | Node 24 EISDIR symlink compatibility bug | 2026-07-04 |
 
 ## Active Issues by Priority
 

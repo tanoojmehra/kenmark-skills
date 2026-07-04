@@ -19,6 +19,7 @@ Status: reviewed
 | Org: Ubuntu VPS + PM2 (not Vercel-first) | Full control, no platform lock-in, known stack |
 | Antigravity copy default | CLI/2.0/IDE do not discover symlinked skills — Kenmark copies into Antigravity skill dirs unless `--symlink` |
 | Global-only installs | Kenmark CLI rejects `--project`; catalog v7 is global-only |
+| Add `brain/specs/` before adding a spec skill | Specs need usage proof before CLI/skill automation; markdown tracker is enough for now |
 | Windows copy default | Symlinks often fail; copy/junction fallback in hub |
 | Catalog v6 selectable installs | Default lean (impeccable + simplify); heavy packs opt-in |
 | `validate` vs `doctor` split | CI-safe repo checks vs local install diagnostics |
@@ -34,7 +35,8 @@ Status: reviewed
 - **Gemini/Codex duplicate skills (fixed 011):** Installing to both `~/.agents/skills` and `~/.gemini/skills` caused Gemini CLI conflict warnings — dedupe on link + prune duplicates on setup/adopt.
 - **Antigravity CLI/Gemini shared path:** Antigravity CLI reads `~/.gemini/skills` alongside `~/.gemini/antigravity-cli/skills` — when both `antigravity-cli` and `gemini` are in `--ide`, link once to `~/.gemini/skills` (Gemini cannot read the antigravity-cli path).
 - **Antigravity symlinks:** Symlinked skills under any Antigravity skill root may not load — doctor warns; copy is default; or add an absolute skill path in Antigravity Settings → Skill Custom Paths.
-- **Three Antigravity surfaces:** `antigravity-cli` (terminal), `antigravity` (2.0 Manager harness), `antigravity-ide` (standalone VS Code app at `~/.gemini/antigravity-ide/skills`) — pass all needed targets in `--ide`.
+- **Three Antigravity surfaces:** `antigravity-cli` (terminal), `antigravity` (2.0 Manager harness), `antigravity-ide` (standalone VS Code app at `~/.gemini/config/skills`) — pass all needed targets in `--ide`.
+- **Node.js 24 symlink compatibility (fixed 023):** `fs.rmSync` on a symlink-to-directory throws `ERR_FS_EISDIR` under Node.js v24+. Use `fs.unlinkSync` for symbolic links.
 
 ## Important files inspected
 
