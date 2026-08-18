@@ -15,7 +15,8 @@ Status: reviewed
 
 ## Confirmed facts
 
-- 39 bundled Kenmark skills under `skills/user-skills/` (flat directories).
+- 53 bundled Kenmark skills under `skills/user-skills/` (flat directories).
+- `kenmark-storage` — unified consumer SDK skill for hosting project assets on Kenmark Storage (uploads, signed downloads, conversion).
 - 10 optional catalog pack IDs: `impeccable`, `simplify`, `ponytail`, `improve`, `drawio-skill`, `graphify`, `seo-geo-selected`, `seo-geo-full`, `ecc`, `headroom`.
 - Default catalog selection: **impeccable** + **simplify** only.
 

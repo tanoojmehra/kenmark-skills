@@ -16,7 +16,7 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (39)
+skills/user-skills/          ← bundled universal skills (53)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow (manual)
@@ -56,6 +56,7 @@ skills/user-skills/          ← bundled universal skills (39)
   kenmark-update/ category: admin
   kenmark-skills-maintain/
   kenmark-agents/
+  kenmark-storage/            category: workflow (phase: implement; Kenmark Storage SDK consumer integration)
   recommended-catalog.json
 ```
 

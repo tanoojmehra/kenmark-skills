@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v2.3.36 — Add unified kenmark-storage skill (2026-08-18)
+
+### Added
+
+- **kenmark-storage:** New bundled skill for integrating Kenmark Storage into any project — uploads (public/private), browser upload tokens, signed private downloads, app-side Sharp/FFmpeg conversion with default presets and per-request params.
+- **Skill count:** Updated documented totals to 53 (reflects all on-disk skill directories including prior unreported additions).
+
 ## v2.3.35 — Node.js v24 symlink compatibility fix (2026-07-04)
 
 ### Fixed
