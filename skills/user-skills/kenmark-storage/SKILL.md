@@ -1,6 +1,6 @@
 ---
 name: kenmark-storage
-version: 1.0.0
+version: 1.1.0
 category: workflow
 scope: universal
 phase: implement
@@ -31,6 +31,26 @@ disable-model-invocation: false
 # Kenmark Storage
 
 Integrate **`@kenmark/storage`** into any application to host assets on the Kenmark Storage platform — public or private files, browser uploads via one-time tokens, signed private downloads, and optional app-side image/video conversion.
+
+Kit overview: see [KIT.md](KIT.md). Deep reference: [reference.md](reference.md).
+
+---
+
+## When to use
+
+- Adding Kenmark Storage uploads to a Next.js / Node app
+- Public or private asset hosting for a project
+- Signed private downloads after your app authenticates the viewer
+- App-side image/video conversion (Sharp / FFmpeg) after upload
+
+## When not to use
+
+| Intent | Use instead |
+| --- | --- |
+| Generic app security audit | **`kenmark-security-review`** |
+| `.env` / credential leak scan | **`kenmark-repo-secrets`** |
+| Vague failure, need RCA | **`kenmark-troubleshoot`** |
+| Plan before a big change | **`kenmark-plan`** |
 
 ---
 
@@ -357,6 +377,9 @@ If uploads are proxied only through your app server, browser→API CORS is less 
 ---
 
 ## Reference
+
+- [KIT.md](KIT.md) — install, invoke, related skills
+- [reference.md](reference.md) — trust zones, auth matrix, pipelines, anti-patterns
 
 When the storage monorepo is available:
 
