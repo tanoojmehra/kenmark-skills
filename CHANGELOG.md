@@ -5,6 +5,7 @@
 ### Added
 
 - **kenmark-storage:** Full installable skill kit — `KIT.md` (install/invoke) and `reference.md` (trust zones, auth, pipelines). Wired into `kenmark-router` and skills catalog as a specialist skill. Skill version `1.1.0`.
+- **kenmark-storage 1.2.0:** Works for all four project types (new/existing Next.js + new/existing monorepo) on existing trees only — Step 0 shape detection, monorepo placement rules, App Router **and** Pages Router route examples, package-manager-aware install.
 
 ## v2.3.36 — Add unified kenmark-storage skill (2026-08-18)
 

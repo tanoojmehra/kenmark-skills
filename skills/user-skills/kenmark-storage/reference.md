@@ -2,6 +2,30 @@
 
 Concise facts for agents integrating **consumer apps**. Prefer live storage repo docs when they disagree.
 
+## Detection checklist (Step 0)
+
+| Check | Look for |
+| --- | --- |
+| Package manager | `pnpm-lock.yaml` / `yarn.lock` / `bun.lockb` / `package-lock.json` |
+| Monorepo | `pnpm-workspace.yaml`, `turbo.json`, `nx.json`, root `workspaces` |
+| Target Next app | Root app **or** `apps/*` / `packages/*` with `next` dependency — ask if multiple |
+| App Router | `app/` or `src/app/` + `layout.tsx` |
+| Pages Router | `pages/` or `src/pages/` |
+| Both | Prefer App unless user says Pages |
+| Alias / lib | Existing `@/` and `lib/` or `src/lib/` — do not invent |
+
+If no Next layout: **stop** — do not scaffold.
+
+## Monorepo placement
+
+| Item | Location |
+| --- | --- |
+| `@kenmark/storage` | Target app `package.json` |
+| Env vars | Target Next app’s `.env` / `.env.local` |
+| `lib/storage.ts` | Inside target app |
+| API routes | Target app App or Pages API tree |
+| New shared package | Only if user asks or pattern already exists |
+
 ## Trust zones
 
 ```text
@@ -71,11 +95,22 @@ Never commit real values. Keep keys server-side only.
 
 Do not import the server client from the package root.
 
+## Route path cheat sheet
+
+| Router | Upload session | Private download |
+| --- | --- | --- |
+| App | `app/api/assets/upload-session/route.ts` | `app/api/assets/[assetId]/download/route.ts` |
+| Pages | `pages/api/assets/upload-session.ts` | `pages/api/assets/[assetId]/download.ts` |
+
+(Prefix with `src/` when the app uses `src/`.)
+
 ## Anti-patterns
 
 - Putting `KENMARK_STORAGE_KEY` in `NEXT_PUBLIC_*` or browser bundles
+- Installing `@kenmark/storage` only at monorepo root when the Next app is under `apps/`
 - Minting signed private URLs without your app’s auth check
 - Expecting Storage to create WebP/AVIF variants on new uploads
 - Skipping the original upload when you only need a derivative
 - Reflecting Storage API errors that may include secrets
 - Open-ended `?width=` on Storage URLs — implement transforms in your app
+- Scaffolding a Next app inside this skill when none exists

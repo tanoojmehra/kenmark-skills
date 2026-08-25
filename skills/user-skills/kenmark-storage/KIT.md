@@ -1,12 +1,25 @@
 # Kenmark Storage — Skill Kit
 
-First-party skill for **consuming** Kenmark Storage from any app (Next.js, Node, etc.).
+First-party skill for **consuming** Kenmark Storage from an **existing** Next.js app or monorepo workspace.
 
 | Skill | Role | Install path |
 | --- | --- | --- |
 | **`kenmark-storage`** | Host assets via `@kenmark/storage` — uploads, public/private delivery, signed URLs, app-side Sharp/FFmpeg conversion | `~/.cursor/skills/kenmark-storage/` (and other IDE skill dirs via Kenmark hub) |
 
-## How to install
+## Project types (all supported)
+
+| Type | Skill behavior |
+| --- | --- |
+| New Next.js | Tree must already exist; detect App/Pages Router; integrate |
+| Existing Next.js | Detect shape; wire env, singleton, routes, conversion |
+| New monorepo | Workspace must already exist; pick target Next app; integrate there |
+| Existing monorepo | Same as new monorepo; deps/env/routes stay in the target app |
+
+**Does not scaffold** `create-next-app` or turbo/pnpm workspaces. Scaffold first, then invoke this skill.
+
+**Routers:** App Router and Pages Router (prefer App if both exist unless the user asks otherwise).
+
+## How to install this skill
 
 ```bash
 # First install (or re-run wizard)
@@ -29,11 +42,14 @@ The CLI copies the full skill folder into `~/.kenmark/store/skills/kenmark-stora
 
 ## What this skill covers
 
+- Step 0: detect package manager, mono vs single, App vs Pages, target app
+- Install `@kenmark/storage` on the target app
 - Env: `KENMARK_STORAGE_URL` + `KENMARK_STORAGE_KEY` (server only)
 - Server singleton from `@kenmark/storage/server`
-- Authenticated upload-session routes + browser `uploadWithSession`
-- Public vs private visibility and signed private downloads
-- App-side conversion with Sharp (images) / FFmpeg (video) — default preset + per-request params
+- Authenticated upload-session + private download routes (App **and** Pages examples)
+- Browser `uploadWithSession`
+- Public vs private visibility
+- App-side conversion with Sharp (images) / FFmpeg (video)
 
 ## Related Kenmark skills
 
@@ -56,6 +72,7 @@ The CLI copies the full skill folder into `~/.kenmark/store/skills/kenmark-stora
 ## Non-goals of this kit
 
 - Not a generic S3/MinIO skill
+- Not scaffolding Next apps or monorepos
 - Not platform-internal monorepo work (API/worker/nginx/Unraid operators)
 - **Not** post-upload conversion inside Storage — apps convert with Sharp/FFmpeg
 - Does not replace auth in your app — Storage has no end-user accounts

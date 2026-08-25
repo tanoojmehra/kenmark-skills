@@ -16,7 +16,7 @@ Status: reviewed
 ## Confirmed facts
 
 - 53 bundled Kenmark skills under `skills/user-skills/` (flat directories).
-- `kenmark-storage` — unified consumer SDK skill for hosting project assets on Kenmark Storage (uploads, signed downloads, conversion). Installable kit includes `SKILL.md`, `KIT.md`, and `reference.md`.
+- `kenmark-storage` — unified consumer SDK skill for hosting project assets on Kenmark Storage (uploads, signed downloads, conversion). Installable kit includes `SKILL.md`, `KIT.md`, and `reference.md`. Version `1.2.0` covers new/existing Next.js and monorepos (detect shape; App + Pages Router; no scaffold).
 - 10 optional catalog pack IDs: `impeccable`, `simplify`, `ponytail`, `improve`, `drawio-skill`, `graphify`, `seo-geo-selected`, `seo-geo-full`, `ecc`, `headroom`.
 - Default catalog selection: **impeccable** + **simplify** only.
 
