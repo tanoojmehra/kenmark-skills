@@ -15,8 +15,8 @@ const IDE_LABELS = {
   gemini: "Gemini (.gemini/skills; shares ~/.agents/skills when Codex is also selected)",
   "antigravity-cli":
     "Antigravity CLI (~/.gemini/antigravity-cli/skills; shares ~/.gemini/skills when Gemini is also selected)",
-  antigravity: "Antigravity 2.0 Manager (~/.gemini/antigravity/skills)",
-  "antigravity-ide": "Antigravity IDE (~/.gemini/antigravity-ide/skills)",
+  antigravity: "Antigravity 2.0 Manager (~/.gemini/config/skills)",
+  "antigravity-ide": "Antigravity IDE (~/.gemini/config/skills)",
   opencode: "OpenCode (.opencode/skills)",
   kiro: "Kiro (.kiro/skills)",
   trae: "Trae (.trae/skills)",

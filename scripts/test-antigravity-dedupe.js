@@ -194,10 +194,10 @@ function main() {
     } else {
       const targets = buildGlobalTargets(ideHome);
       const ideInit = path.join(targets["antigravity-ide"], "kenmark-init", "SKILL.md");
-      assert(fs.existsSync(ideInit), "kenmark-init missing under ~/.gemini/antigravity-ide/skills");
+      assert(fs.existsSync(ideInit), "kenmark-init missing under ~/.gemini/config/skills");
       const ideStat = fs.lstatSync(path.join(targets["antigravity-ide"], "kenmark-init"));
       assert(!ideStat.isSymbolicLink(), "antigravity-ide skill should be copied, not symlinked");
-      console.log("  ✓ antigravity-ide global install copies to ~/.gemini/antigravity-ide/skills");
+      console.log("  ✓ antigravity-ide global install copies to ~/.gemini/config/skills");
     }
   } catch (err) {
     failures.push(err.message);
@@ -238,12 +238,8 @@ function main() {
         "dry-run output should mention antigravity-cli and MCP servers"
       );
       assert(
-        out.includes(".gemini/antigravity/skills"),
-        "dry-run output should mention antigravity 2.0 skills path"
-      );
-      assert(
-        out.includes(".gemini/antigravity-ide/skills"),
-        "dry-run output should mention antigravity-ide skills path"
+        out.includes(".gemini/config/skills"),
+        "dry-run output should mention config skills path"
       );
       console.log("  ✓ antigravity-cli+antigravity+antigravity-ide MCP dry-run plan");
     }

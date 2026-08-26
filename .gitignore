@@ -11,6 +11,7 @@
 .cursor/
 .agents/
 .agent/
+.commandcode/
 
 # Local npm install artifacts
 node_modules/

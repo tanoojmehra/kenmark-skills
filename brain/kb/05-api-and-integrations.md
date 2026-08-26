@@ -60,8 +60,8 @@ Status: reviewed
 | Claude Code | `~/.claude/skills` |
 | Gemini CLI | `~/.gemini/skills` (or `~/.agents/skills` when Codex is also selected — Gemini aliases both) |
 | Antigravity CLI | `~/.gemini/antigravity-cli/skills` (or deduped away from `~/.gemini/antigravity-cli/skills` when Gemini is also selected — Antigravity CLI also reads `~/.gemini/skills`) |
-| Antigravity 2.0 Manager | `~/.gemini/antigravity/skills` |
-| Antigravity IDE (standalone app) | `~/.gemini/antigravity-ide/skills` |
+| Antigravity 2.0 Manager | `~/.gemini/config/skills` |
+| Antigravity IDE (standalone app) | `~/.gemini/config/skills` |
 | OpenCode | `~/.opencode/skills` |
 | Kiro | `~/.kiro/skills` |
 | Trae / Trae CN | `~/.trae/skills`, `~/.trae-cn/skills` |

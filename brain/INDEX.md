@@ -10,6 +10,7 @@ Project knowledge base for humans and AI agents working on **kenmark-skills**.
 | [rules/testing.md](rules/testing.md) | validate, npm test, publish gates |
 | [rules/ui.md](rules/ui.md) | N/A for this package (skills docs only) |
 | [rules/deployment.md](rules/deployment.md) | npm publish, version bumps |
+| [specs/INDEX.md](specs/INDEX.md) | Living specs for durable desired behavior |
 | [kb/00-project-overview.md](kb/00-project-overview.md) | CLI package summary, 41 skills, users |
 | [kb/01-architecture.md](kb/01-architecture.md) | cli.js routing, hub store, setup flow |
 | [kb/02-stack-and-dependencies.md](kb/02-stack-and-dependencies.md) | Node 18+, zero runtime deps |

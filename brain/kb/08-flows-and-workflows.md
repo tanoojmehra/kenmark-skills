@@ -66,6 +66,13 @@ npx kenmark-skills adopt --adopt-overwrite -y   # when review-required
 
 Documented in `kenmark-router` skill; see feature 002.
 
+### Spec lifecycle (`brain/specs/`)
+
+1. Create or update a spec when durable intent is clearer than implementation.
+2. Split specs by feature, system area, or team boundary only when one file becomes hard to scan.
+3. Create plans from specs when implementation is ready; create issues from specs when gaps are discovered.
+4. Archive replaced specs under `brain/specs/archived/`; keep IDs immutable.
+
 ## Important files inspected
 
 - `skills/user-skills/kenmark-router/SKILL.md`
