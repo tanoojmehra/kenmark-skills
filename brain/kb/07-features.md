@@ -15,7 +15,8 @@ Status: reviewed
 
 ## Confirmed facts
 
-- 39 bundled Kenmark skills under `skills/user-skills/` (flat directories).
+- 53 bundled Kenmark skills under `skills/user-skills/` (flat directories).
+- `kenmark-storage` — API-only consumer skill for Kenmark Storage: proxied REST routes (upload, list, serve, visibility, soft delete/restore), shared monorepo package, `@kenmark/storage/server` only. Kit: `SKILL.md`, `KIT.md`, `reference.md`. Version `1.3.0`.
 - 10 optional catalog pack IDs: `impeccable`, `simplify`, `ponytail`, `improve`, `drawio-skill`, `graphify`, `seo-geo-selected`, `seo-geo-full`, `ecc`, `headroom`.
 - Default catalog selection: **impeccable** + **simplify** only.
 

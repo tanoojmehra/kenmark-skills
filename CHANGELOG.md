@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## Unreleased
+
+### Added
+
+- **kenmark-storage 1.3.0:** API-only, full-proxy integration — REST routes for upload, list, proxied public/private serve, PATCH visibility, soft delete, restore; monorepo shared `packages/kenmark-storage` default; `@kenmark/storage/server` only; operator pre-flight via kenmark-manage; no browser SDK or Storage UI for callers.
+- **kenmark-storage:** Full installable skill kit — `KIT.md` (install/invoke) and `reference.md` (trust zones, auth, pipelines). Wired into `kenmark-router` and skills catalog as a specialist skill. Skill version `1.1.0`.
+- **kenmark-storage 1.2.0:** Works for all four project types (new/existing Next.js + new/existing monorepo) on existing trees only — Step 0 shape detection, monorepo placement rules, App Router **and** Pages Router route examples, package-manager-aware install.
+
+## v2.3.36 — Add unified kenmark-storage skill (2026-08-18)
+
+### Added
+
+- **kenmark-storage:** New bundled skill for integrating Kenmark Storage into any project — uploads (public/private), browser upload tokens, signed private downloads, app-side Sharp/FFmpeg conversion with default presets and per-request params.
+- **Skill count:** Updated documented totals to 53 (reflects all on-disk skill directories including prior unreported additions).
+
 ## v2.3.35 — Node.js v24 symlink compatibility fix (2026-07-04)
 
 ### Fixed

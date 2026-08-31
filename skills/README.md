@@ -16,7 +16,7 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (39)
+skills/user-skills/          ← bundled universal skills (53)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow (manual)
@@ -56,6 +56,7 @@ skills/user-skills/          ← bundled universal skills (39)
   kenmark-update/ category: admin
   kenmark-skills-maintain/
   kenmark-agents/
+  kenmark-storage/            category: workflow (phase: implement; API-only Kenmark Storage proxy integration)
   recommended-catalog.json
 ```
 
@@ -79,6 +80,7 @@ not in this package.
 | Dev/build/type/lint/format errors | `kenmark-repo-quality` |
 | Security review, auth bypass, RBAC, injection, SSRF, CORS, rate limits | `kenmark-security-review` |
 | Performance bottlenecks, slow routes, DB queries, bundle, hydration, caching | `kenmark-performance` |
+| Host assets on Kenmark Storage / `@kenmark/storage` / storage API / proxied assets | `kenmark-storage` |
 
 ## Testing suite (routing)
 
@@ -112,6 +114,7 @@ not in this package.
 | `kenmark-repo-quality` | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
 | `kenmark-security-review` | Read-only secure-code review (auth, injection, SSRF, uploads) |
 | `kenmark-performance` | Slow pages/routes, N+1, bundle/hydration, caching, API latency |
+| `kenmark-storage` | API-only Kenmark Storage — proxied upload/list/serve, visibility, soft delete; shared monorepo package; Next.js App/Pages |
 | `kenmark-repo-release` | Pre-release version, changelog, tests, meta consistency |
 | `kenmark-test-plan` | Test strategy: layers, tools, ROI, CI gates before writing tests |
 | `kenmark-test-unit` | Unit tests for functions, components, hooks, utilities |
@@ -141,6 +144,7 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Repo health (see table above) | `kenmark-repo-*` family |
 | Security review / auth / RBAC / injection / SSRF? | `kenmark-security-review` |
 | Performance / slow routes / DB / bundle / hydration? | `kenmark-performance` |
+| Kenmark Storage API / proxied assets? | `kenmark-storage` |
 | Testing (see testing table above) | `kenmark-test-*` family |
 | Installed skills inventory? | `kenmark-skills-maintain` |
 | Need commit? | `kenmark-commit` (explicit) |

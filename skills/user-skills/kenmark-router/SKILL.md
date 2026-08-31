@@ -37,7 +37,7 @@ Then read the winner's `SKILL.md` and follow it.
 
 **Core auto skills (prefer for broad work):** `kenmark-troubleshoot`, `kenmark-output`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-security-review`, `kenmark-performance`.
 
-**Specialist (clear intent only):** `kenmark-subagents`, `kenmark-repo-*`, `kenmark-test-*`, `kenmark-issues-scan`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship`, `kenmark-plan`, `kenmark-plans-execute`, `kenmark-tracker-list`, `kenmark-tracker-check`, `kenmark-tracker-maintain`.
+**Specialist (clear intent only):** `kenmark-subagents`, `kenmark-repo-*`, `kenmark-test-*`, `kenmark-issues-scan`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship`, `kenmark-plan`, `kenmark-plans-execute`, `kenmark-tracker-list`, `kenmark-tracker-check`, `kenmark-tracker-maintain`, `kenmark-storage`.
 
 **Explicit admin (never auto):** `kenmark-setup`, `kenmark-update`, `kenmark-agents`.
 
@@ -52,6 +52,7 @@ Then read the winner's `SKILL.md` and follow it.
 | Complete deliverables | **`kenmark-output`** |
 | Parallel tracks | **`kenmark-subagents`** (explicit) |
 | Ship commits | **`kenmark-commit`** (explicit) |
+| Kenmark Storage API / proxied assets | **`kenmark-storage`** |
 
 ## Output format
 

@@ -28,7 +28,7 @@
    | `risk` too high for a read-only request | −2 |
    | `risk` too low for a write/destructive request and no safer alternative | −1 |
    | **Explicit admin** skill (`kenmark-setup`, `kenmark-update`, `kenmark-agents`) without install/update/setup/prune/inventory intent | −6 |
-   | **Specialist** skill (`kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, `kenmark-test-*`, `kenmark-issues-scan`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship`, `kenmark-plan`, `kenmark-plans-execute`, `kenmark-tracker-list`, `kenmark-tracker-check`, `kenmark-tracker-maintain`) on a broad/unclear coding task | −2 |
+   | **Specialist** skill (`kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, `kenmark-test-*`, `kenmark-issues-scan`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship`, `kenmark-plan`, `kenmark-plans-execute`, `kenmark-tracker-list`, `kenmark-tracker-check`, `kenmark-tracker-maintain`, `kenmark-storage`) on a broad/unclear coding task | −2 |
    | **Core daily** skill when task is general coding/repo work | +1 |
 
 4. **Tie-break** (in order):
@@ -39,6 +39,7 @@
    - For **auth bypass, RBAC, injection, SSRF, open redirect, CORS, rate limits** → **`kenmark-security-review`** (not `kenmark-repo-secrets` unless they ask for keys/tokens)
    - For **slow routes, N+1, bundle size, hydration bloat, caching, API latency** → **`kenmark-performance`** (not `kenmark-repo-quality` unless build/type/lint/test is failing)
    - For **dependency bloat / duplicate packages** → **`kenmark-repo-deps`**; if the user ties slowness to **heavy deps or bundle weight**, prefer **`kenmark-performance`** and note **`kenmark-repo-deps`** as a follow-up
+   - For **Kenmark Storage API, proxied upload/download, asset list, visibility, soft delete, `@kenmark/storage`, app-side conversion** → **`kenmark-storage`**
    - If the task mentions **public**, **open source**, **publish**, or **safe to publish**, prefer **`kenmark-repo-public`** over **`kenmark-repo-hygiene`** even when the user also says "sanitize" or "clean"
    - Prefer `source: kenmark` over `catalog` over `user` when scores are equal
    - Prefer `maturity: stable` over `catalog` over `user`
@@ -76,6 +77,7 @@
 | Dev/build/type/lint/format errors | `workflow` | `kenmark-repo-quality` |
 | Security review (auth, RBAC, injection, SSRF, CORS, rate limits) | `workflow` | `kenmark-security-review` |
 | Performance bottlenecks (slow routes, DB, bundle, hydration, caching) | `workflow` | `kenmark-performance` |
+| Kenmark Storage API, proxied assets, list/visibility/delete, app-side conversion | `workflow` | `kenmark-storage` |
 | Release, publish, handoff | `workflow` | `kenmark-repo-release` |
 | Test strategy before writing tests | `testing` | `kenmark-test-plan` |
 | Unit tests | `testing` | `kenmark-test-unit` |
