@@ -1,78 +1,63 @@
 # Kenmark Storage — Skill Kit
 
-First-party skill for **consuming** Kenmark Storage from an **existing** Next.js app or monorepo workspace.
+First-party skill for **API-only**, **full-proxy** Kenmark Storage integration in **existing** Next.js apps and monorepos.
 
 | Skill | Role | Install path |
 | --- | --- | --- |
-| **`kenmark-storage`** | Host assets via `@kenmark/storage` — uploads, public/private delivery, signed URLs, app-side Sharp/FFmpeg conversion | `~/.cursor/skills/kenmark-storage/` (and other IDE skill dirs via Kenmark hub) |
+| **`kenmark-storage`** | REST API integration — proxied upload/list/serve, visibility, soft delete/restore; shared monorepo package; server SDK only; app-side conversion | `~/.cursor/skills/kenmark-storage/` |
 
-## Project types (all supported)
+## Project types
 
 | Type | Skill behavior |
 | --- | --- |
-| New Next.js | Tree must already exist; detect App/Pages Router; integrate |
-| Existing Next.js | Detect shape; wire env, singleton, routes, conversion |
-| New monorepo | Workspace must already exist; pick target Next app; integrate there |
-| Existing monorepo | Same as new monorepo; deps/env/routes stay in the target app |
+| Single Next.js | `lib/storage.ts` + routes under `/api/assets/*` |
+| New / existing monorepo | **Shared** `packages/kenmark-storage/`; all apps use one Storage project; thin route re-exports per app |
 
-**Does not scaffold** `create-next-app` or turbo/pnpm workspaces. Scaffold first, then invoke this skill.
+**Does not scaffold** apps or workspaces. **No Storage UI** for callers — operators use **kenmark-manage** for project/key setup.
 
-**Routers:** App Router and Pages Router (prefer App if both exist unless the user asks otherwise).
+**Routers:** App Router and Pages Router (prefer App if both exist).
 
 ## How to install this skill
 
 ```bash
-# First install (or re-run wizard)
 npx kenmark-skills init
-
-# Refresh after kenmark-skills updates (preferred)
 npx kenmark-skills update --kenmark-only -y
 ```
 
-The CLI copies the full skill folder into `~/.kenmark/store/skills/kenmark-storage/` and links/copies it into your IDE skill directories. Restart the IDE if the skill does not appear.
+Copies to `~/.kenmark/store/skills/kenmark-storage/` and IDE skill dirs. Restart IDE if needed.
 
 ## How to invoke
 
 - `/kenmark-storage`
-- “add Kenmark Storage uploads to this app”
-- “host assets on kenmark-storage”
-- “signed private download”
-- “convert image after upload”
-- Or let the agent auto-pick from descriptions / **`kenmark-router`**
+- “add Kenmark Storage API to this app”
+- “proxied storage upload download”
+- “soft delete asset API”
+- Or **`kenmark-router`** auto-pick
 
 ## What this skill covers
 
-- Step 0: detect package manager, mono vs single, App vs Pages, target app
-- Install `@kenmark/storage` on the target app
+- Operator pre-flight (kenmark-manage project + key)
+- Step 0: detect shape; monorepo → shared package
 - Env: `KENMARK_STORAGE_URL` + `KENMARK_STORAGE_KEY` (server only)
-- Server singleton from `@kenmark/storage/server`
-- Authenticated upload-session + private download routes (App **and** Pages examples)
-- Browser `uploadWithSession`
-- Public vs private visibility
-- App-side conversion with Sharp (images) / FFmpeg (video)
+- `@kenmark/storage/server` — never browser SDK in production
+- REST routes: upload, list, PATCH visibility, DELETE, restore, proxied public/private serve
+- Sanitized responses — no Storage hostnames or tokens
+- App-side Sharp/FFmpeg conversion (server fetch)
 
 ## Related Kenmark skills
 
 | Need | Skill |
 | --- | --- |
-| Secure-code review of your app’s integration | `kenmark-security-review` |
-| Secrets / `.env` in git | `kenmark-repo-secrets` |
-| Plan before a large change | `kenmark-plan` |
-| Incident / unclear failure | `kenmark-troubleshoot` |
+| Secure-code review | `kenmark-security-review` |
+| Secrets scan | `kenmark-repo-secrets` |
+| Plan before large change | `kenmark-plan` |
+| Troubleshoot | `kenmark-troubleshoot` |
 | Commit by feature | `kenmark-commit` |
 
-## Repo docs (when the storage monorepo is available)
+## Non-goals
 
-- `README.md` — layout & quick start
-- `docs/api.md` — HTTP API
-- `docs/security.md` — threat model & controls
-- `docs/sdk-distribution.md` — publish & consume SDK
-- `examples/nextjs-app/` — safe integration patterns
-
-## Non-goals of this kit
-
-- Not a generic S3/MinIO skill
-- Not scaffolding Next apps or monorepos
-- Not platform-internal monorepo work (API/worker/nginx/Unraid operators)
-- **Not** post-upload conversion inside Storage — apps convert with Sharp/FFmpeg
-- Does not replace auth in your app — Storage has no end-user accounts
+- Not kenmark-manage or platform operator work
+- Not scaffolding Next/monorepos
+- Not browser direct-to-Storage uploads
+- Not post-upload conversion inside Storage platform
+- Not a project CLI (`add-storage`) — global skill install only

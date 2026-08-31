@@ -52,7 +52,7 @@ Then read the winner's `SKILL.md` and follow it.
 | Complete deliverables | **`kenmark-output`** |
 | Parallel tracks | **`kenmark-subagents`** (explicit) |
 | Ship commits | **`kenmark-commit`** (explicit) |
-| Host assets on Kenmark Storage | **`kenmark-storage`** |
+| Kenmark Storage API / proxied assets | **`kenmark-storage`** |
 
 ## Output format
 
