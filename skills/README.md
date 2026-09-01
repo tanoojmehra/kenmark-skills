@@ -114,7 +114,7 @@ not in this package.
 | `kenmark-repo-quality` | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
 | `kenmark-security-review` | Read-only secure-code review (auth, injection, SSRF, uploads) |
 | `kenmark-performance` | Slow pages/routes, N+1, bundle/hydration, caching, API latency |
-| `kenmark-storage` | API-only Kenmark Storage — proxied upload/list/serve, visibility, soft delete; shared monorepo package; Next.js App/Pages |
+| `kenmark-storage` | API-only Kenmark Storage — proxied upload/list/serve, visibility, soft delete; shared monorepo package; pitfalls + CMS patterns (v1.3.1) |
 | `kenmark-repo-release` | Pre-release version, changelog, tests, meta consistency |
 | `kenmark-test-plan` | Test strategy: layers, tools, ROI, CI gates before writing tests |
 | `kenmark-test-unit` | Unit tests for functions, components, hooks, utilities |

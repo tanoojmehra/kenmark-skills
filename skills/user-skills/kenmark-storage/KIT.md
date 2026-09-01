@@ -32,15 +32,18 @@ Copies to `~/.kenmark/store/skills/kenmark-storage/` and IDE skill dirs. Restart
 - “add Kenmark Storage API to this app”
 - “proxied storage upload download”
 - “soft delete asset API”
+- “runtime nodejs thin route”
 - Or **`kenmark-router`** auto-pick
 
 ## What this skill covers
 
-- Operator pre-flight (kenmark-manage project + key)
-- Step 0: detect shape; monorepo → shared package
+- Operator pre-flight (kenmark-manage project + key) + optional CLI upload pattern
+- Step 0: detect shape; monorepo → shared package; sibling `file:` SDK when unpublished
 - Env: `KENMARK_STORAGE_URL` + `KENMARK_STORAGE_KEY` (server only)
 - `@kenmark/storage/server` — never browser SDK in production
 - REST routes: upload, list, PATCH visibility, DELETE, restore, proxied public/private serve
+- Thin routes: declare `runtime` locally; common pitfalls in [reference.md](reference.md)
+- Post-upload: store `/api/assets/{id}` in UI/CMS
 - Sanitized responses — no Storage hostnames or tokens
 - App-side Sharp/FFmpeg conversion (server fetch)
 
@@ -58,6 +61,6 @@ Copies to `~/.kenmark/store/skills/kenmark-storage/` and IDE skill dirs. Restart
 
 - Not kenmark-manage or platform operator work
 - Not scaffolding Next/monorepos
-- Not browser direct-to-Storage uploads
+- Not browser direct-to-Storage uploads or 302 redirect downloads — use **`kenmark-storage-sdk`** skill in the **kenmark-storage** repo (not bundled here)
 - Not post-upload conversion inside Storage platform
 - Not a project CLI (`add-storage`) — global skill install only

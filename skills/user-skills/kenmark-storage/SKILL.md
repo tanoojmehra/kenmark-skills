@@ -1,6 +1,6 @@
 ---
 name: kenmark-storage
-version: 1.3.0
+version: 1.3.1
 category: workflow
 scope: universal
 phase: implement
@@ -19,6 +19,11 @@ triggers:
   - convert image after upload
   - storage SDK
   - app-side conversion
+  - upload:asset
+  - asset id
+  - runtime nodejs
+  - file: kenmark-storage
+  - CMS asset path
 allowed-tools:
   - Bash
   - Read
@@ -36,7 +41,7 @@ disable-model-invocation: false
 
 Integrate **`@kenmark/storage/server`** into an **existing** Next.js app or monorepo — **API-only**, **full proxy** (no Storage hostnames exposed to callers), full asset lifecycle (upload, list, serve, visibility, soft delete, restore), optional app-side conversion.
 
-**Does not scaffold** apps or workspaces. **No end-user Storage UI** — callers use your REST API with your app API key. Operators create Storage projects and keys in **kenmark-manage**.
+**Does not scaffold** apps or workspaces. **No end-user Storage UI** — callers use your REST API with **your app auth** (session, JWT, or optional bearer). Operators create Storage projects and keys in **kenmark-manage**.
 
 Kit overview: [KIT.md](KIT.md). Deep reference: [reference.md](reference.md).
 
@@ -60,6 +65,7 @@ Kit overview: [KIT.md](KIT.md). Deep reference: [reference.md](reference.md).
 | `.env` / credential leak scan | **`kenmark-repo-secrets`** |
 | Vague failure, need RCA | **`kenmark-troubleshoot`** |
 | Plan before a big change | **`kenmark-plan`** |
+| Browser direct-to-Storage upload (`uploadWithSession`) or 302 redirect downloads | **`kenmark-storage-sdk`** skill in the **kenmark-storage** repo (non-proxy pattern; not bundled in kenmark-skills) |
 
 ---
 
@@ -74,9 +80,10 @@ Kit overview: [KIT.md](KIT.md). Deep reference: [reference.md](reference.md).
 7. **Visibility + soft delete** only via app routes (`PATCH`, `DELETE`, `POST …/restore`).
 8. **Block download/serve** when `status === "deleted"`.
 9. **Public → private:** warn that CDN/browser cache may retain old public copies.
-10. Example routes **fail closed** (`validateAppApiKey` returns false) until real auth is wired.
+10. Example routes **fail closed** (`validateCallerAuth` returns false) until real auth is wired.
 11. **Storage is originals-only.** Convert in your app (Sharp / FFmpeg), not in the Storage platform worker.
 12. **Monorepo:** default shared workspace package — one Storage project/key for the whole repo.
+13. **App Router segment config** (`export const runtime`, `maxDuration`, etc.) **must be declared in the route file** — never re-exported from the shared package.
 
 ---
 
@@ -95,7 +102,29 @@ Never expose Storage hostnames, tokens, or project API keys to callers
 2. Create API key with scopes: **`assets:read`**, **`assets:write`**, **`assets:delete`**.
 3. Copy `KENMARK_STORAGE_URL` and `KENMARK_STORAGE_KEY` (`ks_live_...`) into server env (never commit).
 4. Configure allowed MIME types on the platform (empty allowlist **denies** all uploads).
-5. API callers use **your app-level API key** (or auth) — **not** the Kenmark Storage project key.
+5. Callers authenticate with **your app auth** — never send `ks_live_...` (`KENMARK_STORAGE_KEY`) to `/api/assets/*`.
+
+### Operator: upload files (CLI pattern)
+
+Optional local script in the **consumer app** (not in kenmark-skills). POST to your app's upload route with **your app auth** — not `KENMARK_STORAGE_KEY`.
+
+```bash
+# Single file
+pnpm exec dotenv -e .env.local -- node scripts/upload-asset.mjs ./photo.jpg --visibility public
+
+# Multiple files
+pnpm exec dotenv -e .env.local -- node scripts/upload-asset.mjs ./a.jpg ./b.png --visibility public
+
+# Folder (script globs or walks directory)
+pnpm exec dotenv -e .env.local -- node scripts/upload-asset.mjs ./assets/hero --visibility public --recursive
+```
+
+Script behavior:
+
+- Target `http://localhost:3000/api/assets/upload` (or deployed URL)
+- `Authorization: Bearer` from your auth env (session token, service secret — **not** `KENMARK_STORAGE_KEY`)
+- When using pnpm, filter literal `--` from `process.argv` if present
+- One `POST` per file (multipart `file` field)
 
 ---
 
@@ -130,7 +159,7 @@ When Step 0 detects a monorepo:
 2. If `packages/kenmark-storage` (or equivalent) exists → extend it.
 3. Else → create `packages/kenmark-storage/` with workspace `package.json`.
 4. List Next apps under `apps/*` (or `packages/*` with `next` dependency).
-5. For each app that needs asset REST APIs → `"@repo/kenmark-storage": "workspace:*"` + thin route files.
+5. For each app that needs asset REST APIs → `"@acme/kenmark-storage": "workspace:*"` (match workspace scope) + thin route files.
 6. Apps that only need server-side asset access import `createStorage()` from the shared package — no duplicate `@kenmark/storage` per app.
 
 ```
@@ -140,7 +169,7 @@ packages/kenmark-storage/
     client.ts       # createStorage()
     proxy.ts        # putOriginalToSession, streamFromUrl
     sanitize.ts     # sanitizeAssetForApi
-    auth.ts         # validateAppApiKey placeholder
+    auth.ts         # validateCallerAuth placeholder
     handlers/       # upload, list, asset, download, restore
     index.ts
 ```
@@ -161,7 +190,7 @@ packages/kenmark-storage/
 | `DELETE` | `/api/assets/[assetId]` | Soft-delete |
 | `POST` | `/api/assets/[assetId]/restore` | Restore before purge |
 
-All routes: **`validateAppApiKey(request)`** first (fail-closed). See [reference.md](reference.md) for route paths (App vs Pages).
+All routes: **`validateCallerAuth(request)`** first (fail-closed). See [reference.md](reference.md) for route paths (App vs Pages).
 
 ---
 
@@ -172,9 +201,28 @@ Kenmark Storage has **no end-user accounts**. Your API decides who may call rout
 | Visibility | Serve route | Notes |
 | --- | --- | --- |
 | `public` | `GET /api/assets/[assetId]` | Stream via app domain only |
-| `private` | `GET /api/assets/[assetId]/download` | App API key + authz; stream, no redirect |
+| `private` | `GET /api/assets/[assetId]/download` | Your app auth + authz; stream, no redirect |
 
 Set on upload (`visibility: "public" | "private"`). Change via `PATCH /api/assets/[assetId]`. Default to `private` unless public caching is acceptable.
+
+---
+
+## Referencing assets in UI / CMS
+
+After upload succeeds:
+
+- Store **app path** `/api/assets/{assetId}` or `{ assetId }` in DB/CMS — never `publicUrl` or Storage hostname.
+- **Public** images on anonymous pages: upload with `visibility=public`; embed same-origin:
+
+```tsx
+<img src="/api/assets/ast_abc123" alt="" />
+// next/image: src="/api/assets/ast_abc123" — no remotePatterns for Storage host when proxied
+```
+
+- **Private** assets: use download route + your auth — do not embed on public pages.
+- CMS fields (e.g. `heroImagePath`) override code fallbacks — migrate legacy disk paths (`/images/foo.jpg`) or map via `resolveAssetPath()`.
+
+See [reference.md](reference.md) — Common pitfalls.
 
 ---
 
@@ -196,12 +244,29 @@ pnpm add @kenmark/storage
 **Monorepo:** in `packages/kenmark-storage/` only:
 
 ```bash
-pnpm add @kenmark/storage --filter @repo/kenmark-storage
+pnpm add @kenmark/storage --filter @acme/kenmark-storage
 ```
 
-Add workspace dependency in each Next app that mounts routes: `"@repo/kenmark-storage": "workspace:*"`.
+Add workspace dependency in each Next app: `"@acme/kenmark-storage": "workspace:*"`. Match workspace scope (`@repo/*`, `@acme/*`, etc.) — do not copy a placeholder blindly.
 
 Optional: `sharp` in the app or shared package for image conversion.
+
+### SDK not on npm yet (sibling repo)
+
+When `@kenmark/storage` is unpublished, in `packages/kenmark-storage/package.json`:
+
+```json
+"@kenmark/storage": "file:../../../kenmark-storage/packages/sdk"
+```
+
+- Path is **relative to `packages/kenmark-storage`**, not monorepo root.
+- Optional root `pnpm.overrides` for `@kenmark/storage-contracts` if resolution conflicts.
+- CI must checkout sibling storage repo or publish SDK first.
+- Switch to semver once published.
+
+```text
+consumer-monorepo/packages/kenmark-storage/  →  file:  →  kenmark-storage/packages/sdk
+```
 
 ---
 
@@ -210,10 +275,10 @@ Optional: `sharp` in the app or shared package for image conversion.
 ```bash
 # Server only — never NEXT_PUBLIC_*
 KENMARK_STORAGE_URL=https://storage-api.example.com
-KENMARK_STORAGE_KEY=ks_live_...   # assets:read, assets:write, assets:delete
+KENMARK_STORAGE_KEY=ks_live_...   # from kenmark-manage; assets:read, assets:write, assets:delete
 
-# Your app's API key for callers (example)
-APP_API_KEY=...
+# Optional bearer for /api/assets/* if not using session/JWT (your choice — not from Manage)
+# ASSETS_API_AUTH_SECRET=...
 ```
 
 ---
@@ -244,13 +309,15 @@ export function createStorage(): KenmarkStorage {
 
 ### Auth placeholder
 
+Replace with session, JWT, or your existing auth. **Never** accept `KENMARK_STORAGE_KEY` from callers.
+
 ```ts
 // lib/storage-proxy.ts or packages/kenmark-storage/src/auth.ts
-export function validateAppApiKey(request: Request): boolean {
+export function validateCallerAuth(request: Request): boolean {
   const auth = request.headers.get("authorization");
-  const expected = process.env.APP_API_KEY;
-  if (!expected) return false;
-  return auth === `Bearer ${expected}`;
+  const secret = process.env.ASSETS_API_AUTH_SECRET;
+  if (!secret) return false; // fail closed until real auth wired
+  return auth === `Bearer ${secret}`;
 }
 ```
 
@@ -310,7 +377,7 @@ Never include `publicUrl`, `uploadUrl`, or `uploadToken` in JSON sent to callers
 
 **Route:** `POST /api/assets/upload`
 
-1. `validateAppApiKey` — fail closed.
+1. `validateCallerAuth` — fail closed.
 2. Parse multipart (`file`) or raw body + metadata (`filename`, `contentType`, `sizeBytes`, `visibility`, `folder`).
 3. `storage.uploads.create({ ... })` then `putOriginalToSession(session, fileBytes)`.
 4. Return `sanitizeAssetForApi(asset)`.
@@ -323,10 +390,10 @@ export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { createStorage } from "@/lib/storage";
-import { validateAppApiKey, putOriginalToSession, sanitizeAssetForApi } from "@/lib/storage-proxy";
+import { validateCallerAuth, putOriginalToSession, sanitizeAssetForApi } from "@/lib/storage-proxy";
 
 export async function POST(request: Request) {
-  if (!validateAppApiKey(request)) {
+  if (!validateCallerAuth(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -369,7 +436,7 @@ export const config = { api: { bodyParser: false } };
 
 ```bash
 curl -X POST https://yourapp.com/api/assets/upload \
-  -H "Authorization: Bearer YOUR_APP_API_KEY" \
+  -H "Authorization: Bearer YOUR_AUTH_TOKEN" \
   -F "file=@photo.jpg" \
   -F "visibility=private"
 ```
@@ -388,10 +455,10 @@ Forward query params: `folder`, `limit`, `cursor`, `page`, `status`, `visibility
 // app/api/assets/route.ts
 import { NextResponse } from "next/server";
 import { createStorage } from "@/lib/storage";
-import { validateAppApiKey, sanitizeAssetForApi } from "@/lib/storage-proxy";
+import { validateCallerAuth, sanitizeAssetForApi } from "@/lib/storage-proxy";
 
 export async function GET(request: Request) {
-  if (!validateAppApiKey(request)) {
+  if (!validateCallerAuth(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -430,7 +497,7 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ assetId: string }> },
 ) {
-  if (!validateAppApiKey(request)) {
+  if (!validateCallerAuth(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { assetId } = await context.params;
@@ -455,7 +522,7 @@ Platform sets `status: deleted`, `deletedAt`, `purgeAfter`; hard purge is worker
 
 ```bash
 curl -X DELETE https://yourapp.com/api/assets/abc123 \
-  -H "Authorization: Bearer YOUR_APP_API_KEY"
+  -H "Authorization: Bearer YOUR_AUTH_TOKEN"
 ```
 
 ---
@@ -464,7 +531,7 @@ curl -X DELETE https://yourapp.com/api/assets/abc123 \
 
 **Route:** `GET /api/assets/[assetId]/download`
 
-1. `validateAppApiKey` + authz.
+1. `validateCallerAuth` + authz.
 2. `assets.get(assetId)` — reject if `status === "deleted"`.
 3. `signedUrl(assetId, { variant: "original", expiresIn: 300, download: true })` **server-only**.
 4. `fetch(url)` → `streamFromUrl(upstream)` — **no redirect**.
@@ -474,7 +541,7 @@ export async function GET(
   _request: Request,
   context: { params: Promise<{ assetId: string }> },
 ) {
-  if (!validateAppApiKey(_request)) {
+  if (!validateCallerAuth(_request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { assetId } = await context.params;
@@ -514,16 +581,20 @@ Callers and embeds use `/api/assets/${id}` only — never Storage hostname.
 
 ## Monorepo thin routes
 
-Each Next app re-exports shared handlers:
+Each Next app re-exports shared handlers. **Declare segment config in the route file:**
 
 ```ts
 // apps/web/app/api/assets/upload/route.ts
-export { POST } from "@repo/kenmark-storage/handlers/upload";
+export const runtime = "nodejs";
+export { POST } from "@acme/kenmark-storage/handlers/upload";
+
+// ❌ Do not re-export runtime from the shared package
+// export { POST, runtime } from "@acme/kenmark-storage/handlers/upload";
 ```
 
-Or one-liner wrappers if the shared package exports Next-compatible handlers from `handlers/`.
+Apply the same pattern for download/serve routes that need `runtime` or `maxDuration`.
 
-Apps without public asset API can `import { createStorage } from "@repo/kenmark-storage"` in Server Components / server actions.
+Apps without public asset API can `import { createStorage } from "@acme/kenmark-storage"` in Server Components / server actions.
 
 ---
 
@@ -563,24 +634,26 @@ Configure CORS on **your** API routes if browser-based API clients call them. No
 
 - [ ] Operator pre-flight: Manage project + key with `assets:read`, `assets:write`, `assets:delete`
 - [ ] Project shape detected (single vs monorepo, App vs Pages)
-- [ ] **Monorepo:** shared `packages/kenmark-storage`; `@kenmark/storage` only in shared package; thin routes per app
+- [ ] **Monorepo:** shared `packages/kenmark-storage`; `@kenmark/storage` only in shared package; thin routes per app with local `runtime = "nodejs"`
 - [ ] **Single app:** `lib/storage.ts` + `lib/storage-proxy.ts`
 - [ ] No Storage key in client or `NEXT_PUBLIC_*`
 - [ ] Routes: upload, list, PATCH visibility, DELETE, restore, public serve, private download
 - [ ] All delivery **streamed** — no redirects to Storage
 - [ ] Responses sanitized — no `publicUrl`, tokens, or Storage hostnames
 - [ ] Deleted assets return 404 on download/serve
-- [ ] `validateAppApiKey` fail-closed until real auth wired
+- [ ] Caller auth fail-closed until real session/JWT wired; callers never send `ks_live_...`
+- [ ] Public assets used on site with `visibility=public` and `/api/assets/{id}` paths in CMS/UI
 - [ ] Public→private cache warning documented
 - [ ] Conversion (if any) server-side only
 - [ ] Turbo/CI passes `KENMARK_STORAGE_*` to apps
+- [ ] Sibling `file:` SDK path correct if unpublished (see reference.md)
 
 ---
 
 ## Reference
 
 - [KIT.md](KIT.md) — install, invoke, project types
-- [reference.md](reference.md) — trust zones, auth matrix, route cheat sheet, monorepo layout
+- [reference.md](reference.md) — trust zones, auth matrix, route cheat sheet, monorepo layout, **common pitfalls**
 
 When the storage monorepo is available: `docs/api.md`, `docs/sdk-distribution.md`.
 
