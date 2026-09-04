@@ -4,13 +4,13 @@ First-party skill for **API-only**, **full-proxy** Kenmark Storage integration i
 
 | Skill | Role | Install path |
 | --- | --- | --- |
-| **`kenmark-storage`** | REST API integration — proxied upload/list/serve, visibility, soft delete/restore; shared monorepo package; server SDK only; app-side conversion | `~/.cursor/skills/kenmark-storage/` |
+| **`kenmark-storage`** | REST API integration — proxied upload/list/serve, visibility, soft delete/restore; shared monorepo package; server SDK only; vendor SDK in-repo when unpublished; app-side conversion | `~/.cursor/skills/kenmark-storage/` |
 
 ## Project types
 
 | Type | Skill behavior |
 | --- | --- |
-| Single Next.js | `lib/storage.ts` + routes under `/api/assets/*` |
+| Single Next.js | `lib/storage.ts` + routes under `/api/assets/*`; registry or `vendor/` SDK |
 | New / existing monorepo | **Shared** `packages/kenmark-storage/`; all apps use one Storage project; thin route re-exports per app |
 
 **Does not scaffold** apps or workspaces. **No Storage UI** for callers — operators use **kenmark-manage** for project/key setup.
@@ -33,12 +33,14 @@ Copies to `~/.kenmark/store/skills/kenmark-storage/` and IDE skill dirs. Restart
 - “proxied storage upload download”
 - “soft delete asset API”
 - “runtime nodejs thin route”
+- “vendor storage SDK”
 - Or **`kenmark-router`** auto-pick
 
 ## What this skill covers
 
 - Operator pre-flight (kenmark-manage project + key) + optional CLI upload pattern
-- Step 0: detect shape; monorepo → shared package; sibling `file:` SDK when unpublished
+- Step 0: detect shape; monorepo → shared package
+- Step 1: registry install of `@kenmark/storage`, or **vendor-copy** contracts + SDK into the consumer repo when unpublished (never sibling `file:` outside the repo)
 - Env: `KENMARK_STORAGE_URL` + `KENMARK_STORAGE_KEY` (server only)
 - `@kenmark/storage/server` — never browser SDK in production
 - REST routes: upload, list, PATCH visibility, DELETE, restore, proxied public/private serve

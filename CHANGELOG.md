@@ -4,6 +4,7 @@
 
 ### Added
 
+- **kenmark-storage 1.3.2:** Registry-first SDK install; when unpublished, vendor-copy `@kenmark/storage` + `@kenmark/storage-contracts` into the consumer repo (`packages/` or `vendor/`) — never sibling out-of-repo `file:` links.
 - **kenmark-storage 1.3.1:** Operational integration guide — Next.js thin-route `runtime` rule, sibling `file:` SDK linking, post-upload CMS/UI paths, common pitfalls table, optional CLI upload pattern (single/multiple/folder), `kenmark-storage-sdk` cross-link, generic caller auth wording.
 - **kenmark-storage 1.3.0:** API-only, full-proxy integration — REST routes for upload, list, proxied public/private serve, PATCH visibility, soft delete, restore; monorepo shared `packages/kenmark-storage` default; `@kenmark/storage/server` only; operator pre-flight via kenmark-manage; no browser SDK or Storage UI for callers.
 - **kenmark-storage:** Full installable skill kit — `KIT.md` (install/invoke) and `reference.md` (trust zones, auth, pipelines). Wired into `kenmark-router` and skills catalog as a specialist skill. Skill version `1.1.0`.
