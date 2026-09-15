@@ -1,10 +1,10 @@
 ---
 name: kenmark-repo-deps
-version: 1.2.0
+version: 1.3.0
 category: workflow
 scope: universal
 phase: verify
-description: "Read-only package health audit: unused or duplicate dependencies, monorepo workspace drift, lockfile and packageManager consistency, overrides/resolutions, UI-library overlap, bundle/side-effect risks, semver/peer issues, and npm audit summary. Use for dependency bloat, npm vs pnpm vs bun mix, or before cleanup. For app-level CVE/config review use kenmark-security-review."
+description: "Read-only package health and security audit: dependency vulnerability scans, framework CVE checks (Next.js, React, Node), monorepo workspace drift, lockfile and packageManager consistency, overrides/resolutions, UI-library overlap, supply chain/lifecycle script risks, semver/peer issues, and npm audit summary. Use for dependency bloat, security advisories, npm vs pnpm vs bun mix, or before cleanup. For app-level code review use kenmark-security-review; for live server compromise use kenmark-server-defense."
 triggers:
   - dependency audit
   - unused dependencies
@@ -22,6 +22,13 @@ triggers:
   - overrides resolutions
   - ui library overlap
   - bundle size dependencies
+  - vulnerability scan
+  - dependency vulnerability scan
+  - nextjs cve audit
+  - audit known cves
+  - security advisories dependencies
+  - check vulnerable dependencies
+  - cve scan
 allowed-tools:
   - Bash
   - Read
@@ -37,29 +44,32 @@ disable-model-invocation: false
 
 ## Purpose
 
-Audit **dependency health** without removing packages (removal can break builds).
+Audit **dependency health and security vulnerabilities** without removing or mutating packages (removal or forced updates can break builds).
 
 For Node:
 
+- Dependency vulnerability scanning & known CVE detection (Next.js, React, Node, Express)
+- Manifest vs. lockfile staleness (lockfile pinning vulnerable releases despite open semver range)
 - `dependencies` vs `devDependencies` placement
 - Unused dependencies (heuristic — **candidates only**, not facts unless proven)
 - Duplicate libraries (multiple UI, date, HTTP clients)
 - Heavy packages (icon sets, moment + dayjs, etc.)
 - Lockfile vs package manager mismatch (`npm` + `pnpm` + `yarn` + `bun` artifacts)
 - `packageManager` field vs actual lockfile/CI
-- Monorepo workspace dependency drift
+- Monorepo workspace dependency drift & security patch disparities across apps
 - Duplicate React / Next.js / major versions across workspaces
 - Loose semver (`*`, `latest`, overly wide ranges)
 - Peer dependency conflicts (from lockfile / install warnings)
 - `overrides` / `resolutions` / `pnpm.overrides` review (flag stale masks — **never remove automatically**)
 - UI-library overlap (MUI + Radix/ShadCN + Chakra + Ant Design + Mantine, multiple icon/chart libs)
 - Bundle / side-effect risk (broad imports, client/server boundary mistakes)
-- Optional `npm audit` / `pnpm audit` summary (read-only; no `audit fix`)
+- Supply chain / lifecycle script audit (`preinstall`, `postinstall`, `prepare` inspection)
+- `npm audit` / `pnpm audit` advisory extraction (read-only; no `audit fix`)
 - Deprecated or risky package names (flag for review)
 
 Adapt checks for Python (`pyproject.toml`, `requirements.txt`), Go (`go.mod`), Rust (`Cargo.toml`) when present.
 
-This skill covers **package and lockfile health**, not application auth/injection review. For secure-code patterns (middleware, RBAC, SSRF), use **`kenmark-security-review`**. For runtime perf patterns in code, use **`kenmark-performance`**.
+This skill covers **package, lockfile, and dependency CVE health**, not application code logic. For secure-code patterns (custom auth logic, RBAC, application SSRF), use **`kenmark-security-review`**. For live server compromise (running miners, deleted executables in `/tmp`, crontab backdoors), use **`kenmark-server-defense`**. For runtime perf patterns in code, use **`kenmark-performance`**.
 
 **Default behavior:** investigate and report only. Do not uninstall, upgrade, edit `package.json`, or run fix commands unless the user explicitly approves after the report.
 
@@ -68,7 +78,7 @@ This skill covers **package and lockfile health**, not application auth/injectio
 ## Core principle
 
 ```text
-Detect ecosystem → Inspect manifests + lockfiles → Heuristic usage grep → Classify findings → Rank report
+Detect ecosystem → Inspect manifests + lockfiles → Vulnerability & CVE scan → Heuristic usage grep → Classify findings → Rank report
 ```
 
 ---
@@ -79,9 +89,10 @@ Detect ecosystem → Inspect manifests + lockfiles → Heuristic usage grep → 
 | --- | --- | --- |
 | `quick-audit` | Pre-merge sanity | Lockfile + packageManager consistency + obvious duplicates |
 | `standard-audit` | Normal dependency review | Full Steps 1–8 for detected ecosystem |
-| `deep-audit` | Before major cleanup or upgrade | Usage grep for all deps + workspace version matrix + audit summary |
+| `vulnerability-scan` | Security triage & CVE audit | Known CVEs, Next.js/framework advisories, monorepo version drift, lockfile staleness, and lifecycle scripts |
+| `deep-audit` | Before major cleanup or upgrade | Usage grep for all deps + workspace version matrix + full vulnerability audit |
 | `node-focused` | JS/TS monorepo or app | Node sections only |
-| `monorepo-focused` | Turborepo/pnpm workspaces | Steps 4–7 emphasis |
+| `monorepo-focused` | Turborepo/pnpm workspaces | Steps 3–7 emphasis |
 | `python-focused` | Python service | pyproject/requirements sections |
 
 If the user does not specify a mode, use `standard-audit`.
@@ -264,16 +275,134 @@ npm ls 2>&1 | head -40
 
 Flag unmet peer warnings — especially duplicate React/Next peers across workspaces.
 
-### Audit summary (optional, network)
+### Dependency Vulnerability & Known CVE Scan
 
-Read-only only — **do not** run fix:
+Execute a thorough vulnerability audit across manifests, lockfiles, and installed trees. Grounded in the lessons of real-world production exploits (e.g. Next.js monorepo compromises where unpatched framework versions allowed RCE and credential exfiltration).
+
+#### 1. Automated Security Advisory Scan (Read-only)
+
+Run read-only audit to extract structured vulnerability details — **do not** run `audit fix` or `audit fix --force`:
 
 ```bash
-npm audit --json 2>/dev/null | head -5
-# or: pnpm audit --json 2>/dev/null | head -5
+# npm audit extraction (prioritize Critical and High)
+npm audit --json 2>/dev/null | node -e "
+const fs=require('fs');
+let d='';
+process.stdin.on('data', c=>d+=c);
+process.stdin.on('end', ()=>{
+  try {
+    const j=JSON.parse(d);
+    const v=j.vulnerabilities||{};
+    const entries=Object.values(v);
+    console.log('Advisories total:', entries.length);
+    const critical=entries.filter(x=>x.severity==='critical');
+    const high=entries.filter(x=>x.severity==='high');
+    console.log('Critical:', critical.length, 'High:', high.length);
+    [...critical, ...high].slice(0, 15).forEach(x=>{
+      const isDev = x.isDirect ? (x.effects?.length ? 'prod/transitive' : 'direct') : 'transitive';
+      console.log(\`- [\${x.severity.toUpperCase()}] \${x.name} (\${x.range}) -> fix: \${x.fixAvailable ? (typeof x.fixAvailable==='object'? x.fixAvailable.name+'@'+x.fixAvailable.version : 'available') : 'none'} (via \${x.nodes?.slice(0,2).join(', ')})\`);
+    });
+  } catch(e){ console.log('npm audit parse skipped'); }
+});
+" 2>/dev/null
+
+# For pnpm workspaces:
+pnpm audit --json 2>/dev/null | head -30
 ```
 
-Report counts by severity. For **exploitable app impact** of advisories, note that **`kenmark-security-review`** should assess runtime exposure.
+- **Production vs. Dev Impact:** Distinguish vulnerabilities in runtime `dependencies` (accessible to live attackers on servers) from build-time `devDependencies` (lower runtime attack surface).
+
+#### 2. Critical Framework CVE Hunter (Lessons from 2026-09-14 Incident)
+
+Attackers exploit known public CVEs in web frameworks (specifically Next.js and React) when apps lag behind security patches.
+
+Scan all workspace `package.json` files for core framework versions:
+
+```bash
+# Scan Next.js versions across all monorepo apps and packages
+find . -name package.json ! -path '*/node_modules/*' -print0 2>/dev/null | \
+  xargs -0 grep -HnE '"next"' 2>/dev/null
+
+# Scan React versions across workspaces
+find . -name package.json ! -path '*/node_modules/*' -print0 2>/dev/null | \
+  xargs -0 grep -HnE '"react"' 2>/dev/null
+
+# Scan backend server frameworks (Express, NestJS, Fastify)
+find . -name package.json ! -path '*/node_modules/*' -print0 2>/dev/null | \
+  xargs -0 grep -HnE '"(express|@nestjs/core|fastify)"' 2>/dev/null
+```
+
+Evaluate identified framework versions against known high-severity advisories:
+- **CVE-2025-29927 (Next.js Middleware Authorization Bypass):** Affects applications relying on Next.js middleware for route/auth guards where internal route prefixes (`_next/data`) or header tampering bypass authentication.
+- **CVE-2024-34351 (Next.js Server Actions SSRF):** Server Actions host header manipulation allowing internal SSRF.
+- **CVE-2024-46982 / CVE-2023-46298 (Next.js Image Optimization SSRF & DoS):** Unrestricted remote URL image optimization.
+- **React Server Components (RSC) Deserialization & Prototype Pollution:** Vulnerabilities in React/Next serialization boundaries.
+
+#### 3. Monorepo Security Patch Drift
+
+In multi-package repositories (e.g. `apps/web`, `apps/admin`, `apps/api`), security updates applied to one application are frequently omitted in sibling applications:
+
+```bash
+# Compare Next.js versions across apps to spot unpatched workspaces
+node -e "
+const fs=require('fs');
+const glob=require('child_process').execSync('find . -name package.json ! -path \"*/node_modules/*\" ! -path \"*/.next/*\"').toString().split('\n').filter(Boolean);
+const map={};
+glob.forEach(f=>{
+  try {
+    const p=JSON.parse(fs.readFileSync(f,'utf8'));
+    const n=(p.dependencies||{})['next']||(p.devDependencies||{})['next'];
+    if(n) map[f]=n;
+  }catch(e){}
+});
+console.log('Next.js versions across workspaces:', map);
+" 2>/dev/null
+```
+
+| Finding | Severity |
+| --- | --- |
+| Next.js version with known critical RCE / middleware bypass CVE | **Critical** |
+| Monorepo workspace security drift (one app patched, sibling app on vulnerable version) | **High** |
+| Next.js running in development mode (`next dev`) in production manifests | **High** |
+| React/React-DOM version mismatch across workspaces with known advisories | **High** |
+
+#### 4. Manifest vs. Lockfile Staleness
+
+A manifest (`package.json`) might specify an open range like `^14.0.0` or `~14.1.0` that *could* permit a secure patch, but the lockfile (`pnpm-lock.yaml` or `package-lock.json`) was generated months earlier and remains pinned to a vulnerable release:
+
+```bash
+# Check resolved Next.js version in lockfile
+grep -A 2 'next@' pnpm-lock.yaml package-lock.json 2>/dev/null | head -15
+```
+
+If the manifest range is permissive but the lockfile resolves to a vulnerable version, flag **Lockfile Staleness** and recommend a targeted lockfile update.
+
+#### 5. Supply Chain & Malicious Lifecycle Scripts
+
+Attackers frequently use malicious npm packages that execute droppers or cryptominers via npm lifecycle hooks (`preinstall`, `postinstall`, `prepare`):
+
+```bash
+# Check root and workspace lifecycle scripts
+grep -RInE '"(preinstall|postinstall|install|prepare)"' package.json apps/*/package.json packages/*/package.json 2>/dev/null
+
+# Scan node_modules for suspicious shell execution in lifecycle scripts
+find node_modules -maxdepth 3 -name package.json 2>/dev/null | xargs grep -HnE '"(preinstall|postinstall)"' 2>/dev/null | grep -E '(curl|wget|bash|sh|powershell|python|eval)' | head -20
+```
+
+Flag any lifecycle script invoking arbitrary remote downloaders (`curl`, `wget`, `nc`, piped `sh`) as **Critical Supply Chain Risk**.
+
+#### 6. Safe Remediation Strategy (Read-Only Policy)
+
+- **Never** run `npm audit fix --force`. It forces major version upgrades that regularly introduce breaking API changes and destabilize production.
+- **Targeted Package Update:** Provide the exact package manager command to upgrade only the affected package (e.g. `pnpm up next@14.2.15 --filter apps/admin`).
+- **Emergency Override Pin:** For transitive dependencies with no direct upstream fix yet, recommend targeted pins using `overrides` (npm), `resolutions` (yarn), or `pnpm.overrides` (pnpm):
+  ```json
+  "pnpm": {
+    "overrides": {
+      "vulnerable-package": ">=1.2.3"
+    }
+  }
+  ```
 
 ### Deprecated packages (optional, network)
 
@@ -498,6 +627,13 @@ Node (pnpm) + Turborepo | …
 
 <2–3 sentences>
 
+## Vulnerabilities & Security Advisories (CVEs)
+
+| Severity | Package | Workspace / App | Installed | Patched In | Advisory / CVE | Prod / Dev | Safe Recommended Action |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Critical | next | apps/admin | 14.1.0 | >= 14.2.15 | CVE-2025-29927 (Middleware Auth Bypass) | Prod | `pnpm up next@14.2.15 --filter apps/admin` |
+| High | next | apps/website | 14.1.0 | >= 14.2.15 | CVE-2024-34351 (Server Actions SSRF) | Prod | `pnpm up next@14.2.15 --filter apps/website` |
+
 ## Critical
 
 | Confidence | Finding | Package / file | Action | Verify |
@@ -614,4 +750,5 @@ Node (pnpm) + Turborepo | …
 - Do not mark deps unused based on one grep miss (CLI, dynamic import, config plugins, other workspace packages).
 - Do not remove overrides/resolutions automatically — flag only.
 - Do not upgrade major versions without user request.
-- Do not treat npm audit alone as a full security review — delegate app context to **`kenmark-security-review`**.
+- Do not run `npm audit fix --force` — it forces breaking major version bumps that destabilize production applications.
+- Do not treat npm audit alone as a full security review — delegate app context to **`kenmark-security-review`** and live host compromise to **`kenmark-server-defense`**.
