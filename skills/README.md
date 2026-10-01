@@ -16,7 +16,7 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (53)
+skills/user-skills/          ← bundled universal skills (41)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow (manual)

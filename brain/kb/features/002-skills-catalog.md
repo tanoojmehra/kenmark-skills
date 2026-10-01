@@ -5,7 +5,7 @@ Status: reviewed
 
 ## Summary
 
-**53** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
+**41** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
 
 ## Categories
 

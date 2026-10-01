@@ -4,6 +4,10 @@
 
 ### Added
 
+- **kenmark-linear-check 1.0.0:** Added an evidence-backed Linear ticket
+  investigation workflow covering issue context, activity, relationships,
+  pull requests, implementation mapping, reviews, CI, blockers, and next
+  actions.
 - **kenmark-linear-ticket-score:** Added the Linear ticket completion scoring skill, with a compact default health report and optional expanded evidence.
 - **kenmark-storage 1.3.1:** Operational integration guide — Next.js thin-route `runtime` rule, sibling `file:` SDK linking, post-upload CMS/UI paths, common pitfalls table, optional CLI upload pattern (single/multiple/folder), `kenmark-storage-sdk` cross-link, generic caller auth wording.
 - **kenmark-storage 1.3.0:** API-only, full-proxy integration — REST routes for upload, list, proxied public/private serve, PATCH visibility, soft delete, restore; monorepo shared `packages/kenmark-storage` default; `@kenmark/storage/server` only; operator pre-flight via kenmark-manage; no browser SDK or Storage UI for callers.
@@ -789,4 +793,3 @@ Run `npx kenmark-skills setup --global --force -y` after upgrading to migrate lo
 - Updated `skills/user-skills/skill-router/SKILL.md` to generate `skills/user-skills/skill-router/registry.json` at runtime on each invocation.
 - Added repo and publish ignores so the generated registry file is not committed or shipped (`.gitignore`, `.npmignore`).
 - Removed tracked `skills/user-skills/skill-router/registry.json`; it is now per-user generated state.
-
