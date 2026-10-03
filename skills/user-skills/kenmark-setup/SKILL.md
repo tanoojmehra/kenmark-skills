@@ -19,6 +19,10 @@ triggers:
   - install drawio-skill
   - install ponytail
   - install improve
+  - install architecture skill
+  - install vercel react best practices
+  - install constraint driven development
+  - install adverse review
   - install headroom
   - curated skill packs
   - kenmark-packs
