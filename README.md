@@ -10,7 +10,7 @@ No global install required — `npx` downloads and runs the CLI (or uses your np
 
 The **init** wizard walks you through Kenmark skills, optional curated packs, IDE targets, and MCP server selection — all interactively. To refresh an existing install, use **`update`** (do not run `init` again for upgrades).
 
-**41 first-party skills**, a **12-command CLI**, and a **curated catalog** of optional third-party packs. Agent skills and CLI for Cursor, Codex, Claude Code, Antigravity CLI/IDE, Gemini CLI, OpenCode, and other harnesses that read `SKILL.md` files.
+**42 first-party skills**, a **12-command CLI**, and a **curated catalog** of optional third-party packs. Agent skills and CLI for Cursor, Codex, Claude Code, Antigravity CLI/IDE, Gemini CLI, OpenCode, and other harnesses that read `SKILL.md` files.
 
 Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-skills). Created by **Tanooj Mehra** and **Adwait Date**.
 
@@ -33,9 +33,9 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 | Asset | Count | Detail |
 | --- | ---: | --- |
-| Kenmark skills | 41 | Bundled in `skills/user-skills/` |
+| Kenmark skills | 42 | Bundled in `skills/user-skills/` |
 | CLI commands | 12 | [brain/kb/05-api-and-integrations.md](brain/kb/05-api-and-integrations.md) |
-| Recommended packs | 10 | Impeccable, Simplify, Ponytail, improve, draw.io, Graphify, Headroom, SEO, ECC — [brain/kb/features/004-recommended-packs.md](brain/kb/features/004-recommended-packs.md) |
+| Recommended packs | 14 | Impeccable, Ponytail, improve, Architecture, Vercel React, Constraints, Adverse Review, draw.io, Graphify, Headroom, SEO/GEO, ECC, plus optional Simplify — [brain/kb/features/004-recommended-packs.md](brain/kb/features/004-recommended-packs.md) |
 | MCP servers | 5 | Opt-in; 8 JSON IDE targets — [brain/kb/features/003-mcp-integration.md](brain/kb/features/003-mcp-integration.md) |
 
 Skills install once under `~/.kenmark/store` and link into each IDE's skills directory. See [brain/kb/features/005-kenmark-hub-store.md](brain/kb/features/005-kenmark-hub-store.md).
@@ -111,7 +111,7 @@ Full flag tables and MCP profiles: [brain/kb/05-api-and-integrations.md](brain/k
 ```bash
 npx kenmark-skills init --skip-recommended -y
 npx kenmark-skills init --ide cursor --skip-recommended -y
-npx kenmark-skills init --ids impeccable,simplify -y
+npx kenmark-skills init --ids impeccable,ponytail -y
 ```
 
 ### MCP (non-interactive)
@@ -128,7 +128,7 @@ npx kenmark-skills init --with-mcp --skip-recommended -y   # all servers
 
 ```bash
 npx kenmark-skills update --both -y
-npx kenmark-skills install-recommended --ids impeccable,simplify -y
+npx kenmark-skills install-recommended --ids impeccable,ponytail -y
 npx kenmark-skills adopt -y
 npx kenmark-skills doctor --json ./doctor.json --no-fail
 npx kenmark-skills cleanup --recommended -y
@@ -142,11 +142,11 @@ Legacy **`setup`** remains for `--copy`, `--force`, `--skip-adopt` not exposed o
 npx kenmark-skills setup --ide cursor --copy --skip-adopt -y
 ```
 
-Migration: `setup -y` → `init --skip-recommended -y`. Legacy `setup` runs **Install 41 Kenmark skills** via `setup-skills.js`.
+Migration: `setup -y` → `init --skip-recommended -y`. Legacy `setup` runs **Install 42 Kenmark skills** via `setup-skills.js`.
 
 | | `init` | `setup` |
 | --- | --- | --- |
-| **Installs** | Kenmark + optional packs | 41 Kenmark skills |
+| **Installs** | Kenmark + optional packs | 42 Kenmark skills |
 | **Later refreshes** | Use `update` | Use `update` |
 
 ### Testing skills (links)
@@ -160,7 +160,7 @@ kenmark-skills/
 ├── README.md
 ├── brain/                  # dev KB (git only; see brain/INDEX.md)
 ├── scripts/cli.js          # kenmark-skills binary
-└── skills/user-skills/     # 41 universal skills + recommended-catalog.json
+└── skills/user-skills/     # 42 universal skills + recommended-catalog.json
 ```
 
 ---

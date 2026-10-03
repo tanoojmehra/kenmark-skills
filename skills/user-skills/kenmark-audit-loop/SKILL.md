@@ -1,6 +1,6 @@
 ---
 name: kenmark-audit-loop
-version: 1.1.0
+version: 1.2.0
 category: issues
 scope: universal
 phase: discover
@@ -43,8 +43,9 @@ This skill orchestrates existing audit lenses (`kenmark-issues-scan`, `kenmark-s
 3. **Never reuse an issue ID.** Compute `NEXT_ID = max(all IDs) + 1` from active files, completed files, and INDEX entries.
 4. **Never file a duplicate finding** — dedupe by fingerprint (see Step 3) against existing issues and earlier passes in this run.
 5. **Always ask the user which area to audit** (Step 0) unless they already named a specific area in the same message.
-6. **Stop when `new_issues_this_pass == 0`**, or when `max_passes` (default 10) is reached.
-7. **Use subagents** (`Task`) to cover large directories in parallel when the harness supports it.
+6. **Convergence is cycle-level, never lens-level.** A cycle means every applicable lens has run once. Stop only when an entire cycle files zero new unique issues.
+7. **Run at most `max_cycles` (default 3)** unless the user explicitly asks for more.
+8. **Use subagents** (`Task`) to cover large directories in parallel when the harness supports it.
 
 ---
 
@@ -85,9 +86,10 @@ Create or update a scratch ledger at `brain/.audit-run.json` (gitignored if the 
 {
   "started": "YYYY-MM-DD",
   "selected_areas": ["all"],
+  "cycle_number": 0,
   "pass_number": 0,
   "fingerprints": [],
-  "lenses_completed": [],
+  "lenses_completed_this_cycle": [],
   "issues_filed": [],
   "stop_reason": null
 }
@@ -116,7 +118,7 @@ Seed `fingerprints` from all open and completed issues (parse `files:` frontmatt
 
 ## Step 2 — Lens rotation by area
 
-Each **pass** runs **one lens** not yet completed for the selected areas. Rotate lenses in this order; skip lenses that do not apply to the user's selection.
+Each **pass** runs one lens. A **cycle** runs every applicable lens once. Rotate lenses in this order; skip lenses that do not apply to the user's selection. Convergence is evaluated only after the cycle is complete.
 
 | Lens ID | Applies when area is | Delegate to / patterns from |
 | --- | --- | --- |
@@ -129,24 +131,38 @@ Each **pass** runs **one lens** not yet completed for the selected areas. Rotate
 | `deps` | `all`, `deps`, `infra` | `kenmark-repo-deps` audit |
 | `semantic` | `all`, or any area after lens queue empty | Deep read of files flagged in prior passes; paths from `brain/issues/` `files:` for selected areas |
 
-**Pass loop:**
+**Cycle loop:**
 
 ```text
-WHILE lenses remain for selected_areas:
-  pass_number += 1
-  pick next uncompleted lens
-  run pass (subagents per top-level directory when repo is large)
-  dedupe → file new issues → update INDEX
-  IF new_issues_this_pass == 0:
+cycle_number = 0
+WHILE cycle_number < max_cycles (default 3):
+  cycle_number += 1
+  new_issues_this_cycle = 0
+  lenses_completed_this_cycle = []
+
+  FOR each applicable lens in rotation order:
+    pass_number += 1
+    run the lens (subagents per top-level directory when repo is large)
+    dedupe → file new issues → update INDEX
+    new_issues_this_cycle += new_issues_this_pass
+    mark lens completed for this cycle
+
+  # Run semantic last so it can inspect files and patterns surfaced by the other lenses.
+  IF semantic applies and was not already in the rotation:
+    pass_number += 1
+    run semantic pass
+    dedupe → file new issues → update INDEX
+    new_issues_this_cycle += new_issues_this_pass
+
+  IF new_issues_this_cycle == 0:
     stop_reason = "converged"
     BREAK
-  IF pass_number >= max_passes (default 10):
-    stop_reason = "max_passes"
-    BREAK
-  mark lens completed; continue to next lens
-IF all lenses completed AND last pass had new issues:
-  run one `semantic` pass, then re-check stop condition
+
+IF stop_reason is null:
+  stop_reason = "max_cycles"
 ```
+
+A clean lens does **not** end the audit. For example, if simplify finds zero issues, security/testing/performance/docs/deps still run before convergence is considered.
 
 Continue the loop **in the same session** across turns until `stop_reason` is set.
 
@@ -157,11 +173,17 @@ Continue the loop **in the same session** across turns until `stop_reason` is se
 Before filing any issue, compute a fingerprint:
 
 ```text
-fingerprint = lower(file_path) + ":" + line_or_range + ":" + category + ":" + root_cause_slug
+fingerprint = lower(normalized_file_path)
+            + ":" + stable_symbol_or_route
+            + ":" + category
+            + ":" + root_cause_slug
 ```
 
+- `stable_symbol_or_route` — exported function/class/component, route, config key, package name, migration/table, or another stable semantic anchor. Use `file-scope` only when no better anchor exists.
 - `category` — lens id (`bugs`, `security`, `simplify`, etc.)
-- `root_cause_slug` — short normalized summary (e.g. `missing-return-type`, `stale-import`, `open-redirect`)
+- `root_cause_slug` — short normalized summary (e.g. `stale-import`, `open-redirect`, `missing-ownership-check`)
+- Keep line/range in **evidence**, not in the primary fingerprint. Lines move after edits and make otherwise-identical findings look new.
+- When reading legacy issues that only have line-based fingerprints, normalize them to the semantic form for in-memory comparison; do not rewrite old issue files just for dedupe.
 
 **Skip filing when:**
 
@@ -251,11 +273,11 @@ When the loop stops, report:
 | Passes run | … |
 | Lenses used | … |
 | New issues filed | count + IDs |
-| Stop reason | `converged` \| `max_passes` |
+| Stop reason | `converged` \| `max_cycles` |
 | Deduped (skipped) | count |
 | Next steps | `kenmark-tracker-list`, `kenmark-issues-fix-and-ship`, or fix P0s first |
 
-**Converged** means the last full pass filed **zero** new unique issues — not that the repo has zero bugs globally.
+**Converged** means the last full **cycle across all applicable lenses** filed **zero** new unique issues — not that the repo has zero bugs globally.
 
 ---
 

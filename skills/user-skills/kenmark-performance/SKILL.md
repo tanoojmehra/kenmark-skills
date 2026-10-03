@@ -1,6 +1,6 @@
 ---
 name: kenmark-performance
-version: 1.0.0
+version: 1.1.0
 category: workflow
 scope: universal
 phase: audit
@@ -173,6 +173,12 @@ find . -maxdepth 5 \( \
 | Monitoring | OpenTelemetry, Sentry performance, `instrumentation.ts` |
 
 Note framework versions when relevant (Next 13+ App Router vs Pages).
+
+### Framework specialist handoff
+
+Keep this skill framework-neutral at the decision level. When React or Next.js is detected **and** the optional `vercel-react-best-practices` recommended pack is installed, use it as a specialist lens in addition to this audit for current framework-specific rendering, data-fetching, waterfall, bundle, and re-render guidance.
+
+Do not duplicate the entire external rule set here. Findings from the specialist still need Kenmark evidence, impact/confidence classification, and measurement/verification before being reported as bottlenecks.
 
 ---
 
@@ -493,6 +499,7 @@ Performance risk: Low | Medium | High | Critical
 | Package overlap / unused deps | `kenmark-repo-deps` |
 | Production incident | `kenmark-troubleshoot` |
 | Add perf regression tests | `kenmark-test-integration`, `kenmark-test-e2e` |
+| React/Next framework-specific optimization | optional `vercel-react-best-practices` recommended pack |
 | Pick skill | `kenmark-router` |
 
 ---

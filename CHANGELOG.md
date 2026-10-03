@@ -14,12 +14,28 @@
 - **kenmark-storage:** Full installable skill kit — `KIT.md` (install/invoke) and `reference.md` (trust zones, auth, pipelines). Wired into `kenmark-router` and skills catalog as a specialist skill. Skill version `1.1.0`.
 - **kenmark-storage 1.2.0:** Works for all four project types (new/existing Next.js + new/existing monorepo) on existing trees only — Step 0 shape detection, monorepo placement rules, App Router **and** Pages Router route examples, package-manager-aware install.
 
+### Changed
+
+- **recommended-catalog.json (v13):** Added specialist packs for Matt Pocock's Improve Codebase Architecture (+ required `codebase-design` companion), Vercel React Best Practices, Addy Osmani's Constraint-Driven Development, and Adverse Review. Simplify is no longer default/recommended; Ponytail is the preferred minimalism/review pack. Next.js and audit presets were refreshed.
+- **kenmark-audit-loop 1.2.0:** Convergence is now evaluated after a full cycle across all applicable lenses; a clean single lens can no longer terminate an `all` audit. Fingerprints now prefer stable semantic anchors over line numbers.
+- **kenmark-issues-scan 1.4.0:** Simplify mode now targets demonstrated duplication, dead/speculative abstraction, unnecessary indirection/state/conversion, branching complexity, and canonical-representation drift instead of enforcing arrow-function/return-type style preferences.
+- **kenmark-troubleshoot 1.2.0:** Added one-leading-hypothesis discriminating tests and a three-failed-fixes rule that forces assumption/architecture re-evaluation before more speculative patches.
+- **kenmark-output 1.1.0 / kenmark-repo-quality 1.2.0:** Added fresh-evidence-before-completion contracts and gate freshness tracking after final code mutations.
+- **kenmark-security-review 1.1.0:** Added supply-chain/provenance, webhook replay/signature, multi-tenant isolation, mass-assignment/business-logic, privacy/logging/retention, and TOCTOU review lenses.
+- **kenmark-test-coverage 1.1.0:** Added optional deep-mode mutation-confidence checks for critical behavior.
+- **kenmark-performance 1.1.0:** Added explicit handoff to the optional Vercel React/Next specialist while keeping Kenmark's generic evidence/measurement model.
+
+### Fixed
+
+- **Docs/package metadata:** Reconciled the current bundled count to the actual **42** direct `skills/user-skills/*/SKILL.md` directories, the recommended catalog to **14** packs / v13, and `package.json` to v2.3.36. Existing `validate-repo` count checks remain the source-of-truth guard against future drift.
+- **Setup/catalog docs:** Removed stale “Impeccable + Simplify” defaults and updated pack routing/examples to the v13 strategy.
+
 ## v2.3.36 — Add unified kenmark-storage skill (2026-08-18)
 
 ### Added
 
 - **kenmark-storage:** New bundled skill for integrating Kenmark Storage into any project — uploads (public/private), browser upload tokens, signed private downloads, app-side Sharp/FFmpeg conversion with default presets and per-request params.
-- **Skill count:** Updated documented totals to 53 (reflects all on-disk skill directories including prior unreported additions).
+- **Skill count:** Documentation totals were refreshed here; a later audit corrected the current source-of-truth count to the direct `SKILL.md` directory count enforced by `validate-repo`.
 
 ## v2.3.35 — Node.js v24 symlink compatibility fix (2026-07-04)
 

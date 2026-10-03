@@ -1,6 +1,6 @@
 ---
 name: kenmark-output
-version: 1.0.0
+version: 1.1.0
 category: workflow
 scope: universal
 phase: verify
@@ -202,6 +202,48 @@ Validation/testing
 * Do not omit rollback for risky changes.
 * Do not omit migration notes for breaking changes.
 * Do not hide failed tool actions.
+
+---
+
+## Verification-before-completion contract
+
+Do not make a completion claim unless there is **fresh evidence produced after the final relevant change**.
+
+Completion claims include words such as:
+
+```text
+fixed
+done
+working
+passes
+completed
+ready
+production-ready
+merged successfully
+deployed successfully
+```
+
+Before making one of these claims, map it to proof:
+
+| Claim | Minimum fresh proof |
+| --- | --- |
+| Build works | build command exits 0 |
+| Types pass | typecheck exits 0 |
+| Lint passes | lint/check command exits 0 |
+| Tests pass | relevant test command exits 0 with test summary |
+| Route/UI works | actual runtime/browser/HTTP verification of the affected path |
+| Issue fixed | original failure reproduced before fix, then no longer reproduces after fix; add regression test when appropriate |
+| Merge/commit/push succeeded | tool/VCS response confirms the resulting ref/commit |
+
+Rules:
+
+1. **Evidence must be fresh.** If code/config changes after a check, that check no longer proves the final state.
+2. **Use the narrowest relevant proof first, then broader gates.**
+3. **Never convert planned verification into claimed verification.** “Run `pnpm test`” is an instruction, not evidence that tests pass.
+4. **If verification cannot be run, downgrade the wording.** Say “implemented; not verified because …” rather than “done.”
+5. **Report failed or skipped proof explicitly.** Do not hide a red or unrun gate behind a positive summary.
+
+For repository work, pair this contract with `kenmark-repo-quality`.
 
 ---
 

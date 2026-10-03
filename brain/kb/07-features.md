@@ -17,8 +17,8 @@ Status: reviewed
 
 - 41 bundled Kenmark skills under `skills/user-skills/` (flat directories).
 - `kenmark-storage` — API-only consumer skill for Kenmark Storage: proxied REST routes (upload, list, serve, visibility, soft delete/restore), shared monorepo package, `@kenmark/storage/server` only. Kit: `SKILL.md`, `KIT.md`, `reference.md`. Version `1.3.1` adds operational pitfalls, thin-route runtime, sibling SDK linking, CMS usage patterns.
-- 10 optional catalog pack IDs: `impeccable`, `simplify`, `ponytail`, `improve`, `drawio-skill`, `graphify`, `seo-geo-selected`, `seo-geo-full`, `ecc`, `headroom`.
-- Default catalog selection: **impeccable** + **simplify** only.
+- 14 optional catalog pack IDs: `impeccable`, `simplify`, `ponytail`, `improve`, `architecture`, `vercel-react-best-practices`, `constraint-driven-development`, `adverse-review`, `drawio-skill`, `graphify`, `seo-geo-selected`, `seo-geo-full`, `ecc`, `headroom`.
+- Default catalog selection: **impeccable** only. Ponytail is the preferred primary minimalism/review pack; Simplify remains optional overlap.
 
 ## Documentation gaps
 

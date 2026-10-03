@@ -1,12 +1,12 @@
 # Project overview
 
-Last updated: 2026-06-07
+Last updated: 2026-10-04
 Status: reviewed
 
 ## Confirmed facts
 
-- **kenmark-skills** is a public npm package (MIT) that ships **41 first-party Kenmark agent skills** and a **12-command CLI** for Cursor, Claude Code, Codex, and other harnesses that read `SKILL.md` files.
-- Current version: **2.3.10** in `package.json`.
+- **kenmark-skills** is a public npm package (MIT) that ships **42 first-party Kenmark agent skills** and a **12-command CLI** for Cursor, Claude Code, Codex, and other harnesses that read `SKILL.md` files.
+- Current version: **2.3.36** in `package.json`.
 - Binaries: `kenmark-skills` → `scripts/cli.js`, `kenmark-skills-setup` → `scripts/setup-skills.js` (legacy).
 - Recommended first install for humans: `npx kenmark-skills init` (interactive wizard).
 - Skills install to `~/.kenmark/store/skills/` and link into IDE skill directories; optional third-party packs from `recommended-catalog.json`.
@@ -20,7 +20,7 @@ Status: reviewed
 - `README.md` — user-facing quick start (being simplified)
 - `scripts/cli.js` — command routing
 - `skills/README.md` — flat skill layout and categories
-- `skills/user-skills/recommended-catalog.json` — optional pack catalog v5
+- `skills/user-skills/recommended-catalog.json` — optional pack catalog v13
 
 ## Assumptions
 
@@ -33,5 +33,5 @@ Status: reviewed
 
 ## Maintenance notes
 
-- Update skill count if bundled skills added/removed (validate-repo enforces consistency).
+- Bundled skill count is derived from direct `skills/user-skills/*/SKILL.md` directories; `validate-repo` enforces package/README/skills README consistency (currently 42).
 - Update version line when releasing.

@@ -1,6 +1,6 @@
 ---
 name: kenmark-repo-quality
-version: 1.1.1
+version: 1.2.0
 category: workflow
 scope: universal
 phase: verify
@@ -110,6 +110,15 @@ git status --short 2>/dev/null || true
 ```
 
 Record whether the repo is already dirty. Do not mix pre-existing changes with fixes unless the user approves.
+
+Capture a verification baseline:
+
+```bash
+VERIFY_HEAD_BEFORE="$(git rev-parse HEAD 2>/dev/null || echo no-git)"
+VERIFY_STATUS_BEFORE="$(git status --porcelain 2>/dev/null || true)"
+```
+
+These values are evidence metadata, not a cleanliness requirement.
 
 ---
 
@@ -339,15 +348,15 @@ Use this template for the report (fill in rows and sections from the run):
 
 ## Summary
 
-| Gate | Command | Result | Notes |
-| --- | --- | --- | --- |
-| package manager | ... | pass/fail/skip | ... |
-| typecheck | ... | pass/fail/skip | ... |
-| lint | ... | pass/fail/skip | ... |
-| format | ... | pass/fail/skip | ... |
-| build | ... | pass/fail/skip | ... |
-| test | ... | pass/fail/skip | ... |
-| dev/runtime | ... | pass/fail/skip | ... |
+| Gate | Command | Result | Evidence freshness | Notes |
+| --- | --- | --- | --- | --- |
+| package manager | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| typecheck | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| lint | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| format | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| build | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| test | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| dev/runtime | ... | pass/fail/skip | fresh/stale/not-run | ... |
 
 ## Highest-priority failures
 
@@ -378,6 +387,21 @@ Include concise error excerpts. Do not paste huge logs. Prefer first error + fin
 
 - ...
 ```
+
+---
+
+## Step 8b — Freshness check before any green claim
+
+Immediately before reporting that the repository or a gate is healthy, capture:
+
+```bash
+VERIFY_HEAD_AFTER="$(git rev-parse HEAD 2>/dev/null || echo no-git)"
+VERIFY_STATUS_AFTER="$(git status --porcelain 2>/dev/null || true)"
+```
+
+A gate is **fresh** only when it was run after the last relevant file mutation. If files were edited after typecheck/lint/build/tests, mark affected rows **stale** and re-run the smallest relevant gates before claiming success.
+
+Report the before/after HEAD and dirty-state summary when it helps explain whether evidence is still valid. Never claim “all checks pass” when one of the required checks is stale, skipped, or not run.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: kenmark-test-coverage
-version: 1.0.0
+version: 1.1.0
 category: testing
 scope: universal
 phase: audit
@@ -119,6 +119,35 @@ error handling
 
 ---
 
+## Step 4 — Optional mutation-confidence check
+
+Use only in a user-requested **deep** audit or when a critical path appears covered but the assertions may be weak.
+
+The question is not only “does a test execute this code?” but “would the test fail if the behavior were wrong?”
+
+For a small, isolated critical branch:
+
+1. Ensure the working tree state is known and preserve the exact original content.
+2. Make **one temporary mutation** such as:
+   - invert a boolean condition
+   - change a comparison boundary
+   - remove a guard/authorization branch
+   - return a clearly wrong value from the targeted branch
+3. Run only the directly relevant tests.
+4. Immediately restore the original source, even when the test command fails or is interrupted.
+5. Record whether the tests **killed** the mutation (failed as expected) or **survived** it (stayed green).
+
+A surviving mutation is evidence of weak behavioral protection even if line coverage is high.
+
+Safety rules:
+
+- Never mutate production/live systems or generated/vendor code.
+- Never leave a mutation in the working tree.
+- Do not bulk-mutate a repository manually; use a dedicated mutation-testing tool when the user wants systematic mutation testing.
+- Do not weaken/delete tests to make a mutation pass.
+
+---
+
 ## Output format
 
 ```markdown
@@ -132,6 +161,8 @@ error handling
 | --- | --- | --- | --- | --- |
 
 ## Weak tests
+
+## Mutation confidence (deep mode only)
 
 ## Suggested thresholds
 
