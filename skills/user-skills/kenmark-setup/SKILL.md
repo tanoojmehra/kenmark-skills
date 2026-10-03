@@ -1,6 +1,6 @@
 ---
 name: kenmark-setup
-version: 1.0.0
+version: 1.1.0
 category: admin
 scope: universal
 phase: setup
@@ -32,7 +32,7 @@ disable-model-invocation: true
 
 # Kenmark Setup
 
-One guided flow for **new users**: install Kenmark skills globally, optionally install **selectable third-party packs** (defaults: Impeccable + Simplify only; Graphify, SEO, ECC are opt-in), with **repo-aware suggestions**, then pick **IDEs**. Kenmark installs to `~/.kenmark/store` and links into IDE home folders — not per-repo.
+One guided flow for **new users**: install Kenmark skills globally, optionally install **selectable third-party packs** (default: Impeccable only; Ponytail and specialist packs are suggested from repo signals; Graphify, SEO, ECC remain opt-in), with **repo-aware suggestions**, then pick **IDEs**. Kenmark installs to `~/.kenmark/store` and links into IDE home folders — not per-repo.
 
 ## When to use
 
@@ -59,7 +59,7 @@ Prompts (nothing is pre-selected — you must choose each step):
 
 1. Install Kenmark skills? (default **no**)
 2. Install optional recommended packs? (default **no**)
-3. If packs: checklist with repo suggestions (`--suggest` shows the same analysis non-interactively); Enter accepts defaults (**impeccable**, **simplify**)
+3. If packs: checklist with repo suggestions (`--suggest` shows the same analysis non-interactively); Enter accepts the catalog default (**impeccable**)
 4. ECC profile prompt when ECC is selected
 5. Scope — **global only** (no project installs)
 6. IDE targets — auto, all, or numbered list (**required** when installing Kenmark)
@@ -78,8 +78,8 @@ npx kenmark-skills init --skip-recommended -y
 # Repo-aware suggestions only (no install)
 npx kenmark-skills init --suggest
 
-# Kenmark + specific packs (defaults: impeccable + simplify)
-npx kenmark-skills init --ids impeccable,simplify -y
+# Kenmark + specific packs (recommended example)
+npx kenmark-skills init --ids impeccable,ponytail -y
 
 # Explicit IDE targets
 # npx kenmark-skills init --ide cursor,claude,codex --skip-recommended -y
@@ -130,14 +130,18 @@ Read from: `skills/user-skills/recommended-catalog.json`
 
 **Mode:** `selectable` (v5+)
 
-**Default selection:** `impeccable` + `simplify` only — heavy packs are opt-in.
+**Default selection:** `impeccable` only. `ponytail` is the preferred primary minimalism/review pack; `simplify` remains optional overlap.
 
 | Pack | Role |
 | --- | --- |
 | `impeccable` | UI/design polish (default-on) |
-| `simplify` | Post-generation code simplification (default-on) |
-| `ponytail` | YAGNI / anti-over-engineering (5 skills; opt-in) |
+| `ponytail` | Preferred YAGNI / anti-over-engineering review pack (5 skills) |
+| `simplify` | Optional behavior-preserving cleanup; overlaps Ponytail/native simplify audit |
 | `improve` | Audit → plan → execute delegation (opt-in; writes `plans/`) |
+| `architecture` | Deep-module architecture survey; installs `codebase-design` companion |
+| `vercel-react-best-practices` | React/Next.js performance specialist from Vercel Engineering |
+| `constraint-driven-development` | Durable measurable project quality contract |
+| `adverse-review` | Heavy multi-perspective review for high-risk changes |
 | `drawio-skill` | draw.io architecture/UML/flow diagrams (opt-in; needs desktop CLI) |
 | `graphify` | Large-repo navigation |
 | `seo-geo-selected` | Six SEO/GEO skills (not full suite) |
@@ -158,18 +162,22 @@ Read from: `skills/user-skills/recommended-catalog.json`
 Do **not** install multiple overlapping packs for the same purpose unless the user asks:
 
 - Design/UI: max 1 primary pack
-- Code review / minimalism: Simplify (default) or Ponytail (YAGNI ladder) — not both unless asked
+- Code review / minimalism: prefer Ponytail; Simplify is optional overlap — do not stack both unless asked
 - SEO/GEO: selected skills by default; full pack only on request
 - Agent harness: ECC **minimal** by default
 - Navigation: Graphify for medium/large repos
 - Audit / planning: improve for audit-to-plan workflows (repo-root `plans/`)
+- Architecture: `architecture` for deep-module/seam/testability surveys
+- Framework: `vercel-react-best-practices` for React/Next-specific performance rules; may coexist with generic Kenmark performance review
+- Constraints: `constraint-driven-development` for durable machine-checkable quality bars
+- Adversarial review: `adverse-review` for large/risky PRs; expensive, not a routine default
 - Diagrams: draw.io skill for architecture/UML exports (requires draw.io desktop CLI)
 - Context compression: Headroom for tool-heavy agent workflows (optional)
 
 | Audience | How to run |
 | --- | --- |
 | **Human** | `npx kenmark-skills install-recommended` — checklist + repo suggestions, scope, confirm |
-| **Agent** | `npx kenmark-skills install-recommended --ids impeccable,simplify -y` or `--profile core-next` |
+| **Agent** | `npx kenmark-skills install-recommended --ids impeccable,ponytail -y` or `--profile core-next` |
 
 ### Step 1 — Suggest or list
 
@@ -184,8 +192,9 @@ Interactive flow shows weight, bloat, and stack-specific suggestions before conf
 ### Step 2 — Install selected packs (preferred)
 
 ```bash
-npx kenmark-skills install-recommended --ids impeccable,simplify -y
-npx kenmark-skills install-recommended --ids impeccable,simplify,graphify -y
+npx kenmark-skills install-recommended --ids impeccable,ponytail -y
+npx kenmark-skills install-recommended --ids impeccable,ponytail,vercel-react-best-practices -y
+npx kenmark-skills install-recommended --ids architecture,constraint-driven-development -y
 ```
 
 ### Step 3 — Presets (advanced / CI)
