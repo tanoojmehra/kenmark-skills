@@ -1,10 +1,10 @@
 ---
 name: kenmark-security-review
-version: 1.0.0
+version: 1.1.0
 category: workflow
 scope: universal
 phase: audit
-description: "Read-only secure-code review for auth bypass, RBAC mistakes, injection risks, unsafe uploads, SSRF, open redirects, exposed admin routes, insecure CORS, dependency/security config, and API abuse/rate-limit gaps. Use for application security review. For secrets use kenmark-repo-secrets; for public-publish readiness use kenmark-repo-public."
+description: "Read-only secure-code review for auth bypass, RBAC mistakes, injection risks, unsafe uploads, SSRF, open redirects, exposed admin routes, insecure CORS, API abuse, supply-chain risk, multi-tenant isolation, webhook trust, privacy/data handling, and dependency/security config. Use for application security review. For secrets use kenmark-repo-secrets; for public-publish readiness use kenmark-repo-public."
 triggers:
   - security review
   - secure code review
@@ -73,7 +73,7 @@ Assume malicious input → Verify authorization at every boundary → Report evi
 | Mode | Use when | Behavior |
 | --- | --- | --- |
 | `quick-review` | Fast pre-merge or spot check | Auth on changed routes, obvious injection/upload/SSRF patterns |
-| `standard-review` | Normal security review | Steps 2–10 for detected stack |
+| `standard-review` | Normal security review | Steps 2–12 for detected stack |
 | `deep-review` | High-risk app or pre-release | Full surface map + cross-file data-flow checks |
 | `api-focused` | REST/GraphQL/tRPC/API routes | Auth, RBAC, injection, rate limits, CORS, SSRF on outbound calls |
 | `auth-focused` | Login/session/RBAC concerns | Middleware, role checks, cookies, CSRF, session config |
@@ -345,7 +345,59 @@ grep -RInE '(catch\s*\([^)]*\)\s*\{[^}]*res\.(status|json|send).*err)' \
 
 ---
 
-## Step 11 — Report template
+## Step 11 — Supply chain and dependency provenance
+
+Review the dependency boundary as part of application security, not only dependency bloat:
+
+- suspicious or newly introduced install/postinstall scripts
+- direct dependencies pulled from Git URLs, tarballs, untrusted registries, or mutable branches
+- security-critical packages that are abandoned, unmaintained, or unexpectedly replaced
+- lockfile changes that introduce unrelated dependency trees
+- CI actions/plugins referenced by mutable tags where pinning is appropriate
+- package name confusion / typo-squatting risk on newly introduced dependencies
+
+Do not automatically upgrade or remove dependencies. Record evidence and route version/CVE remediation to `kenmark-repo-deps`.
+
+---
+
+## Step 12 — Trust, privacy, and business-logic review
+
+For applicable systems, explicitly inspect these non-syntax attack surfaces:
+
+### Webhooks and callbacks
+
+- Verify signatures before processing webhook bodies.
+- Prefer replay protection / timestamp windows when the provider supports them.
+- Confirm idempotency for payment/order/account mutation webhooks.
+- Do not trust callback query/body fields as proof of provider success.
+
+### Multi-tenant and ownership isolation
+
+- Verify tenant/account/organization scope at the server/data-access boundary.
+- Look for queries that accept record IDs without also constraining owner/tenant.
+- Check cache keys, object storage paths, background jobs, exports, and admin tools for cross-tenant leakage.
+
+### Mass assignment and business-logic abuse
+
+- Do not spread untrusted request bodies directly into ORM/update/create calls without an allowlist/schema.
+- Check price, role, quota, status, ownership, approval, and entitlement fields for client-controlled mutation.
+- Look for race/TOCTOU windows around balances, inventory, one-time tokens, approvals, and duplicate submissions.
+
+### Privacy and sensitive-data handling
+
+Identify sensitive/PII flows and verify:
+
+- logs and analytics do not capture full tokens, passwords, session IDs, payment data, or unnecessary PII
+- sensitive fields are minimized and retained only as long as needed
+- data-at-rest/in-transit protection matches the sensitivity of the data
+- exports, backups, debug endpoints, error tracking, and support tooling do not bypass normal access controls
+- deletion/anonymization flows cover derived copies where the product promises deletion
+
+Mark policy/legal questions as **Needs verification**; do not invent retention or regulatory requirements.
+
+---
+
+## Step 13 — Report template
 
 Use this template in chat. For large reviews, offer `brain/reports/kenmark-security-review-YYYY-MM-DD.md` when `brain/` exists.
 
