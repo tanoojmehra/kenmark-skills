@@ -1,6 +1,6 @@
 ---
 name: kenmark-issues-scan
-version: 1.3.0
+version: 1.4.0
 category: issues
 scope: universal
 phase: discover
@@ -11,15 +11,6 @@ triggers:
   - discover issues
   - new issues
   - scan issues
-  - scan for simplification opportunities
-  - simplify audit
-  - kenmark-simplify-scan
-  - scan for simplification opportunities
-  - simplify audit
-  - kenmark-simplify-scan
-  - scan for simplification opportunities
-  - simplify audit
-  - kenmark-simplify-scan
   - scan for simplification opportunities
   - simplify audit
   - kenmark-simplify-scan
@@ -221,51 +212,69 @@ grep -rn "redirect\|returnTo\|callback\|oauth" --include="*.ts" --include="*.py"
 
 ## Simplify scan mode
 
-Use this sub-mode when the user asks to **scan for simplification opportunities** — nested ternaries, arrow functions, missing return types, redundant boilerplate. This mode focuses on code clarity and consistency without altering functionality.
+Use this sub-mode when the user asks to **scan for simplification opportunities**. The goal is behavior-preserving reduction of accidental complexity, not enforcing arbitrary style preferences.
 
 **Hard rules:**
 1. Never modify source code during the scan. Only document opportunities as issue files.
 2. Preserve exact functionality when proposing simplifications.
 3. Follow the global ID ledger rules in `brain/issues/INDEX.md`.
+4. **Follow project conventions first.** Do not file an issue merely because code uses arrow functions, inferred return types, classes, functions, or another valid style.
+5. **Require demonstrated complexity or duplication.** A grep hit is a lead, never sufficient evidence.
 
-### Simplification checklist
+### High-value simplification checklist
 
-Audit code against these standard project patterns:
+Look for opportunities where removing or consolidating code makes the system easier to understand without changing behavior:
 
-1. **Nested Ternaries:** Identify nested ternary operators (`? :` inside another `? :`). Propose standard `if/else` or `switch` statements instead.
-2. **Top-Level Arrow Functions:** Locate top-level function declarations defined using `const foo = () => ...`. Propose using the standard `function` keyword instead.
-3. **Missing Return Type Annotations:** Find top-level, helper, or middleware functions lacking explicit return type annotations. Propose adding clear return types (e.g., `: void`, `: Promise<void>`, `: string`).
-4. **Redundant Boilerplate & try/catch:** Spot duplicate database initialization, repeated environment loading, or unnecessarily nested try/catch blocks that can be refactored into a single shared helper or global hook.
+1. **Duplicated implementation:** equivalent validation, mapping, formatting, parsing, initialization, error handling, or business rules repeated in multiple places.
+2. **Dead or speculative abstraction:** interfaces, factories, providers, wrappers, extension points, feature flags, or indirection with no meaningful second implementation or current caller need.
+3. **Single-use helpers and pass-through wrappers:** abstractions that add another hop but hide little or no complexity. Keep them when they provide a real domain name, policy boundary, instrumentation point, or test seam.
+4. **Native/platform replacement:** custom code that can safely use an existing language, framework, or already-installed dependency capability.
+5. **Deep nesting / high branch complexity:** nested conditionals, try/catch pyramids, deeply nested callbacks, or long decision trees that can be flattened or expressed with clearer early returns/data structures.
+6. **Large functions/modules with mixed responsibilities:** code where one unit performs unrelated orchestration, transformation, I/O, validation, and rendering and has clear evidence of change friction.
+7. **Unnecessary state or derived-state duplication:** stored values that can be derived reliably from a single source of truth, duplicated caches, or mirrored client/server state without a need.
+8. **Parallel representations of the same concept:** multiple schemas/types/enums/constant lists that drift and can share one canonical representation.
+9. **Redundant conversion layers:** repeated DTO ↔ model ↔ view-model transformations that do not enforce a meaningful boundary.
+10. **Boilerplate around stable primitives:** repeated environment loading, DB/client initialization, request parsing, response wrapping, or logging that can be consolidated without creating a god helper.
 
-### Grep search examples
+### Style is not simplification by itself
 
-```bash
-# Find arrow functions assigned to variables
-grep -rn "const [a-zA-Z0-9_]\+ = (.*) =>" src/ 2>/dev/null
+Do **not** file findings solely for:
 
-# Find nested ternaries in JSX/TSX
-grep -rn "?.*:.*:.*:" src/ 2>/dev/null
+- top-level arrow functions vs `function` declarations
+- explicit vs inferred TypeScript return types
+- one project's formatting preference
+- class vs functional style
+- minor line-count reduction
 
-# Find functions with missing return types
-grep -rn "function [a-zA-Z0-9_]\+(.*) {" src/ 2>/dev/null | grep -v ":"
+Only raise those when the repository's own lint/rules explicitly require them or when they materially contribute to readability, correctness, or maintenance cost.
+
+### Evidence standard
+
+For each proposed simplification, confirm:
+
+```text
+current complexity → concrete maintenance/readability cost → smaller equivalent design → behavior-preservation evidence
 ```
+
+Useful searches may locate candidates, but always read the surrounding implementation and callers before filing. Prefer symbol/reference search, duplicate blocks, complexity reports, and call-site inspection over regex-only style scans.
 
 ### Documenting simplification findings
 
-For each high-value simplification opportunity found:
+For each **high-value** simplification opportunity found:
 1. Write a new issue file `brain/issues/NNN-slug.md`.
 2. Format the issue frontmatter with:
    - `id`: NNN
    - `title`: Short, clear summary
-   - `severity`: P2 (or P1 if critical regression/bug)
+   - `severity`: normally P2; use P1 only when complexity is causing a concrete reliability/security/performance risk
    - `area`: dx / testing / ui / backend / etc.
    - `source`: kenmark-issues-scan (simplify mode)
    - `status`: open
    - `files`: array of relative paths
-3. Include clear evidence with clickable `file://` markdown links referencing line ranges.
-4. Add clear acceptance criteria (e.g., `[ ] All functions in x.ts have return types`).
-5. Update `brain/issues/INDEX.md` active issues tables, active issue counts, and ledger parameters.
-6. Append a summary entry to `brain/CHANGELOG.md` describing the simplification audit pass.
+3. Include the current call sites/duplication/branching evidence, not only the candidate declaration.
+4. State what behavior must remain unchanged.
+5. Add acceptance criteria that describe the reduced design and verification required.
+6. Update `brain/issues/INDEX.md` active issue tables, counts, and ledger parameters.
+7. Append a summary entry to `brain/CHANGELOG.md` describing the simplification audit pass.
 
 ---
 
