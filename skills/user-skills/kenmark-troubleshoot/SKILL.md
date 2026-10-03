@@ -1,6 +1,6 @@
 ---
 name: kenmark-troubleshoot
-version: 1.1.0
+version: 1.2.0
 category: workflow
 scope: universal
 phase: diagnose
@@ -276,6 +276,26 @@ Prefer tests that are:
 * Fast
 * Narrow in scope
 * Able to falsify a hypothesis
+
+### One-hypothesis-at-a-time rule
+
+After building the hypothesis tree, select the **single leading hypothesis** and run the smallest discriminating test for it. Add the result to the evidence bundle and update confidence before changing code or moving to another hypothesis.
+
+Do not shotgun multiple unrelated fixes. If a test refutes the leading hypothesis, move to the next best-supported hypothesis and repeat.
+
+### Three-failed-fixes rule
+
+Track attempted fixes separately from diagnostic tests.
+
+If **three materially different fixes** have been attempted without resolving the symptom:
+
+1. Stop making additional symptom-level changes.
+2. Re-read the original problem frame and evidence bundle.
+3. Re-evaluate hidden assumptions, interfaces, ownership boundaries, architecture, and environment.
+4. Consider whether the repeated failures indicate the problem is upstream of the edited code or that the current abstraction has no stable seam.
+5. Return to hypothesis generation before another fix attempt.
+
+A fourth speculative patch without this re-evaluation is not allowed.
 
 ---
 
