@@ -761,7 +761,7 @@
           "summary": "Install codebase-design plus improve-codebase-architecture globally"
         },
         "verify": {
-          "global": "test -f \"$HOME/.agents/skills/codebase-design/SKILL.md\" -o -f \"$HOME/.claude/skills/codebase-design/SKILL.md\"; test -f \"$HOME/.agents/skills/improve-codebase-architecture/SKILL.md\" -o -f \"$HOME/.claude/skills/improve-codebase-architecture/SKILL.md\""
+          "global": "{ test -f \"$HOME/.agents/skills/codebase-design/SKILL.md\" || test -f \"$HOME/.cursor/skills/codebase-design/SKILL.md\" || test -f \"$HOME/.claude/skills/codebase-design/SKILL.md\"; } && { test -f \"$HOME/.agents/skills/improve-codebase-architecture/SKILL.md\" || test -f \"$HOME/.cursor/skills/improve-codebase-architecture/SKILL.md\" || test -f \"$HOME/.claude/skills/improve-codebase-architecture/SKILL.md\"; }"
         }
       }
     },
