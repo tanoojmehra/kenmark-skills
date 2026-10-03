@@ -6,8 +6,7 @@
   "defaults": {
     "scope": "global",
     "selectedIds": [
-      "impeccable",
-      "simplify"
+      "impeccable"
     ]
   },
   "installRules": {
