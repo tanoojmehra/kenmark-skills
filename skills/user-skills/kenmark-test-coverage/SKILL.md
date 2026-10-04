@@ -1,6 +1,6 @@
 ---
 name: kenmark-test-coverage
-version: 1.0.0
+version: 1.1.0
 category: testing
 scope: universal
 phase: audit
@@ -119,6 +119,31 @@ error handling
 
 ---
 
+## Step 4 — Optional mutation confidence
+
+Line coverage can be high while tests fail to protect behavior. For critical logic, add a **mutation-confidence** lens.
+
+Prefer an already-configured mutation-testing tool (for example Stryker, mutmut, PIT, or the ecosystem equivalent). Discover existing config/scripts first; do not install new tooling automatically.
+
+```bash
+node -e "const p=require('./package.json'); console.log(JSON.stringify(p.scripts||{}, null, 2))" 2>/dev/null || true
+find . -maxdepth 3 -type f \( -name 'stryker.conf.*' -o -name '.stryker-tmp' -o -name 'mutmut-config*' -o -name 'pitest*' \) -print 2>/dev/null
+```
+
+When a configured mutation command exists and is safe/local, run it against a narrow critical module. Otherwise, report **candidate mutations** without changing tracked source:
+
+- invert a permission/authorization condition
+- change `>` to `>=` (or the reverse) at an important threshold
+- remove a required guard/validation branch
+- replace a success/error branch return value
+- skip an idempotency or ownership check
+
+A strong test suite should fail for behavior-changing mutations. If these changes would survive, the gap is **behavioral protection**, even if percentage coverage is high.
+
+**Safety:** this skill remains read-only. Do not directly edit tracked source to simulate mutations. If the user explicitly wants manual mutation experiments, use a disposable copy/worktree or a configured mutation runner and restore/verify state before reporting.
+
+---
+
 ## Output format
 
 ```markdown
@@ -132,6 +157,12 @@ error handling
 | --- | --- | --- | --- | --- |
 
 ## Weak tests
+
+## Mutation confidence
+
+- Configured mutation tooling: yes/no
+- Critical modules sampled: ...
+- Surviving/high-risk candidate mutations: ...
 
 ## Suggested thresholds
 
