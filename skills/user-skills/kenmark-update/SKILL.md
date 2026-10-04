@@ -1,6 +1,6 @@
 ---
 name: kenmark-update
-version: 1.0.0
+version: 1.1.0
 category: admin
 scope: universal
 phase: maintain
@@ -34,7 +34,7 @@ Pair with **kenmark-skills-maintain** if the machine has duplicate or stale skil
 | Target | Action |
 | --- | --- |
 | **Kenmark skills** | Refresh `~/.kenmark/store/skills` from the package, then relink IDE paths (same as `setup`) |
-| **Recommended packs** | Re-run install commands from `recommended-catalog.json` (Impeccable, ECC, Graphify, code review, SEO/GEO — install methods vary) |
+| **Recommended packs** | Re-run install commands from `recommended-catalog.json` (Impeccable/Ponytail defaults plus framework, architecture, constraints, assurance, Graphify, SEO/GEO, ECC, and other selected packs — install methods vary) |
 | **Adopt** (default) | Copy adoptable catalog skills into the store and relink IDEs (`kenmark-skills adopt`). Includes Kenmark bundled skills and adoptable catalog packs (Impeccable, ECC, and more) when present on disk. |
 | **npm package** (optional) | `npm update -g kenmark-skills` when installed globally |
 
@@ -74,7 +74,7 @@ npx kenmark-skills update --both -y
 npx kenmark-skills update --kenmark-only -y
 
 # Reinstall recommended packs only
-npx kenmark-skills update --recommended-only --ids impeccable,ecc -y
+npx kenmark-skills update --recommended-only --ids impeccable,ponytail -y
 
 # Upgrade global npm package only
 npx kenmark-skills update --npm-only -y
