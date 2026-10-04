@@ -20,7 +20,7 @@ Status: reviewed
 - `README.md` — user-facing quick start (being simplified)
 - `scripts/cli.js` — command routing
 - `skills/README.md` — flat skill layout and categories
-- `skills/user-skills/recommended-catalog.json` — optional pack catalog v5
+- `skills/user-skills/recommended-catalog.json` — optional pack catalog v13
 
 ## Assumptions
 
@@ -33,5 +33,5 @@ Status: reviewed
 
 ## Maintenance notes
 
-- Update skill count if bundled skills added/removed (validate-repo enforces consistency).
+- Bundled skill count is derived from direct `skills/user-skills/*/SKILL.md` directories; `validate-repo` enforces package/README/skills README consistency (currently 42).
 - Update version line when releasing.
