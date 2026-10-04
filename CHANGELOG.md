@@ -16,7 +16,7 @@
 ### Fixed
 
 - **Repository metadata:** Reconciled the active package/docs to **42 bundled skills** and aligned `package.json` with the latest released changelog version `2.3.36`.
-- **Recommended-pack docs/setup:** Updated presets, defaults, pack counts, setup examples, and KB references for catalog v13.
+- **Recommended-pack docs/setup/update:** Updated presets, defaults, pack counts, setup/update examples, verification paths, and KB references for catalog v13.
 
 
 ### Added
@@ -36,7 +36,7 @@
 ### Added
 
 - **kenmark-storage:** New bundled skill for integrating Kenmark Storage into any project — uploads (public/private), browser upload tokens, signed private downloads, app-side Sharp/FFmpeg conversion with default presets and per-request params.
-- **Skill count:** Updated documented totals to 53 (reflects all on-disk skill directories including prior unreported additions).
+- **Skill count:** Added the storage skill; current bundled totals are derived from `skills/user-skills/*/SKILL.md` and enforced by repo validation rather than relying on this historical snapshot.
 
 ## v2.3.35 — Node.js v24 symlink compatibility fix (2026-07-04)
 
