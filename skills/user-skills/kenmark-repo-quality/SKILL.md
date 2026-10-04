@@ -1,6 +1,6 @@
 ---
 name: kenmark-repo-quality
-version: 1.1.1
+version: 1.2.0
 category: workflow
 scope: universal
 phase: verify
@@ -107,9 +107,15 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT"
 echo "REPO_ROOT=$REPO_ROOT"
 git status --short 2>/dev/null || true
+git rev-parse HEAD 2>/dev/null || true
 ```
 
-Record whether the repo is already dirty. Do not mix pre-existing changes with fixes unless the user approves.
+Record:
+- the starting `HEAD`
+- whether the repo is already dirty
+- the relevant pre-existing changed paths
+
+Do not mix pre-existing changes with fixes unless the user approves.
 
 ---
 
@@ -332,22 +338,31 @@ Do not leave background dev servers running.
 
 ## Step 8 — Output report
 
+Before reporting a gate as passing, confirm the evidence is **fresh relative to the final relevant mutation**. If files changed after a gate ran, rerun that gate (or mark the old result stale). Capture final `HEAD` and `git status --short` so the report can distinguish verified state from later edits.
+
 Use this template for the report (fill in rows and sections from the run):
 
 ```markdown
 # Repo Quality Gates Report
 
+## Verification state
+
+- HEAD before checks: ...
+- HEAD after final relevant change: ...
+- Dirty state before: ...
+- Dirty state after: ...
+
 ## Summary
 
-| Gate | Command | Result | Notes |
-| --- | --- | --- | --- |
-| package manager | ... | pass/fail/skip | ... |
-| typecheck | ... | pass/fail/skip | ... |
-| lint | ... | pass/fail/skip | ... |
-| format | ... | pass/fail/skip | ... |
-| build | ... | pass/fail/skip | ... |
-| test | ... | pass/fail/skip | ... |
-| dev/runtime | ... | pass/fail/skip | ... |
+| Gate | Command | Result | Evidence | Notes |
+| --- | --- | --- | --- | --- |
+| package manager | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| typecheck | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| lint | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| format | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| build | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| test | ... | pass/fail/skip | fresh/stale/not-run | ... |
+| dev/runtime | ... | pass/fail/skip | fresh/stale/not-run | ... |
 
 ## Highest-priority failures
 
@@ -421,4 +436,5 @@ Examples:
 - Do not paste entire logs when the first actionable error is enough.
 - Do not start multiple dev servers on different ports.
 - Do not hide skipped gates. Always say why a gate was skipped.
+- Do not claim a gate still passes if relevant files changed after it ran; rerun it or mark the evidence stale.
 - Do not default to `npx` when `./node_modules/.bin/<tool>` exists — unexpected installs and version drift are common failure modes.
