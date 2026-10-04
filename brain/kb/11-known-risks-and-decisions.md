@@ -21,7 +21,7 @@ Status: reviewed
 | Global-only installs | Kenmark CLI rejects `--project`; catalog v7 is global-only |
 | Add `brain/specs/` before adding a spec skill | Specs need usage proof before CLI/skill automation; markdown tracker is enough for now |
 | Windows copy default | Symlinks often fail; copy/junction fallback in hub |
-| Catalog v6 selectable installs | Default lean (impeccable + simplify); heavy packs opt-in |
+| Catalog v13 selectable installs | Default lean (impeccable + ponytail); framework/architecture/constraints/assurance specialists and heavy packs opt-in |
 | `validate` vs `doctor` split | CI-safe repo checks vs local install diagnostics |
 | brain/ in git, not npm | Dev KB for this repo; consumers get their own brain via kenmark-init |
 
