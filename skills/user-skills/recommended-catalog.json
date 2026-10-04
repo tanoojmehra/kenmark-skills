@@ -29,11 +29,6 @@
         "note": "Prefer selected SEO skills; full pack only on request"
       },
       {
-        "category": "navigation",
-        "maxPrimary": 1,
-        "note": "Graphify for medium/large repos only"
-      },
-      {
         "category": "diagram",
         "maxPrimary": 1,
         "note": "One primary diagram skill (e.g. draw.io)"
@@ -86,19 +81,10 @@
       ]
     },
     {
-      "id": "core-next",
-      "name": "Core Next.js Full-Stack",
-      "description": "core-next-lite + Graphify for medium/large Next.js repos.",
-      "extends": "core-next-lite",
-      "packIds": [
-        "graphify"
-      ]
-    },
-    {
       "id": "core-next-agentic",
       "name": "Core Next.js Agentic",
       "description": "core-next + durable constraints (manual install).",
-      "extends": "core-next",
+      "extends": "core-next-lite",
       "packIds": [
         "constraint-driven-development"
       ]
@@ -107,7 +93,7 @@
       "id": "growth-seo",
       "name": "Growth + SEO/GEO",
       "description": "core-next + selected SEO/GEO skills (not the full 20-skill suite).",
-      "extends": "core-next",
+      "extends": "core-next-lite",
       "packIds": [
         {
           "id": "seo-geo-selected"
@@ -138,7 +124,6 @@
         "improve-codebase-architecture",
         "constraint-driven-development",
         "adverse-review",
-        "graphify",
         "seo-geo-full"
       ]
     }
@@ -569,54 +554,6 @@
         ],
         "verify": {
           "global": "test -f \"$HOME/.agents/skills/adverse-review/SKILL.md\" || test -f \"$HOME/.cursor/skills/adverse-review/SKILL.md\" || test -f \"$HOME/.claude/skills/adverse-review/SKILL.md\""
-        }
-      }
-    },
-    {
-      "id": "graphify",
-      "name": "Graphify",
-      "category": "navigation",
-      "weight": "medium",
-      "bloatScore": 2,
-      "recommended": false,
-      "defaultSelected": false,
-      "helpsWith": [
-        "large-repo navigation",
-        "architecture maps",
-        "cross-file reasoning"
-      ],
-      "bestFor": [
-        "large repos",
-        "architecture understanding",
-        "full-stack navigation"
-      ],
-      "avoidWhen": [
-        "small repos",
-        "simple one-file edits"
-      ],
-      "suggestiveTest": {
-        "question": "Is this repo large enough to benefit from a knowledge graph?",
-        "signals": [
-          "repo-file-count-high",
-          "monorepo-workspace",
-          "next.config"
-        ],
-        "recommendWhen": ">=2",
-        "recommendation": "optional"
-      },
-      "url": "https://github.com/safishamsi/graphify",
-      "description": "Turns code, schemas, docs, and media into a queryable knowledge graph for project navigation.",
-      "warning": "Python-based (graphifyy on PyPI). Requires uv, pipx, or pip.",
-      "install": {
-        "global": {
-          "command": "uv tool install graphifyy && graphify install",
-          "summary": "Install graphifyy via uv, then register the skill with global agents"
-        },
-        "alternatives": [
-          "pipx install graphifyy && graphify install"
-        ],
-        "verify": {
-          "global": "test -f \"$HOME/.claude/skills/graphify/SKILL.md\" || test -f \"$HOME/.agents/skills/graphify/SKILL.md\""
         }
       }
     },

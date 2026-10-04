@@ -43,7 +43,7 @@ function printUsage() {
   console.log("  --legacy-only             Proven unprefixed Kenmark folder names");
   console.log("  --all                     Broken symlinks + legacy paths (hygiene preset)");
   console.log("  --kenmark                 kenmark-* bundled skills from IDE dirs");
-  console.log("  --recommended, --packs    Catalog pack skills (impeccable, graphify, …)");
+  console.log("  --recommended, --packs    Catalog pack skills (impeccable, drawio-skill, …)");
   console.log("  --all-managed             kenmark + recommended packs");
   console.log("  --full                    broken + legacy + all managed skills");
   console.log("");

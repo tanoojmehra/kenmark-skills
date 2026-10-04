@@ -13,7 +13,6 @@ triggers:
   - onboard kenmark skills
   - install recommended skills
   - install impeccable
-  - install graphify
   - install drawio
   - install drawio-skill
   - install ponytail
@@ -34,7 +33,7 @@ disable-model-invocation: true
 
 # Kenmark Setup
 
-One guided flow for **new users**: install Kenmark skills globally, optionally install **selectable third-party packs** (defaults: Impeccable + Ponytail; framework, architecture, constraints, assurance, Graphify, and SEO are opt-in), with **repo-aware suggestions**, then pick **IDEs**. Kenmark installs to `~/.kenmark/store` and links into IDE home folders — not per-repo.
+One guided flow for **new users**: install Kenmark skills globally, optionally install **selectable third-party packs** (defaults: Impeccable + Ponytail; framework, architecture, constraints, assurance, and SEO are opt-in), with **repo-aware suggestions**, then pick **IDEs**. Kenmark installs to `~/.kenmark/store` and links into IDE home folders — not per-repo.
 
 ## When to use
 
@@ -144,15 +143,14 @@ Read from: `skills/user-skills/recommended-catalog.json`
 | `constraint-driven-development` | Durable measurable quality constraints via `CONSTRAINTS.md` |
 | `adverse-review` | Heavy multi-agent adversarial review for high-risk changes |
 | `drawio-skill` | draw.io architecture/UML/flow diagrams (opt-in; needs desktop CLI) |
-| `graphify` | Large-repo navigation |
 | `seo-geo-selected` | Six SEO/GEO skills (not full suite) |
 | `seo-geo-full` | Full 20-skill SEO/GEO (explicit opt-in) |
 
-**Presets (advanced):** `lean`, `core-next`, `core-next-agentic`, `growth-seo`, `audit-review`, `experimental-heavy`, …
+**Presets (advanced):** `lean`, `core-next-lite`, `core-next-agentic`, `growth-seo`, `audit-review`, `experimental-heavy`, …
 
 ### When to use
 
-- "Install recommended skills", optional third-party packs, impeccable, graphify
+- "Install recommended skills", optional third-party packs, impeccable
 - After **kenmark-skills-maintain** cleanup when rebuilding a lean set
 - For refresh only, use **kenmark-update**
 
@@ -163,7 +161,6 @@ Do **not** install multiple overlapping packs for the same purpose unless the us
 - Design/UI: max 1 primary pack
 - Code review / minimalism: Ponytail (default) or Simplify — one everyday primary unless asked
 - SEO/GEO: selected skills by default; full pack only on request
-- Navigation: Graphify for medium/large repos
 - Audit / planning: improve for audit-to-plan workflows (repo-root `plans/`)
 - Architecture: improve-codebase-architecture for deep-module/seam review
 - Framework: vercel-react-best-practices for React/Next.js performance
@@ -181,7 +178,7 @@ Do **not** install multiple overlapping packs for the same purpose unless the us
 ```bash
 npx kenmark-skills install-recommended --suggest
 npx kenmark-skills install-recommended --list
-npx kenmark-skills install-recommended --explain graphify
+npx kenmark-skills install-recommended --explain seo-geo-selected
 ```
 
 Interactive flow shows weight, bloat, and stack-specific suggestions before confirming.
@@ -190,13 +187,13 @@ Interactive flow shows weight, bloat, and stack-specific suggestions before conf
 
 ```bash
 npx kenmark-skills install-recommended --ids impeccable,ponytail -y
-npx kenmark-skills install-recommended --ids impeccable,ponytail,graphify -y
+npx kenmark-skills install-recommended --ids impeccable,ponytail,vercel-react-best-practices -y
 ```
 
 ### Step 3 — Presets (advanced / CI)
 
 ```bash
-npx kenmark-skills install-recommended --profile core-next -y
+npx kenmark-skills install-recommended --profile core-next-lite -y
 npx kenmark-skills install-recommended --profile growth-seo -y
 npx kenmark-skills install-recommended --profile lean -y
 ```
@@ -225,7 +222,7 @@ npx kenmark-skills setup -y
 npx kenmark-skills install-recommended --suggest
 npx kenmark-skills install-recommended --list
 npx kenmark-skills install-recommended --ids impeccable -y
-npx kenmark-skills install-recommended --profile core-next -y
+npx kenmark-skills install-recommended --profile core-next-lite -y
 npx kenmark-skills install-recommended   # interactive checklist
 ```
 

@@ -350,7 +350,7 @@ async function promptSelectOptionalPacks(packs, suggestions, opts = {}) {
   }
 
   console.log(
-    "\nEnter: number(s) 1,2 · ids impeccable,graphify · all · defaults · Enter for defaults · empty cancels\n"
+    "\nEnter: number(s) 1,2 · ids impeccable,drawio-skill · all · defaults · Enter for defaults · empty cancels\n"
   );
 
   return promptSelectPacks(packs, { defaultIds, quietList: true });
@@ -369,9 +369,9 @@ async function promptSelectPacks(packs, opts = {}) {
       console.log(`  ${i + 1}) ${p.id}${mark} — ${p.name}`);
     });
     if (noDefaults) {
-      console.log("\nEnter: number(s) 1,2 · ids impeccable,graphify · all · (empty cancels)\n");
+      console.log("\nEnter: number(s) 1,2 · ids impeccable,drawio-skill · all · (empty cancels)\n");
     } else {
-      console.log("\nEnter: number(s) 1,2 · ids impeccable,graphify · all · defaults · Enter for defaults\n");
+      console.log("\nEnter: number(s) 1,2 · ids impeccable,drawio-skill · all · defaults · Enter for defaults\n");
     }
   }
   const answer = await ask(rl, "Choice> ");
@@ -540,7 +540,7 @@ async function promptCleanupCategories() {
   console.log("  1) broken      — dangling symlinks only [default]");
   console.log("  2) legacy      — proven unprefixed Kenmark paths (+ store when applicable)");
   console.log("  3) kenmark     — kenmark-* bundled skills from selected IDE dirs");
-  console.log("  4) recommended — catalog pack skills (impeccable, graphify, …)");
+  console.log("  4) recommended — catalog pack skills (impeccable, drawio-skill, …)");
   console.log("  5) all-managed — kenmark + recommended packs");
   console.log("  6) full        — broken + legacy + all managed skills\n");
   console.log(

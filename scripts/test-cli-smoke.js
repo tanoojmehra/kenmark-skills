@@ -45,7 +45,7 @@ const COMMANDS = [
   [
     "install-recommended",
     "--preset",
-    "core-next",
+    "core-next-lite",
     "--dry-run",
     "--ide",
     "claude",

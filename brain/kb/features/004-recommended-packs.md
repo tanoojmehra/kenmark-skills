@@ -22,7 +22,6 @@ Default selection is **Impeccable + Ponytail**. Simplify remains available as an
 | `constraint-driven-development` | Constraint-Driven Development | constraints | no |
 | `adverse-review` | Adverse Review | assurance | no |
 | `drawio-skill` | draw.io Diagrams | diagram | no |
-| `graphify` | Graphify | navigation | no |
 | `seo-geo-selected` | SEO/GEO (selected skills) | seo | no |
 | `seo-geo-full` | SEO/GEO (full suite) | seo | no |
 
@@ -36,7 +35,7 @@ Default selection is **Impeccable + Ponytail**. Simplify remains available as an
 
 ## Overlap rules
 
-Catalog `installRules.overlapCaps` keeps one primary pack per overlapping purpose unless the user explicitly asks for more. Current categories include design, review, seo, navigation, diagram, audit, architecture, framework, constraints, and assurance.
+Catalog `installRules.overlapCaps` keeps one primary pack per overlapping purpose unless the user explicitly asks for more. Current categories include design, review, seo, diagram, audit, architecture, framework, constraints, and assurance.
 
 Framework/architecture/constraints/assurance packs may complement generic Kenmark audits because their responsibilities are intentionally distinct.
 
@@ -44,9 +43,8 @@ Framework/architecture/constraints/assurance packs may complement generic Kenmar
 
 - `lean` — Impeccable + Ponytail.
 - `core-next-lite` — lean + Vercel React Best Practices.
-- `core-next` — core-next-lite + Graphify.
-- `core-next-agentic` — core-next + Constraint-Driven Development.
-- `growth-seo` — core-next + selected SEO/GEO.
+- `core-next-agentic` — core-next-lite + Constraint-Driven Development.
+- `growth-seo` — core-next-lite + selected SEO/GEO.
 - `audit-review` — improve + Improve Codebase Architecture + Adverse Review.
 - `experimental-heavy` — broad explicit opt-in bundle.
 
@@ -59,7 +57,7 @@ npx kenmark-skills install-recommended --list
 npx kenmark-skills install-recommended --suggest
 npx kenmark-skills install-recommended --ids impeccable,ponytail -y
 npx kenmark-skills install-recommended --ids vercel-react-best-practices,improve-codebase-architecture -y
-npx kenmark-skills install-recommended --profile core-next -y
+npx kenmark-skills install-recommended --profile core-next-lite -y
 ```
 
 In chat: **kenmark-setup** (packs section) for guided install and **kenmark-skills-maintain** for inventory/cleanup recommendations.
