@@ -153,7 +153,7 @@ function inferCategory(name, description) {
   if (text.includes("seo")) return "seo";
   if (/\b(design|ui|ux|frontend|visual|impeccable)\b/.test(text)) return "design";
   if (/\b(test|qa|verification|eval|tdd)\b/.test(text)) return "testing";
-  if (/\b(workflow|router|learning|agent|ecc|gstack|kenmark-troubleshoot|diagnose|debug|investigate|root.?cause)\b/.test(text)) return "workflow";
+  if (/\b(workflow|router|learning|agent|kenmark-troubleshoot|diagnose|debug|investigate|root.?cause)\b/.test(text)) return "workflow";
   if (/\b(api|backend|django|python|database|server|nestjs)\b/.test(text)) return "backend";
   return "general";
 }

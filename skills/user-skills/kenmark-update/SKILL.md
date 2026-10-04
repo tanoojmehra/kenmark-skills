@@ -4,7 +4,7 @@ version: 1.1.0
 category: admin
 scope: universal
 phase: maintain
-description: Updates installed Kenmark skills and optionally refreshes curated recommended packs (Impeccable, ECC, and more). Use when the user says update skills, refresh skills, sync skills, upgrade kenmark-skills, or after pulling a new kenmark-skills release.
+description: Updates installed Kenmark skills and optionally refreshes curated recommended packs (Impeccable and more). Use when the user says update skills, refresh skills, sync skills, upgrade kenmark-skills, or after pulling a new kenmark-skills release.
 triggers:
   - update skills
   - refresh skills
@@ -34,8 +34,8 @@ Pair with **kenmark-skills-maintain** if the machine has duplicate or stale skil
 | Target | Action |
 | --- | --- |
 | **Kenmark skills** | Refresh `~/.kenmark/store/skills` from the package, then relink IDE paths (same as `setup`) |
-| **Recommended packs** | Re-run install commands from `recommended-catalog.json` (Impeccable/Ponytail defaults plus framework, architecture, constraints, assurance, Graphify, SEO/GEO, ECC, and other selected packs — install methods vary) |
-| **Adopt** (default) | Copy adoptable catalog skills into the store and relink IDEs (`kenmark-skills adopt`). Includes Kenmark bundled skills and adoptable catalog packs (Impeccable, ECC, and more) when present on disk. |
+| **Recommended packs** | Re-run install commands from `recommended-catalog.json` (Impeccable/Ponytail defaults plus framework, architecture, constraints, assurance, Graphify, SEO/GEO, and other selected packs — install methods vary) |
+| **Adopt** (default) | Copy adoptable catalog skills into the store and relink IDEs (`kenmark-skills adopt`). Includes Kenmark bundled skills and adoptable catalog packs (Impeccable and more) when present on disk. |
 | **npm package** (optional) | `npm update -g kenmark-skills` when installed globally |
 
 Updating Kenmark skills does **not** remove third-party skills. Re-running recommended installs may overwrite pack files in the chosen scope. Use **`--skip-adopt`** to skip the adopt pass.

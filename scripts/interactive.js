@@ -369,9 +369,9 @@ async function promptSelectPacks(packs, opts = {}) {
       console.log(`  ${i + 1}) ${p.id}${mark} — ${p.name}`);
     });
     if (noDefaults) {
-      console.log("\nEnter: number(s) 1,2 · ids impeccable,ecc · all · (empty cancels)\n");
+      console.log("\nEnter: number(s) 1,2 · ids impeccable,graphify · all · (empty cancels)\n");
     } else {
-      console.log("\nEnter: number(s) 1,2 · ids impeccable,ecc · all · defaults · Enter for defaults\n");
+      console.log("\nEnter: number(s) 1,2 · ids impeccable,graphify · all · defaults · Enter for defaults\n");
     }
   }
   const answer = await ask(rl, "Choice> ");
@@ -397,50 +397,6 @@ async function promptSelectPacks(packs, opts = {}) {
   }
   if (byNum.length > 0) return [...new Set(byNum)];
   return answer.split(",").map((s) => s.trim()).filter(Boolean);
-}
-
-/**
- * @param {{install?: {profiles?: Array<{id: string, description: string}>, defaultProfile?: string}}} pack
- * @param {string|null} preset
- * @returns {Promise<string>}
- */
-async function promptEccProfile(pack, preset, opts = {}) {
-  if (preset) return preset;
-  const required = opts.required === true;
-  const profiles = pack.install?.profiles;
-  if (!profiles?.length) {
-    return pack.install?.defaultProfile || "core";
-  }
-  const rl = createRl();
-  console.log("\nECC install profile:");
-  profiles.forEach((p, i) => {
-    console.log(`  ${i + 1}) ${p.id} — ${p.description}`);
-  });
-  const defaultId = pack.install.defaultProfile || "core";
-  const hint = required
-    ? `Profile [1-${profiles.length} or id] (required): `
-    : `Profile [1-${profiles.length} or id] (default ${defaultId}): `;
-  const answer = await ask(rl, hint);
-  rl.close();
-  if (!answer) {
-    if (required) {
-      console.log("Please choose an ECC profile.");
-      return promptEccProfile(pack, preset, opts);
-    }
-    return defaultId;
-  }
-  const num = parseInt(answer, 10);
-  if (!Number.isNaN(num) && num >= 1 && num <= profiles.length) {
-    return profiles[num - 1].id;
-  }
-  const byId = profiles.find((p) => p.id === answer);
-  if (byId) return byId.id;
-  if (required) {
-    console.error(`Unknown profile "${answer}".`);
-    return promptEccProfile(pack, preset, opts);
-  }
-  console.error(`Unknown profile "${answer}", using ${defaultId}.`);
-  return defaultId;
 }
 
 function banner(title, subtitle) {
@@ -584,7 +540,7 @@ async function promptCleanupCategories() {
   console.log("  1) broken      — dangling symlinks only [default]");
   console.log("  2) legacy      — proven unprefixed Kenmark paths (+ store when applicable)");
   console.log("  3) kenmark     — kenmark-* bundled skills from selected IDE dirs");
-  console.log("  4) recommended — catalog pack skills (impeccable, graphify, ECC, …)");
+  console.log("  4) recommended — catalog pack skills (impeccable, graphify, …)");
   console.log("  5) all-managed — kenmark + recommended packs");
   console.log("  6) full        — broken + legacy + all managed skills\n");
   console.log(
@@ -719,7 +675,6 @@ module.exports = {
   promptHighBloatConfirm,
   promptCleanupCategories,
   parseCleanupCategoryChoice,
-  promptEccProfile,
   promptMcpProfile,
   promptMcpServers,
   confirmPlan,

@@ -94,7 +94,6 @@ function printUsage() {
   console.log("  --mcp-servers <list>      MCP servers by name (e.g. playwright,context7,fetch)");
   console.log("  --skip-mcp                Skip MCP even if --with-mcp / --mcp-profile is set");
   console.log("  --mcp-only                Uninstall only Kenmark MCP (IDE configs + mcp store); keep skills");
-  console.log("  --ecc-profile core        ECC profile (core, developer, …) when adopting");
   console.log("  --dry-run                 Show plan only");
   console.log("  -y, --yes                 Skip prompts");
   console.log("  -h, --help                Show help");
@@ -132,7 +131,6 @@ function parseArgs(argv) {
     withMcp: false,
     mcpProfile: null,
     mcpServers: null,
-    eccProfile: null,
     explicitMode: false,
     explicitAction: false,
     explicitIde: false
@@ -222,11 +220,6 @@ function parseArgs(argv) {
       i += 1;
       continue;
     }
-    if (token === "--ecc-profile") {
-      args.eccProfile = (argv[i + 1] || "").trim() || null;
-      i += 1;
-      continue;
-    }
     if (token === "-y" || token === "--yes") {
       args.yes = true;
       continue;
@@ -261,7 +254,6 @@ function executeInstall(targetMap, requestedTargetIdes, action, options) {
     skipAdopt,
     mcpInstall,
     mcpOnly,
-    eccProfile,
     mcpTargetMap,
     projectDir = null
   } = options;
@@ -447,8 +439,7 @@ function executeInstall(targetMap, requestedTargetIdes, action, options) {
               sourceUserSkillsDir: sourceDir,
               catalogPath,
               targetMap: selectedTargetMap,
-              eccProfile,
-              homeDir,
+                        homeDir,
               force: false,
               forceCopy,
               forceSymlink,
@@ -705,7 +696,6 @@ async function run() {
     skipAdopt: args.skipAdopt,
     mcpInstall,
     mcpOnly: args.mcpOnly,
-    eccProfile: args.eccProfile,
     mcpTargetMap,
     projectDir: null
   });

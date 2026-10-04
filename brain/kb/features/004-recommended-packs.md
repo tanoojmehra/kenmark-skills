@@ -25,7 +25,6 @@ Default selection is **Impeccable + Ponytail**. Simplify remains available as an
 | `graphify` | Graphify | navigation | no |
 | `seo-geo-selected` | SEO/GEO (selected skills) | seo | no |
 | `seo-geo-full` | SEO/GEO (full suite) | seo | no |
-| `ecc` | Everything Claude Code (ECC) | harness | no |
 
 ### Specialist boundaries
 
@@ -37,7 +36,7 @@ Default selection is **Impeccable + Ponytail**. Simplify remains available as an
 
 ## Overlap rules
 
-Catalog `installRules.overlapCaps` keeps one primary pack per overlapping purpose unless the user explicitly asks for more. Current categories include design, review, seo, harness, navigation, diagram, audit, architecture, framework, constraints, and assurance.
+Catalog `installRules.overlapCaps` keeps one primary pack per overlapping purpose unless the user explicitly asks for more. Current categories include design, review, seo, navigation, diagram, audit, architecture, framework, constraints, and assurance.
 
 Framework/architecture/constraints/assurance packs may complement generic Kenmark audits because their responsibilities are intentionally distinct.
 
@@ -46,7 +45,7 @@ Framework/architecture/constraints/assurance packs may complement generic Kenmar
 - `lean` — Impeccable + Ponytail.
 - `core-next-lite` — lean + Vercel React Best Practices.
 - `core-next` — core-next-lite + Graphify.
-- `core-next-agentic` — core-next + Constraint-Driven Development + ECC minimal.
+- `core-next-agentic` — core-next + Constraint-Driven Development.
 - `growth-seo` — core-next + selected SEO/GEO.
 - `audit-review` — improve + Improve Codebase Architecture + Adverse Review.
 - `experimental-heavy` — broad explicit opt-in bundle.

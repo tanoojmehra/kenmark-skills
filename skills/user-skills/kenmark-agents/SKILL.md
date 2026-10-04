@@ -30,7 +30,7 @@ Pairs with **kenmark-skills-maintain** for the parallel skills cleanup and **ken
 
 - "Clean up my agents", "too many sub-agents", "audit installed agents"
 - "What agents can I delete?", "find duplicate agents", "prune gstack agents"
-- Before/after installing large packs (ECC, gstack) that bundle their own agents
+- Before/after installing large packs that bundle their own agents (e.g. impeccable)
 
 ## Step 1 — Run inventory (required)
 

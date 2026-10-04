@@ -1625,9 +1625,6 @@ function isCatalogSkillPack(pack) {
   if (!pack || pack.installStrategy === "manual" || isSeoCatalogPack(pack)) {
     return false;
   }
-  if (pack.id === "ecc") {
-    return true;
-  }
   const verify =
     pack.install?.verify?.global || pack.install?.verify?.project || pack.install?.verify;
   return typeof verify === "string" && /SKILL\.md/.test(verify);
@@ -1637,9 +1634,6 @@ function resolvePackAdoptSkillNames(pack, catalog, options = {}) {
   if (!pack) return [];
   if (Array.isArray(pack.adoptSkillNames) && pack.adoptSkillNames.length) {
     return [...pack.adoptSkillNames];
-  }
-  if (pack.id === "ecc") {
-    return resolveEccAdoptSkillNames(catalog, options);
   }
   if (isCatalogSkillPack(pack)) {
     return [pack.id];
@@ -1656,7 +1650,6 @@ function getAdoptableSkillNames(sourceUserSkillsDir, catalogPath, options = {}) 
   for (const pack of catalog.packs || []) {
     if (packIdFilter && !packIdFilter.has(pack.id)) continue;
     for (const name of resolvePackAdoptSkillNames(pack, catalog, {
-      eccProfile: options.eccProfile,
       homeDir
     })) {
       names.add(name);

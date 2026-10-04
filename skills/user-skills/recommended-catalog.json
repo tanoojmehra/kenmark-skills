@@ -29,11 +29,6 @@
         "note": "Prefer selected SEO skills; full pack only on request"
       },
       {
-        "category": "harness",
-        "maxPrimary": 1,
-        "note": "ECC minimal by default; avoid stacking with plugin install"
-      },
-      {
         "category": "navigation",
         "maxPrimary": 1,
         "note": "Graphify for medium/large repos only"
@@ -102,14 +97,10 @@
     {
       "id": "core-next-agentic",
       "name": "Core Next.js Agentic",
-      "description": "core-next + durable constraints + ECC minimal (manual install).",
+      "description": "core-next + durable constraints (manual install).",
       "extends": "core-next",
       "packIds": [
-        "constraint-driven-development",
-        {
-          "id": "ecc",
-          "profile": "minimal"
-        }
+        "constraint-driven-development"
       ]
     },
     {
@@ -148,10 +139,6 @@
         "constraint-driven-development",
         "adverse-review",
         "graphify",
-        {
-          "id": "ecc",
-          "profile": "core"
-        },
         "seo-geo-full"
       ]
     }
@@ -752,75 +739,6 @@
         ],
         "verify": {
           "global": "test -d \"$HOME/.agents/skills/seo-geo-claude-skills\" || test -d \"$HOME/.claude/skills/seo-geo-claude-skills\""
-        }
-      }
-    },
-    {
-      "id": "ecc",
-      "name": "Everything Claude Code (ECC)",
-      "category": "harness",
-      "weight": "heavy-variable",
-      "bloatScore": 3,
-      "installStrategy": "manual",
-      "recommended": false,
-      "defaultSelected": false,
-      "helpsWith": [
-        "structured agent workflows",
-        "security scanning patterns"
-      ],
-      "bestFor": [
-        "structured agent workflows",
-        "security scanning patterns"
-      ],
-      "avoidWhen": [
-        "already using ECC plugin",
-        "minimal daily coding only"
-      ],
-      "suggestiveTest": {
-        "question": "Do you want a large agent harness overlay?",
-        "signals": [
-          "claude-project-config",
-          "ecc-already-present"
-        ],
-        "recommendWhen": "ecc-already-present",
-        "recommendation": "avoid"
-      },
-      "defaultProfile": "minimal",
-      "allowedProfiles": [
-        "minimal",
-        "core",
-        "full"
-      ],
-      "recommendedProfile": "minimal",
-      "url": "https://github.com/affaan-m/ECC",
-      "description": "Agent-harness performance system \u2014 skills, agents, hooks, rules. Manual install until npm installer is verified.",
-      "warning": "ECC npm installer is not verified. Kenmark prints manual/plugin steps. Do not stack with plugin install.",
-      "install": {
-        "defaultProfile": "minimal",
-        "profiles": [
-          {
-            "id": "minimal",
-            "description": "Minimal: rules, agents, commands, core workflow skills (~3-5 agents, ~10-15 skills)."
-          },
-          {
-            "id": "core",
-            "description": "Core: standard install. Pair with --without baseline:hooks to keep hooks off"
-          },
-          {
-            "id": "full",
-            "description": "Full: complete installer (28 agents, 119 skills). Explicit opt-in only"
-          }
-        ],
-        "global": {
-          "manual": true,
-          "summary": "Install ECC with the selected profile into global Claude config"
-        },
-        "alternatives": [
-          "Plugin: /plugin marketplace add https://github.com/affaan-m/ECC && /plugin install ecc@ecc",
-          "Override: --ecc-profile minimal|core|full on install-recommended"
-        ],
-        "verify": {
-          "global": "{ ls \"$HOME/.claude/agents\"/ecc-*.md 2>/dev/null; ls -d \"$HOME/.claude/skills\"/ecc-*/ 2>/dev/null; } | grep -q ."
         }
       }
     },

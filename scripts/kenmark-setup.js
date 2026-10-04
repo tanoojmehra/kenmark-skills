@@ -9,7 +9,6 @@ const {
   promptIde,
   promptYesNo,
   promptSelectOptionalPacks,
-  promptEccProfile,
   promptMcpServers,
   confirmPlan,
   banner,
@@ -267,7 +266,6 @@ async function run() {
   let installRecommended = false;
   let selectedPreset = null;
   let selectedPacks = [];
-  let eccProfile = null;
   let mcpProfile = args.mcpProfile;
   let mcpServers = args.mcpServers;
 
@@ -300,10 +298,6 @@ async function run() {
           console.log(
             `\nSelected ${selectedPacks.length} pack(s) · estimated weight: ${w.label} (bloat ${w.total})`
           );
-          const eccPack = packs.find((p) => p.id === "ecc");
-          if (eccPack && selectedPacks.includes("ecc")) {
-            eccProfile = await promptEccProfile(eccPack, null, { required: true });
-          }
         }
       }
     }
@@ -389,7 +383,6 @@ async function run() {
       plan.push(`Recommended preset → ${scope}: ${selectedPreset}`);
     } else {
       plan.push(`Recommended packs → ${scope}: ${selectedPacks.join(", ")}`);
-      if (eccProfile) plan.push(`  ECC profile: ${eccProfile}`);
     }
   }
   plan.push("Tip: run kenmark-init in your agent chat to bootstrap brain/ in a repo");
@@ -440,7 +433,6 @@ async function run() {
       recArgs.push("--profile", selectedPreset);
     } else {
       recArgs.push("--ids", selectedPacks.join(","));
-      if (eccProfile) recArgs.push("--ecc-profile", eccProfile);
     }
     if (ideArg) recArgs.push("--ide", ideArg);
     if (args.dryRun) recArgs.push("--dry-run");

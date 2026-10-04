@@ -30,7 +30,7 @@ Pair with **kenmark-setup** for first-time setup (humans: interactive wizard; ag
 
 - "Clean up my skills", "too many skills", "audit installed skills"
 - "What can I delete?", "find duplicate skills", "prune gstack skills"
-- Before/after installing large packs (ECC, gstack, impeccable)
+- Before/after installing large packs (e.g. impeccable)
 
 ## Step 1 — Run inventory (required)
 

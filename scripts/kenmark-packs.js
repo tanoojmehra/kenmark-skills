@@ -6,7 +6,6 @@ const os = require("os");
 const {
   wantsInteractive,
   promptSelectOptionalPacks,
-  promptEccProfile,
   confirmPlan,
   banner,
   rejectProjectScopeInArgv,
@@ -65,7 +64,6 @@ function printUsage() {
   console.log("  --profile <id>      Alias for --preset (backward compatible)");
   console.log("  --all               Install every pack (legacy)");
   console.log("  --ids a,b           Install specific pack ids");
-  console.log("  --ecc-profile <id>  Override ECC profile (minimal, core, full)");
   console.log("  --ide <target>      Limit adopt/relink: cursor, cursor,codex,claude, all, …");
   console.log("  --skip-adopt        Skip post-install catalog adoption");
   console.log("  --copy              Copy into IDE paths instead of symlinks (adopt relink)");
@@ -84,7 +82,6 @@ function parseArgs(argv) {
     yes: false,
     dryRun: false,
     scope: null,
-    eccProfile: null,
     preset: null,
     profile: null,
     ide: null,
@@ -152,11 +149,6 @@ function parseArgs(argv) {
       args.scope = "project";
       continue;
     }
-    if (t === "--ecc-profile") {
-      args.eccProfile = (argv[i + 1] || "").trim();
-      i += 1;
-      continue;
-    }
     if (t === "--ide") {
       args.ide = (argv[i + 1] || "").trim().toLowerCase() || null;
       args.explicitIde = true;
@@ -213,12 +205,6 @@ function printPresets(catalog) {
   console.log("Install: npx kenmark-skills install-recommended --preset <id> -y");
 }
 
-function applyEccOverride(installPlan, eccProfileOverride) {
-  if (!eccProfileOverride) return installPlan;
-  return installPlan.map((entry) =>
-    entry.pack?.id === "ecc" ? { ...entry, eccProfile: eccProfileOverride } : entry
-  );
-}
 
 function runShell(command, dryRun, cwd) {
   const prefix = cwd ? `(cwd: ${cwd}) ` : "";
@@ -338,7 +324,7 @@ async function run() {
     }
   } else if (args.all) {
     selectedIds = packs.map((p) => p.id);
-    resolved = planFromPackIds(selectedIds, catalog, args.eccProfile);
+    resolved = planFromPackIds(selectedIds, catalog);
   }
 
   const interactive =
@@ -360,11 +346,11 @@ async function run() {
       console.log("No packs selected. Exiting.");
       process.exit(0);
     }
-    resolved = planFromPackIds(selectedIds, catalog, null);
+    resolved = planFromPackIds(selectedIds, catalog);
     const w = weightLabel(resolved.installPlan);
     console.log(`\nSelected ${selectedIds.length} pack(s) · estimated weight: ${w.label} (bloat ${w.total})`);
   } else if (!resolved && selectedIds.length > 0) {
-    resolved = planFromPackIds(selectedIds, catalog, args.eccProfile);
+    resolved = planFromPackIds(selectedIds, catalog);
   }
 
   if (!resolved) {
@@ -374,21 +360,11 @@ async function run() {
 
   let { installPlan, preset, profile } = resolved;
   const presetMeta = preset || profile;
-  installPlan = applyEccOverride(installPlan, args.eccProfile);
 
   const missing = installPlan.filter((e) => e.missing);
   if (missing.length) {
     console.error(`Unknown pack ids in plan: ${missing.map((e) => e.packId).join(", ")}`);
     process.exit(1);
-  }
-
-  const eccEntry = installPlan.find((e) => e.pack?.id === "ecc");
-  let eccProfile = eccEntry?.eccProfile || args.eccProfile || "minimal";
-  if (eccEntry && interactive && !args.eccProfile) {
-    eccProfile = await promptEccProfile(eccEntry.pack, eccProfile, { required: true });
-    installPlan = installPlan.map((e) =>
-      e.pack?.id === "ecc" ? { ...e, eccProfile } : e
-    );
   }
 
   const fullTargetMap = buildGlobalTargets(os.homedir());
@@ -410,7 +386,6 @@ async function run() {
 
   const packLabels = installPlan.map((e) => {
     let label = e.packId;
-    if (e.eccProfile) label += `@${e.eccProfile}`;
     if (e.seoSkills?.length) label += `+${e.seoSkills.length}seo`;
     return label;
   });
@@ -451,7 +426,6 @@ async function run() {
   console.log(
     `\nInstalling ${installPlan.length} pack(s) · scope "${scope}"${presetId ? ` · preset ${presetId}` : ""}`
   );
-  if (eccEntry) console.log(`ECC profile: ${eccProfile}`);
   if (args.dryRun) console.log("(dry-run — commands only)\n");
 
   for (const entry of installPlan) {
@@ -534,7 +508,6 @@ async function run() {
         sourceUserSkillsDir: sourceDir,
         catalogPath,
         targetMap,
-        eccProfile,
         homeDir: os.homedir(),
         packIds: installPlan.map((entry) => entry.packId),
         seoSkills: installPlan.flatMap((entry) => entry.seoSkills || []),

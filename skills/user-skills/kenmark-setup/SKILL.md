@@ -13,7 +13,6 @@ triggers:
   - onboard kenmark skills
   - install recommended skills
   - install impeccable
-  - install ECC
   - install graphify
   - install drawio
   - install drawio-skill
@@ -35,7 +34,7 @@ disable-model-invocation: true
 
 # Kenmark Setup
 
-One guided flow for **new users**: install Kenmark skills globally, optionally install **selectable third-party packs** (defaults: Impeccable + Ponytail; framework, architecture, constraints, assurance, Graphify, SEO, and ECC are opt-in), with **repo-aware suggestions**, then pick **IDEs**. Kenmark installs to `~/.kenmark/store` and links into IDE home folders — not per-repo.
+One guided flow for **new users**: install Kenmark skills globally, optionally install **selectable third-party packs** (defaults: Impeccable + Ponytail; framework, architecture, constraints, assurance, Graphify, and SEO are opt-in), with **repo-aware suggestions**, then pick **IDEs**. Kenmark installs to `~/.kenmark/store` and links into IDE home folders — not per-repo.
 
 ## When to use
 
@@ -63,10 +62,9 @@ Prompts (nothing is pre-selected — you must choose each step):
 1. Install Kenmark skills? (default **no**)
 2. Install optional recommended packs? (default **no**)
 3. If packs: checklist with repo suggestions (`--suggest` shows the same analysis non-interactively); Enter accepts defaults (**impeccable**, **ponytail**)
-4. ECC profile prompt when ECC is selected
-5. Scope — **global only** (no project installs)
-6. IDE targets — auto, all, or numbered list (**required** when installing Kenmark)
-7. Confirm plan (**yes** required to proceed), then runs `setup` + `install-recommended` as chosen
+4. Scope — **global only** (no project installs)
+5. IDE targets — auto, all, or numbered list (**required** when installing Kenmark)
+6. Confirm plan (**yes** required to proceed), then runs `setup` + `install-recommended` as chosen
 
 Presets (`--profile core-next`, …) are supported for agents/CI only — not shown in the interactive wizard.
 
@@ -149,13 +147,12 @@ Read from: `skills/user-skills/recommended-catalog.json`
 | `graphify` | Large-repo navigation |
 | `seo-geo-selected` | Six SEO/GEO skills (not full suite) |
 | `seo-geo-full` | Full 20-skill SEO/GEO (explicit opt-in) |
-| `ecc` | Everything Claude Code — manual install |
 
 **Presets (advanced):** `lean`, `core-next`, `core-next-agentic`, `growth-seo`, `audit-review`, `experimental-heavy`, …
 
 ### When to use
 
-- "Install recommended skills", optional third-party packs, impeccable, ECC, graphify
+- "Install recommended skills", optional third-party packs, impeccable, graphify
 - After **kenmark-skills-maintain** cleanup when rebuilding a lean set
 - For refresh only, use **kenmark-update**
 
@@ -166,7 +163,6 @@ Do **not** install multiple overlapping packs for the same purpose unless the us
 - Design/UI: max 1 primary pack
 - Code review / minimalism: Ponytail (default) or Simplify — one everyday primary unless asked
 - SEO/GEO: selected skills by default; full pack only on request
-- Agent harness: ECC **minimal** by default
 - Navigation: Graphify for medium/large repos
 - Audit / planning: improve for audit-to-plan workflows (repo-root `plans/`)
 - Architecture: improve-codebase-architecture for deep-module/seam review

@@ -41,7 +41,6 @@ function printUsage() {
   console.log("  --ide <target>        IDE for Kenmark sync: cursor, claude, all, …");
   console.log("  --ids a,b             Recommended pack ids (default: defaultSelected)");
   console.log("  --all                 Refresh all recommended packs");
-  console.log("  --ecc-profile core    ECC profile when refreshing recommended");
   console.log("  --skip-npm            Do not run npm install -g kenmark-skills@latest");
   console.log("  --skip-adopt          Do not adopt catalog skills into ~/.kenmark/store");
   console.log("  --npm-only            Only upgrade global kenmark-skills package");
@@ -65,7 +64,6 @@ function parseArgs(argv) {
     ide: null,
     mode: null,
     ids: null,
-    eccProfile: null,
     skipMcp: false,
     withMcp: false,
     mcpProfile: null,
@@ -105,11 +103,6 @@ function parseArgs(argv) {
     }
     if (t === "--all") {
       args.allPacks = true;
-      continue;
-    }
-    if (t === "--ecc-profile") {
-      args.eccProfile = (argv[i + 1] || "").trim();
-      i += 1;
       continue;
     }
     if (t === "--skip-npm") {
@@ -371,7 +364,6 @@ async function run() {
   if (mode === "kenmark" || mode === "both") {
     const setupArgs = ["--install", "--ide", ide || "auto", "-y"];
     if (args.skipAdopt) setupArgs.push("--skip-adopt");
-    if (args.eccProfile) setupArgs.push("--ecc-profile", args.eccProfile);
     if (args.skipMcp) setupArgs.push("--skip-mcp");
     if (args.withMcp) setupArgs.push("--with-mcp");
     if (mcpServers) {
@@ -410,10 +402,7 @@ async function run() {
       recArgs.includes("--all") || recArgs.some((a, i) => a === "--ids" && recArgs[i + 1]);
 
     if (shouldRunRecommended) {
-      if (args.eccProfile) {
-        recArgs.push("--ecc-profile", args.eccProfile);
-      }
-      if (args.skipAdopt) recArgs.push("--skip-adopt");
+        if (args.skipAdopt) recArgs.push("--skip-adopt");
       recArgs.push("--ide", ide || "auto");
       if (args.dryRun) recArgs.push("--dry-run");
 

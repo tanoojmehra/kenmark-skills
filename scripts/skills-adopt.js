@@ -37,7 +37,6 @@ function printUsage() {
   console.log("  --symlink                 Force symlinks (Windows: junction) instead of copy");
   console.log("  --force                   Overwrite store when source differs (--adopt-overwrite alias)");
   console.log("  --adopt-overwrite         Overwrite existing store skills from IDE copies");
-  console.log("  --ecc-profile core        ECC profile for adopt skill list (core, developer, …)");
   console.log("  --dry-run                 Show plan only");
   console.log("  -y, --yes                 Skip prompts");
   console.log("  -h, --help                Show help");
@@ -54,7 +53,6 @@ function parseArgs(argv) {
     preferCopyOnWindows: true,
     force: false,
     adoptOverwrite: false,
-    eccProfile: null,
     explicitMode: false,
     explicitIde: false
   };
@@ -86,11 +84,6 @@ function parseArgs(argv) {
     if (token === "--force" || token === "--adopt-overwrite") {
       args.force = true;
       args.adoptOverwrite = true;
-      continue;
-    }
-    if (token === "--ecc-profile") {
-      args.eccProfile = (argv[i + 1] || "").trim() || null;
-      i += 1;
       continue;
     }
     if (token === "-y" || token === "--yes") {
@@ -149,7 +142,6 @@ async function run() {
     sourceUserSkillsDir: sourceDir,
     catalogPath,
     targetMap,
-    eccProfile: args.eccProfile,
     homeDir: os.homedir(),
     force: args.force,
     adoptOverwrite: args.adoptOverwrite,

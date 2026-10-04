@@ -144,19 +144,12 @@ function buildInstallPlan(packRefs, catalog) {
       plan.push({ packId: ref.id, missing: true, ref });
       continue;
     }
-    const eccProfile =
-      ref.profile ||
-      pack.recommendedProfile ||
-      pack.defaultProfile ||
-      pack.install?.defaultProfile ||
-      "minimal";
     const seoMode = isSeoPack(pack) ? seoModeForEntry(pack, ref) : null;
     const seoSkills = isSeoPack(pack) ? seoSkillsForEntry(pack, ref) : null;
     plan.push({
       packId: pack.id,
       pack,
       ref,
-      eccProfile: pack.id === "ecc" ? eccProfile : null,
       seoSkills,
       seoMode
     });
@@ -239,7 +232,6 @@ function summarizePreset(presetId, catalog) {
     .filter((e) => !e.missing)
     .map((e) => {
       let suffix = "";
-      if (e.eccProfile) suffix = ` (${e.eccProfile})`;
       if (e.seoSkills?.length) {
         suffix = ` (${e.seoSkills.length} SEO/GEO skills)`;
       } else if (e.seoMode === "full") {
@@ -404,14 +396,6 @@ function resolveInstallCommands(entry, scope, catalog) {
   if (!block?.command) return [];
 
   let cmd = block.command;
-  if (pack.id === "ecc" && cmd.includes("{{profile}}")) {
-    const profile =
-      entry.eccProfile ||
-      pack.recommendedProfile ||
-      pack.install?.defaultProfile ||
-      "minimal";
-    cmd = cmd.replace(/\{\{profile\}\}/g, profile);
-  }
   const cwd = block.cwd === "project" ? process.cwd() : undefined;
   return [{ command: preferLocalSkillsCli(cmd), cwd }];
 }
@@ -486,14 +470,9 @@ function defaultProfileId(catalog) {
   return defaultPresetId(catalog);
 }
 
-function planFromPackIds(packIds, catalog, eccProfileOverride) {
+function planFromPackIds(packIds, catalog) {
   const refs = packIds.map((id) => ({ id: resolvePackId(id) }));
   const installPlan = buildInstallPlan(refs, catalog);
-  if (eccProfileOverride) {
-    for (const entry of installPlan) {
-      if (entry.pack?.id === "ecc") entry.eccProfile = eccProfileOverride;
-    }
-  }
   return {
     presetId: null,
     profileId: null,
