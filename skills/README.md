@@ -50,6 +50,7 @@ skills/user-skills/          ← bundled universal skills (42)
   kenmark-tracker-check/
   kenmark-tracker-maintain/
   kenmark-issues-scan/               category: issues (scan codebase, file issues)
+  kenmark-linear-check/               category: issues (evidence-backed Linear ticket investigation)
   kenmark-linear-ticket-score/       category: issues (score Linear ticket completion)
   kenmark-audit-loop/                category: issues (multi-pass audit until converged)
   kenmark-issues-fix-and-ship/   category: workflow (phase: ship)
@@ -82,6 +83,7 @@ not in this package.
 | Security review, auth bypass, RBAC, injection, SSRF, CORS, rate limits | `kenmark-security-review` |
 | Performance bottlenecks, slow routes, DB queries, bundle, hydration, caching | `kenmark-performance` |
 | Host assets on Kenmark Storage / `@kenmark/storage` / storage API / proxied assets | `kenmark-storage` |
+| Check a Linear ticket's implementation/review/CI evidence | `kenmark-linear-check` |
 | Score a Linear ticket's completion | `kenmark-linear-ticket-score` |
 
 ## Testing suite (routing)
@@ -103,7 +105,7 @@ not in this package.
 | Skill | Purpose |
 | --- | --- |
 | `kenmark-plan` | Tiered planning to `brain/plans/` (explicit invocation) |
-| `kenmark-output` | Enforce complete final outputs and deliverables |
+| `kenmark-output` | Enforce complete final outputs plus fresh evidence before completion claims |
 | `kenmark-subagents` | Split complex work into specialist tracks (explicit) |
 | `kenmark-repo-hygiene` | Read-only clutter audit + structure audit; cleanup plan only |
 | `kenmark-repo-cleanup` | Execute approved hygiene cleanup (explicit) |
@@ -113,8 +115,8 @@ not in this package.
 | `kenmark-repo-docs` | README, setup, env docs, KB freshness, broken links (read-only) |
 | `kenmark-repo-docs-fix` | Apply approved doc fixes (explicit) |
 | `kenmark-repo-deps` | Package health, monorepo drift, lockfile/PM consistency, UI overlap |
-| `kenmark-repo-quality` | Dev/runtime/build/typecheck/lint/format gates; diagnose without auto-editing |
-| `kenmark-security-review` | Read-only secure-code review (auth, injection, SSRF, uploads) |
+| `kenmark-repo-quality` | Dev/runtime/build/typecheck/lint/format gates with fresh/stale evidence tracking; diagnose without auto-editing |
+| `kenmark-security-review` | Read-only appsec review (auth, injection, SSRF, uploads, supply chain, data/tenant/business-logic abuse) |
 | `kenmark-performance` | Slow pages/routes, N+1, bundle/hydration, caching, API latency |
 | `kenmark-storage` | API-only Kenmark Storage — proxied upload/list/serve, visibility, soft delete; shared monorepo package; pitfalls + CMS patterns (v1.3.1) |
 | `kenmark-linear-ticket-score` | Score Linear ticket completion against implementation, PR review, and CI evidence |
@@ -124,7 +126,7 @@ not in this package.
 | `kenmark-test-integration` | API, DB, service, and module boundary tests |
 | `kenmark-test-e2e` | Browser/user-journey tests (Playwright, Cypress, etc.) |
 | `kenmark-test-mocks` | Fixtures, factories, MSW handlers, fake adapters |
-| `kenmark-test-coverage` | Coverage and risk-gap audit (read-only) |
+| `kenmark-test-coverage` | Coverage/risk-gap audit with optional mutation-confidence lens (read-only) |
 | `kenmark-test-ci` | Wire tests into CI/CD and release gates |
 
 See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [README](../README.md) lists all bundled skills and [Skill activation tiers](../README.md#skill-activation-tiers).
