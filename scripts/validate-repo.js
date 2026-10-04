@@ -137,7 +137,6 @@ const REQUIRED_PACKAGE_FILES = [
   "scripts/test-interactive-noninteractive-stdin.js",
   "scripts/test-gemini-codex-dedupe.js",
   "scripts/test-antigravity-dedupe.js",
-  "scripts/test-headroom-init.js",
   "scripts/test-packs-verify-skip.js",
   "scripts/test-install-temp-home.js",
   "scripts/test-pack.js",
@@ -1163,10 +1162,10 @@ function validatePackageJson() {
   }
   if (
     scripts["test:cli"] !==
-    "node scripts/test-cli-smoke.js && node scripts/test-interactive-scope-prompt.js && node scripts/test-interactive-noninteractive-stdin.js && node scripts/test-cli-package.js && node scripts/test-gemini-codex-dedupe.js && node scripts/test-antigravity-dedupe.js && node scripts/test-headroom-init.js"
+    "node scripts/test-cli-smoke.js && node scripts/test-interactive-scope-prompt.js && node scripts/test-interactive-noninteractive-stdin.js && node scripts/test-cli-package.js && node scripts/test-gemini-codex-dedupe.js && node scripts/test-antigravity-dedupe.js"
   ) {
     fail(
-      'package.json: scripts["test:cli"] must chain test-cli-smoke.js, test-interactive-scope-prompt.js, test-interactive-noninteractive-stdin.js, test-cli-package.js, test-gemini-codex-dedupe.js, test-antigravity-dedupe.js, and test-headroom-init.js'
+      'package.json: scripts["test:cli"] must chain test-cli-smoke.js, test-interactive-scope-prompt.js, test-interactive-noninteractive-stdin.js, test-cli-package.js, test-gemini-codex-dedupe.js, and test-antigravity-dedupe.js'
     );
   }
   if (scripts["test:packs-verify"] !== "node scripts/test-packs-verify-skip.js") {

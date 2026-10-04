@@ -19,7 +19,6 @@ triggers:
   - install drawio-skill
   - install ponytail
   - install improve
-  - install headroom
   - install vercel react best practices
   - install improve codebase architecture
   - install constraint driven development
@@ -151,7 +150,6 @@ Read from: `skills/user-skills/recommended-catalog.json`
 | `seo-geo-selected` | Six SEO/GEO skills (not full suite) |
 | `seo-geo-full` | Full 20-skill SEO/GEO (explicit opt-in) |
 | `ecc` | Everything Claude Code — manual install |
-| `headroom` | Context compression CLI (proxy, MCP, agent wrap) |
 
 **Presets (advanced):** `lean`, `core-next`, `core-next-agentic`, `growth-seo`, `audit-review`, `experimental-heavy`, …
 
@@ -176,7 +174,6 @@ Do **not** install multiple overlapping packs for the same purpose unless the us
 - Constraints: constraint-driven-development for durable quality floors
 - Assurance: adverse-review for high-risk PR/release review; not routine tiny changes
 - Diagrams: draw.io skill for architecture/UML exports (requires draw.io desktop CLI)
-- Context compression: Headroom for tool-heavy agent workflows (optional)
 
 | Audience | How to run |
 | --- | --- |

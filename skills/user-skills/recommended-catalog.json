@@ -2,7 +2,7 @@
   "version": 13,
   "mode": "selectable",
   "updatedAt": "2026-10-04",
-  "notes": "Selectable optional third-party installs with repo-aware suggestions. Global install only — no project scope.",
+  "notes": "Selectable optional third-party installs with repo-aware suggestions. Global install only \u2014 no project scope.",
   "defaults": {
     "scope": "global",
     "selectedIds": [
@@ -37,11 +37,6 @@
         "category": "navigation",
         "maxPrimary": 1,
         "note": "Graphify for medium/large repos only"
-      },
-      {
-        "category": "context",
-        "maxPrimary": 1,
-        "note": "One context compression tool (e.g. Headroom)"
       },
       {
         "category": "diagram",
@@ -79,7 +74,7 @@
     {
       "id": "lean",
       "name": "Lean Daily Coding",
-      "description": "Impeccable + Ponytail — default UI quality plus YAGNI/minimalism.",
+      "description": "Impeccable + Ponytail \u2014 default UI quality plus YAGNI/minimalism.",
       "packIds": [
         "impeccable",
         "ponytail"
@@ -141,7 +136,7 @@
     {
       "id": "experimental-heavy",
       "name": "Experimental Heavy",
-      "description": "Large experimental install — high bloat, explicit opt-in only.",
+      "description": "Large experimental install \u2014 high bloat, explicit opt-in only.",
       "risk": "high-bloat",
       "requiresConfirmation": true,
       "packIds": [
@@ -199,7 +194,7 @@
         "recommendation": "recommended"
       },
       "url": "https://github.com/pbakaus/impeccable",
-      "description": "Design language for agent harnesses — UI/UX quality, anti-slop patterns, frontend polish workflows.",
+      "description": "Design language for agent harnesses \u2014 UI/UX quality, anti-slop patterns, frontend polish workflows.",
       "warning": "The upstream skills CLI may report partial failures for unsupported harnesses (e.g. PromptScript). If Verify is OK, Impeccable is installed for supported agents.",
       "install": {
         "global": {
@@ -247,7 +242,7 @@
         "recommendation": "recommended"
       },
       "url": "https://github.com/brianlovin/claude-config",
-      "description": "Simplify and refine recently modified code for clarity and consistency — use after generating or editing code without changing functionality.",
+      "description": "Simplify and refine recently modified code for clarity and consistency \u2014 use after generating or editing code without changing functionality.",
       "install": {
         "global": {
           "command": "npx --yes skills add brianlovin/claude-config -g -y -s simplify",
@@ -301,8 +296,8 @@
         "recommendation": "optional"
       },
       "url": "https://github.com/DietrichGebert/ponytail",
-      "description": "YAGNI-first coding discipline for agents — a six-rung ladder (skip, stdlib, platform, deps, one line, then minimum) plus review, audit, and debt skills. Lazy, not negligent: security, accessibility, and validation stay intact.",
-      "warning": "Installs 5 skills via npx. Overlaps with Simplify (review category) — pick one primary unless you want both. For always-on rules and Claude/Codex lifecycle hooks, install the plugin: /plugin marketplace add DietrichGebert/ponytail then /plugin install ponytail@ponytail. Cursor/Windsurf: copy rules from the repo. Node.js on PATH for plugin hooks.",
+      "description": "YAGNI-first coding discipline for agents \u2014 a six-rung ladder (skip, stdlib, platform, deps, one line, then minimum) plus review, audit, and debt skills. Lazy, not negligent: security, accessibility, and validation stay intact.",
+      "warning": "Installs 5 skills via npx. Overlaps with Simplify (review category) \u2014 pick one primary unless you want both. For always-on rules and Claude/Codex lifecycle hooks, install the plugin: /plugin marketplace add DietrichGebert/ponytail then /plugin install ponytail@ponytail. Cursor/Windsurf: copy rules from the repo. Node.js on PATH for plugin hooks.",
       "install": {
         "global": {
           "command": "npx --yes skills add DietrichGebert/ponytail -g -y",
@@ -342,7 +337,7 @@
         "teams that do not want a plans/ directory"
       ],
       "suggestiveTest": {
-        "question": "Would a structured audit → plan → execute workflow help this repo?",
+        "question": "Would a structured audit \u2192 plan \u2192 execute workflow help this repo?",
         "signals": [
           "git-repo",
           "monorepo-workspace",
@@ -353,8 +348,8 @@
         "recommendation": "optional"
       },
       "url": "https://github.com/shadcn/improve",
-      "description": "Audit any codebase and write self-contained implementation plans for other agents to execute — expensive model advises, cheaper models ship. Never modifies source; writes only to plans/ and uses isolated worktrees for execute.",
-      "warning": "Writes plans to repo-root plans/ (not brain/plans/). Complements but differs from kenmark-plan. The skill never edits application source — only plans/ and disposable executor worktrees.",
+      "description": "Audit any codebase and write self-contained implementation plans for other agents to execute \u2014 expensive model advises, cheaper models ship. Never modifies source; writes only to plans/ and uses isolated worktrees for execute.",
+      "warning": "Writes plans to repo-root plans/ (not brain/plans/). Complements but differs from kenmark-plan. The skill never edits application source \u2014 only plans/ and disposable executor worktrees.",
       "install": {
         "global": {
           "command": "npx --yes skills add shadcn/improve -g -y -s improve",
@@ -408,7 +403,7 @@
         "recommendation": "recommended"
       },
       "url": "https://github.com/vercel-labs/agent-skills",
-      "description": "Vercel Engineering's React/Next.js performance skill — prioritized rules for waterfalls, bundle loading, server/client boundaries, rendering, data fetching, and re-renders.",
+      "description": "Vercel Engineering's React/Next.js performance skill \u2014 prioritized rules for waterfalls, bundle loading, server/client boundaries, rendering, data fetching, and re-renders.",
       "warning": "Framework-specific specialist. Pair with kenmark-performance for broader DB/API/runtime analysis; do not treat it as a replacement for generic performance review.",
       "install": {
         "global": {
@@ -685,7 +680,7 @@
         "recommendation": "optional"
       },
       "url": "https://github.com/aaron-he-zhu/seo-geo-claude-skills",
-      "description": "Six high-value SEO/GEO skills (keyword research, technical audit, schema, on-page, content, GEO) — not the full 20-skill suite. Install verify for all defaultSeoSkills is built at runtime; catalog verify is a single-skill sample.",
+      "description": "Six high-value SEO/GEO skills (keyword research, technical audit, schema, on-page, content, GEO) \u2014 not the full 20-skill suite. Install verify for all defaultSeoSkills is built at runtime; catalog verify is a single-skill sample.",
       "warning": "Installs selected skills only. For all 20 skills use seo-geo-full.",
       "install": {
         "global": {
@@ -745,7 +740,7 @@
         "recommendation": "avoid"
       },
       "url": "https://github.com/aaron-he-zhu/seo-geo-claude-skills",
-      "description": "All 20 SEO and GEO skills plus slash commands — high bloat; prefer seo-geo-selected for most sites.",
+      "description": "All 20 SEO and GEO skills plus slash commands \u2014 high bloat; prefer seo-geo-selected for most sites.",
       "warning": "Full pack installs 20 skills + 20 slash commands. Explicit opt-in only.",
       "install": {
         "global": {
@@ -798,7 +793,7 @@
       ],
       "recommendedProfile": "minimal",
       "url": "https://github.com/affaan-m/ECC",
-      "description": "Agent-harness performance system — skills, agents, hooks, rules. Manual install until npm installer is verified.",
+      "description": "Agent-harness performance system \u2014 skills, agents, hooks, rules. Manual install until npm installer is verified.",
       "warning": "ECC npm installer is not verified. Kenmark prints manual/plugin steps. Do not stack with plugin install.",
       "install": {
         "defaultProfile": "minimal",
@@ -864,7 +859,7 @@
         "recommendation": "optional"
       },
       "url": "https://github.com/Agents365-ai/drawio-skill",
-      "description": "Generate draw.io diagrams from natural language — architecture, UML, ERD, flowcharts, ML layouts; vision self-check, codebase-to-diagram, 10k+ official shapes; exports PNG/SVG/PDF/JPG.",
+      "description": "Generate draw.io diagrams from natural language \u2014 architecture, UML, ERD, flowcharts, ML layouts; vision self-check, codebase-to-diagram, 10k+ official shapes; exports PNG/SVG/PDF/JPG.",
       "warning": "Requires draw.io desktop CLI (`brew install --cask drawio` on macOS). Optional Graphviz for auto-layout of large import graphs. The upstream skills CLI may report partial failures for unsupported harnesses (e.g. PromptScript). If verify is OK, drawio-skill is installed for supported agents.",
       "install": {
         "global": {
@@ -877,60 +872,6 @@
         ],
         "verify": {
           "global": "test -f \"$HOME/.agents/skills/drawio-skill/SKILL.md\" || test -f \"$HOME/.cursor/skills/drawio-skill/SKILL.md\" || test -f \"$HOME/.claude/skills/drawio-skill/SKILL.md\""
-        }
-      }
-    },
-    {
-      "id": "headroom",
-      "name": "Headroom",
-      "category": "context",
-      "weight": "medium",
-      "bloatScore": 2,
-      "recommended": false,
-      "defaultSelected": false,
-      "helpsWith": [
-        "context compression",
-        "token savings",
-        "large tool outputs",
-        "long agent sessions"
-      ],
-      "bestFor": [
-        "tool-heavy agent workflows",
-        "large repo exploration",
-        "MCP and proxy integrations"
-      ],
-      "avoidWhen": [
-        "one-shot scripts",
-        "environments without Python 3.10+",
-        "minimal harnesses only"
-      ],
-      "suggestiveTest": {
-        "question": "Do agents here read large tool outputs, logs, files, or RAG chunks?",
-        "signals": [
-          "git-repo",
-          "typescript-project",
-          "multi-language-src",
-          "monorepo-workspace",
-          "repo-file-count-high"
-        ],
-        "recommendWhen": "any",
-        "recommendation": "optional"
-      },
-      "url": "https://github.com/chopratejas/headroom",
-      "description": "Context compression layer for AI agents — compress tool outputs, logs, files, and RAG chunks before they reach the LLM (library, proxy, MCP, agent wrap).",
-      "warning": "Python 3.10+. The [all] extra installs proxy, MCP, and ML dependencies (large download). Not a SKILL.md pack — after install use `headroom wrap <agent>`, `headroom proxy`, or Headroom MCP tools.",
-      "install": {
-        "global": {
-          "command": "uv tool install 'headroom-ai[all]'",
-          "summary": "Install Headroom CLI globally via uv (Python 3.10+)"
-        },
-        "alternatives": [
-          "pipx install 'headroom-ai[all]'",
-          "pip install 'headroom-ai[all]'",
-          "Claude plugin: /plugin marketplace add chopratejas/headroom"
-        ],
-        "verify": {
-          "global": "command -v headroom >/dev/null 2>&1"
         }
       }
     }

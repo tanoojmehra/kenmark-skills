@@ -26,7 +26,6 @@ Default selection is **Impeccable + Ponytail**. Simplify remains available as an
 | `seo-geo-selected` | SEO/GEO (selected skills) | seo | no |
 | `seo-geo-full` | SEO/GEO (full suite) | seo | no |
 | `ecc` | Everything Claude Code (ECC) | harness | no |
-| `headroom` | Headroom | context | no |
 
 ### Specialist boundaries
 
@@ -36,11 +35,9 @@ Default selection is **Impeccable + Ponytail**. Simplify remains available as an
 - **Constraint-Driven Development** writes durable, measurable project quality floors rather than performing another one-shot audit.
 - **Adverse Review** is a heavy assurance pass for substantial/high-risk changes, not a routine review for tiny diffs.
 
-**Headroom usage (built-in models):** [005-headroom-built-in-usage.md](005-headroom-built-in-usage.md) — also shipped as `kenmark-setup/references/headroom-usage.md`.
-
 ## Overlap rules
 
-Catalog `installRules.overlapCaps` keeps one primary pack per overlapping purpose unless the user explicitly asks for more. Current categories include design, review, seo, harness, navigation, diagram, audit, context, architecture, framework, constraints, and assurance.
+Catalog `installRules.overlapCaps` keeps one primary pack per overlapping purpose unless the user explicitly asks for more. Current categories include design, review, seo, harness, navigation, diagram, audit, architecture, framework, constraints, and assurance.
 
 Framework/architecture/constraints/assurance packs may complement generic Kenmark audits because their responsibilities are intentionally distinct.
 

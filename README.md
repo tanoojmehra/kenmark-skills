@@ -35,7 +35,7 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 | --- | ---: | --- |
 | Kenmark skills | 43 | Bundled in `skills/user-skills/` |
 | CLI commands | 12 | [brain/kb/05-api-and-integrations.md](brain/kb/05-api-and-integrations.md) |
-| Recommended packs | 14 | Impeccable, Ponytail, Simplify, improve, Architecture, Vercel React, Constraints, Adverse Review, draw.io, Graphify, Headroom, SEO, ECC — [brain/kb/features/004-recommended-packs.md](brain/kb/features/004-recommended-packs.md) |
+| Recommended packs | 13 | Impeccable, Ponytail, Simplify, improve, Architecture, Vercel React, Constraints, Adverse Review, draw.io, Graphify, SEO, ECC — [brain/kb/features/004-recommended-packs.md](brain/kb/features/004-recommended-packs.md) |
 | MCP servers | 5 | Opt-in; 8 JSON IDE targets — [brain/kb/features/003-mcp-integration.md](brain/kb/features/003-mcp-integration.md) |
 
 Skills install once under `~/.kenmark/store` and link into each IDE's skills directory. See [brain/kb/features/005-kenmark-hub-store.md](brain/kb/features/005-kenmark-hub-store.md).
