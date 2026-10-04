@@ -20,7 +20,7 @@ If no Next layout: **stop** — do not scaffold.
 
 | Item | Location |
 | --- | --- |
-| `@kenmark/storage` | **Shared package only** (`packages/kenmark-storage/package.json`) |
+| `@kenmark/storage` | Registry semver **or** vendored `packages/kenmark-storage-sdk` (`workspace:*`); **never** out-of-repo `file:` |
 | `KENMARK_STORAGE_*` | One Storage project/key per monorepo; turbo `globalEnv` + app `.env.local` |
 | Client, proxy, handlers | `packages/kenmark-storage/src/` |
 | API routes | Thin re-exports in each Next app under `app/api/assets/` or `pages/api/assets/` |
@@ -32,31 +32,51 @@ Match the workspace package name (`@repo/kenmark-storage`, `@acme/kenmark-storag
 
 | Item | Location |
 | --- | --- |
-| `@kenmark/storage` | App `package.json` |
+| `@kenmark/storage` | App `package.json` (registry) **or** `vendor/kenmark-storage-sdk` via in-repo `file:./vendor/...` |
 | Env | App `.env.local` |
 | `lib/storage.ts`, `lib/storage-proxy.ts` | Inside the app |
 | API routes | App App or Pages API tree |
 
-## SDK not on npm yet (sibling repo)
+## Install / vendor SDK
 
-When `@kenmark/storage` is not published:
+**Priority:** (1) registry semver → (2) vendor-copy into the consumer repo → **never** sibling `file:` outside the repo.
 
-- Install **only** in `packages/kenmark-storage/package.json` (monorepo) or the target app (single repo).
-- Use `file:` **relative to that package**, not the monorepo root:
+### Registry (preferred)
 
-```json
-"@kenmark/storage": "file:../../../kenmark-storage/packages/sdk"
+```bash
+# Single app
+pnpm add @kenmark/storage
+
+# Monorepo — only in shared integration package
+pnpm add @kenmark/storage --filter @acme/kenmark-storage
 ```
 
-Adjust `../` depth to your sibling layout:
+### Vendor when unpublished
+
+Copy from a local kenmark-storage checkout (`packages/contracts`, `packages/sdk`) — **source + package.json + tsconfig only** (no `node_modules`, no `core`/`database`):
+
+**Monorepo:**
 
 ```text
-consumer-monorepo/packages/kenmark-storage/  →  file:  →  kenmark-storage/packages/sdk
+packages/
+  kenmark-storage-contracts/   # @kenmark/storage-contracts
+  kenmark-storage-sdk/         # @kenmark/storage
+  kenmark-storage/             # proxy handlers; depends workspace:* on @kenmark/storage
 ```
 
-- Optional root `pnpm.overrides` for `@kenmark/storage-contracts` if workspace resolution conflicts.
-- **CI:** checkout the sibling storage repo or publish the SDK before install.
-- Once published, switch to semver and remove `file:`.
+- SDK package: `"@kenmark/storage-contracts": "workspace:^"`
+- Integration package: `"@kenmark/storage": "workspace:*"`
+- Build contracts, then SDK
+- When published later: remove vendored dirs and switch to semver
+
+**Single app:**
+
+```json
+"@kenmark/storage-contracts": "file:./vendor/kenmark-storage-contracts",
+"@kenmark/storage": "file:./vendor/kenmark-storage-sdk"
+```
+
+In-repo `file:./vendor/...` only. **Forbidden:** `file:../kenmark/kenmark-storage/...` or any path outside the consumer repository.
 
 ## Thin App Router re-exports
 
@@ -199,7 +219,7 @@ Prefix with `src/` when the app uses `src/`. Monorepo: logic in `packages/kenmar
 | Pitfall | Fix |
 | --- | --- |
 | Re-export `runtime` / `maxDuration` from shared handler | Declare segment config in the route file; re-export handler only |
-| `file:` path from monorepo root | Path relative to `packages/kenmark-storage` |
+| Sibling / out-of-repo `file:../kenmark-storage/...` | Registry install **or** vendor-copy into `packages/` / `vendor/` inside the consumer repo |
 | CMS/DB still points at legacy disk URL | Update DB or map legacy paths to `/api/assets/{id}` |
 | `next/dynamic` with `ssr: false` inside RSC page | Use a client boundary / `ClientOnly` wrapper pattern |
 | Asset 404 on public page | Upload must be `public`; private needs auth + download route |
@@ -212,6 +232,7 @@ Prefix with `src/` when the app uses `src/`. Monorepo: logic in `packages/kenmar
 - Returning `uploadUrl` / `uploadToken` / `publicUrl` in JSON
 - `@kenmark/storage/browser` / `uploadWithSession` as production path in this skill
 - Per-app duplicate `@kenmark/storage` in monorepos (use shared package)
+- Sibling `file:` to an external kenmark-storage checkout (vendor in-repo or use registry)
 - Serving assets with `status: deleted`
 - Minting signed URLs without your app's auth check
 - Expecting Storage to create WebP/AVIF variants on upload

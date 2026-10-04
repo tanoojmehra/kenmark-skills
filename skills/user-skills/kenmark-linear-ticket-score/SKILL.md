@@ -1,6 +1,25 @@
 ---
 name: kenmark-linear-ticket-score
-description: Evaluate a Linear ticket against its requirements and related GitHub pull requests, reviews, and CI, then calculate and explain a completion score out of 100. Use when asked to score a Linear ticket, check ticket readiness, or determine whether a ticket is actually done.
+version: 1.0.0
+category: issues
+scope: universal
+phase: verify
+description: "Evaluate a Linear ticket against its requirements and related GitHub pull requests, reviews, and CI, then calculate and explain a completion score out of 100. Use when asked to score a Linear ticket, check ticket readiness, or determine whether a ticket is actually done."
+triggers:
+  - kenmark-linear-ticket-score
+  - score Linear ticket
+  - check ticket readiness
+  - is ticket done
+  - ticket completion score
+allowed-tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
+  - Web
+  - AskUserQuestion
+risk: read-only
+disable-model-invocation: false
 ---
 
 # Linear Ticket Score

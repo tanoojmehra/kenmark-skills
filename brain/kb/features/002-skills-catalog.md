@@ -5,14 +5,14 @@ Status: reviewed
 
 ## Summary
 
-**42** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
+**43** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
 
 ## Categories
 
 | Category | Examples |
 | --- | --- |
 | onboarding | `kenmark-init`, `kenmark-setup` |
-| workflow | `kenmark-plan`, `kenmark-troubleshoot`, `kenmark-repo-*`, `kenmark-security-review`, `kenmark-performance`, `kenmark-storage` |
+| workflow | `kenmark-plan`, `kenmark-troubleshoot`, `kenmark-repo-*`, `kenmark-security-review`, `kenmark-server-defense`, `kenmark-performance`, `kenmark-storage` |
 | testing | `kenmark-test-plan`, `kenmark-test-unit`, … `kenmark-test-ci` |
 | git | `kenmark-commit` |
 | issues | `kenmark-issues-scan`, `kenmark-linear-check`, `kenmark-linear-ticket-score`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship` |
@@ -31,7 +31,7 @@ May use freely: `kenmark-troubleshoot`, `kenmark-output`, `kenmark-tracker-list`
 
 ### Specialist
 
-Use when task clearly matches: `kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, all `kenmark-test-*`, `kenmark-issues-scan`, `kenmark-linear-ticket-score`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship`, `kenmark-plan`, `kenmark-plans-execute`, `kenmark-tracker-setup`, `kenmark-tracker-check`, `kenmark-tracker-maintain`, `kenmark-storage`.
+Use when task clearly matches: `kenmark-subagents`, `kenmark-repo-docs`, `kenmark-repo-deps`, `kenmark-repo-release`, `kenmark-repo-hygiene`, `kenmark-server-defense`, all `kenmark-test-*`, `kenmark-issues-scan`, `kenmark-linear-ticket-score`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship`, `kenmark-plan`, `kenmark-plans-execute`, `kenmark-tracker-setup`, `kenmark-tracker-check`, `kenmark-tracker-maintain`, `kenmark-storage`.
 
 ### Explicit admin
 

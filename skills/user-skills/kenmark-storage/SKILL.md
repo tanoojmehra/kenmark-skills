@@ -1,10 +1,10 @@
 ---
 name: kenmark-storage
-version: 1.3.1
+version: 1.3.2
 category: workflow
 scope: universal
 phase: implement
-description: "API-only Kenmark Storage integration for Next.js — proxied upload/list/download/public serve, visibility updates, soft delete/restore via app REST routes; shared monorepo package; server @kenmark/storage only; app-side Sharp/FFmpeg conversion. Operators provision projects/keys in kenmark-manage."
+description: "API-only Kenmark Storage integration for Next.js — proxied upload/list/download/public serve, visibility updates, soft delete/restore via app REST routes; shared monorepo package; server @kenmark/storage only; vendor SDK in-repo when unpublished; app-side Sharp/FFmpeg conversion. Operators provision projects/keys in kenmark-manage."
 triggers:
   - kenmark-storage
   - storage platform
@@ -22,7 +22,8 @@ triggers:
   - upload:asset
   - asset id
   - runtime nodejs
-  - file: kenmark-storage
+  - vendor sdk
+  - workspace storage
   - CMS asset path
 allowed-tools:
   - Bash
@@ -84,6 +85,7 @@ Kit overview: [KIT.md](KIT.md). Deep reference: [reference.md](reference.md).
 11. **Storage is originals-only.** Convert in your app (Sharp / FFmpeg), not in the Storage platform worker.
 12. **Monorepo:** default shared workspace package — one Storage project/key for the whole repo.
 13. **App Router segment config** (`export const runtime`, `maxDuration`, etc.) **must be declared in the route file** — never re-exported from the shared package.
+14. **Never** depend on `@kenmark/storage` via a path **outside** the consumer repository (no sibling `file:../kenmark-storage/...`). Prefer registry install; if unpublished, **vendor-copy** contracts + SDK into the consumer repo (`packages/` or `vendor/`).
 
 ---
 
@@ -163,15 +165,18 @@ When Step 0 detects a monorepo:
 6. Apps that only need server-side asset access import `createStorage()` from the shared package — no duplicate `@kenmark/storage` per app.
 
 ```
-packages/kenmark-storage/
-  package.json
-  src/
-    client.ts       # createStorage()
-    proxy.ts        # putOriginalToSession, streamFromUrl
-    sanitize.ts     # sanitizeAssetForApi
-    auth.ts         # validateCallerAuth placeholder
-    handlers/       # upload, list, asset, download, restore
-    index.ts
+packages/
+  kenmark-storage-contracts/  # vendored if unpublished
+  kenmark-storage-sdk/        # vendored if unpublished
+  kenmark-storage/
+    package.json              # "@kenmark/storage": "workspace:*" or semver
+    src/
+      client.ts       # createStorage()
+      proxy.ts        # putOriginalToSession, streamFromUrl
+      sanitize.ts     # sanitizeAssetForApi
+      auth.ts         # validateCallerAuth placeholder
+      handlers/       # upload, list, asset, download, restore
+      index.ts
 ```
 
 **Env (one Storage project per monorepo):** `KENMARK_STORAGE_URL` + `KENMARK_STORAGE_KEY` in turbo `globalEnv` and each Next app's `.env.local` (or root `.env` with passthrough). Turbo/CI must pass vars into apps.
@@ -232,41 +237,58 @@ Storage keeps the **uploaded original** only. Your app owns Sharp / FFmpeg conve
 
 ---
 
-## Step 1 — Install package
+## Step 1 — Install / vendor SDK
 
-**Single app:** in the app directory:
+**Must** land `@kenmark/storage` **inside** the consumer project before wiring routes. Order:
 
-```bash
-pnpm add @kenmark/storage
-# yarn add / npm install / bun add
-```
+1. Detect monorepo vs single app (Step 0).
+2. **Try registry** (preferred when published):
+   - **Single app:** `pnpm add @kenmark/storage` (or yarn/npm/bun).
+   - **Monorepo:** `pnpm add @kenmark/storage --filter @acme/kenmark-storage` — SDK only in the shared integration package.
+3. **If unpublished / install fails → vendor-copy** into the consumer repo (never sibling `file:` outside the repo).
+4. Wire apps to the integration package: `"@acme/kenmark-storage": "workspace:*"`. Match workspace scope — do not copy a placeholder blindly.
+5. Optional: `sharp` for image conversion.
 
-**Monorepo:** in `packages/kenmark-storage/` only:
+### Vendor when unpublished (required fallback)
 
-```bash
-pnpm add @kenmark/storage --filter @acme/kenmark-storage
-```
+Ask the operator for a local **kenmark-storage** checkout path if not discoverable. Copy **source + `package.json` + `tsconfig` only** (no `node_modules`, no platform `core`/`database`):
 
-Add workspace dependency in each Next app: `"@acme/kenmark-storage": "workspace:*"`. Match workspace scope (`@repo/*`, `@acme/*`, etc.) — do not copy a placeholder blindly.
+| Source (kenmark-storage) | Consumer destination | Package name |
+| --- | --- | --- |
+| `packages/contracts` | `packages/kenmark-storage-contracts/` | `@kenmark/storage-contracts` |
+| `packages/sdk` | `packages/kenmark-storage-sdk/` | `@kenmark/storage` |
 
-Optional: `sharp` in the app or shared package for image conversion.
-
-### SDK not on npm yet (sibling repo)
-
-When `@kenmark/storage` is unpublished, in `packages/kenmark-storage/package.json`:
-
-```json
-"@kenmark/storage": "file:../../../kenmark-storage/packages/sdk"
-```
-
-- Path is **relative to `packages/kenmark-storage`**, not monorepo root.
-- Optional root `pnpm.overrides` for `@kenmark/storage-contracts` if resolution conflicts.
-- CI must checkout sibling storage repo or publish SDK first.
-- Switch to semver once published.
+**Monorepo layout:**
 
 ```text
-consumer-monorepo/packages/kenmark-storage/  →  file:  →  kenmark-storage/packages/sdk
+packages/
+  kenmark-storage-contracts/   # vendored @kenmark/storage-contracts
+  kenmark-storage-sdk/         # vendored @kenmark/storage
+  kenmark-storage/             # proxy handlers (this skill)
 ```
+
+Wiring after copy:
+
+- In `kenmark-storage-sdk/package.json`: `"@kenmark/storage-contracts": "workspace:^"`
+- In `packages/kenmark-storage/package.json`: `"@kenmark/storage": "workspace:*"`
+- Build contracts, then SDK: `pnpm --filter @kenmark/storage-contracts build` then `pnpm --filter @kenmark/storage build`
+- `zod` comes via contracts dependencies
+
+**Single app (no workspace):** copy into the app repo:
+
+```text
+vendor/kenmark-storage-contracts/
+vendor/kenmark-storage-sdk/
+```
+
+```json
+"@kenmark/storage-contracts": "file:./vendor/kenmark-storage-contracts",
+"@kenmark/storage": "file:./vendor/kenmark-storage-sdk"
+```
+
+In-repo `file:./vendor/...` is OK. **Forbidden:** `file:../kenmark/...` or any path outside the consumer repository.
+
+**Upgrade path:** when `@kenmark/storage` is published, delete vendored packages/`vendor/` dirs and switch the integration package to semver (`pnpm add @kenmark/storage`). Re-copy vendored trees when upgrading an unpublished SDK.
 
 ---
 
@@ -646,7 +668,7 @@ Configure CORS on **your** API routes if browser-based API clients call them. No
 - [ ] Public→private cache warning documented
 - [ ] Conversion (if any) server-side only
 - [ ] Turbo/CI passes `KENMARK_STORAGE_*` to apps
-- [ ] Sibling `file:` SDK path correct if unpublished (see reference.md)
+- [ ] `@kenmark/storage` installed from registry **or** vendored in-repo (`packages/kenmark-storage-sdk` / `vendor/`) — **no** out-of-repo sibling `file:` path
 
 ---
 

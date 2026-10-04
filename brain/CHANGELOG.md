@@ -12,6 +12,16 @@ Brain knowledge base
 
 - **Skill catalog:** Added `kenmark-linear-ticket-score` to the bundled issues skills and routing reference; its default response is a compact ticket health report with expanded evidence available when needed.
 
+## v2026.09.15-repo-deps-vulnerability-scan
+
+- **Skills:** Upgraded `kenmark-repo-deps` (v1.3.0) with comprehensive dependency vulnerability scanning and framework CVE auditing. Learned from the 2026-09-14 production Next.js monorepo incident: added Next.js CVE hunter (CVE-2025-29927 middleware bypass, CVE-2024-34351 Server Actions SSRF), monorepo cross-workspace security patch drift checks, lockfile staleness detection, supply chain lifecycle script audits, and a dedicated `vulnerability-scan` operating mode.
+
+## v2026.09.15-server-defense
+
+- **Skills:** Added `kenmark-server-defense` skill (workflow / audit) to audit server and project vulnerabilities, detect runtime compromise (cryptominers, deleted running binaries in `/tmp`, malicious cron persistence), audit deployed Next.js/Node framework CVEs, inspect secret blast radius, and provide incident containment/hardening playbooks.
+- **Plans:** Completed Plan 001 (`001-kenmark-server-defense-skill.md`).
+- **Docs:** Updated `skills/README.md`, `README.md`, `package.json` (v2.3.36), and `brain/kb/` (00, features/002) with 41 bundled skills at that time (now 43 after audit upgrades).
+
 ## v2026.07.04-node24-symlink-compat
 
 - **CLI/Hub:** Resolved Node.js v24 EISDIR symlink compatibility bug by using `fs.unlinkSync` for symbolic links in `removePathIfExists`.

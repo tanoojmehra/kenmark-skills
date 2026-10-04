@@ -4,8 +4,8 @@
 
 | Field | Value |
 |------|-------|
-| Last Assigned ID | 000 |
-| Next ID | 001 |
+| Last Assigned ID | 001 |
+| Next ID | 002 |
 
 ## Ledger Rules
 
@@ -20,14 +20,14 @@
 | Category | Count |
 |----------|-------|
 | Active plans | 0 |
-| Completed | 0 |
-| **Total** | **0** |
+| Completed | 1 |
+| **Total** | **1** |
 
 ## Completed Plans
 
 | ID | Title | Tier | Completed |
 |----|-------|------|-----------|
-| _none yet_ | | | |
+| 001 | Add kenmark-server-defense skill for server & project vulnerability audit, incident detection, and hardening | full-feature | 2026-09-15 |
 
 ## Active Plans by Status
 

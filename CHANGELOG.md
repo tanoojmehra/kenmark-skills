@@ -15,12 +15,13 @@
 
 ### Fixed
 
-- **Repository metadata:** Reconciled the active package/docs to **42 bundled skills** and aligned `package.json` with the latest released changelog version `2.3.36`.
+- **Repository metadata:** Reconciled the active package/docs to **42 bundled skills** at that point (now 43 with `kenmark-server-defense`) and aligned `package.json` with the latest released changelog version `2.3.36`.
 - **Recommended-pack docs/setup/update:** Updated presets, defaults, pack counts, setup/update examples, verification paths, and KB references for catalog v13.
 
 
 ### Added
 
+- **kenmark-storage 1.3.2:** Registry-first SDK install; when unpublished, vendor-copy `@kenmark/storage` + `@kenmark/storage-contracts` into the consumer repo (`packages/` or `vendor/`) — never sibling out-of-repo `file:` links.
 - **kenmark-linear-check 1.0.0:** Added an evidence-backed Linear ticket
   investigation workflow covering issue context, activity, relationships,
   pull requests, implementation mapping, reviews, CI, blockers, and next

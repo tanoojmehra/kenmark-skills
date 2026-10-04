@@ -16,7 +16,7 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (42)
+skills/user-skills/          ← bundled universal skills (43)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow (manual)
@@ -30,6 +30,7 @@ skills/user-skills/          ← bundled universal skills (42)
   kenmark-repo-secrets/
   kenmark-repo-public/
   kenmark-security-review/         category: workflow (phase: audit)
+  kenmark-server-defense/          category: workflow (phase: audit)
   kenmark-performance/             category: workflow (phase: audit)
   kenmark-kb-sync/              category: workflow (phase: maintain)
   kenmark-repo-docs/
@@ -81,6 +82,7 @@ not in this package.
 | Dependency bloat / monorepo drift / unused packages | `kenmark-repo-deps` |
 | Dev/build/type/lint/format errors | `kenmark-repo-quality` |
 | Security review, auth bypass, RBAC, injection, SSRF, CORS, rate limits | `kenmark-security-review` |
+| Server compromise, cryptominers, malicious cron, Next.js CVEs, host hardening | `kenmark-server-defense` |
 | Performance bottlenecks, slow routes, DB queries, bundle, hydration, caching | `kenmark-performance` |
 | Host assets on Kenmark Storage / `@kenmark/storage` / storage API / proxied assets | `kenmark-storage` |
 | Check a Linear ticket's implementation/review/CI evidence | `kenmark-linear-check` |
@@ -117,8 +119,9 @@ not in this package.
 | `kenmark-repo-deps` | Package health, monorepo drift, lockfile/PM consistency, UI overlap |
 | `kenmark-repo-quality` | Dev/runtime/build/typecheck/lint/format gates with fresh/stale evidence tracking; diagnose without auto-editing |
 | `kenmark-security-review` | Read-only appsec review (auth, injection, SSRF, uploads, supply chain, data/tenant/business-logic abuse) |
+| `kenmark-server-defense` | Server/host threat audit, miner/cron detection, Next.js CVEs, and hardening playbooks |
 | `kenmark-performance` | Slow pages/routes, N+1, bundle/hydration, caching, API latency |
-| `kenmark-storage` | API-only Kenmark Storage — proxied upload/list/serve, visibility, soft delete; shared monorepo package; pitfalls + CMS patterns (v1.3.1) |
+| `kenmark-storage` | API-only Kenmark Storage — proxied upload/list/serve, visibility, soft delete; shared monorepo package; registry or in-repo vendor SDK (v1.3.2) |
 | `kenmark-linear-ticket-score` | Score Linear ticket completion against implementation, PR review, and CI evidence |
 | `kenmark-repo-release` | Pre-release version, changelog, tests, meta consistency |
 | `kenmark-test-plan` | Test strategy: layers, tools, ROI, CI gates before writing tests |
@@ -148,6 +151,7 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Need skill choice? | `kenmark-router` (explicit) |
 | Repo health (see table above) | `kenmark-repo-*` family |
 | Security review / auth / RBAC / injection / SSRF? | `kenmark-security-review` |
+| Server breach, miner IOCs, host security audit? | `kenmark-server-defense` |
 | Performance / slow routes / DB / bundle / hydration? | `kenmark-performance` |
 | Kenmark Storage API / proxied assets? | `kenmark-storage` |
 | Testing (see testing table above) | `kenmark-test-*` family |
