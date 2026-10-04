@@ -1,11 +1,11 @@
 # Bundled skills catalog
 
-Last updated: 2026-08-21
+Last updated: 2026-10-04
 Status: reviewed
 
 ## Summary
 
-**41** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
+**42** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
 
 ## Categories
 
@@ -15,7 +15,7 @@ Status: reviewed
 | workflow | `kenmark-plan`, `kenmark-troubleshoot`, `kenmark-repo-*`, `kenmark-security-review`, `kenmark-performance`, `kenmark-storage` |
 | testing | `kenmark-test-plan`, `kenmark-test-unit`, … `kenmark-test-ci` |
 | git | `kenmark-commit` |
-| issues | `kenmark-issues-scan`, `kenmark-linear-ticket-score`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship` |
+| issues | `kenmark-issues-scan`, `kenmark-linear-check`, `kenmark-linear-ticket-score`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship` |
 | plans | `kenmark-plan`, `kenmark-plans-execute` |
 | admin | `kenmark-update`, `kenmark-skills-maintain`, `kenmark-agents` |
 
