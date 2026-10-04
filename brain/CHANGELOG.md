@@ -6,7 +6,7 @@ Brain knowledge base
 
 - **Native audit/verification skills:** Fixed audit-loop cycle convergence and stable dedup fingerprints; made simplify findings semantic rather than style-driven; added single-hypothesis troubleshooting, fresh completion evidence, quality-gate freshness tracking, expanded appsec lenses, mutation-confidence coverage review, and React/Next specialist routing.
 - **Recommended catalog v13:** Added Vercel React Best Practices, Improve Codebase Architecture, Constraint-Driven Development, and Adverse Review. Default lean selection is now Impeccable + Ponytail; Simplify remains optional.
-- **Metadata/docs:** Reconciled the active repository to 42 bundled skills, package version 2.3.36, 14 catalog packs, updated presets/examples, and refreshed skills/catalog/testing KB references.
+- **Metadata/docs:** Reconciled the active repository to 42 bundled skills, package version 2.3.37, 11 catalog packs, updated presets/examples, and refreshed skills/catalog/testing KB references.
 
 ## v2026.09.25-linear-ticket-score
 
@@ -20,7 +20,7 @@ Brain knowledge base
 
 - **Skills:** Added `kenmark-server-defense` skill (workflow / audit) to audit server and project vulnerabilities, detect runtime compromise (cryptominers, deleted running binaries in `/tmp`, malicious cron persistence), audit deployed Next.js/Node framework CVEs, inspect secret blast radius, and provide incident containment/hardening playbooks.
 - **Plans:** Completed Plan 001 (`001-kenmark-server-defense-skill.md`).
-- **Docs:** Updated `skills/README.md`, `README.md`, `package.json` (v2.3.36), and `brain/kb/` (00, features/002) with 41 bundled skills at that time (now 43 after audit upgrades).
+- **Docs:** Updated `skills/README.md`, `README.md`, `package.json` (v2.3.37), and `brain/kb/` (00, features/002) with 41 bundled skills at that time (now 43 after audit upgrades).
 
 ## v2026.07.04-node24-symlink-compat
 

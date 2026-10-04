@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## v2.3.37 — Audit upgrades, Linear skills, storage vendor + catalog cleanup (2026-10-04)
 
 ### Changed
 
@@ -15,7 +15,7 @@
 
 ### Fixed
 
-- **Repository metadata:** Reconciled the active package/docs to **42 bundled skills** at that point (now 43 with `kenmark-server-defense`) and aligned `package.json` with the latest released changelog version `2.3.36`.
+- **Repository metadata:** Reconciled the active package/docs to **42 bundled skills** at that point (now 43 with `kenmark-server-defense`) and aligned `package.json` with the latest released changelog version `2.3.37`.
 - **Recommended-pack docs/setup/update:** Updated presets, defaults, pack counts, setup/update examples, verification paths, and KB references for catalog v13.
 
 
@@ -31,6 +31,10 @@
 - **kenmark-storage 1.3.0:** API-only, full-proxy integration — REST routes for upload, list, proxied public/private serve, PATCH visibility, soft delete, restore; monorepo shared `packages/kenmark-storage` default; `@kenmark/storage/server` only; operator pre-flight via kenmark-manage; no browser SDK or Storage UI for callers.
 - **kenmark-storage:** Full installable skill kit — `KIT.md` (install/invoke) and `reference.md` (trust zones, auth, pipelines). Wired into `kenmark-router` and skills catalog as a specialist skill. Skill version `1.1.0`.
 - **kenmark-storage 1.2.0:** Works for all four project types (new/existing Next.js + new/existing monorepo) on existing trees only — Step 0 shape detection, monorepo placement rules, App Router **and** Pages Router route examples, package-manager-aware install.
+
+### Removed
+
+- **recommended-catalog.json:** Removed optional packs `headroom` (context compression), `ecc` (Everything Claude Code harness), and `graphify` (large-repo navigation). Catalog 14 → 11 packs, 12 → 9 overlap categories, 7 → 6 presets (`core-next` removed, dependents retargeted to `core-next-lite`). Fixed `kenmark-linear-ticket-score` frontmatter to satisfy `validate-repo`.
 
 ## v2.3.36 — Add unified kenmark-storage skill (2026-08-18)
 
