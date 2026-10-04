@@ -1,10 +1,10 @@
 ---
 name: kenmark-security-review
-version: 1.0.0
+version: 1.1.0
 category: workflow
 scope: universal
 phase: audit
-description: "Read-only secure-code review for auth bypass, RBAC mistakes, injection risks, unsafe uploads, SSRF, open redirects, exposed admin routes, insecure CORS, dependency/security config, and API abuse/rate-limit gaps. Use for application security review. For secrets use kenmark-repo-secrets; for public-publish readiness use kenmark-repo-public."
+description: "Read-only application security review for auth/RBAC, injection, uploads, SSRF, redirects, CORS/session/CSRF, API abuse, supply-chain risk, sensitive-data handling, webhooks, multi-tenant isolation, and business-logic abuse. For secrets use kenmark-repo-secrets; for public-publish readiness use kenmark-repo-public."
 triggers:
   - security review
   - secure code review
@@ -345,7 +345,72 @@ grep -RInE '(catch\s*\([^)]*\)\s*\{[^}]*res\.(status|json|send).*err)' \
 
 ---
 
-## Step 11 — Report template
+## Step 11 — Supply-chain and dependency provenance
+
+This is a **targeted security lens**, not a replacement for `kenmark-repo-deps`.
+
+Inspect package-manager and build metadata for:
+- unpinned or unexpectedly broad versions on security-critical packages
+- git/URL dependencies or forks with unclear provenance
+- install/postinstall/preinstall/prepare lifecycle scripts
+- packages that execute downloaded binaries or shell commands during install
+- lockfile drift, multiple lockfiles, or package-manager mismatch that weakens reproducibility
+- unmaintained or abandoned dependencies in auth/crypto/parsing/upload/network paths
+
+For Node repos, inspect scripts without executing them:
+
+```bash
+node -e "const p=require('./package.json'); console.log(JSON.stringify({scripts:p.scripts||{},dependencies:p.dependencies||{},devDependencies:p.devDependencies||{}}, null, 2))" 2>/dev/null || true
+grep -RInE '"(preinstall|install|postinstall|prepare)"\s*:' --include='package.json' . 2>/dev/null | grep -v node_modules | head -30
+```
+
+Do not run `npm audit fix`, package upgrades, or third-party install scripts from this review. Escalate dependency inventory/CVE work to `kenmark-repo-deps`.
+
+---
+
+## Step 12 — Sensitive data, privacy, and tenant isolation
+
+Trace where sensitive or regulated data is collected, stored, logged, cached, exported, and deleted.
+
+Look for:
+- passwords, auth tokens, reset links, session IDs, API credentials, payment/identity data, or PII written to logs/analytics
+- excessive request/response logging or error telemetry containing user payloads
+- missing field-level redaction before logs or third-party telemetry
+- sensitive data stored unencrypted when the threat model requires protection at rest
+- data retained indefinitely with no deletion/expiry path
+- cross-tenant queries that filter by object ID but not tenant/account ownership
+- caches, object stores, queues, search indexes, or background jobs missing tenant scoping
+- admin/support tooling that can access customer data without explicit authorization/audit trail
+
+For multi-tenant code, verify tenant/account constraints are enforced **server-side at the data boundary**, not only in UI filters.
+
+---
+
+## Step 13 — Webhooks, mass assignment, races, and business-logic abuse
+
+Review high-impact workflows that generic injection checks can miss:
+
+| Area | Look for |
+| --- | --- |
+| Webhooks | signature verification, timestamp/replay protection, canonical body handling, idempotency |
+| Mass assignment | request bodies spread directly into ORM/update calls; protected fields writable by clients |
+| Race / TOCTOU | check-then-write flows for inventory, balances, quotas, permissions, file paths, one-time tokens |
+| Idempotency | duplicate payments/orders/jobs/webhook deliveries causing repeated side effects |
+| Business logic | negative/overflow quantities, coupon stacking, role escalation through state transitions, bypassing required workflow steps |
+| Tenant isolation | resource IDs accepted without tenant/account ownership constraints |
+
+Search candidates, then confirm context:
+
+```bash
+grep -RInE '(webhook|signature|idempot|update\(|create\(|\.data\(|req\.body|request\.body|Object\.assign|\.\.\.req\.body)' \
+  --include='*.{ts,tsx,js,jsx,py,rb,go}' . 2>/dev/null | grep -v node_modules | head -60
+```
+
+Treat replayable signed webhooks, writable privilege/ownership fields, and cross-tenant access as High/Critical when exploitability is confirmed.
+
+---
+
+## Step 14 — Report template
 
 Use this template in chat. For large reviews, offer `brain/reports/kenmark-security-review-YYYY-MM-DD.md` when `brain/` exists.
 

@@ -114,7 +114,7 @@ npx kenmark-skills init --ide antigravity-cli --mcp-profile web -y
 npx kenmark-skills init --ide antigravity-ide --mcp-profile web -y
 npx kenmark-skills init --ide antigravity --mcp-servers playwright,context7 -y
 npx kenmark-skills update --both -y
-npx kenmark-skills install-recommended --ids impeccable,simplify -y
+npx kenmark-skills install-recommended --ids impeccable,ponytail -y
 ```
 
 ## Important files inspected

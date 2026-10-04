@@ -1,6 +1,6 @@
 ---
 name: kenmark-output
-version: 1.0.0
+version: 1.1.0
 category: workflow
 scope: universal
 phase: verify
@@ -222,6 +222,44 @@ I updated the repo
 ```
 
 unless the write actually succeeded.
+
+### Completion evidence contract
+
+Completion language requires **fresh evidence from after the final relevant change**. This applies to claims such as:
+
+```text
+fixed
+done
+working
+passes
+completed
+ready
+production-ready
+merged successfully
+deployed successfully
+```
+
+Before making one of those claims, map it to proof:
+
+| Claim | Minimum fresh evidence |
+| --- | --- |
+| Build works | Build command completed successfully after the final code change |
+| Types pass | Typecheck completed successfully after the final code change |
+| Lint passes | Lint/check command completed successfully after the final code change |
+| Tests pass | Relevant test command completed successfully; report failures/skips honestly |
+| Route/UI works | Actual runtime/browser/HTTP interaction or clearly state it was not runtime-verified |
+| Issue fixed | Original failure reproduced or understood, targeted verification passes, and regression evidence exists where practical |
+| Repo/PR updated | Write operation succeeded and the resulting branch/commit/PR can be identified |
+
+Use the pattern:
+
+```text
+Claim → proof required → command/action → fresh result
+```
+
+**Fresh** means the verification happened after the last mutation that could invalidate it. If code changed after tests/build ran, rerun the affected checks before saying they still pass.
+
+When verification cannot be run, use precise language such as **"implemented but not runtime-verified"** rather than upgrading an assumption into a completion claim.
 
 ---
 

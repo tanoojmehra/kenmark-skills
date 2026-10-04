@@ -1,6 +1,6 @@
 ---
 name: kenmark-performance
-version: 1.0.0
+version: 1.1.0
 category: workflow
 scope: universal
 phase: audit
@@ -57,7 +57,10 @@ This skill is **not** the same as **`kenmark-repo-quality`**.
 | Build/type/lint/test/dev server failures | `kenmark-repo-quality` |
 | Dependency bloat/package overlap | `kenmark-repo-deps` |
 | General performance bottlenecks | `kenmark-performance` |
+| React/Next.js framework-specific performance rules | `vercel-react-best-practices` recommended pack, when installed |
 | Production incident / unclear root cause | `kenmark-troubleshoot` |
+
+Keep this skill framework-neutral at the architecture/runtime level. When React or Next.js is detected and the **Vercel React Best Practices** recommended pack is installed, use it as a specialist second lens for waterfalls, bundle loading, server/client boundaries, re-renders, and rendering patterns. Do not duplicate its full rulebook here.
 
 For **duplicate heavy libraries** (moment + dayjs, multiple HTTP clients), note in the report and suggest **`kenmark-repo-deps`** — do not uninstall packages here.
 
@@ -493,6 +496,7 @@ Performance risk: Low | Medium | High | Critical
 | Package overlap / unused deps | `kenmark-repo-deps` |
 | Production incident | `kenmark-troubleshoot` |
 | Add perf regression tests | `kenmark-test-integration`, `kenmark-test-e2e` |
+| React/Next specialist lens | `vercel-react-best-practices` (recommended pack, when installed) |
 | Pick skill | `kenmark-router` |
 
 ---

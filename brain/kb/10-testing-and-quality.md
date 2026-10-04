@@ -1,6 +1,6 @@
 # Testing and quality
 
-Last updated: 2026-06-08
+Last updated: 2026-10-04
 Status: reviewed
 
 ## Confirmed facts
@@ -27,6 +27,12 @@ Checks include:
 | `test-cleanup-temp-home.js` | Cleanup kenmark/packs modes |
 | `test-legacy-cleanup-canonical.js` | Legacy cleanup must not remove canonical bundled skills after init |
 | `test-skill-portability.js` | Path rewrite in store (IDE anchors + cwd-relative `./scripts/` in agent-facing docs); adopt result summarizer (`summarizeAdoptResults`, `formatAdoptPassSummary`) |
+
+### Skill verification policy
+
+- `kenmark-output` requires fresh evidence before completion claims such as "fixed", "passes", or "ready".
+- `kenmark-repo-quality` records starting/final HEAD + dirty state and marks gate evidence fresh/stale/not-run; affected checks must be rerun after later mutations.
+- `kenmark-test-coverage` includes optional mutation-confidence analysis. It remains read-only by default; use configured mutation tooling or disposable worktrees for manual mutation experiments.
 
 ### doctor (`scripts/doctor.js`)
 

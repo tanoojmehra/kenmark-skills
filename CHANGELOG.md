@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Changed
+
+- **recommended-catalog.json (v13):** Added `vercel-react-best-practices`, `improve-codebase-architecture`, `constraint-driven-development`, and `adverse-review`; default selection is now **Impeccable + Ponytail**, with Simplify retained as an optional alternative review pack.
+- **kenmark-audit-loop 1.2.0:** Convergence now requires a complete clean cycle across all applicable audit lenses; stable symbol/surface fingerprints replace line-number-first deduplication.
+- **kenmark-issues-scan 1.4.0:** Simplify mode now targets duplicated behavior, dead/speculative abstractions, indirection, state duplication, and measurable complexity instead of enforcing arrow-function/return-type style preferences.
+- **kenmark-troubleshoot 1.2.0:** Added single-leading-hypothesis discipline and a three-failed-fixes escalation rule.
+- **kenmark-output 1.1.0 / kenmark-repo-quality 1.2.0:** Completion and quality-gate claims require fresh evidence after the final relevant mutation; quality reports track HEAD/dirty state and fresh/stale evidence.
+- **kenmark-security-review 1.1.0:** Added supply-chain/provenance, sensitive-data/privacy, tenant isolation, webhook, mass-assignment, race/idempotency, and business-logic abuse lenses.
+- **kenmark-test-coverage 1.1.0:** Added a read-only mutation-confidence lens using configured mutation tooling or disposable experiments.
+- **kenmark-performance 1.1.0:** Keeps the generic performance role while routing React/Next.js-specific rules to the Vercel specialist pack when installed.
+
+### Fixed
+
+- **Repository metadata:** Reconciled the active package/docs to **42 bundled skills** and aligned `package.json` with the latest released changelog version `2.3.36`.
+- **Recommended-pack docs/setup/update:** Updated presets, defaults, pack counts, setup/update examples, verification paths, and KB references for catalog v13.
+
+
 ### Added
 
 - **kenmark-linear-check 1.0.0:** Added an evidence-backed Linear ticket
@@ -19,7 +36,7 @@
 ### Added
 
 - **kenmark-storage:** New bundled skill for integrating Kenmark Storage into any project — uploads (public/private), browser upload tokens, signed private downloads, app-side Sharp/FFmpeg conversion with default presets and per-request params.
-- **Skill count:** Updated documented totals to 53 (reflects all on-disk skill directories including prior unreported additions).
+- **Skill count:** Added the storage skill; current bundled totals are derived from `skills/user-skills/*/SKILL.md` and enforced by repo validation rather than relying on this historical snapshot.
 
 ## v2.3.35 — Node.js v24 symlink compatibility fix (2026-07-04)
 

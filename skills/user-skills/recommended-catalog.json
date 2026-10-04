@@ -1,64 +1,142 @@
 {
-  "version": 12,
+  "version": 13,
   "mode": "selectable",
-  "updatedAt": "2026-06-18",
+  "updatedAt": "2026-10-04",
   "notes": "Selectable optional third-party installs with repo-aware suggestions. Global install only — no project scope.",
   "defaults": {
     "scope": "global",
-    "selectedIds": ["impeccable", "simplify"]
+    "selectedIds": [
+      "impeccable",
+      "ponytail"
+    ]
   },
   "installRules": {
     "guidance": "Do not install multiple overlapping packs for the same purpose unless the user explicitly asks.",
     "overlapCaps": [
-      { "category": "design", "maxPrimary": 1, "note": "One primary UI/design pack (e.g. Impeccable)" },
-      { "category": "review", "maxPrimary": 1, "note": "One primary code-quality pack (e.g. Simplify or Ponytail)" },
-      { "category": "seo", "maxPrimary": 1, "note": "Prefer selected SEO skills; full pack only on request" },
-      { "category": "harness", "maxPrimary": 1, "note": "ECC minimal by default; avoid stacking with plugin install" },
-      { "category": "navigation", "maxPrimary": 1, "note": "Graphify for medium/large repos only" },
-      { "category": "context", "maxPrimary": 1, "note": "One context compression tool (e.g. Headroom)" },
-      { "category": "diagram", "maxPrimary": 1, "note": "One primary diagram skill (e.g. draw.io)" },
-      { "category": "audit", "maxPrimary": 1, "note": "One primary audit-to-plan pack (e.g. improve)" }
+      {
+        "category": "design",
+        "maxPrimary": 1,
+        "note": "One primary UI/design pack (e.g. Impeccable)"
+      },
+      {
+        "category": "review",
+        "maxPrimary": 1,
+        "note": "One primary everyday code-quality/minimalism pack (e.g. Ponytail or Simplify)"
+      },
+      {
+        "category": "seo",
+        "maxPrimary": 1,
+        "note": "Prefer selected SEO skills; full pack only on request"
+      },
+      {
+        "category": "harness",
+        "maxPrimary": 1,
+        "note": "ECC minimal by default; avoid stacking with plugin install"
+      },
+      {
+        "category": "navigation",
+        "maxPrimary": 1,
+        "note": "Graphify for medium/large repos only"
+      },
+      {
+        "category": "context",
+        "maxPrimary": 1,
+        "note": "One context compression tool (e.g. Headroom)"
+      },
+      {
+        "category": "diagram",
+        "maxPrimary": 1,
+        "note": "One primary diagram skill (e.g. draw.io)"
+      },
+      {
+        "category": "audit",
+        "maxPrimary": 1,
+        "note": "One primary audit-to-plan pack (e.g. improve)"
+      },
+      {
+        "category": "architecture",
+        "maxPrimary": 1,
+        "note": "One primary architecture/deep-module specialist"
+      },
+      {
+        "category": "framework",
+        "maxPrimary": 1,
+        "note": "Framework-specific specialists may complement generic audit/performance skills"
+      },
+      {
+        "category": "constraints",
+        "maxPrimary": 1,
+        "note": "One durable quality-constraint system"
+      },
+      {
+        "category": "assurance",
+        "maxPrimary": 1,
+        "note": "One heavy adversarial/independent assurance pack for high-risk changes"
+      }
     ]
   },
   "presets": [
     {
       "id": "lean",
       "name": "Lean Daily Coding",
-      "description": "Impeccable + Simplify — same as default selection.",
-      "packIds": ["impeccable", "simplify"]
+      "description": "Impeccable + Ponytail — default UI quality plus YAGNI/minimalism.",
+      "packIds": [
+        "impeccable",
+        "ponytail"
+      ]
     },
     {
       "id": "core-next-lite",
       "name": "Core Next.js Lite",
-      "description": "Next.js essentials without Graphify or ECC.",
-      "packIds": ["impeccable", "simplify"]
+      "description": "Lean daily coding + Vercel React Best Practices for React/Next.js.",
+      "packIds": [
+        "impeccable",
+        "ponytail",
+        "vercel-react-best-practices"
+      ]
     },
     {
       "id": "core-next",
       "name": "Core Next.js Full-Stack",
       "description": "core-next-lite + Graphify for medium/large Next.js repos.",
       "extends": "core-next-lite",
-      "packIds": ["graphify"]
+      "packIds": [
+        "graphify"
+      ]
     },
     {
       "id": "core-next-agentic",
       "name": "Core Next.js Agentic",
-      "description": "core-next plus ECC minimal (manual install).",
+      "description": "core-next + durable constraints + ECC minimal (manual install).",
       "extends": "core-next",
-      "packIds": [{ "id": "ecc", "profile": "minimal" }]
+      "packIds": [
+        "constraint-driven-development",
+        {
+          "id": "ecc",
+          "profile": "minimal"
+        }
+      ]
     },
     {
       "id": "growth-seo",
       "name": "Growth + SEO/GEO",
       "description": "core-next + selected SEO/GEO skills (not the full 20-skill suite).",
       "extends": "core-next",
-      "packIds": [{ "id": "seo-geo-selected" }]
+      "packIds": [
+        {
+          "id": "seo-geo-selected"
+        }
+      ]
     },
     {
       "id": "audit-review",
       "name": "Audit / Review",
-      "description": "Simplify + Graphify without default UI design skills.",
-      "packIds": ["simplify", "graphify"]
+      "description": "Broad audit + architecture survey + adversarial assurance for substantial reviews.",
+      "packIds": [
+        "improve",
+        "improve-codebase-architecture",
+        "adverse-review"
+      ]
     },
     {
       "id": "experimental-heavy",
@@ -68,9 +146,17 @@
       "requiresConfirmation": true,
       "packIds": [
         "impeccable",
-        "simplify",
+        "ponytail",
+        "vercel-react-best-practices",
+        "improve",
+        "improve-codebase-architecture",
+        "constraint-driven-development",
+        "adverse-review",
         "graphify",
-        { "id": "ecc", "profile": "core" },
+        {
+          "id": "ecc",
+          "profile": "core"
+        },
         "seo-geo-full"
       ]
     }
@@ -84,12 +170,31 @@
       "bloatScore": 1,
       "recommended": true,
       "defaultSelected": true,
-      "helpsWith": ["UI polish", "design systems", "frontend taste"],
-      "bestFor": ["UI polish", "frontend taste", "design systems"],
-      "avoidWhen": ["backend-only scripts", "non-UI refactors"],
+      "helpsWith": [
+        "UI polish",
+        "design systems",
+        "frontend taste"
+      ],
+      "bestFor": [
+        "UI polish",
+        "frontend taste",
+        "design systems"
+      ],
+      "avoidWhen": [
+        "backend-only scripts",
+        "non-UI refactors"
+      ],
       "suggestiveTest": {
         "question": "Does this project have a user-facing UI?",
-        "signals": ["next.config", "ui-app-router", "ui-src-components", "ui-pages-dir", "tailwind.config", "shadcn-ui", "css-modules"],
+        "signals": [
+          "next.config",
+          "ui-app-router",
+          "ui-src-components",
+          "ui-pages-dir",
+          "tailwind.config",
+          "shadcn-ui",
+          "css-modules"
+        ],
         "recommendWhen": "any",
         "recommendation": "recommended"
       },
@@ -116,13 +221,28 @@
       "weight": "light",
       "bloatScore": 1,
       "recommended": true,
-      "defaultSelected": true,
-      "helpsWith": ["code simplification", "readability", "post-generation cleanup"],
-      "bestFor": ["refactoring after generation", "readability passes", "reducing complexity"],
-      "avoidWhen": [],
+      "defaultSelected": false,
+      "helpsWith": [
+        "code simplification",
+        "readability",
+        "post-generation cleanup"
+      ],
+      "bestFor": [
+        "refactoring after generation",
+        "readability passes",
+        "reducing complexity"
+      ],
+      "avoidWhen": [
+        "Ponytail is already the primary review pack",
+        "native kenmark-issues-scan simplify mode is sufficient"
+      ],
       "suggestiveTest": {
         "question": "Will agents write or refactor code in this repo?",
-        "signals": ["git-repo", "typescript-project", "multi-language-src"],
+        "signals": [
+          "git-repo",
+          "typescript-project",
+          "multi-language-src"
+        ],
         "recommendWhen": "any",
         "recommendation": "recommended"
       },
@@ -148,7 +268,7 @@
       "weight": "medium",
       "bloatScore": 3,
       "recommended": true,
-      "defaultSelected": false,
+      "defaultSelected": true,
       "adoptSkillNames": [
         "ponytail",
         "ponytail-review",
@@ -168,12 +288,15 @@
         "reviewing diffs for unnecessary code"
       ],
       "avoidWhen": [
-        "Simplify is already your primary review pack",
         "you need plugin hooks without separate Claude/Codex setup"
       ],
       "suggestiveTest": {
         "question": "Do agents here tend to over-engineer or write more code than needed?",
-        "signals": ["git-repo", "typescript-project", "multi-language-src"],
+        "signals": [
+          "git-repo",
+          "typescript-project",
+          "multi-language-src"
+        ],
         "recommendWhen": "any",
         "recommendation": "optional"
       },
@@ -246,6 +369,228 @@
       }
     },
     {
+      "id": "vercel-react-best-practices",
+      "name": "Vercel React Best Practices",
+      "category": "framework",
+      "weight": "light",
+      "bloatScore": 1,
+      "recommended": true,
+      "defaultSelected": false,
+      "adoptSkillNames": [
+        "vercel-react-best-practices"
+      ],
+      "helpsWith": [
+        "React and Next.js performance",
+        "waterfall avoidance",
+        "bundle size",
+        "server/client rendering",
+        "re-render reduction"
+      ],
+      "bestFor": [
+        "React applications",
+        "Next.js App Router and Pages Router projects",
+        "performance-sensitive frontend work"
+      ],
+      "avoidWhen": [
+        "non-React projects",
+        "backend-only repositories"
+      ],
+      "suggestiveTest": {
+        "question": "Does this repo use React or Next.js?",
+        "signals": [
+          "next.config",
+          "ui-app-router",
+          "ui-src-components",
+          "ui-pages-dir",
+          "typescript-project"
+        ],
+        "recommendWhen": ">=1",
+        "recommendation": "recommended"
+      },
+      "url": "https://github.com/vercel-labs/agent-skills",
+      "description": "Vercel Engineering's React/Next.js performance skill — prioritized rules for waterfalls, bundle loading, server/client boundaries, rendering, data fetching, and re-renders.",
+      "warning": "Framework-specific specialist. Pair with kenmark-performance for broader DB/API/runtime analysis; do not treat it as a replacement for generic performance review.",
+      "install": {
+        "global": {
+          "command": "npx --yes skills add vercel-labs/agent-skills -g -y -s vercel-react-best-practices",
+          "summary": "Install Vercel React Best Practices globally"
+        },
+        "alternatives": [
+          "Manual: install only skills/react-best-practices from vercel-labs/agent-skills"
+        ],
+        "verify": {
+          "global": "test -f \"$HOME/.agents/skills/vercel-react-best-practices/SKILL.md\" || test -f \"$HOME/.cursor/skills/vercel-react-best-practices/SKILL.md\" || test -f \"$HOME/.claude/skills/vercel-react-best-practices/SKILL.md\""
+        }
+      }
+    },
+    {
+      "id": "improve-codebase-architecture",
+      "name": "Improve Codebase Architecture",
+      "category": "architecture",
+      "weight": "medium",
+      "bloatScore": 2,
+      "recommended": true,
+      "defaultSelected": false,
+      "adoptSkillNames": [
+        "codebase-design",
+        "improve-codebase-architecture"
+      ],
+      "helpsWith": [
+        "architectural friction",
+        "module depth",
+        "testability",
+        "stable seams",
+        "AI navigability"
+      ],
+      "bestFor": [
+        "large or fast-changing repos",
+        "monorepos",
+        "areas with repeated cross-file churn",
+        "architecture review before refactors"
+      ],
+      "avoidWhen": [
+        "small one-file utilities",
+        "repos where architecture work is out of scope"
+      ],
+      "suggestiveTest": {
+        "question": "Is this repo large or change-heavy enough to benefit from architecture review?",
+        "signals": [
+          "git-repo",
+          "monorepo-workspace",
+          "repo-file-count-high",
+          "typescript-project",
+          "multi-language-src"
+        ],
+        "recommendWhen": ">=2",
+        "recommendation": "optional"
+      },
+      "url": "https://github.com/mattpocock/skills",
+      "description": "Surveys codebases for shallow modules and architectural friction, then proposes deeper interfaces/seams that improve testability and maintainability.",
+      "warning": "The architecture skill relies on Matt Pocock's codebase-design vocabulary; this pack installs both codebase-design and improve-codebase-architecture. It may create architecture reports/issues depending on the upstream workflow.",
+      "install": {
+        "global": {
+          "command": "npx --yes skills add https://github.com/mattpocock/skills -g -y -s codebase-design && npx --yes skills add https://github.com/mattpocock/skills -g -y -s improve-codebase-architecture",
+          "summary": "Install codebase-design + improve-codebase-architecture globally"
+        },
+        "alternatives": [
+          "Interactive: npx skills add https://github.com/mattpocock/skills and select codebase-design + improve-codebase-architecture"
+        ],
+        "verify": {
+          "global": "(test -f \"$HOME/.agents/skills/codebase-design/SKILL.md\" || test -f \"$HOME/.cursor/skills/codebase-design/SKILL.md\" || test -f \"$HOME/.claude/skills/codebase-design/SKILL.md\") && (test -f \"$HOME/.agents/skills/improve-codebase-architecture/SKILL.md\" || test -f \"$HOME/.cursor/skills/improve-codebase-architecture/SKILL.md\" || test -f \"$HOME/.claude/skills/improve-codebase-architecture/SKILL.md\")"
+        }
+      }
+    },
+    {
+      "id": "constraint-driven-development",
+      "name": "Constraint-Driven Development",
+      "category": "constraints",
+      "weight": "light",
+      "bloatScore": 1,
+      "recommended": true,
+      "defaultSelected": false,
+      "adoptSkillNames": [
+        "constraint-driven-development"
+      ],
+      "helpsWith": [
+        "durable quality bars",
+        "measurable engineering constraints",
+        "CI gate design",
+        "preventing agents from weakening checks"
+      ],
+      "bestFor": [
+        "agent-heavy codebases",
+        "teams that want explicit quality floors",
+        "repos without written quality thresholds"
+      ],
+      "avoidWhen": [
+        "throwaway prototypes",
+        "repos where root-level CONSTRAINTS.md is unwanted"
+      ],
+      "suggestiveTest": {
+        "question": "Would persistent measurable quality constraints help keep agent changes within bounds?",
+        "signals": [
+          "git-repo",
+          "typescript-project",
+          "monorepo-workspace",
+          "repo-file-count-high"
+        ],
+        "recommendWhen": ">=2",
+        "recommendation": "optional"
+      },
+      "url": "https://github.com/addyosmani/agent-skills",
+      "description": "Defines a durable quality bar in CONSTRAINTS.md, places checks by cost, and catches attempts to silence checks or skip tests just to get green.",
+      "warning": "Writes/maintains a repo-root CONSTRAINTS.md when invoked. Treat constraints as reviewed project policy; do not weaken them merely to make a change pass.",
+      "install": {
+        "global": {
+          "command": "npx --yes skills add addyosmani/agent-skills -g -y -s constraint-driven-development",
+          "summary": "Install Constraint-Driven Development globally"
+        },
+        "alternatives": [
+          "Browse first: npx skills add addyosmani/agent-skills --list"
+        ],
+        "verify": {
+          "global": "test -f \"$HOME/.agents/skills/constraint-driven-development/SKILL.md\" || test -f \"$HOME/.cursor/skills/constraint-driven-development/SKILL.md\" || test -f \"$HOME/.claude/skills/constraint-driven-development/SKILL.md\""
+        }
+      }
+    },
+    {
+      "id": "adverse-review",
+      "name": "Adverse Review",
+      "category": "assurance",
+      "weight": "heavy",
+      "bloatScore": 3,
+      "recommended": true,
+      "defaultSelected": false,
+      "adoptSkillNames": [
+        "adverse-review"
+      ],
+      "helpsWith": [
+        "multi-agent adversarial review",
+        "cross-validation of findings",
+        "high-risk PR review",
+        "release confidence"
+      ],
+      "bestFor": [
+        "large PRs",
+        "auth/payment/security changes",
+        "architecture migrations",
+        "risky refactors",
+        "release candidates"
+      ],
+      "avoidWhen": [
+        "tiny cosmetic changes",
+        "simple documentation edits",
+        "harnesses without subagent support unless using the CLI"
+      ],
+      "suggestiveTest": {
+        "question": "Does this repo regularly ship large or high-risk changes that benefit from adversarial review?",
+        "signals": [
+          "git-repo",
+          "repo-file-count-high",
+          "monorepo-workspace",
+          "multi-language-src"
+        ],
+        "recommendWhen": ">=2",
+        "recommendation": "optional"
+      },
+      "url": "https://github.com/addyosmani/adverse",
+      "description": "Multi-agent adversarial review: independent reviewers, cross-examination, and deterministic synthesis to reduce single-reviewer blind spots.",
+      "warning": "Heavy review path. Skill mode expects subagent support; the standalone adverse CLI requires Node.js 20+. Use for important changes rather than every small commit.",
+      "install": {
+        "global": {
+          "command": "npx --yes skills add addyosmani/adverse -g -y -s adverse-review",
+          "summary": "Install Adverse Review globally"
+        },
+        "alternatives": [
+          "CLI: npm install -g adverse (Node.js 20+)",
+          "Skill: npx skills add addyosmani/adverse"
+        ],
+        "verify": {
+          "global": "test -f \"$HOME/.agents/skills/adverse-review/SKILL.md\" || test -f \"$HOME/.cursor/skills/adverse-review/SKILL.md\" || test -f \"$HOME/.claude/skills/adverse-review/SKILL.md\""
+        }
+      }
+    },
+    {
       "id": "graphify",
       "name": "Graphify",
       "category": "navigation",
@@ -253,12 +598,27 @@
       "bloatScore": 2,
       "recommended": false,
       "defaultSelected": false,
-      "helpsWith": ["large-repo navigation", "architecture maps", "cross-file reasoning"],
-      "bestFor": ["large repos", "architecture understanding", "full-stack navigation"],
-      "avoidWhen": ["small repos", "simple one-file edits"],
+      "helpsWith": [
+        "large-repo navigation",
+        "architecture maps",
+        "cross-file reasoning"
+      ],
+      "bestFor": [
+        "large repos",
+        "architecture understanding",
+        "full-stack navigation"
+      ],
+      "avoidWhen": [
+        "small repos",
+        "simple one-file edits"
+      ],
       "suggestiveTest": {
         "question": "Is this repo large enough to benefit from a knowledge graph?",
-        "signals": ["repo-file-count-high", "monorepo-workspace", "next.config"],
+        "signals": [
+          "repo-file-count-high",
+          "monorepo-workspace",
+          "next.config"
+        ],
         "recommendWhen": ">=2",
         "recommendation": "optional"
       },
@@ -280,7 +640,9 @@
     },
     {
       "id": "seo-geo-selected",
-      "aliases": ["seo-geo-claude-skills"],
+      "aliases": [
+        "seo-geo-claude-skills"
+      ],
       "name": "SEO & GEO (selected skills)",
       "category": "seo",
       "weight": "medium",
@@ -297,12 +659,28 @@
         "seo-content-writer",
         "geo-content-optimizer"
       ],
-      "helpsWith": ["public websites", "content marketing", "GEO optimization"],
-      "bestFor": ["client websites", "landing pages", "SEO-heavy marketing sites"],
-      "avoidWhen": ["private apps", "admin dashboards", "non-public tools"],
+      "helpsWith": [
+        "public websites",
+        "content marketing",
+        "GEO optimization"
+      ],
+      "bestFor": [
+        "client websites",
+        "landing pages",
+        "SEO-heavy marketing sites"
+      ],
+      "avoidWhen": [
+        "private apps",
+        "admin dashboards",
+        "non-public tools"
+      ],
       "suggestiveTest": {
         "question": "Is this a public marketing or content site?",
-        "signals": ["seo-marketing-deps", "public-static-site", "sitemap-or-robots"],
+        "signals": [
+          "seo-marketing-deps",
+          "public-static-site",
+          "sitemap-or-robots"
+        ],
         "recommendWhen": ">=1",
         "recommendation": "optional"
       },
@@ -343,12 +721,26 @@
       "recommended": false,
       "defaultSelected": false,
       "seoMode": "full",
-      "helpsWith": ["full SEO/GEO suite", "rank tracking", "competitor analysis"],
-      "bestFor": ["SEO agencies", "content teams needing every skill"],
-      "avoidWhen": ["daily coding", "private/internal apps", "minimal harnesses"],
+      "helpsWith": [
+        "full SEO/GEO suite",
+        "rank tracking",
+        "competitor analysis"
+      ],
+      "bestFor": [
+        "SEO agencies",
+        "content teams needing every skill"
+      ],
+      "avoidWhen": [
+        "daily coding",
+        "private/internal apps",
+        "minimal harnesses"
+      ],
       "suggestiveTest": {
         "question": "Do you need the entire 20-skill SEO/GEO suite?",
-        "signals": ["seo-marketing-deps", "seo-heavy-package-scripts"],
+        "signals": [
+          "seo-marketing-deps",
+          "seo-heavy-package-scripts"
+        ],
         "recommendWhen": ">=2",
         "recommendation": "avoid"
       },
@@ -377,17 +769,33 @@
       "installStrategy": "manual",
       "recommended": false,
       "defaultSelected": false,
-      "helpsWith": ["structured agent workflows", "security scanning patterns"],
-      "bestFor": ["structured agent workflows", "security scanning patterns"],
-      "avoidWhen": ["already using ECC plugin", "minimal daily coding only"],
+      "helpsWith": [
+        "structured agent workflows",
+        "security scanning patterns"
+      ],
+      "bestFor": [
+        "structured agent workflows",
+        "security scanning patterns"
+      ],
+      "avoidWhen": [
+        "already using ECC plugin",
+        "minimal daily coding only"
+      ],
       "suggestiveTest": {
         "question": "Do you want a large agent harness overlay?",
-        "signals": ["claude-project-config", "ecc-already-present"],
+        "signals": [
+          "claude-project-config",
+          "ecc-already-present"
+        ],
         "recommendWhen": "ecc-already-present",
         "recommendation": "avoid"
       },
       "defaultProfile": "minimal",
-      "allowedProfiles": ["minimal", "core", "full"],
+      "allowedProfiles": [
+        "minimal",
+        "core",
+        "full"
+      ],
       "recommendedProfile": "minimal",
       "url": "https://github.com/affaan-m/ECC",
       "description": "Agent-harness performance system — skills, agents, hooks, rules. Manual install until npm installer is verified.",
@@ -395,9 +803,18 @@
       "install": {
         "defaultProfile": "minimal",
         "profiles": [
-          { "id": "minimal", "description": "Minimal: rules, agents, commands, core workflow skills (~3-5 agents, ~10-15 skills)." },
-          { "id": "core", "description": "Core: standard install. Pair with --without baseline:hooks to keep hooks off" },
-          { "id": "full", "description": "Full: complete installer (28 agents, 119 skills). Explicit opt-in only" }
+          {
+            "id": "minimal",
+            "description": "Minimal: rules, agents, commands, core workflow skills (~3-5 agents, ~10-15 skills)."
+          },
+          {
+            "id": "core",
+            "description": "Core: standard install. Pair with --without baseline:hooks to keep hooks off"
+          },
+          {
+            "id": "full",
+            "description": "Full: complete installer (28 agents, 119 skills). Explicit opt-in only"
+          }
         ],
         "global": {
           "manual": true,

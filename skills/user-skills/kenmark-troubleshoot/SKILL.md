@@ -1,6 +1,6 @@
 ---
 name: kenmark-troubleshoot
-version: 1.1.0
+version: 1.2.0
 category: workflow
 scope: universal
 phase: diagnose
@@ -276,6 +276,20 @@ Prefer tests that are:
 * Fast
 * Narrow in scope
 * Able to falsify a hypothesis
+
+### Hypothesis discipline
+
+Do not shotgun fixes across multiple hypotheses.
+
+1. Select **one leading hypothesis** based on current evidence.
+2. Run the **smallest discriminating test** that can meaningfully confirm or weaken it.
+3. Record the result as new evidence before changing code/config.
+4. Update confidence. Only then choose a targeted fix or move to the next hypothesis.
+5. Keep an **attempt counter** for actual fixes (not read-only tests).
+
+If **3 targeted fixes fail to resolve the same symptom**, stop making incremental changes. Treat repeated failure as evidence that an assumption, interface, dependency relationship, or architecture may be wrong. Rebuild the problem model from the evidence bundle, revisit the reproduction, and escalate to `kenmark-troubleshoot-deep` when appropriate.
+
+Never stack several speculative fixes into one change merely to see whether "something works"; that destroys diagnostic signal.
 
 ---
 
