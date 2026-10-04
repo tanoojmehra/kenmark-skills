@@ -2,6 +2,12 @@
 
 Brain knowledge base
 
+## v2026.10.04-skills-audit-upgrades
+
+- **Native audit/verification skills:** Fixed audit-loop cycle convergence and stable dedup fingerprints; made simplify findings semantic rather than style-driven; added single-hypothesis troubleshooting, fresh completion evidence, quality-gate freshness tracking, expanded appsec lenses, mutation-confidence coverage review, and React/Next specialist routing.
+- **Recommended catalog v13:** Added Vercel React Best Practices, Improve Codebase Architecture, Constraint-Driven Development, and Adverse Review. Default lean selection is now Impeccable + Ponytail; Simplify remains optional.
+- **Metadata/docs:** Reconciled the active repository to 42 bundled skills, package version 2.3.36, 14 catalog packs, updated presets/examples, and refreshed skills/catalog/testing KB references.
+
 ## v2026.09.25-linear-ticket-score
 
 - **Skill catalog:** Added `kenmark-linear-ticket-score` to the bundled issues skills and routing reference; its default response is a compact ticket health report with expanded evidence available when needed.
