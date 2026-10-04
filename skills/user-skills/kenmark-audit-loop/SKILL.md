@@ -1,6 +1,6 @@
 ---
 name: kenmark-audit-loop
-version: 1.1.0
+version: 1.2.0
 category: issues
 scope: universal
 phase: discover
@@ -43,8 +43,9 @@ This skill orchestrates existing audit lenses (`kenmark-issues-scan`, `kenmark-s
 3. **Never reuse an issue ID.** Compute `NEXT_ID = max(all IDs) + 1` from active files, completed files, and INDEX entries.
 4. **Never file a duplicate finding** — dedupe by fingerprint (see Step 3) against existing issues and earlier passes in this run.
 5. **Always ask the user which area to audit** (Step 0) unless they already named a specific area in the same message.
-6. **Stop when `new_issues_this_pass == 0`**, or when `max_passes` (default 10) is reached.
-7. **Use subagents** (`Task`) to cover large directories in parallel when the harness supports it.
+6. **Convergence is cycle-wide, never lens-wide.** Run every applicable lens in the cycle; stop only when the **entire cycle** files zero new unique issues.
+7. **Default to at most 3 full cycles.** A cycle is one complete rotation of all selected lenses plus the semantic pass when applicable.
+8. **Use subagents** (`Task`) to cover large directories in parallel when the harness supports it.
 
 ---
 
@@ -85,9 +86,10 @@ Create or update a scratch ledger at `brain/.audit-run.json` (gitignored if the 
 {
   "started": "YYYY-MM-DD",
   "selected_areas": ["all"],
+  "cycle_number": 0,
   "pass_number": 0,
   "fingerprints": [],
-  "lenses_completed": [],
+  "lenses_completed_this_cycle": [],
   "issues_filed": [],
   "stop_reason": null
 }
@@ -116,7 +118,7 @@ Seed `fingerprints` from all open and completed issues (parse `files:` frontmatt
 
 ## Step 2 — Lens rotation by area
 
-Each **pass** runs **one lens** not yet completed for the selected areas. Rotate lenses in this order; skip lenses that do not apply to the user's selection.
+A **cycle** is one complete rotation through every applicable lens for the selected areas. Each **pass** runs one lens. Rotate lenses in this order; skip lenses that do not apply to the user's selection.
 
 | Lens ID | Applies when area is | Delegate to / patterns from |
 | --- | --- | --- |
@@ -129,26 +131,38 @@ Each **pass** runs **one lens** not yet completed for the selected areas. Rotate
 | `deps` | `all`, `deps`, `infra` | `kenmark-repo-deps` audit |
 | `semantic` | `all`, or any area after lens queue empty | Deep read of files flagged in prior passes; paths from `brain/issues/` `files:` for selected areas |
 
-**Pass loop:**
+**Cycle loop:**
 
 ```text
-WHILE lenses remain for selected_areas:
-  pass_number += 1
-  pick next uncompleted lens
-  run pass (subagents per top-level directory when repo is large)
-  dedupe → file new issues → update INDEX
-  IF new_issues_this_pass == 0:
+max_cycles = 3
+cycle_number = 0
+
+WHILE cycle_number < max_cycles:
+  cycle_number += 1
+  cycle_new_issues = 0
+  reset lenses_completed_this_cycle
+
+  FOR each applicable lens in order:
+    pass_number += 1
+    run pass (subagents per top-level directory when repo is large)
+    dedupe → file new issues → update INDEX
+    cycle_new_issues += new_issues_this_pass
+    mark lens completed for this cycle
+
+  IF the normal lens queue produced any findings OR prior issues identify hot paths:
+    pass_number += 1
+    run one semantic pass over flagged symbols/files
+    cycle_new_issues += new_issues_this_pass
+
+  IF cycle_new_issues == 0:
     stop_reason = "converged"
     BREAK
-  IF pass_number >= max_passes (default 10):
-    stop_reason = "max_passes"
-    BREAK
-  mark lens completed; continue to next lens
-IF all lenses completed AND last pass had new issues:
-  run one `semantic` pass, then re-check stop condition
+
+IF stop_reason is still null:
+  stop_reason = "max_cycles"
 ```
 
-Continue the loop **in the same session** across turns until `stop_reason` is set.
+A clean **single lens** never means convergence. Continue through the rest of the current cycle even when that lens finds zero issues. Continue the loop **in the same session** across turns until `stop_reason` is set.
 
 ---
 
@@ -157,16 +171,19 @@ Continue the loop **in the same session** across turns until `stop_reason` is se
 Before filing any issue, compute a fingerprint:
 
 ```text
-fingerprint = lower(file_path) + ":" + line_or_range + ":" + category + ":" + root_cause_slug
+fingerprint = lower(file_path) + ":" + stable_symbol_or_surface + ":" + category + ":" + root_cause_slug
 ```
 
+- `stable_symbol_or_surface` — prefer an exported function/class/component, route, config key, schema field, or other stable semantic anchor; use `file-scope` only when no better anchor exists
 - `category` — lens id (`bugs`, `security`, `simplify`, etc.)
-- `root_cause_slug` — short normalized summary (e.g. `missing-return-type`, `stale-import`, `open-redirect`)
+- `root_cause_slug` — short normalized summary (e.g. `stale-import`, `open-redirect`, `duplicate-validation`)
+
+Line/range belongs in the issue evidence, **not** the primary fingerprint, because line numbers move after edits.
 
 **Skip filing when:**
 
 1. Fingerprint exists in `brain/.audit-run.json` → `fingerprints`
-2. An open or completed issue already covers the same file + root cause (compare titles, evidence, and `files:` frontmatter)
+2. An open or completed issue already covers the same stable symbol/surface + root cause (compare titles, evidence, and `files:` frontmatter)
 3. The finding is a grep hit without confirming context (read the file first)
 
 After filing, append the fingerprint and issue id to the run ledger.
@@ -248,14 +265,15 @@ When the loop stops, report:
 | Field | Value |
 | --- | --- |
 | Selected areas | … |
+| Cycles run | … |
 | Passes run | … |
 | Lenses used | … |
 | New issues filed | count + IDs |
-| Stop reason | `converged` \| `max_passes` |
+| Stop reason | `converged` \| `max_cycles` |
 | Deduped (skipped) | count |
 | Next steps | `kenmark-tracker-list`, `kenmark-issues-fix-and-ship`, or fix P0s first |
 
-**Converged** means the last full pass filed **zero** new unique issues — not that the repo has zero bugs globally.
+**Converged** means the last **full cycle across all applicable lenses** filed zero new unique issues — not that the repo has zero bugs globally.
 
 ---
 
