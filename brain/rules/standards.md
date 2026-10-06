@@ -6,6 +6,14 @@ Universal rules for **kenmark-skills** (npm CLI + bundled skills). Stack, workfl
 
 - Prefer the smallest correct change; do not refactor unrelated code.
 - Match existing patterns in `scripts/` and skill frontmatter before adding new conventions.
+
+## Context efficiency
+
+- Keep the primary agent as a coordinator when work is multi-part, research-heavy, repo-wide, or queued.
+- Prefer fresh bounded workers for independent work; send only task-relevant context, not the full conversation.
+- Workers return compact state (status, files/evidence, checks, decisions, blockers, commit/artifact), not verbose histories or logs.
+- Keep the controller's durable memory to task state and dependencies; repository files, issue/plan trackers, commits, and artifacts are the source of truth.
+- Prefer higher total worker token usage over unnecessarily growing the controller context when that improves responsiveness and focus.
 - Bundled skills live under `skills/user-skills/<name>/SKILL.md` — flat layout only (no nested category folders on disk).
 
 ## Project layout
