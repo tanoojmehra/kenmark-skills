@@ -20,7 +20,7 @@ Status: reviewed
 - `README.md` — user-facing quick start (being simplified)
 - `scripts/cli.js` — command routing
 - `skills/README.md` — flat skill layout and categories
-- `skills/user-skills/recommended-catalog.json` — optional pack catalog v13
+- `skills/user-skills/recommended-catalog.json` — optional pack catalog v14
 
 ## Assumptions
 
