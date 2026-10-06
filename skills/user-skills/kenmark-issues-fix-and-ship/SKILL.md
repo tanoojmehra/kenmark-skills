@@ -1,6 +1,6 @@
 ---
 name: kenmark-issues-fix-and-ship
-version: 1.1.0
+version: 1.2.0
 category: workflow
 scope: universal
 phase: ship
@@ -18,6 +18,7 @@ triggers:
   - fix and ship issues
   - issue workflow ship
 allowed-tools:
+  - Task
   - Bash
   - Read
   - Write
@@ -44,6 +45,7 @@ Load sibling skills for each phase — do not reimplement their rules:
 
 | Phase | Skill |
 | --- | --- |
+| Context / decomposition | `kenmark-context` (automatic policy; fresh worker per bounded issue when useful) |
 | Discover / file issues | `kenmark-issues-scan` |
 | Verify / close issues | `kenmark-tracker-check` |
 | Index health | `kenmark-tracker-maintain` (when INDEX disagrees with folders) |
@@ -65,6 +67,7 @@ See `references/workflow.md` for phase detail and `references/merge-safety.md` f
 7. **Merge default:** open a PR; direct merge only when the user explicitly requests it.
 8. **Stop if zero new issues** — when the blob yields no unique candidates after dedupe, report and stop before creating a feature branch.
 9. **Confirm large or risky fixes** — when a fix touches many files (>8 unrelated paths) or changes a public API surface, pause and confirm with the user before committing.
+10. **Queue efficiently** — independent issues should use fresh bounded workers when supported; keep only issue status, dependencies, commit/artifact, and blockers in the controller.
 
 ---
 
@@ -129,9 +132,22 @@ git switch -c fix/<short-summary>
 # or: git switch -c feature/<short-summary>
 ```
 
+### Context-aware issue queue
+
+Before the fix loop, build a compact dependency table for the issues from this run/backlog:
+
+```markdown
+| Issue | Status | Depends on | Parallel safe? | Commit/artifact | Blocker |
+| --- | --- | --- | --- | --- | --- |
+```
+
+Prefer **one fresh worker per bounded issue**. Parallelize only when workers cannot race on the same files/state; otherwise run fresh workers sequentially. Use **kenmark-context** task capsules and compact result envelopes. Do not forward the full conversation or return verbose worker histories.
+
+Testing/coverage issues that depend on several fixes should run after those fixes integrate.
+
 ### Per-issue loop (P0 → P1 → P2)
 
-For each open issue from this run (or all open if user asked to fix existing backlog):
+For each open issue from this run (or all open if user asked to fix existing backlog), either execute locally or delegate one bounded issue:
 
 1. Read issue `files:` and Evidence section.
 2. Search codebase to confirm the bug still exists.
@@ -146,6 +162,7 @@ pnpm test        # when tests exist and cover the change
 ```
 
 6. If INDEX drift appears, run `kenmark-tracker-maintain` before closing issues.
+7. For delegated fixes, retain only the compact result (status, files, checks, future-relevant decision, blocker, commit/artifact) and re-read current repo state before dependent work.
 
 **Pause gate:** if a single fix touches >8 unrelated file paths or changes a public API (exported types, route contracts, env vars), ask the user to confirm before proceeding.
 
@@ -235,6 +252,7 @@ Return to the user:
 | Checks | typecheck, lint, test — pass/fail |
 | Git | branch, commit SHAs + subjects |
 | Ship | PR URL, merge result (if merged) |
+| Workers | Bounded issue statuses + commit/artifact refs when delegation was used |
 | KB | `brain/kb/` and `CHANGELOG.md` files updated |
 
 ---
@@ -245,6 +263,7 @@ Return to the user:
 | --- | --- |
 | Feature branch off protected branches | Commit directly on `main`/`dev` |
 | Dedupe blob against INDEX + completed | Create duplicate issues |
+| Fresh worker per bounded issue when useful | Reuse one bloated worker for unrelated issues |
 | Stop when blob yields zero new issues | Open empty PRs |
 | `git log -1 --format=%B` after each commit | Co-authored-by trailers |
 | PR by default | Force-push protected branches |
