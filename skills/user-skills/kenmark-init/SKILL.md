@@ -1,6 +1,6 @@
 ---
 name: kenmark-init
-version: 1.3.0
+version: 1.4.0
 category: onboarding
 scope: universal
 phase: setup
@@ -328,6 +328,8 @@ Use this **exact** markdown inside `<!-- init-brain:START -->` / `<!-- init-brai
 
 **Required — start of every new conversation:** Before non-trivial work, **Read** `brain/rules/standards.md` first. **Read** relevant `brain/kb/` files for the task (numbered `00`–`11` and any `kb/features/` entry). **Read** additional rule files (`stack.md`, `workflow.md`, `testing.md`, `ui.md`, `deployment.md`) only when relevant.
 
+**Context efficiency:** For multi-part, repo-wide, research-heavy, or queued work, keep the primary agent lean: delegate bounded independent work to fresh contexts when available, pass only task-relevant context, and retain compact state rather than worker history/logs.
+
 **After meaningful changes:** Update the matching `brain/kb/` files and `brain/CHANGELOG.md` — code and KB move together.
 ```
 
@@ -489,6 +491,14 @@ Universal rules for this repo. Stack, workflow, testing, UI, and deploy details 
 - Prefer the smallest correct change; do not refactor unrelated code.
 - In code you touch: complete behavior, real data shapes, and sensible error handling — not mocks, TODO stubs, or placeholder APIs unless the user asked for a spike.
 - Read surrounding code before editing; match naming, types, and patterns already in the repo.
+
+## Context efficiency
+
+- Keep the primary agent as a coordinator when work is multi-part, research-heavy, repo-wide, or queued.
+- Prefer fresh bounded workers for independent work; send only task-relevant context, not the full conversation.
+- Workers return compact state (status, files/evidence, checks, decisions, blockers, commit/artifact), not verbose histories or logs.
+- Keep the controller's durable memory to task state and dependencies; repo files, trackers, commits, and artifacts are the source of truth.
+- Prefer higher total worker token usage over unnecessarily growing the controller context when that improves responsiveness and focus.
 
 ## Project layout
 
@@ -672,6 +682,8 @@ Optional — fill in per project.
 
 ## Related skills
 
+- `kenmark-context` — automatic context-budget policy for long, queued, multi-part, and repo-wide work
+- `kenmark-subagents` — explicit deep orchestration with fresh worker contexts and compact handoffs
 - `kenmark-commit` — reads `brain/rules/workflow.md` Git branch policy for protected deployment branches
 - `kenmark-tracker-setup` — standalone bootstrap for `brain/issues/` and `brain/plans/` docs (Step 1b/1c runs the same workflow)
 - `kenmark-issues-scan` — scan codebase and **create issue files** (requires `INDEX.md`; not setup)

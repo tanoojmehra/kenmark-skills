@@ -1,6 +1,6 @@
 ---
 name: kenmark-plans-execute
-version: 1.0.0
+version: 1.1.0
 category: plans
 scope: universal
 phase: ship
@@ -14,6 +14,7 @@ triggers:
   - build from plan
   - execute plans
 allowed-tools:
+  - Task
   - Bash
   - Read
   - Write
@@ -40,6 +41,7 @@ Load sibling skills for each phase:
 
 | Phase | Skill |
 | --- | --- |
+| Context / decomposition | `kenmark-context` (automatic policy; fresh workers when useful) |
 | Author plans | `kenmark-plan` |
 | Verify / archive | `kenmark-tracker-check` |
 | Index health | `kenmark-tracker-maintain` (when INDEX disagrees with folders) |
@@ -58,6 +60,7 @@ Load sibling skills for each phase:
 5. **No force push**, **no `--no-verify`**, **no git config** changes.
 6. **Code and KB move together** — update `brain/kb/` and `brain/CHANGELOG.md` for behavioral changes.
 7. **Confirm large or risky work** — pause when a phase touches many unrelated paths or changes public API surface.
+8. **Keep controller context lean** — for separable phases/tasks, use fresh bounded workers with task capsules and compact return envelopes; retain task state, not worker history.
 
 ---
 
@@ -103,15 +106,29 @@ Output a short summary: plan ID, title, tier, phases, files likely touched.
 
 Follow `kenmark-commit` branch rules. Create `feature/<plan-slug>` or `fix/<plan-slug>` when on a protected branch.
 
+### Context-aware execution
+
+Before implementing, classify the plan phases/tasks:
+
+- **small/tightly coupled:** execute locally;
+- **bounded + independent:** delegate to a fresh worker when the harness supports it;
+- **bounded but shared-state:** use fresh workers sequentially;
+- **read-only investigation:** parallelize when safe.
+
+Use **kenmark-context** task capsules. Workers return only status, summary, files, verification, future-relevant decisions, blockers, and commit/artifact reference. Do not forward the full conversation or paste verbose worker logs back into the controller.
+
+Keep a compact plan execution ledger: phase/task, status, dependency, commit/artifact, blocker. The plan file and repository remain the source of truth.
+
 ### Per-phase loop
 
-For each phase in the plan file (in order):
+For each phase in the plan file (in dependency order):
 
 1. Read checklist items and `files:` hints.
 2. Implement the **smallest correct change** per item.
 3. Update impacted `brain/kb/` when behavior changes.
 4. Run verification commands from the plan when listed.
 5. Tick completed checklist items in the plan file (optional, for progress tracking).
+6. After a delegated task returns, record only its compact state; inspect the current repo before starting dependent work.
 
 **Pause gate:** if a phase touches >8 unrelated paths or changes public API, ask the user before proceeding.
 
@@ -155,4 +172,5 @@ Report:
 - Files changed
 - Verification results
 - Whether plan was archived
+- Worker/delegation summary when used (task status + commit/artifact only)
 - Suggested next steps (related plans, open issues)

@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## v2.3.38 — Context-efficient orchestration (2026-10-06)
+
+### Added
+
+- **kenmark-context 1.0.0:** Automatic context-budget controller for long, queued, multi-part, research-heavy, and repo-wide work. Decomposes bounded tasks, prefers fresh worker contexts, uses minimal task capsules, and keeps compact state instead of verbose worker history.
+- **recommended-catalog.json (v14):** Added optional Addy Osmani `context-engineering` pack for deeper selective-loading, context-budget, compression, and restartable-session guidance. Native `kenmark-context` remains the default orchestrator.
+
+### Changed
+
+- **kenmark-subagents 2.0.0:** Fresh-worker discipline, task-first implementation workers, required compact return envelopes, safe sequential isolation for shared-state work, and controller-owned final verification.
+- **kenmark-plans-execute 1.1.0 / kenmark-issues-fix-and-ship 1.2.0:** Bounded plan phases and queued issues can be delegated to fresh workers while the controller keeps only dependencies, status, commits/artifacts, and blockers.
+- **kenmark-init 1.4.0 / project standards:** Generated agent stubs and default standards now include a short always-on context-efficiency rule so multi-part work stays controller-light across supported harnesses.
+- **Package metadata/docs:** Bundled skill count 43 → 44; recommended catalog packs 11 → 12; package version 2.3.38.
+
 ## v2.3.37 — Audit upgrades, Linear skills, storage vendor + catalog cleanup (2026-10-04)
 
 ### Changed

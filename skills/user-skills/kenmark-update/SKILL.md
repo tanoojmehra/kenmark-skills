@@ -34,7 +34,7 @@ Pair with **kenmark-skills-maintain** if the machine has duplicate or stale skil
 | Target | Action |
 | --- | --- |
 | **Kenmark skills** | Refresh `~/.kenmark/store/skills` from the package, then relink IDE paths (same as `setup`) |
-| **Recommended packs** | Re-run install commands from `recommended-catalog.json` (Impeccable/Ponytail defaults plus framework, architecture, constraints, assurance, SEO/GEO, and other selected packs — install methods vary) |
+| **Recommended packs** | Re-run install commands from `recommended-catalog.json` (Impeccable/Ponytail defaults plus framework, architecture, constraints, assurance, context, SEO/GEO, and other selected packs — install methods vary) |
 | **Adopt** (default) | Copy adoptable catalog skills into the store and relink IDEs (`kenmark-skills adopt`). Includes Kenmark bundled skills and adoptable catalog packs (Impeccable and more) when present on disk. |
 | **npm package** (optional) | `npm update -g kenmark-skills` when installed globally |
 

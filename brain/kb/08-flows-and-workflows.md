@@ -1,6 +1,6 @@
 # Flows and workflows
 
-Last updated: 2026-06-08
+Last updated: 2026-10-06
 Status: reviewed
 
 ## Confirmed facts
@@ -16,10 +16,11 @@ Status: reviewed
 | Situation | Skill |
 | --- | --- |
 | Problem unclear | `kenmark-troubleshoot` |
+| Keep long/queued work lean | `kenmark-context` (automatic context-budget policy) |
 | Plan before coding | `kenmark-plan` / `kenmark-plan` (asks tier: Quick / Prototype / Full Feature / Dig Deep / ULTRATHINK; writes `brain/plans/`) |
 | Execute approved plan | `kenmark-plans-execute` |
 | List or archive plans | `kenmark-tracker-list` / `kenmark-tracker-check` |
-| Parallel investigation | `kenmark-subagents` |
+| Deep parallel/specialist orchestration | `kenmark-subagents` (explicit; fresh workers + compact handoffs) |
 | Complete deliverable | `kenmark-output` |
 | Pick right skill | `kenmark-router` |
 | Commit grouped changes | `kenmark-commit` |
@@ -60,7 +61,7 @@ npx kenmark-skills adopt --adopt-overwrite -y   # when review-required
 
 1. **`kenmark-init`** or **`kenmark-tracker-setup`** — create `INDEX.md` and `completed/`.
 2. **`kenmark-plan` / `kenmark-plan`** — ask tier, inspect repo, write `brain/plans/{id}-{slug}.md`, update INDEX.
-3. **`kenmark-plans-execute`** — implement phases on a feature branch; verify; archive to `completed/`.
+3. **`kenmark-plans-execute`** — implement phases on a feature branch; delegate bounded independent phases to fresh workers when useful; verify; archive to `completed/`.
 4. **`kenmark-tracker-check`** / **`kenmark-tracker-maintain`** — sync acceptance criteria and fix INDEX drift.
 - **Explicit admin:** setup, packs, update, agents — only when user asks.
 

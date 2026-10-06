@@ -16,11 +16,12 @@ Use **frontmatter** for logical grouping instead:
 ## Logical map (flat on disk)
 
 ```
-skills/user-skills/          ← bundled universal skills (43)
+skills/user-skills/          ← bundled universal skills (44)
   kenmark-init/                category: onboarding
   kenmark-setup/
   kenmark-router/             category: workflow (manual)
   kenmark-plan/               category: plans (phase: plan; manual; writes brain/plans/)
+  kenmark-context/            category: workflow (phase: orchestrate; automatic context budget)
   kenmark-subagents/          category: workflow (phase: orchestrate; manual)
   kenmark-output/             category: workflow (phase: verify)
   kenmark-troubleshoot/       category: workflow (phase: diagnose)
@@ -107,6 +108,7 @@ not in this package.
 | Skill | Purpose |
 | --- | --- |
 | `kenmark-plan` | Tiered planning to `brain/plans/` (explicit invocation) |
+| `kenmark-context` | Automatic context-budget controller: task capsules, fresh workers, compact state-only handoffs |
 | `kenmark-output` | Enforce complete final outputs plus fresh evidence before completion claims |
 | `kenmark-subagents` | Split complex work into specialist tracks (explicit) |
 | `kenmark-repo-hygiene` | Read-only clutter audit + structure audit; cleanup plan only |
@@ -140,6 +142,7 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | --- | --- |
 | Problem unclear? | `kenmark-troubleshoot` |
 | Need a durable plan in `brain/plans/`? | `kenmark-plan` (explicit) |
+| Long/queued/multi-part work? | `kenmark-context` (automatic) |
 | Need parallel/specialist tracks? | `kenmark-subagents` (explicit) |
 | Need complete final deliverable? | `kenmark-output` |
 | Need issue/plan tracker docs (`brain/issues/` or `brain/plans/`)? | `kenmark-tracker-setup` (or `kenmark-init`) |

@@ -1,18 +1,18 @@
 # Bundled skills catalog
 
-Last updated: 2026-10-04
+Last updated: 2026-10-06
 Status: reviewed
 
 ## Summary
 
-**43** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
+**44** universal Kenmark skills in `skills/user-skills/<name>/SKILL.md`. Logical categories via YAML frontmatter — flat on-disk layout.
 
 ## Categories
 
 | Category | Examples |
 | --- | --- |
 | onboarding | `kenmark-init`, `kenmark-setup` |
-| workflow | `kenmark-plan`, `kenmark-troubleshoot`, `kenmark-repo-*`, `kenmark-security-review`, `kenmark-server-defense`, `kenmark-performance`, `kenmark-storage` |
+| workflow | `kenmark-context`, `kenmark-plan`, `kenmark-troubleshoot`, `kenmark-repo-*`, `kenmark-security-review`, `kenmark-server-defense`, `kenmark-performance`, `kenmark-storage` |
 | testing | `kenmark-test-plan`, `kenmark-test-unit`, … `kenmark-test-ci` |
 | git | `kenmark-commit` |
 | issues | `kenmark-issues-scan`, `kenmark-linear-check`, `kenmark-linear-ticket-score`, `kenmark-audit-loop`, `kenmark-issues-fix-and-ship` |
@@ -27,7 +27,7 @@ Policy for **kenmark-router** and humans — all skills remain installed; tiers 
 
 ### Core daily
 
-May use freely: `kenmark-troubleshoot`, `kenmark-output`, `kenmark-tracker-list`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-kb-sync`, `kenmark-skills-maintain`, `kenmark-security-review`, `kenmark-performance`.
+May use freely: `kenmark-context`, `kenmark-troubleshoot`, `kenmark-output`, `kenmark-tracker-list`, `kenmark-repo-quality`, `kenmark-repo-secrets`, `kenmark-repo-public`, `kenmark-kb-sync`, `kenmark-skills-maintain`, `kenmark-security-review`, `kenmark-performance`.
 
 ### Specialist
 

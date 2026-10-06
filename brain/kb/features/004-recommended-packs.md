@@ -1,11 +1,11 @@
 # Recommended catalog packs
 
-Last updated: 2026-10-04
+Last updated: 2026-10-06
 Status: reviewed
 
 ## Summary
 
-Optional third-party skills installed via `install-recommended` / `init` wizard. Catalog: `skills/user-skills/recommended-catalog.json` (v13, **selectable**, **global-only**).
+Optional third-party skills installed via `install-recommended` / `init` wizard. Catalog: `skills/user-skills/recommended-catalog.json` (v14, **selectable**, **global-only**).
 
 Default selection is **Impeccable + Ponytail**. Simplify remains available as an alternative everyday review/simplification pack, but is no longer default.
 
@@ -21,6 +21,7 @@ Default selection is **Impeccable + Ponytail**. Simplify remains available as an
 | `improve-codebase-architecture` | Improve Codebase Architecture | architecture | no |
 | `constraint-driven-development` | Constraint-Driven Development | constraints | no |
 | `adverse-review` | Adverse Review | assurance | no |
+| `context-engineering` | Context Engineering | context | no |
 | `drawio-skill` | draw.io Diagrams | diagram | no |
 | `seo-geo-selected` | SEO/GEO (selected skills) | seo | no |
 | `seo-geo-full` | SEO/GEO (full suite) | seo | no |
@@ -32,10 +33,11 @@ Default selection is **Impeccable + Ponytail**. Simplify remains available as an
 - **kenmark-performance** remains generic; **Vercel React Best Practices** is the React/Next.js specialist second lens.
 - **Constraint-Driven Development** writes durable, measurable project quality floors rather than performing another one-shot audit.
 - **Adverse Review** is a heavy assurance pass for substantial/high-risk changes, not a routine review for tiny diffs.
+- **Context Engineering** adds deeper context-budget, selective-loading, compression, and restartable-session guidance. It complements native **kenmark-context**; Kenmark remains the task orchestrator.
 
 ## Overlap rules
 
-Catalog `installRules.overlapCaps` keeps one primary pack per overlapping purpose unless the user explicitly asks for more. Current categories include design, review, seo, diagram, audit, architecture, framework, constraints, and assurance.
+Catalog `installRules.overlapCaps` keeps one primary pack per overlapping purpose unless the user explicitly asks for more. Current categories include design, review, seo, diagram, audit, architecture, framework, constraints, assurance, and context.
 
 Framework/architecture/constraints/assurance packs may complement generic Kenmark audits because their responsibilities are intentionally distinct.
 
@@ -57,6 +59,7 @@ npx kenmark-skills install-recommended --list
 npx kenmark-skills install-recommended --suggest
 npx kenmark-skills install-recommended --ids impeccable,ponytail -y
 npx kenmark-skills install-recommended --ids vercel-react-best-practices,improve-codebase-architecture -y
+npx kenmark-skills install-recommended --ids context-engineering -y
 npx kenmark-skills install-recommended --profile core-next-lite -y
 ```
 
