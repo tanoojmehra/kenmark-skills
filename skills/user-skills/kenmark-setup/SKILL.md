@@ -33,7 +33,7 @@ disable-model-invocation: true
 
 # Kenmark Setup
 
-One guided flow for **new users**: install Kenmark skills globally, optionally install **selectable third-party packs** (defaults: Impeccable + Ponytail; framework, architecture, constraints, assurance, and SEO are opt-in), with **repo-aware suggestions**, then pick **IDEs**. Kenmark installs to `~/.kenmark/store` and links into IDE home folders — not per-repo.
+One guided flow for **new users**: install Kenmark skills globally, optionally install **selectable third-party packs** (defaults: Impeccable + Ponytail; framework, architecture, constraints, assurance, context engineering, and SEO are opt-in), with **repo-aware suggestions**, then pick **IDEs**. Kenmark installs to `~/.kenmark/store` and links into IDE home folders — not per-repo.
 
 ## When to use
 
@@ -142,6 +142,7 @@ Read from: `skills/user-skills/recommended-catalog.json`
 | `improve-codebase-architecture` | Architecture/deep-module survey (installs `codebase-design` too) |
 | `constraint-driven-development` | Durable measurable quality constraints via `CONSTRAINTS.md` |
 | `adverse-review` | Heavy multi-agent adversarial review for high-risk changes |
+| `context-engineering` | Context budget/selective loading/session handoff specialist; complements native `kenmark-context` |
 | `drawio-skill` | draw.io architecture/UML/flow diagrams (opt-in; needs desktop CLI) |
 | `seo-geo-selected` | Six SEO/GEO skills (not full suite) |
 | `seo-geo-full` | Full 20-skill SEO/GEO (explicit opt-in) |
@@ -166,6 +167,7 @@ Do **not** install multiple overlapping packs for the same purpose unless the us
 - Framework: vercel-react-best-practices for React/Next.js performance
 - Constraints: constraint-driven-development for durable quality floors
 - Assurance: adverse-review for high-risk PR/release review; not routine tiny changes
+- Context: context-engineering is an optional specialist; keep native kenmark-context as the default controller policy
 - Diagrams: draw.io skill for architecture/UML exports (requires draw.io desktop CLI)
 
 | Audience | How to run |
@@ -188,6 +190,7 @@ Interactive flow shows weight, bloat, and stack-specific suggestions before conf
 ```bash
 npx kenmark-skills install-recommended --ids impeccable,ponytail -y
 npx kenmark-skills install-recommended --ids impeccable,ponytail,vercel-react-best-practices -y
+npx kenmark-skills install-recommended --ids context-engineering -y
 ```
 
 ### Step 3 — Presets (advanced / CI)
