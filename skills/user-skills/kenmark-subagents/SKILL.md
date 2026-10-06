@@ -1,10 +1,10 @@
 ---
 name: kenmark-subagents
-version: 1.0.0
+version: 2.0.0
 category: workflow
 scope: universal
 phase: orchestrate
-description: "Manual orchestration skill for complex work that genuinely benefits from specialist tracks. Use only when the user explicitly asks for subagents/parallel tracks, or when a planning or diagnosis skill escalates to deep investigation."
+description: "Manual deep orchestration skill for complex work that benefits from fresh specialist or task workers. Use when the user explicitly asks for subagents/parallel tracks, or when another Kenmark workflow escalates to deep investigation or bounded worker execution."
 triggers:
   - kenmark-subagents
   - use subagents
@@ -29,284 +29,294 @@ disable-model-invocation: true
 
 ## Purpose
 
-Use this skill when a task is complex enough to benefit from specialist investigation tracks.
+Use fresh sub-agents when complex work benefits from isolated context, independent evidence, or bounded execution.
 
-This skill is for:
+The controller should coordinate and integrate. Workers should do the heavy investigation or implementation without feeding their full working history back into the parent.
 
-- large audits
-- architecture decisions
-- debugging complex failures
-- repo-wide analysis
-- research-heavy questions
-- migration planning
-- performance investigations
-- security/public-readiness reviews
-- product/technical tradeoff analysis
-- multi-file implementation planning
+> **Fresh workers receive task capsules. The controller receives compact results.**
 
-It should not be used for simple one-shot tasks.
+Use **kenmark-context** as the default context-budget policy. This skill is the explicit deep orchestration workflow.
 
 ---
 
-## Core principle
+## Core principles
 
 ```text
-Split independent questions → Delegate → Collect evidence → Reconcile conflicts → Synthesize
+Decompose bounded work
+→ isolate context
+→ delegate
+→ collect compact envelopes
+→ reconcile conflicts
+→ verify centrally
+→ retain state, not history
 ```
 
-Sub-agents are useful only when they reduce uncertainty.
+Sub-agents are useful only when they reduce uncertainty, context pollution, or wall-clock time.
+
+Fresh context is valuable even when work runs sequentially.
 
 ---
 
 ## When to use sub-agents
 
-Use sub-agents when at least one is true:
+Use when at least one is true:
 
 ```text
-[ ] The task has multiple independent domains
+[ ] The task has multiple independent domains or issues
 [ ] The repo/system is large
 [ ] The answer needs research + local inspection
 [ ] There are competing hypotheses
 [ ] The decision is high-impact
 [ ] The user explicitly asked to use sub-agents
 [ ] A single linear pass is likely to miss things
+[ ] The controller would otherwise accumulate large tool output
+[ ] A plan/backlog can be split into bounded tasks
 ```
 
-Do not use sub-agents when:
+Do not use when:
 
 ```text
 [ ] The task is small and obvious
 [ ] The user needs a fast direct answer
 [ ] The task is mostly formatting
 [ ] The work is destructive and not approved
-[ ] Delegation would create noise instead of clarity
+[ ] Delegation would create more context than it removes
+[ ] Parallel writers would touch the same repository state
 ```
 
 ---
 
-## Standard agent tracks
+## Worker shape: task first, role second
 
-Pick only the tracks that fit.
+For implementation, prefer one bounded outcome per worker:
 
-| Track                | Responsibility                                        |
-| -------------------- | ----------------------------------------------------- |
-| `context-agent`      | Understand user goal, constraints, current state      |
-| `repo-agent`         | Inspect repo structure, files, scripts, configs       |
-| `code-agent`         | Inspect implementation paths and likely code changes  |
-| `quality-agent`      | Check type/build/lint/test/release gates              |
-| `security-agent`     | Look for secrets, risky actions, public-safety issues |
-| `research-agent`     | Check current docs, package behavior, external facts  |
-| `architecture-agent` | Compare design options and system tradeoffs           |
-| `risk-agent`         | Identify failure modes, rollback, migration risk      |
-| `docs-agent`         | Identify docs/brain/KB updates required               |
-| `synthesis-agent`    | Merge findings into final recommendation              |
+```text
+issue-103-worker
+issue-108-worker
+auth-regression-worker
+```
+
+Use role-based tracks for investigations:
+
+| Track | Responsibility |
+| --- | --- |
+| `context-agent` | Understand goal, constraints, current state |
+| `repo-agent` | Inspect repo structure, files, scripts, configs |
+| `code-agent` | Inspect implementation paths and likely changes |
+| `quality-agent` | Check type/build/lint/test/release gates |
+| `security-agent` | Look for secrets, risky actions, public-safety issues |
+| `research-agent` | Check current docs, package behavior, external facts |
+| `architecture-agent` | Compare design options and system tradeoffs |
+| `risk-agent` | Identify failure modes, rollback, migration risk |
+| `docs-agent` | Identify docs/brain/KB updates required |
+| `synthesis-agent` | Merge findings into a decision |
+
+Do not keep a single long-lived worker for unrelated tasks merely because they share a technology.
 
 ---
 
-## Delegation rule
+## Task capsule (required)
 
-Each sub-agent must have:
-
-```text
-Specific question
-Scope boundaries
-Allowed evidence
-Output format
-Confidence level
-```
-
-Do not ask sub-agents vague prompts like:
-
-```text
-Review this repo.
-```
-
-Use:
-
-```text
-Inspect package scripts and CLI entry points. Determine whether all referenced files exist and whether dry-run commands are safe. Return blockers, evidence, and recommended fixes.
-```
-
----
-
-## Sub-agent prompt template
+Each worker receives **only the context it needs**:
 
 ```markdown
-You are the `<track-name>` for this Kenmark investigation.
+## Task
+<one bounded outcome>
 
-## Goal
+## Success
+- <acceptance criterion>
+- <acceptance criterion>
 
-<overall user request>
+## Relevant context
+- <file/module/spec/issue pointer>
+- <small decision from earlier work>
 
-## Your focused task
+## Constraints
+- <scope boundary>
+- <project/safety rule>
 
-<specific question for this sub-agent>
-
-## Scope
-
-Include:
-- ...
-
-Exclude:
-- ...
+## Dependencies
+- <task/commit required first, or "none">
 
 ## Rules
-
 - Prefer evidence over guesses.
-- Cite file paths, commands, logs, or sources.
-- Separate facts from assumptions.
-- Mark confidence as High / Medium / Low.
-- Do not make destructive changes.
-- If you cannot verify something, say what would verify it.
+- Read project rules relevant to this task.
+- Do not expand scope.
+- Do not make destructive changes without approval.
+- Keep verbose logs and exploration out of the return message.
 
-## Output
-
-1. Findings
-2. Evidence
-3. Risks / unknowns
-4. Recommendation
-5. Confidence
+## Return
+Return only the compact result envelope below.
 ```
+
+Do **not** copy the full parent conversation into a worker prompt by default.
+
+Prefer file paths, issue IDs, plan IDs, commit SHAs, and artifact pointers over pasted contents.
 
 ---
 
-## Fallback if sub-agents are unavailable
+## Compact result envelope (required)
 
-If the environment does not support a `Task` tool or sub-agent delegation, emulate sub-agents sequentially:
+Workers should target roughly **150–500 tokens** unless more detail is explicitly requested.
+
+```yaml
+status: done | blocked | failed
+summary: <1-3 sentences>
+files:
+  - <path>
+verification:
+  - <check>: pass | fail | not-run
+decisions:
+  - <only decisions future work needs>
+blockers:
+  - <only unresolved blockers>
+commit: <sha or null>
+artifact: <path/url or null>
+confidence: High | Medium | Low
+```
+
+A worker may create a detailed artifact when useful, but should return only the pointer plus conclusions.
+
+Never dump full command output, discarded hypotheses, or large diffs back into the controller.
+
+---
+
+## Delegation modes
+
+### Investigation mode
+
+Use 3–5 focused tracks for normal complex work; 6–8 only for deep audits.
+
+Parallelize independent **read-only** tracks when supported.
+
+### Implementation mode
+
+Use one fresh worker per bounded issue/task when practical.
+
+For write tasks:
+
+- parallelize only when file/state ownership is clearly independent;
+- otherwise run fresh workers sequentially;
+- each worker must re-read current repository state before editing;
+- the controller owns integration and final verification.
+
+Do not create multiple concurrent workers that can race on the same branch/files.
+
+---
+
+## Step 1 — Build the dependency map
+
+Create a compact table:
 
 ```markdown
-## Track A — Context
-
-## Track B — Repo / evidence
-
-## Track C — Research
-
-## Track D — Risk
-
-## Track E — Synthesis
+| Task/track | Depends on | Isolation | Parallel safe? | Return |
+| --- | --- | --- | --- | --- |
+| #103 login redirect | - | fresh worker | yes | compact envelope |
+| #121 coverage | #103,#108 | fresh worker | no | compact envelope |
 ```
 
-Clearly say:
-
-```text
-Sub-agent tool is unavailable, so I am running the tracks sequentially.
-```
+Keep this in the controller. Do not store worker narratives in the table.
 
 ---
 
-## Step 1 — Decide tracks
+## Step 2 — Run fresh workers
 
-Create a table:
+For each task/track:
+
+1. create the task capsule;
+2. start a fresh worker when supported;
+3. let the worker inspect the relevant sources itself;
+4. collect only the compact result envelope;
+5. record status / dependency-changing decisions / commit or artifact.
+
+If the environment has no true subagent primitive, follow **kenmark-context** fallback rules and say that true isolation is unavailable. Sequential headings in the same context are not sub-agents.
+
+---
+
+## Step 3 — Reconcile
+
+For investigations, synthesize disagreements:
 
 ```markdown
-## Delegation plan
-
-| Track | Question | Why needed | Output |
-| --- | --- | --- | --- |
-| repo-agent | ... | ... | ... |
-| risk-agent | ... | ... | ... |
-```
-
-Use no more than 3–5 tracks for normal work.
-
-Use 6–8 only for deep audits.
-
----
-
-## Step 2 — Run tracks
-
-For each track, either:
-
-* call the sub-agent tool if available, or
-* run the track sequentially.
-
-Do not let agents modify files unless the user explicitly approved implementation.
-
----
-
-## Step 3 — Reconcile findings
-
-After tracks return, synthesize:
-
-```markdown
-## Cross-agent synthesis
-
 | Topic | Agreement | Conflict | Decision |
 | --- | --- | --- | --- |
 | ... | ... | ... | ... |
 ```
 
-If agents disagree, prefer:
+Prefer:
 
 ```text
-local evidence > official docs > recent reputable sources > assumptions
+current local evidence
+> official/current docs
+> recent reputable sources
+> assumptions
 ```
+
+For implementation workers, inspect integration boundaries and repository state rather than replaying each worker's full history.
 
 ---
 
-## Step 4 — Final output
+## Step 4 — Verify centrally
 
-Use this format:
+The controller owns final verification.
+
+A worker's passing test result can become stale after another worker changes adjacent code.
+
+Run the appropriate final integration gates after all relevant work is combined.
+
+---
+
+## Step 5 — Final output
+
+Return a concise orchestration summary:
 
 ```markdown
 # Kenmark Subagents Report
 
-## Delegation summary
+| Task/track | Status | Commit/artifact | Confidence |
+| --- | --- | --- | --- |
 
-| Track | Status | Confidence |
-| --- | --- | --- |
-
-## Key findings
-
-1. ...
-
-## Evidence
-
-| Evidence | Source | Supports |
-| --- | --- | --- |
-
-## Conflicts / uncertainty
-
+## Key decisions
 - ...
 
-## Recommended decision or plan
-
-1. ...
-2. ...
-3. ...
-
-## Follow-up checks
-
+## Verification
 - ...
 
-## If implementing next
+## Conflicts / blockers
+- ...
 
-- Files likely involved:
-- Commands/checks:
-- Risks:
-- Rollback:
+## Recommended next action
+- ...
 ```
+
+Expose detailed worker evidence only when the user asks or when it is necessary to explain a blocker/risk.
 
 ---
 
-## Step 5 — Optional artifact
+## Optional durable artifacts
 
-If the user asks to save the investigation, write:
+Use existing repo trackers/specs/plans where possible.
+
+If the user explicitly asks to save a standalone investigation, write:
 
 ```text
 brain/subagents/YYYY-MM-DD-short-title.md
 ```
 
-Only write this file after approval or in an explicit brain documentation workflow.
+Do not create duplicate durable state when `brain/issues/`, `brain/plans/`, or a spec already owns it.
 
 ---
 
 ## Anti-patterns
 
-* Do not spawn sub-agents for tiny tasks.
-* Do not delegate vague questions.
-* Do not accept sub-agent findings without synthesis.
-* Do not hide conflicts between agents.
-* Do not use sub-agents as theater.
-* Do not let sub-agents make irreversible changes.
-* Do not produce a pile of findings without a decision.
+- Do not spawn sub-agents for tiny tasks.
+- Do not delegate vague prompts such as "review this repo".
+- Do not forward the whole conversation by default.
+- Do not accept worker claims without integration checks.
+- Do not hide conflicts between workers.
+- Do not request essay-length worker reports.
+- Do not paste verbose logs back into the controller.
+- Do not keep one worker alive across unrelated tasks to save setup tokens.
+- Do not parallelize overlapping writes.
+- Do not use sub-agents as theater.
+- Do not let workers make irreversible changes outside user-approved scope.
