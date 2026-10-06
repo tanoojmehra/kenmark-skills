@@ -10,7 +10,7 @@ No global install required — `npx` downloads and runs the CLI (or uses your np
 
 The **init** wizard walks you through Kenmark skills, optional curated packs, IDE targets, and MCP server selection — all interactively. To refresh an existing install, use **`update`** (do not run `init` again for upgrades).
 
-**43 first-party skills**, a **12-command CLI**, and a **curated catalog** of optional third-party packs. Agent skills and CLI for Cursor, Codex, Claude Code, Antigravity CLI/IDE, Gemini CLI, OpenCode, and other harnesses that read `SKILL.md` files.
+**44 first-party skills**, a **12-command CLI**, and a **curated catalog** of optional third-party packs. Agent skills and CLI for Cursor, Codex, Claude Code, Antigravity CLI/IDE, Gemini CLI, OpenCode, and other harnesses that read `SKILL.md` files.
 
 Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-skills). Created by **Tanooj Mehra** and **Adwait Date**.
 
@@ -33,9 +33,9 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 
 | Asset | Count | Detail |
 | --- | ---: | --- |
-| Kenmark skills | 43 | Bundled in `skills/user-skills/` |
+| Kenmark skills | 44 | Bundled in `skills/user-skills/` |
 | CLI commands | 12 | [brain/kb/05-api-and-integrations.md](brain/kb/05-api-and-integrations.md) |
-| Recommended packs | 11 | Impeccable, Ponytail, Simplify, improve, Architecture, Vercel React, Constraints, Adverse Review, draw.io, SEO — [brain/kb/features/004-recommended-packs.md](brain/kb/features/004-recommended-packs.md) |
+| Recommended packs | 12 | Impeccable, Ponytail, Simplify, improve, Architecture, Vercel React, Constraints, Adverse Review, Context Engineering, draw.io, SEO — [brain/kb/features/004-recommended-packs.md](brain/kb/features/004-recommended-packs.md) |
 | MCP servers | 5 | Opt-in; 8 JSON IDE targets — [brain/kb/features/003-mcp-integration.md](brain/kb/features/003-mcp-integration.md) |
 
 Skills install once under `~/.kenmark/store` and link into each IDE's skills directory. See [brain/kb/features/005-kenmark-hub-store.md](brain/kb/features/005-kenmark-hub-store.md).
@@ -75,7 +75,7 @@ Run `npx kenmark-skills init` from **PowerShell** or **CMD** if you use native W
 
 **Setup (once):** `npx kenmark-skills init` → **kenmark-init** in your project repo.
 
-**Day-to-day:** start with **kenmark-troubleshoot** when the problem is unclear; **kenmark-plan** (explicit) to save a tiered plan to `brain/plans/`; **kenmark-plans-execute** (explicit) to implement an approved plan; **kenmark-subagents** (explicit) for parallel specialist tracks; **kenmark-output** for complete deliverables; **kenmark-router** (explicit) when the domain is clear but the skill is not; **kenmark-commit** (explicit) when shipping changes. Issue and plan trackers live under `brain/issues/` and `brain/plans/` (bootstrapped by **kenmark-init**).
+**Day-to-day:** start with **kenmark-troubleshoot** when the problem is unclear; **kenmark-plan** (explicit) to save a tiered plan to `brain/plans/`; **kenmark-plans-execute** (explicit) to implement an approved plan; **kenmark-context** automatically keeps long/queued work lean; **kenmark-subagents** (explicit) for deep parallel specialist tracks; **kenmark-output** for complete deliverables; **kenmark-router** (explicit) when the domain is clear but the skill is not; **kenmark-commit** (explicit) when shipping changes. Issue and plan trackers live under `brain/issues/` and `brain/plans/` (bootstrapped by **kenmark-init**).
 
 Full skill catalog, activation tiers, and routing tables: [brain/kb/features/002-skills-catalog.md](brain/kb/features/002-skills-catalog.md) and [brain/kb/08-flows-and-workflows.md](brain/kb/08-flows-and-workflows.md).
 
@@ -160,7 +160,7 @@ kenmark-skills/
 ├── README.md
 ├── brain/                  # dev KB (git only; see brain/INDEX.md)
 ├── scripts/cli.js          # kenmark-skills binary
-└── skills/user-skills/     # 43 universal skills + recommended-catalog.json
+└── skills/user-skills/     # 44 universal skills + recommended-catalog.json
 ```
 
 ---
