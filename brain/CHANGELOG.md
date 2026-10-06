@@ -2,6 +2,14 @@
 
 Brain knowledge base
 
+## v2026.10.06-context-orchestration
+
+- **Context orchestration:** Added `kenmark-context` automatic context-budget controller: bounded task decomposition, fresh worker contexts, minimal task capsules, compact return envelopes, and state-not-history controller ledgers.
+- **Subagents/workflows:** Upgraded `kenmark-subagents` to v2 and integrated context-aware delegation into `kenmark-plans-execute` and `kenmark-issues-fix-and-ship`.
+- **Project defaults:** `kenmark-init` and the repo agent stub/standards now seed a lean always-on context-efficiency policy.
+- **Recommended catalog v14:** Added optional Addy Osmani `context-engineering` pack; 12 optional packs total.
+- **Docs/metadata:** Added `kb/features/007-context-orchestration.md`; package v2.3.38; 44 bundled skills.
+
 ## v2026.10.04-skills-audit-upgrades
 
 - **Native audit/verification skills:** Fixed audit-loop cycle convergence and stable dedup fingerprints; made simplify findings semantic rather than style-driven; added single-hypothesis troubleshooting, fresh completion evidence, quality-gate freshness tracking, expanded appsec lenses, mutation-confidence coverage review, and React/Next specialist routing.
