@@ -142,11 +142,11 @@ Legacy **`setup`** remains for `--copy`, `--force`, `--skip-adopt` not exposed o
 npx kenmark-skills setup --ide cursor --copy --skip-adopt -y
 ```
 
-Migration: `setup -y` → `init --skip-recommended -y`. Legacy `setup` runs **Install 43 Kenmark skills** via `setup-skills.js`.
+Migration: `setup -y` → `init --skip-recommended -y`. Legacy `setup` runs **Install 44 Kenmark skills** via `setup-skills.js`.
 
 | | `init` | `setup` |
 | --- | --- | --- |
-| **Installs** | Kenmark + optional packs | 43 Kenmark skills |
+| **Installs** | Kenmark + optional packs | 44 Kenmark skills |
 | **Later refreshes** | Use `update` | Use `update` |
 
 ### Testing skills (links)
