@@ -110,7 +110,7 @@ not in this package.
 | `kenmark-plan` | Tiered planning to `brain/plans/` (explicit invocation) |
 | `kenmark-context` | Automatic context-budget controller: task capsules, fresh workers, compact state-only handoffs |
 | `kenmark-output` | Enforce complete final outputs plus fresh evidence before completion claims |
-| `kenmark-subagents` | Split complex work into specialist tracks (explicit) |
+| `kenmark-subagents` | Build task queues, dispatch fresh workers in a bounded elastic pool, supervise deadlines/retries, verify every task (explicit) |
 | `kenmark-repo-hygiene` | Read-only clutter audit + structure audit; cleanup plan only |
 | `kenmark-repo-cleanup` | Execute approved hygiene cleanup (explicit) |
 | `kenmark-repo-secrets` | Deep read-only secret/key/token scan with redaction |
@@ -143,7 +143,7 @@ See each `skills/user-skills/<name>/SKILL.md` for full workflows. The root [READ
 | Problem unclear? | `kenmark-troubleshoot` |
 | Need a durable plan in `brain/plans/`? | `kenmark-plan` (explicit) |
 | Long/queued/multi-part work? | `kenmark-context` (automatic) |
-| Need parallel/specialist tracks? | `kenmark-subagents` (explicit) |
+| Need task queues, pooled workers, or parallel specialist tracks? | `kenmark-subagents` (explicit) |
 | Need complete final deliverable? | `kenmark-output` |
 | Need issue/plan tracker docs (`brain/issues/` or `brain/plans/`)? | `kenmark-tracker-setup` (or `kenmark-init`) |
 | Find bugs/gaps to file as issues? | `kenmark-issues-scan` |

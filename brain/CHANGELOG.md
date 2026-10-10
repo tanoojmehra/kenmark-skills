@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2026.10.10-elastic-subagent-pool
+
+- **kenmark-subagents v3:** Replaced advisory-only delegation with a task-first queue scheduler: explicit task IDs, dependencies, acceptance gates, bounded maxAgents concurrency, elastic/batch queue draining, and fresh worker per task attempt.
+- **Safety and completion:** Deadline checkpoints, capability-aware cancellation, one safe retry by default, verified task completion, write-work isolation, stuck-worker accounting, and no false 100% completion reporting.
+- **Docs/release:** Added `references/scheduling-contract.md`, updated context orchestration KB and README indexes; package v2.3.39.
+
 Brain knowledge base
 
 ## v2026.10.06-context-orchestration
