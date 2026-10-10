@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2.3.40 — Maintenance release (2026-10-10)
+
+### Changed
+
+- **Package:** Version bump 2.3.39 → 2.3.40.
+
 ## v2.3.39 — Elastic task queue and subagent pool (2026-10-10)
 
 ### Changed

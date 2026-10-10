@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2026.10.10-maintenance-2.3.40
+
+- **Release:** Maintenance bump v2.3.39 → v2.3.40.
+
 ## v2026.10.10-elastic-subagent-pool
 
 - **kenmark-subagents v3:** Replaced advisory-only delegation with a task-first queue scheduler: explicit task IDs, dependencies, acceptance gates, bounded maxAgents concurrency, elastic/batch queue draining, and fresh worker per task attempt.
