@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v2.3.39 — Elastic task queue and subagent pool (2026-10-10)
+
+### Changed
+
+- **kenmark-subagents 3.0.0:** Task-first orchestration now starts with a complete dependency-aware queue and assigns a fresh worker to each bounded task. Supports configurable `maxAgents` (default 4), elastic or batch pooling, continuous slot refill, and live queue additions where supported by the harness.
+- **Supervision and correctness:** Adds observable heartbeats, per-task soft/hard deadlines, bounded safe retries, cancellation/cleanup rules, exclusive write ownership, controller acceptance verification, and a strict all-tasks-done exit gate. Explicitly distinguishes a skill's instructions from actual harness worker/timer/cancellation capabilities.
+- **Documentation:** Added a scheduling/state-machine reference, refreshed usage notes, and updated the context-orchestration KB.
+
 ## v2.3.38 — Context-efficient orchestration (2026-10-06)
 
 ### Added

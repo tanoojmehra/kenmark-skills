@@ -1,6 +1,6 @@
 # Context orchestration
 
-Last updated: 2026-10-06
+Last updated: 2026-10-10
 Status: implemented
 
 ## Goal
@@ -52,9 +52,9 @@ Responsibilities:
 - keep a small task/dependency ledger;
 - define fallback behavior when the harness has no true subagent primitive.
 
-### `kenmark-subagents` v2
+### `kenmark-subagents` v2 (historical baseline)
 
-Explicit deep orchestration workflow.
+Earlier explicit deep orchestration workflow; superseded by v3 task scheduling below.
 
 Changes from v1:
 
@@ -162,3 +162,19 @@ It is **not** a replacement for `kenmark-context` and is not selected by default
 Total token usage may increase because fresh workers independently load focused context.
 
 That is intentional when it reduces repeated processing of a large parent conversation and keeps the main session responsive through long queues of work.
+
+## kenmark-subagents v3 — task-first elastic worker pool (2026-10-10)
+
+The v2 guidance did not prescribe actual queue dispatch, agent caps, deadline recovery or whole-queue completion. The v3 skill adds a bounded scheduler:
+
+- **Decompose first:** create and show all task IDs, priorities, acceptance criteria, dependencies and write ownership before starting workers.
+- **One fresh worker per task attempt:** no recycled worker context. A pool slot (not the worker) is reused after an agent exits.
+- **Concurrency and intake:** configurable `maxAgents` (default 4), `pooling: elastic|batch` (elastic default), FIFO within priority, queue refill when workers finish, and task additions while running when the harness supports it.
+- **Supervision:** configurable heartbeat, soft/hard time budgets, safe capped retry (2 total attempts), worker cancellation/confirmation, and stuck worker slots that cannot be overbooked.
+- **Acceptance:** worker reported success is not completion; the controller verifies outcomes and integration, then marks `done`. The run is `complete` only when every queued task is verified done.
+- **Write safety:** parallel mutations require isolated worktrees/branches and non-overlapping file/external state ownership; otherwise serialize.
+- **Honest capability fallback:** SKILL.md cannot itself provide timers, daemons, concurrent worker APIs, termination, or future monitoring. It must disclose unsupported harness capabilities rather than claim them.
+
+Detailed transitions, configuration, examples and failure recovery: `skills/user-skills/kenmark-subagents/references/scheduling-contract.md`.
+
+The v2 worker capsule/compact-return ideas remain intact; `kenmark-context` still supplies automatic context budgeting for non-explicit delegation.
