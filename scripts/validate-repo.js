@@ -104,6 +104,7 @@ const REQUIRED_PACKAGE_SCRIPTS = [
   "test:pack",
   "test:broken-links",
   "test:portability",
+  "test:brain",
   "test:all",
   "pack:check"
 ];
@@ -1183,10 +1184,10 @@ function validatePackageJson() {
   }
   if (
     scripts["test:all"] !==
-    "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability"
+    "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability && npm run test:brain"
   ) {
     fail(
-      'package.json: scripts["test:all"] must be "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability"'
+      'package.json: scripts["test:all"] must be "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability && npm run test:brain"'
     );
   }
   if (
