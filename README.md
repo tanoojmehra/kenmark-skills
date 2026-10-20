@@ -183,3 +183,7 @@ kenmark-skills/
 MIT — Kenmark ITan Solutions ([`package.json`](package.json)).
 
 **Links:** [Repository](https://github.com/tanoojmehra/kenmark-skills) · [Issues](https://github.com/tanoojmehra/kenmark-skills/issues)
+
+## Brain 2.0 compatibility
+
+Portable Brain is Markdown/Git-owned; see the [versioned Brain format](docs/BRAIN_FORMAT_v2.md). Issue/plan IDs scale beyond 999. Skills perform selective evidence-backed KB maintenance, preserve pre-existing legacy and custom Brain documents, and do not require Studio, MongoDB, embeddings or a background index. See [Studio compatibility requirements](docs/STUDIO_COMPATIBILITY_REQUIRED.md) for separate integration work.

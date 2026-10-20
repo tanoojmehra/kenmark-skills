@@ -70,3 +70,8 @@ Then read the winner's `SKILL.md` and follow it.
 ## Maintenance
 
 Refresh bundled skills via `npx kenmark-skills setup` / `update`. Registry cache regenerates on each router invocation.
+
+
+## Brain-aware reference capsules
+
+Optional capsule fields: `task_id: "3753"`, `relevant_knowledge: [{path: "brain/kb/01-architecture.md", revision: "source-hash-or-commit"}]`, `related_issues: ["3752"]`, `related_plans: ["141"]` and `relevant_source: ["src/lib/dsh/run-executor.ts"]`. These are **references**, not copied articles. Workers fetch the necessary source/KB details on demand. No full Brain pages or conversation history inside default task capsules. Use authorized Studio retrieval only if available; otherwise Read, Grep, Glob, Bash and Git suffice.

@@ -63,7 +63,7 @@ See `references/workflow.md` for phase detail and `references/merge-safety.md` f
 3. **Feature branch:** never commit on `main`, `master`, `dev`, `develop`, `staging`, or `production` unless the user explicitly approves after a CI/CD warning.
 4. **No co-author trailers** — never add `Co-authored-by:`, `Made-with:`, or similar; verify each commit with `git log -1 --format=%B`.
 5. **No force push**, **no `--no-verify`**, **no git config** changes.
-6. **Code and KB move together** — update `brain/kb/` and `brain/CHANGELOG.md` for behavioral changes.
+6. **Knowledge consistency gate** — after verification compare existing canonical KB against durable facts; edit only if documented knowledge changed, otherwise report `KB already consistent`.
 7. **Merge default:** open a PR; direct merge only when the user explicitly requests it.
 8. **Stop if zero new issues** — when the blob yields no unique candidates after dedupe, report and stop before creating a feature branch.
 9. **Confirm large or risky fixes** — when a fix touches many files (>8 unrelated paths) or changes a public API surface, pause and confirm with the user before committing.
@@ -152,7 +152,7 @@ For each open issue from this run (or all open if user asked to fix existing bac
 1. Read issue `files:` and Evidence section.
 2. Search codebase to confirm the bug still exists.
 3. Implement the **smallest correct fix**; match repo naming and patterns.
-4. Update impacted `brain/kb/` files when behavior, API, schema, auth, UI, deploy, or workflow changed.
+4. Compare established canonical KB claims with verified contracts; update only if actually inaccurate.
 5. Run quality gates when feasible (detect from `package.json` scripts):
 
 ```bash
@@ -193,7 +193,7 @@ Report failures honestly; fix or ask the user before committing.
 
 ---
 
-## Phase 6 — Commit and push
+## Phase 6 — Commit/push only after explicit user authorization
 
 Invoke `kenmark-commit`:
 
@@ -269,3 +269,12 @@ Return to the user:
 | PR by default | Force-push protected branches |
 | Confirm large/API-breaking fixes | Silent wide refactors |
 | `kenmark-commit` grouping rules | `git add -A` blindly |
+
+
+## Brain 2.0 portable consistency contract
+
+- Files and Git are canonical. Studio/MongoDB/indexing/embeddings/network are never required for this skill.
+- Issues and plans keep investigations, hypotheses, tests, implementation history and milestones. KB contains verified durable knowledge, updated only after source evidence demonstrates an existing fact changed.
+- On no-op KB checks report `KB already consistent`; do not append meaningless changelog entries.
+- Positive numeric IDs use complete >=3-digit prefixes and scale beyond 999; never reuse a reserved number or delete history merely to reconcile an index.
+- Coordinate concurrent tracker/KB writers and keep legacy Brain files unchanged by default; commit/push/merge only when authorized.

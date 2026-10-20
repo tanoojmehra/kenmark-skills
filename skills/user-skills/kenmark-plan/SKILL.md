@@ -203,7 +203,7 @@ Use tier-appropriate sections. Full-feature and above use:
 ### Phase 3 — Verification
 - [ ] ...
 
-### Phase 4 — Documentation / KB update
+### Phase 4 — Verify established KB consistency (edit only verified changed facts)
 - [ ] ...
 
 ## Files likely involved
@@ -301,3 +301,12 @@ A valid `kenmark-plan` response must include:
 - **`kenmark-plans-execute`** — implement an approved plan
 - **`kenmark-tracker-check`** — verify acceptance criteria and archive
 - **`kenmark-tracker-maintain`** — fix INDEX drift
+
+
+## Brain 2.0 portable consistency contract
+
+- Files and Git are canonical. Studio/MongoDB/indexing/embeddings/network are never required for this skill.
+- Issues and plans keep investigations, hypotheses, tests, implementation history and milestones. KB contains verified durable knowledge, updated only after source evidence demonstrates an existing fact changed.
+- On no-op KB checks report `KB already consistent`; do not append meaningless changelog entries.
+- Positive numeric IDs use complete >=3-digit prefixes and scale beyond 999; never reuse a reserved number or delete history merely to reconcile an index.
+- Coordinate concurrent tracker/KB writers and keep legacy Brain files unchanged by default; commit/push/merge only when authorized.

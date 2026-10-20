@@ -115,7 +115,7 @@ not in this package.
 | `kenmark-repo-cleanup` | Execute approved hygiene cleanup (explicit) |
 | `kenmark-repo-secrets` | Deep read-only secret/key/token scan with redaction |
 | `kenmark-repo-public` | Safe-to-publish gate before open-sourcing |
-| `kenmark-kb-sync` | Update `brain/kb/` after code changes |
+| `kenmark-kb-sync` | Check canonical KB for verified durable changes and update selectively |
 | `kenmark-repo-docs` | README, setup, env docs, KB freshness, broken links (read-only) |
 | `kenmark-repo-docs-fix` | Apply approved doc fixes (explicit) |
 | `kenmark-repo-deps` | Package health, monorepo drift, lockfile/PM consistency, UI overlap |

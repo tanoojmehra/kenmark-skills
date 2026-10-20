@@ -34,7 +34,7 @@ disable-model-invocation: false
 
 **Not setup.** This skill does not create the tracker layout. If `brain/issues/INDEX.md` is missing, stop and run **`kenmark-tracker-setup`** (or **`kenmark-init`**) first.
 
-Assign unique IDs (next available in the 3-digit sequence), populate with
+Assign unique IDs (next globally unique positive numeric ID (minimum 3-character width)), populate with
 evidence, and optionally update INDEX.md.
 
 ---
@@ -52,54 +52,15 @@ evidence, and optionally update INDEX.md.
 
 ---
 
-## Step 1 — Collect all known IDs and compute next ID
+## Step 1 — Collect all known IDs and reserve safely
 
-## Hard ID rule
+**Never reuse an ID** (or previously reserved IDs), and never compute only from active files. Read `brain/issues/INDEX.md` **Last Assigned ID**, **Next ID**, actual ID-column table rows, every `[0-9]*-*.md` in active and `completed/` (optional `archive/`). Parse entire numeric prefixes, validate >=3-digit canonical formatting, sort numerically, detect duplicates, and report missing/corrupt ledgers rather than assuming `001`.
 
-Issue IDs are global and immutable.
+The next candidate is `max(lastAssigned+1, nextId, maxIndexedId+1, maxFileId+1)`, displayed using `String(id).padStart(3, "0")` (e.g. 998, 999, 1000, 3752, 10000). Do **not** `grep -Eo` arbitrary three-digit numbers in INDEX; titles/dates are not IDs.
 
-Never reuse an ID.
+Parallel agents must serialize writes. With exclusive tracker ownership re-read all sources, reserve high-water in INDEX atomically before exclusive file creation, and never reuse a reservation after a crash. Separate Git clones must coordinate merges. For conflicts stop and use `kenmark-tracker-maintain` first; do not delete duplicates.
 
-Before creating a new issue, collect IDs from:
-
-1. `brain/issues/INDEX.md`
-2. `brain/issues/[0-9]*.md`
-3. `brain/issues/completed/[0-9]*.md`
-
-The next ID is:
-
-```text
-max(all IDs found anywhere) + 1
-```
-
-Do not use only the active `brain/issues/` folder to determine the next ID.
-Completed issues still reserve their IDs forever.
-
-```bash
-ISSUES_DIR="$(git rev-parse --show-toplevel 2>/dev/null)/brain/issues"
-
-{
-  # IDs from active files
-  find "$ISSUES_DIR" -maxdepth 1 -type f -name "[0-9][0-9][0-9]-*.md" \
-    -exec basename {} \; 2>/dev/null | sed 's/-.*//'
-
-  # IDs from completed files
-  find "$ISSUES_DIR/completed" -maxdepth 1 -type f -name "[0-9][0-9][0-9]-*.md" \
-    -exec basename {} \; 2>/dev/null | sed 's/-.*//'
-
-  # IDs from INDEX links/tables
-  grep -Eo '\b[0-9]{3}\b' "$ISSUES_DIR/INDEX.md" 2>/dev/null
-} | grep -E '^[0-9]{3}$' | sort -n | uniq > /tmp/kenmark_all_issue_ids.txt
-
-LAST_ID="$(tail -1 /tmp/kenmark_all_issue_ids.txt 2>/dev/null || echo 000)"
-NEXT_ID="$(printf "%03d" "$((10#$LAST_ID + 1))")"
-
-echo "LAST_ID=$LAST_ID"
-echo "NEXT_ID=$NEXT_ID"
-```
-
-Read `INDEX.md` **ID Ledger** (`Last Assigned ID`, `Next ID`) and reconcile with the command output. If they disagree, run `kenmark-tracker-maintain` before creating issues.
-
+An optional helper in this source checkout is `node scripts/brain-tracker.js reserve issues [repoRoot]`; independent agents can use normal filesystem and Git tools instead.
 ---
 
 ## Step 2 — Discover repo layout
@@ -385,3 +346,12 @@ Report:
 - How many new issues created
 - Which IDs were assigned
 - Any findings that were deduplicated against existing issues
+
+## Brain 2.0 portable knowledge contract
+
+- Markdown and Git are authoritative. Studio indexing, MongoDB, embeddings and any background retrieval service are optional.
+- Working investigations belong in issues/plans; verified durable knowledge belongs in canonical KB and is edited selectively, not on every code change.
+- Positive numeric issue/plan IDs use a **minimum three-digit display width**, full prefix parsing and numeric sorting; scan active/completed history. Preserve duplicates for manual reconciliation.
+- Parse structured INDEX ledger fields and ID table rows, not arbitrary digits from prose. Never reuse a reserved ID or write competing ledger changes concurrently.
+- Preserve legacy Brain files and customized IDE instructions by default. No auto migration for indexing. Commit/push/merge require user authorization.
+

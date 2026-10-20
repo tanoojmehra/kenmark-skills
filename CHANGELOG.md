@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v2.3.41-rc.0 — Portable Brain 2.0 alignment (2026-10-20)
+
+### Added
+- Versioned portable Brain format and optional dependency-free tracker auditing/ID reservation utility with executable regression tests.
+- Studio-side compatibility follow-up document.
+
+### Changed
+- Issue and plan numeric IDs support width 3 and above, with high-water reservations and non-destructive duplicate handling.
+- Selective, verified KB synchronization and knowledge-consistency commit gate replace unconditional documentation edits.
+- Init, IDE stubs, tracker workflows, documentation freshness and context capsules now preserve legacy content and keep working history in issues/plans.
+
+### Release
+- RC package metadata only. No npm publication; Studio's pinned version and integrity remain unchanged.
+
+
 ## v2.3.40 — Maintenance release (2026-10-10)
 
 ### Changed

@@ -1,17 +1,16 @@
 ---
 name: kenmark-kb-sync
-version: 1.0.0
+version: 1.1.0
 category: workflow
 scope: universal
 phase: maintain
-description: "Update brain/kb/ and brain/CHANGELOG.md after code changes: features, API, schema, auth, UI routes, workflows, deployment. Use when a feature is done, API changed, or the user asks to update brain or sync the knowledge base."
+description: "Verify whether durable Brain knowledge needs a targeted update after meaningful source changes; otherwise report KB already consistent."
 triggers:
   - update brain
   - sync kb
   - brain kb sync
   - update knowledge base
   - feature completed update docs
-  - kenmark-kb-sync
   - kenmark-kb-sync
   - sync brain after change
 allowed-tools:
@@ -25,151 +24,26 @@ risk: write-files
 disable-model-invocation: false
 ---
 
-# Kenmark KB Sync
+# Kenmark KB Sync — verified knowledge consistency
 
-## Purpose
+KB is durable verified knowledge, **not** a development diary. Transient debugging attempts, unverified hypotheses, investigation notes and implementation checkpoints belong in `brain/issues/` and `brain/plans/`, not KB.
 
-Use after meaningful work when **code and KB must move together**:
+1. Inspect specific meaningful source changes and their evidence (tests, code, commits, approved decisions). Identify contracts and canonical facts that might be affected; do not assume every code change merits documentation.
+2. Read existing relevant `brain/kb/`, `brain/kb/features/` and `brain/kb/decisions/` including legacy names. Search canonical feature identities and links before allocating a new KB feature ID. Preserve old Markdown and missing metadata.
+3. Compare documented claims to verified source and tests. Newer code timestamps, internal refactors, test additions or intermediate attempts alone do not prove that a KB page is wrong.
+4. If no durable fact changed, report **KB already consistent** with paths checked and a brief reason. Do **not** edit `brain/kb/` or append a no-op `brain/CHANGELOG.md` entry.
+5. If a verified architectural decision, API/schema/authentication contract, invariant, deployment guarantee or important feature behavior actually changed, make the smallest targeted correction to its existing canonical article. Create a new feature or decision only when it is genuinely distinct, verified, and not already documented. IDs use a minimum three-digit width and scale past 999.
+6. Source evidence and optional `related_issues`, `related_plans`, `source_paths`, `verified_at_commit` must be grounded. Do not elevate assumptions to facts, invent API endpoints, create empty TODO fillers or auto-rewrite legacy frontmatter.
+7. Update `brain/CHANGELOG.md` only when verified durable knowledge changed or explicit project changelog policy separately warrants it.
+8. Report the exact source/KB paths, evidence, edits (if any), no-op reasoning and remaining unknowns.
 
-- Feature completed or behavior changed
-- Bug fix that changes documented behavior
-- API or integration change
-- DB schema / data model change
-- Auth or permissions change
-- UI route or page change
-- Workflow or business logic change
-- Deployment or infra config change
-
-Updates:
-
-- `brain/kb/07-features.md`
-- `brain/kb/features/NNN-feature.md`
-- `brain/kb/03-data-model.md`
-- `brain/kb/05-api-and-integrations.md`
-- `brain/kb/06-ui-and-routes.md`
-- `brain/kb/11-known-risks-and-decisions.md`
-- Other numbered `00`–`11` files when relevant
-- `brain/CHANGELOG.md`
-
-**`kenmark-commit`** enforces KB updates at commit time; this skill is the **how**.
-
----
-
-## Prerequisite
-
-If `brain/kb/` does not exist, run **`kenmark-init`** first (creates `00`–`11`, `features/`, `decisions/`).
-
-```bash
-test -d brain/kb && echo "kb ok" || echo "run kenmark-init first"
-```
-
----
-
-## Core principle
-
-```text
-Read code diff → Map to KB files → Update confirmed facts only → Link features → Changelog entry
-```
-
-Document **confirmed facts** from files you read. Put guesses in **Assumptions**; gaps in **Documentation gaps**.
-
----
-
-## Step 1 — Resolve repo root and gather change context
-
-```bash
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-cd "$REPO_ROOT"
-git status --short
-git diff --stat HEAD 2>/dev/null || git diff --stat
-```
-
-Use user description plus changed paths to infer change type.
-
----
-
-## Step 2 — Map change type → KB targets
-
-| Change type | Primary KB files |
+| Verified change | Expected KB outcome |
 | --- | --- |
-| New or changed feature | `07-features.md`, `features/NNN-name.md` |
-| Schema / Prisma / models | `03-data-model.md` |
-| API routes, webhooks, integrations | `05-api-and-integrations.md` |
-| Pages, routes, components (UI) | `06-ui-and-routes.md` |
-| Auth, roles, permissions | `04-auth-and-permissions.md` |
-| Deploy, CI, env, hosting | `09-infra-and-deployment.md` |
-| Test strategy change | `10-testing-and-quality.md` |
-| Architecture / major decision | `01-architecture.md`, `11-known-risks-and-decisions.md`, `decisions/NNN-name.md` |
-| Stack / new dependency | `02-stack-and-dependencies.md` |
-| Unclear | `07-features.md` + TODO under Documentation gaps |
+| Type fix, formatting, existing behavior test, non-behavior refactor | Usually no edit |
+| Regression fix with no durable new contract | Issue and tests may suffice |
+| Documented API, schema, auth, security invariant changed | Targeted canonical edit |
+| Confirmed architectural decision or technical limitation | Verified durable entry |
+| Temporary hypothesis / failed attempt | Issues or plans only |
+| Established feature already correctly documented | KB already consistent |
 
----
-
-## Step 3 — Read before write
-
-Read existing KB sections you will edit. Preserve structure and tone. Do not invent endpoints or tables not seen in code.
-
----
-
-## Step 4 — Update KB files
-
-### New feature
-
-1. Next ID: highest `brain/kb/features/NNN-*.md` + 1 (3-digit zero-padded).
-2. Create `brain/kb/features/NNN-short-name.md` (purpose, entry points, key files, config).
-3. Add link row in `07-features.md`.
-
-### Existing feature
-
-Update the feature file and any numbered file affected (API, UI, data model).
-
-### `11-known-risks-and-decisions.md`
-
-Add decisions with date and rationale when the change is architectural.
-
----
-
-## Step 5 — Changelog
-
-Append to `brain/CHANGELOG.md`:
-
-```markdown
-## vYYYY.MM.DD-HHMM-kb-sync
-- KB: updated <files> for <short summary of code change>.
-```
-
-Use local timestamp in the version id.
-
----
-
-## Step 6 — Report to user
-
-```markdown
-## KB sync complete
-
-**Code areas touched:** …
-**KB files updated:** …
-**New feature files:** …
-**Changelog:** brain/CHANGELOG.md
-
-**Still undocumented (if any):** …
-```
-
----
-
-## Related skills
-
-| Situation | Prefer |
-| --- | --- |
-| First-time brain scaffold | `kenmark-init` |
-| Commit with KB gate | `kenmark-commit` |
-| Docs/README accuracy | `kenmark-repo-docs` |
-| File clutter | `kenmark-repo-hygiene` |
-
----
-
-## Anti-patterns
-
-- Do not copy large code blocks into KB — summarize behavior and pointers to paths.
-- Do not skip `07-features.md` when adding a feature file.
-- Do not document features that were not implemented in the diff.
+Freshness categories: `current`, `potentially-stale`, `needs-review`, `unknown`; never infer stale from age alone. No dependency on Studio, MongoDB, network, embeddings or an invented `brain_search` tool. Use ordinary Read/Grep/Glob/Bash/Git and optional authorized index retrieval. No commit/push without user authorization.

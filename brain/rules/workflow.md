@@ -24,10 +24,6 @@ Protected **deployment branches** — pushing triggers release expectations. Do 
 - No dev server — run `npm run validate` and targeted `npm run test:*` scripts.
 - `npm test` = validate + CLI smoke + packs verify skip.
 
-## KB update requirement
+## KB update requirement — verified knowledge consistency
 
-After meaningful changes:
-
-1. Update the relevant `brain/kb/` file(s).
-2. Append to `brain/CHANGELOG.md`.
-3. For user-facing releases: bump `package.json` version and `CHANGELOG.md` at repo root.
+After successful verification, identify specific established durable KB claims affected by the change and compare them to source. Update only claims that genuinely became inaccurate; otherwise report `KB already consistent`. Do not create meaningless changelog entries. When preparing a real user-facing release, update root package version and CHANGELOG separately according to release policy.

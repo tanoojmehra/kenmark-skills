@@ -1,60 +1,16 @@
-# Persist plan file (mandatory for kenmark-plan)
+# Persist plan file safely
 
-## Compute next ID
+## Step 1 — Collect all known IDs and reserve safely
 
-Never create a plan without reading `brain/plans/INDEX.md`.
+**Never reuse an ID** (or previously reserved IDs), and never compute only from active files. Read `brain/plans/INDEX.md` **Last Assigned ID**, **Next ID**, actual ID-column table rows, every `[0-9]*-*.md` in active and `completed/` (optional `archive/`). Parse entire numeric prefixes, validate >=3-digit canonical formatting, sort numerically, detect duplicates, and report missing/corrupt ledgers rather than assuming `001`.
 
-Collect IDs from:
+The next candidate is `max(lastAssigned+1, nextId, maxIndexedId+1, maxFileId+1)`, displayed using `String(id).padStart(3, "0")` (e.g. 998, 999, 1000, 3752, 10000). Do **not** `grep -Eo` arbitrary three-digit numbers in INDEX; titles/dates are not IDs.
 
-1. `INDEX.md` (`Last Assigned ID`, `Next ID`)
-2. `brain/plans/[0-9]*.md`
-3. `brain/plans/completed/[0-9]*.md`
+Parallel agents must serialize writes. With exclusive tracker ownership re-read all sources, reserve high-water in INDEX atomically before exclusive file creation, and never reuse a reservation after a crash. Separate Git clones must coordinate merges. For conflicts stop and use `kenmark-tracker-maintain` first; do not delete duplicates.
 
-```bash
-PLANS_DIR="$(git rev-parse --show-toplevel 2>/dev/null)/brain/plans"
-grep -E 'Last Assigned ID|Next ID' "$PLANS_DIR/INDEX.md"
-find "$PLANS_DIR" "$PLANS_DIR/completed" -name "[0-9][0-9][0-9]-*.md" 2>/dev/null | \
-  xargs -I{} basename {} | sed 's/-.*//' | sort -n | tail -1
-```
+An optional helper in this source checkout is `node scripts/brain-tracker.js reserve plans [repoRoot]`; independent agents can use normal filesystem and Git tools instead.
 
-Use `Next ID` from INDEX unless a higher ID exists in files — then use highest + 1. Never reuse IDs.
 
-## Collision check
+## Plan artifact
 
-```bash
-if find "$PLANS_DIR" "$PLANS_DIR/completed" -name "${NEXT_ID}-*.md" 2>/dev/null | grep -q .; then
-  echo "ERROR: ID collision for $NEXT_ID. Recompute from INDEX + active + completed."
-  exit 1
-fi
-```
-
-## Write plan file
-
-Path: `brain/plans/{id}-{slug}.md`
-
-Slug rules: lowercase, hyphens, no numbers in slug. ID: 3-digit zero-padded (`001`, `002`, …).
-
-```yaml
----
-id: "{next-id}"
-title: {concise one-liner}
-tier: {quick|prototype|full-feature|dig-deep|ultrathink}
-type: {planning-type}
-status: proposed
-source: kenmark-plan
-created: {YYYY-MM-DD}
-files:
-  - path/to/file
-related_issues: []
-related_plans: []
----
-```
-
-Include full plan body from the planning steps in `SKILL.md`.
-
-## Update INDEX.md
-
-1. Set `Last Assigned ID` to assigned ID; `Next ID` to assigned + 1 (3-digit)
-2. Increment Active plans count
-3. Add row to **Proposed** table (ID, Title, Tier)
-4. Never decrement `Last Assigned ID` when archiving later
+Create `brain/plans/{id}-{slug}.md` exclusively, never overwrite an existing file. Keep existing plan metadata fields, tier/type/status and full plan body. Update INDEX high-water and Proposed table while preserving all historical rows; if file creation fails, the reserved ID remains consumed. **Never reuse IDs**. Confirm active and completed history before allocation.

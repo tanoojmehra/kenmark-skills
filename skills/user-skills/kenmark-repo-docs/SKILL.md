@@ -101,16 +101,11 @@ List `process.env` / `os.environ` / `ENV[` usages (sample). Compare to `.env.exa
 
 ---
 
-## Step 5 — brain/kb freshness
+## Step 5 — evidence-based brain/kb freshness
 
-If `brain/kb/` exists:
+When a KB claim references code, source files, contracts, tests or an architecture decision, compare the **specific assertion** with that evidence. Git history may show a relevant source changed, but age alone never proves documentation is inaccurate. A newer source commit or older KB timestamp is **not** a stale-documentation finding by itself.
 
-```bash
-git log -1 --format='%ci' -- brain/kb/ 2>/dev/null
-git log -1 --format='%ci' -- src/ app/ lib/ 2>/dev/null | head -1
-```
-
-If code changed recently but KB did not, flag stale KB. Recommend **`kenmark-kb-sync`**.
+Classify `current` (specific claim confirmed), `potentially-stale` (related source changed, claim not yet validated), `needs-review` (evidence-backed discrepancy or superseded decision), `unknown` (insufficient evidence). Report the assertion and source evidence; never rewrite documentation because of timestamps or create placeholder TODOs. Recommend selective `kenmark-kb-sync` only when verified durable knowledge changed.
 
 ---
 

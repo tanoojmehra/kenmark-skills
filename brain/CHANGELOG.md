@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v2026.10.20-brain2-portable-contract
+
+- Established portable Brain 2.0 compatibility, verified/selective knowledge maintenance, scalable artifact IDs, safe tracker conflict handling and reference-only context capsules. Legacy history preserved; Studio changes remain separate.
+
+
 ## v2026.10.10-maintenance-2.3.40
 
 - **Release:** Maintenance bump v2.3.39 → v2.3.40.

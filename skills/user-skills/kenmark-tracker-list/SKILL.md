@@ -42,7 +42,7 @@ Accepts a `tracker-type` parameter:
 - `plans` — show only plans
 - `both` (default) — show both
 
-If `INDEX.md` is missing for a tracker, stop and run **`kenmark-tracker-setup`** (or **`kenmark-init`**) first.
+If `INDEX.md` is missing, read-only enumeration of existing files is still possible. Flag the missing ledger and propose non-destructive tracker maintenance; never initialize `001` over existing artifacts.
 
 ---
 
@@ -172,3 +172,14 @@ BY TIER (active only)
 ## Read-only reminder
 
 This skill is read-only. If the list appears inconsistent with files on disk, do not infer missing IDs from folders. Run **`kenmark-tracker-maintain`**.
+
+
+## Brain 2.0 portable consistency contract
+
+- Files and Git are canonical. Studio/MongoDB/indexing/embeddings/network are never required for this skill.
+- Issues and plans keep investigations, hypotheses, tests, implementation history and milestones. KB contains verified durable knowledge, updated only after source evidence demonstrates an existing fact changed.
+- On no-op KB checks report `KB already consistent`; do not append meaningless changelog entries.
+- Positive numeric IDs use complete >=3-digit prefixes and scale beyond 999; never reuse a reserved number or delete history merely to reconcile an index.
+- Coordinate concurrent tracker/KB writers and keep legacy Brain files unchanged by default; commit/push/merge only when authorized.
+
+Cross-check INDEX tables against active/completed artifacts, show every duplicate numeric ID with all file paths, flag missing/dangling entries, and sort by numeric ID, not filename string.

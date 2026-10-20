@@ -216,3 +216,8 @@ Final report: **complete/incomplete**, total tasks by terminal status, tasks ver
 - Keep verbose worker logs in worker contexts or artifacts; the parent stores **state, not worker history**.
 - Do not skip a failed/blocked task silently to make the progress counter show 100%.
 - Do not confuse an agent pool with the separate **kenmark-agents** inventory/cleanup skill.
+
+
+## Brain-aware reference capsules
+
+Optional capsule fields: `task_id: "3753"`, `relevant_knowledge: [{path: "brain/kb/01-architecture.md", revision: "source-hash-or-commit"}]`, `related_issues: ["3752"]`, `related_plans: ["141"]` and `relevant_source: ["src/lib/dsh/run-executor.ts"]`. These are **references**, not copied articles. Workers fetch the necessary source/KB details on demand. No full Brain pages or conversation history inside default task capsules. Use authorized Studio retrieval only if available; otherwise Read, Grep, Glob, Bash and Git suffice.

@@ -58,7 +58,7 @@ Load sibling skills for each phase:
 3. **Feature branch:** never commit on protected branches unless the user explicitly approves.
 4. **No co-author trailers** — verify each commit with `git log -1 --format=%B`.
 5. **No force push**, **no `--no-verify`**, **no git config** changes.
-6. **Code and KB move together** — update `brain/kb/` and `brain/CHANGELOG.md` for behavioral changes.
+6. **Knowledge consistency gate** — after verification compare existing canonical KB against durable facts; edit only if documented knowledge changed, otherwise report `KB already consistent`.
 7. **Confirm large or risky work** — pause when a phase touches many unrelated paths or changes public API surface.
 8. **Keep controller context lean** — for separable phases/tasks, use fresh bounded workers with task capsules and compact return envelopes; retain task state, not worker history.
 
@@ -125,7 +125,7 @@ For each phase in the plan file (in dependency order):
 
 1. Read checklist items and `files:` hints.
 2. Implement the **smallest correct change** per item.
-3. Update impacted `brain/kb/` when behavior changes.
+3. After verification check whether durable canonical KB facts changed, otherwise leave KB untouched.
 4. Run verification commands from the plan when listed.
 5. Tick completed checklist items in the plan file (optional, for progress tracking).
 6. After a delegated task returns, record only its compact state; inspect the current repo before starting dependent work.
@@ -155,9 +155,9 @@ Run repo quality gates when feasible (`npm run validate`, `typecheck`, `lint`, `
 
 ---
 
-## Phase 6 — Commit and push
+## Phase 6 — Commit/push only after explicit user authorization
 
-Use **`kenmark-commit`** to group changes (code + plan archive + KB).
+Only when authorized, use **`kenmark-commit`** to group changes (code + plan archive + any warranted KB).
 
 Suggest PR when on a feature branch; merge only when the user explicitly requests.
 
@@ -174,3 +174,12 @@ Report:
 - Whether plan was archived
 - Worker/delegation summary when used (task status + commit/artifact only)
 - Suggested next steps (related plans, open issues)
+
+
+## Brain 2.0 portable consistency contract
+
+- Files and Git are canonical. Studio/MongoDB/indexing/embeddings/network are never required for this skill.
+- Issues and plans keep investigations, hypotheses, tests, implementation history and milestones. KB contains verified durable knowledge, updated only after source evidence demonstrates an existing fact changed.
+- On no-op KB checks report `KB already consistent`; do not append meaningless changelog entries.
+- Positive numeric IDs use complete >=3-digit prefixes and scale beyond 999; never reuse a reserved number or delete history merely to reconcile an index.
+- Coordinate concurrent tracker/KB writers and keep legacy Brain files unchanged by default; commit/push/merge only when authorized.

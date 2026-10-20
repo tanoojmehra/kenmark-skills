@@ -320,39 +320,9 @@ stakes are high (e.g., half-finished feature vs ready-to-ship).
 
 ## Brain KB check before commit
 
-Before committing, check whether the code change required a KB update. Read
-`brain/rules/standards.md` and `brain/rules/workflow.md` when present — they
-define KB maintenance for this repo.
+Use a **knowledge consistency gate**, not a changed-file presence gate. Inspect source diffs, authoritative contracts and relevant canonical KB. Require only an evidence-backed targeted KB edit if a documented durable assertion actually became incorrect. A type fix, added test, behavior-preserving refactor or routine regression without durable implications usually means **KB already consistent**. Record a short no-op rationale, not a meaningless KB/changelog edit. Working investigation remains in issues/plans.
 
-```bash
-git diff --name-only
-git diff --cached --name-only
-```
-
-If changed files affect behavior, verify at least one relevant file under
-`brain/kb/` or `brain/CHANGELOG.md` was updated in the same batch. If no KB
-update is needed, state why in the commit body or plan (typo-only, formatting-only,
-or internal refactor with no behavior/API/workflow impact).
-
-**Requires KB update (examples):**
-
-- New feature or changed feature behavior
-- New or changed API route / integration
-- Schema / model change
-- Auth or permission change
-- UI route / page change
-- Deployment / config / env change
-- Testing strategy change
-
-**Usually does not require KB update:**
-
-- Typo-only or formatting-only edits
-- Comment-only changes
-- Internal refactor with no behavior, API, or workflow impact
-
-When KB updates are required, include `brain/kb/` paths in the same commit (or a
-dedicated `docs(brain):` commit in the push batch). **Code and KB move together.**
-
+Preserve **Git branch policy**, **protected deployment branches**, **Branch safety and intent check**, **stale or mismatched** feature branch checks and all existing commit/push safety rules. Never commit/push without the user's explicit authorization.
 ---
 
 ## Step 4 — Message convention

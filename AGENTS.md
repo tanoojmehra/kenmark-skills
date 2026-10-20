@@ -12,5 +12,5 @@ Rules live in `brain/rules/`. Keep the `init-brain` block in parity with `CLAUDE
 
 **Context efficiency:** For multi-part, repo-wide, research-heavy, or queued work, keep the primary agent lean: delegate bounded independent work to fresh contexts when available, pass only task-relevant context, and retain compact state rather than worker history/logs.
 
-**After meaningful changes:** Update the matching `brain/kb/` files and `brain/CHANGELOG.md` — code and KB move together.
+**After verified changes:** Compare canonical KB to actual source; make targeted edits only for changed durable facts. If no change, report `KB already consistent` without a timestamp-only changelog entry.
 <!-- init-brain:END -->

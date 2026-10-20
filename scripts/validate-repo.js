@@ -1535,6 +1535,25 @@ function findForbiddenTerms() {
   }
 }
 
+function validateBrain2Policy() {
+  // Text policy checks are smoke guards only: numeric/ledger behavior is covered by test:brain.
+  const readSkill = (name) => fs.readFileSync(path.join(userSkillsDir, name, "SKILL.md"), "utf8");
+  const kb = readSkill("kenmark-kb-sync");
+  const commit = readSkill("kenmark-commit");
+  const tracker = readSkill("kenmark-tracker-maintain");
+  const init = readSkill("kenmark-init");
+  const audit = readSkill("kenmark-audit-loop");
+  const docs = readSkill("kenmark-repo-docs");
+  for (const [ok, msg] of [
+    [kb.includes("KB already consistent"), "KB sync must permit no-op verification"],
+    [commit.includes("knowledge consistency gate"), "commit must verify knowledge rather than require unrelated KB edits"],
+    [tracker.includes("Default: report-only"), "tracker duplicates must default to report-only"],
+    [init.includes("Existing Brain compatibility gate"), "init must preserve existing Brain"],
+    [!audit.includes("grep -Eo"), "audit loop must use structural ledger parsing"],
+    [docs.includes("evidence-based") && docs.includes("timestamp"), "docs freshness must not use age alone"],
+  ]) if (!ok) fail("Brain 2.0 policy: " + msg);
+}
+
 function main() {
   console.log("kenmark-skills validate — checking repo invariants\n");
 
@@ -1547,6 +1566,7 @@ function main() {
   validateInitBrainKb();
   validateIssuesIdLedger();
   validatePlansIdLedger();
+  validateBrain2Policy();
   validatePackageJson();
   validateClaudeWrapperPolicy();
   findLegacySkillNameReferences();

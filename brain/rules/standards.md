@@ -23,13 +23,13 @@ Universal rules for **kenmark-skills** (npm CLI + bundled skills). Stack, workfl
 - **Config:** `config/mcp-servers.json`, `config/mcp-profiles.json`.
 - Never delete the `brain/` folder — project knowledge base for this repo.
 - Use `temp/` for scratch scripts (gitignored).
-- Update `brain/kb/` and `brain/CHANGELOG.md` after meaningful CLI, catalog, MCP, or skill changes.
+- After verified changes, check existing KB against source and edit only changed durable facts; use changelog for substantive changes.
 
 ## Brain KB maintenance
 
 - Read relevant `brain/kb/` files before non-trivial work.
 - Read relevant `brain/specs/` files before implementing feature or workflow changes.
-- After every meaningful change, update the matching numbered KB file or `kb/features/` entry.
+- After verified changes, inspect canonical KB; update only changed knowledge and otherwise report `KB already consistent`.
 - Keep `README.md` lean; move new long-form docs to `brain/kb/`.
 - Package `CHANGELOG.md` and version in `package.json` must move with user-facing CLI or skill changes.
 

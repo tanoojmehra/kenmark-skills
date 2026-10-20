@@ -56,6 +56,12 @@ Creates per tracker:
 
 ---
 
+## Existing tracker preservation gate (before any write)
+
+Inspect active/completed/archive artifact filenames, index and ledger fields before creating directories or indexes. If any artifacts already exist, **never** write a fresh `000`/`001` tracker INDEX or reset a high-water reservation; report-only until an explicitly approved non-destructive reconstruction. Keep completed history, malformed metadata and duplicates intact for review. Only a genuinely empty tracker gets an initial ledger. No automatic KB writes.
+
+---
+
 ## Step 1 — Determine tracker type
 
 If the user specified a tracker type (`issues`, `plans`, or `both`), use that. Otherwise default to `both`.
@@ -359,3 +365,12 @@ Then suggest next steps:
 - **`kenmark-tracker-list`** — view open issues and plans dashboard
 - **`kenmark-tracker-check`** — move resolved items to completed/ and refresh index
 - **`kenmark-tracker-maintain`** — fix tracker structural drift (duplicates, stale index)
+
+## Brain 2.0 portable knowledge contract
+
+- Markdown and Git are authoritative. Studio indexing, MongoDB, embeddings and any background retrieval service are optional.
+- Working investigations belong in issues/plans; verified durable knowledge belongs in canonical KB and is edited selectively, not on every code change.
+- Positive numeric issue/plan IDs use a **minimum three-digit display width**, full prefix parsing and numeric sorting; scan active/completed history. Preserve duplicates for manual reconciliation.
+- Parse structured INDEX ledger fields and ID table rows, not arbitrary digits from prose. Never reuse a reserved ID or write competing ledger changes concurrently.
+- Preserve legacy Brain files and customized IDE instructions by default. No auto migration for indexing. Commit/push/merge require user authorization.
+

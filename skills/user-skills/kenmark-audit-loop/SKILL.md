@@ -97,17 +97,8 @@ Create or update a scratch ledger at `brain/.audit-run.json` (gitignored if the 
 
 Reconcile the issue ID ledger (same as `kenmark-issues-scan`):
 
-```bash
-ISSUES_DIR="$(git rev-parse --show-toplevel 2>/dev/null)/brain/issues"
-
-{
-  find "$ISSUES_DIR" -maxdepth 1 -type f -name "[0-9][0-9][0-9]-*.md" -exec basename {} \; 2>/dev/null | sed 's/-.*//'
-  find "$ISSUES_DIR/completed" -maxdepth 1 -type f -name "[0-9][0-9][0-9]-*.md" -exec basename {} \; 2>/dev/null | sed 's/-.*//'
-  grep -Eo '\b[0-9]{3}\b' "$ISSUES_DIR/INDEX.md" 2>/dev/null
-} | grep -E '^[0-9]{3}$' | sort -n | uniq > /tmp/kenmark_all_issue_ids.txt
-
-LAST_ID="$(tail -1 /tmp/kenmark_all_issue_ids.txt 2>/dev/null || echo 000)"
-NEXT_ID="$(printf "%03d" "$((10#$LAST_ID + 1))")"
+```text
+Use kenmark-issues-scan structural ledger parsing and exclusive allocation. Scan active/completed full numeric prefixes and ID table rows; never collect arbitrary numbers from titles.
 ```
 
 If `INDEX.md` and folders disagree, run `kenmark-tracker-maintain` before continuing.
@@ -286,3 +277,12 @@ When the loop stops, report:
 | `kenmark-subagents` | Optional; audit loop already delegates per pass |
 
 Do not invoke `kenmark-audit-loop` for a one-shot scan — use `kenmark-issues-scan` or the relevant specialist skill instead.
+
+## Brain 2.0 portable knowledge contract
+
+- Markdown and Git are authoritative. Studio indexing, MongoDB, embeddings and any background retrieval service are optional.
+- Working investigations belong in issues/plans; verified durable knowledge belongs in canonical KB and is edited selectively, not on every code change.
+- Positive numeric issue/plan IDs use a **minimum three-digit display width**, full prefix parsing and numeric sorting; scan active/completed history. Preserve duplicates for manual reconciliation.
+- Parse structured INDEX ledger fields and ID table rows, not arbitrary digits from prose. Never reuse a reserved ID or write competing ledger changes concurrently.
+- Preserve legacy Brain files and customized IDE instructions by default. No auto migration for indexing. Commit/push/merge require user authorization.
+

@@ -42,7 +42,7 @@ Accepts a `tracker-type` parameter:
 - `plans` — check only plans
 - `both` (default) — check both
 
-If `INDEX.md` is missing for a tracker, stop and run **`kenmark-tracker-setup`** (or **`kenmark-init`**) first.
+If `INDEX.md` is missing but artifacts exist, report the missing ledger and use tracker-maintain for a safe, approved rebuild; do not initialize a zero-based ledger over history.
 
 ---
 
@@ -61,7 +61,7 @@ For each enabled tracker:
 find "$ISSUES_DIR" -maxdepth 1 -name "*.md" -not -path "*/completed/*" -not -name "INDEX.md" | sort
 
 # Plans
-find "$PLANS_DIR" -maxdepth 1 -name "[0-9][0-9][0-9]-*.md" -not -name "INDEX.md" 2>/dev/null | sort
+find "$PLANS_DIR" -maxdepth 1 -name "[0-9]*-*.md" -not -name "INDEX.md" 2>/dev/null | sort
 ```
 
 Parse each file to get its `id`, `title`, and `status`.
@@ -191,3 +191,12 @@ Report:
 - How many closed/archived
 - How many remain open/active
 - Any items where evidence was inconclusive (kept open/active)
+
+
+## Brain 2.0 portable consistency contract
+
+- Files and Git are canonical. Studio/MongoDB/indexing/embeddings/network are never required for this skill.
+- Issues and plans keep investigations, hypotheses, tests, implementation history and milestones. KB contains verified durable knowledge, updated only after source evidence demonstrates an existing fact changed.
+- On no-op KB checks report `KB already consistent`; do not append meaningless changelog entries.
+- Positive numeric IDs use complete >=3-digit prefixes and scale beyond 999; never reuse a reserved number or delete history merely to reconcile an index.
+- Coordinate concurrent tracker/KB writers and keep legacy Brain files unchanged by default; commit/push/merge only when authorized.

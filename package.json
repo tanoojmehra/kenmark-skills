@@ -1,6 +1,6 @@
 {
   "name": "kenmark-skills",
-  "version": "2.3.40",
+  "version": "2.3.41-rc.0",
   "description": "44 universal Kenmark agent skills + 12-command CLI for Cursor, Claude Code, Codex, and other SKILL.md-compatible agents. Includes setup, init, update, adopt, cleanup, validate, doctor, inventory, mcp, selectable optional packs, native kenmark-context context orchestration, kenmark-subagents elastic task queue/pool, kenmark-repo-* maintenance, security/performance, and kenmark-test-* testing suite skills.",
   "license": "MIT",
   "private": false,
@@ -32,11 +32,12 @@
     "test:pack": "node scripts/test-pack.js",
     "test:broken-links": "node scripts/test-broken-symlink-cleanup.js && node scripts/test-cleanup-temp-home.js && node scripts/test-legacy-cleanup-canonical.js",
     "test:portability": "node scripts/test-skill-portability.js",
-    "test:all": "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability",
+    "test:all": "npm run test && npm run test:install && npm run test:pack && npm run test:broken-links && npm run test:portability && npm run test:brain",
     "prepublishOnly": "npm run test:all && npm run pack:check",
     "setup:skills": "node scripts/setup-skills.js",
     "pack:check": "npm pack --dry-run",
-    "publish:public": "npm publish --access public"
+    "publish:public": "npm publish --access public",
+    "test:brain": "node --test scripts/test-brain-contract.js"
   },
   "files": [
     "CHANGELOG.md",
@@ -73,7 +74,12 @@
     "scripts/test-broken-symlink-cleanup.js",
     "scripts/test-cleanup-temp-home.js",
     "scripts/test-legacy-cleanup-canonical.js",
-    "scripts/test-skill-portability.js"
+    "scripts/test-skill-portability.js",
+    "scripts/brain-contract.js",
+    "scripts/brain-tracker.js",
+    "scripts/test-brain-contract.js",
+    "docs/BRAIN_FORMAT_v2.md",
+    "docs/STUDIO_COMPATIBILITY_REQUIRED.md"
   ],
   "engines": {
     "node": ">=18"

@@ -72,7 +72,15 @@ Before writing, read only the agent files the user selected (if they already exi
 
 ---
 
-## Step 1 — Create brain scaffold
+## Existing Brain compatibility gate (before any write)
+
+Inspect existing `brain/`, partial KB/tracker installs, legacy `00-overview.md`, custom modular rules and customized AGENTS/CLAUDE/GEMINI/Cursor instructions. **Existing projects:** report compatibility, preserve every authored file byte by default, and add only explicitly requested missing structure. Do not merge, normalize, regenerate, auto-migrate or rewrite old frontmatter for Studio indexing. Change selected IDE synchronization targets only inside managed marker blocks; preserve all content outside.
+
+New projects: create only useful minimum Brain structure and evidenced numbered KB documents. No speculative features, placeholder pages, TODO-only content or automatically generated changelog entries. A no-op rerun means `Already compatible; no files changed`.
+
+---
+
+## Step 1 — Create brain scaffold (new/explicitly requested missing structure only)
 
 ```bash
 mkdir -p brain/rules brain/kb/features brain/kb/decisions brain/issues/completed brain/plans/completed temp
@@ -81,7 +89,7 @@ touch temp/.gitkeep
 
 ### `brain/INDEX.md`
 
-Create or refresh:
+Create only when absent in a genuinely new Brain (or separately authorized):
 
 ```markdown
 # Brain Index
@@ -114,7 +122,7 @@ Project knowledge base for humans and AI agents.
 
 ## Maintenance
 
-- **Code and KB move together** — update `brain/kb/` after every meaningful feature, API, schema, auth, UI, workflow, deploy, or test-strategy change.
+- **KB consistency** — update canonical durable knowledge only after verifying a substantive documented fact changed.
 - Edit rules under `brain/rules/` — keep `standards.md` lean; put stack/workflow/testing detail in the modular files.
 - Re-run **kenmark-init** to refresh IDE pointer stubs (or `sync-full` embeds) after changing standards or stub template.
 - Never delete the `brain/` folder.
@@ -148,7 +156,7 @@ Ensure `temp/` exists for scratch scripts and downloads. Add to `.gitignore` if 
 
 ---
 
-## Step 1.5 — Inspect project and create numbered KB (required)
+## Step 1.5 — Inspect project and create evidenced KB only when justified
 
 After the scaffold exists, **inspect the repository** and create or refresh `brain/kb/`. Document only **confirmed facts** from files you actually read. Put guesses in **Assumptions** and gaps in **Unknowns / documentation gaps**. Never invent architecture you did not inspect.
 
@@ -165,9 +173,9 @@ After the scaffold exists, **inspect the repository** and create or refresh `bra
 | Infra | `Dockerfile`, `docker-compose.*`, `.github/workflows/`, `vercel.json`, `fly.toml` |
 | Tests | `vitest.config.*`, `jest.config.*`, `playwright.config.*`, `**/*.test.*`, `e2e/` |
 
-Use **Read**, **Grep**, and **Glob** on the repo root (`$REPO_ROOT`). If a numbered KB file already exists, **merge** new findings; do not wipe user-written content unless the user asked to reset the KB.
+Use **Read**, **Grep**, and **Glob** on the repo root (`$REPO_ROOT`). If a numbered KB file or legacy alias exists, preserve it unchanged by default; make only separately approved targeted edits.
 
-### Files to create if missing
+### Conventional numbered KB files (optional until source evidence supports them)
 
 - `brain/kb/00-project-overview.md`
 - `brain/kb/01-architecture.md`
@@ -192,7 +200,7 @@ Use this structure for each numbered KB file (adjust the `#` title):
 # <Title>
 
 Last updated: YYYY-MM-DD
-Status: draft|reviewed|needs-update
+Status: draft|verified|needs-review|superseded|archived
 
 ## Confirmed facts
 
@@ -230,7 +238,7 @@ Include a **Feature index** table:
 | 001 | (name) | [features/001-name.md](features/001-name.md) |
 ```
 
-If no features are documented yet, list discovered modules from the codebase and mark rows as `draft` or `TODO`.
+If no verified feature identities exist, do not generate placeholder feature rows.
 
 ### Rule (non-negotiable)
 
@@ -330,7 +338,7 @@ Use this **exact** markdown inside `<!-- init-brain:START -->` / `<!-- init-brai
 
 **Context efficiency:** For multi-part, repo-wide, research-heavy, or queued work, keep the primary agent lean: delegate bounded independent work to fresh contexts when available, pass only task-relevant context, and retain compact state rather than worker history/logs.
 
-**After meaningful changes:** Update the matching `brain/kb/` files and `brain/CHANGELOG.md` — code and KB move together.
+**After verification:** Check relevant canonical KB; edit only changed durable facts. Otherwise report `KB already consistent` without changelog changes.
 ```
 
 ---
@@ -459,7 +467,7 @@ Report to the user:
 
 ## Step 6 — Changelog entry
 
-Append to `brain/CHANGELOG.md`:
+Append to `brain/CHANGELOG.md` only for substantive actual Brain or selected IDE marker changes:
 
 ```markdown
 ## vYYYY.MM.DD-HHMM-kenmark-init
@@ -510,12 +518,12 @@ Universal rules for this repo. Stack, workflow, testing, UI, and deploy details 
 
 - The project knowledge base lives under `brain/kb/` (numbered `00`–`11`, plus `features/` and `decisions/`).
 - Before starting a non-trivial task, read the relevant KB files.
-- After every meaningful feature, bug fix, refactor, workflow change, API change, DB change, UI change, or deployment/config change, update the relevant KB file.
-- If the change adds a new feature, create or update `brain/kb/features/NNN-feature-name.md` and link it from `brain/kb/07-features.md`.
+- After verifying source changes, edit canonical KB only if an established durable fact became incorrect.
+- Create a verified feature record only if no canonical feature identity already describes it.
 - If the change affects architecture, data model, auth, API, UI routes, deployment, or testing, update the matching numbered KB file.
 - Update `brain/CHANGELOG.md` with what changed in the KB.
-- **Code and KB move together** — undocumented feature changes are incomplete work.
-- If unsure which file to update, update `brain/kb/07-features.md` and add a TODO under “Documentation gaps.”
+- **KB quality over volume** — a no-op is appropriate when canonical knowledge remains correct.
+- If uncertain, report unknown in the relevant issue/plan rather than creating KB TODO placeholders.
 
 ## Packages and docs
 
@@ -607,12 +615,12 @@ Direct commit/push to a protected branch only when the user explicitly says so (
 
 ## KB update requirement
 
-For every meaningful change:
+Only for verified, durable knowledge changes:
 
 1. Identify impacted KB areas: feature behavior, route/page/component, API/integration, database/schema, auth/permissions, workflow/business logic, deployment/config, testing/quality.
 2. Update existing KB files when the concept already exists.
-3. Create a new feature file under `brain/kb/features/` when the feature is new.
-4. Add a short entry to `brain/CHANGELOG.md`.
+3. First search canonical features; create only genuinely new verified articles.
+4. Append a changelog entry only if durable knowledge changed.
 5. In the final response, mention: code files changed, KB files changed, tests/checks run.
 ```
 
@@ -690,3 +698,12 @@ Optional — fill in per project.
 - `kenmark-tracker-check` — move resolved items to `completed/` and refresh index
 - `kenmark-plan` — create tiered plan files (requires `INDEX.md`)
 - `kenmark-plans-execute` — implement an approved plan end to end
+
+## Brain 2.0 portable knowledge contract
+
+- Markdown and Git are authoritative. Studio indexing, MongoDB, embeddings and any background retrieval service are optional.
+- Working investigations belong in issues/plans; verified durable knowledge belongs in canonical KB and is edited selectively, not on every code change.
+- Positive numeric issue/plan IDs use a **minimum three-digit display width**, full prefix parsing and numeric sorting; scan active/completed history. Preserve duplicates for manual reconciliation.
+- Parse structured INDEX ledger fields and ID table rows, not arbitrary digits from prose. Never reuse a reserved ID or write competing ledger changes concurrently.
+- Preserve legacy Brain files and customized IDE instructions by default. No auto migration for indexing. Commit/push/merge require user authorization.
+
