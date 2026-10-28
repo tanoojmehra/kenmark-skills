@@ -19,10 +19,16 @@ function run(cmd, args, options = {}) {
     env: options.env || process.env,
     stdio: options.stdio || "pipe"
   });
-  const code = result.status === null ? 1 : result.status;
+  const code = result.status === null ? (result.error && result.error.code === "ENOENT" ? 127 : 1) : result.status;
   if (code !== 0 && !options.allowFail) {
-    const detail = [result.stderr, result.stdout].filter(Boolean).join("\n");
-    throw new Error(`${label} failed (exit ${code})\n${detail}`.trim());
+    const detail = [
+      result.error ? `spawn error: ${result.error.message}` : null,
+      result.stderr,
+      result.stdout
+    ]
+      .filter(Boolean)
+      .join("\n");
+    throw new Error(`${label} failed (exit ${code})${detail ? `\n${detail}` : ""}`.trim());
   }
   return { label, result, code };
 }

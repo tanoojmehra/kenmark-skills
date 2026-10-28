@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v2.3.41 — Portable Brain 2.0 alignment (2026-10-28)
+
+### Changed
+- **Package:** Promotes `2.3.41-rc.0` to stable `2.3.41` and publishes to npm. No functional changes since the RC.
+
 ## v2.3.41-rc.0 — Portable Brain 2.0 alignment (2026-10-20)
 
 ### Added
