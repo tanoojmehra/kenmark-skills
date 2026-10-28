@@ -60,8 +60,8 @@ npx kenmark-skills adopt --adopt-overwrite -y   # when review-required
 ### Plan tracker lifecycle (`brain/plans/`)
 
 1. **`kenmark-init`** or **`kenmark-tracker-setup`** — create `INDEX.md` and `completed/`.
-2. **`kenmark-plan` / `kenmark-plan`** — ask tier, inspect repo, write `brain/plans/{id}-{slug}.md`, update INDEX.
-3. **`kenmark-plans-execute`** — implement phases on a feature branch; delegate bounded independent phases to fresh workers when useful; verify; archive to `completed/`.
+2. **`kenmark-plan`** — ask tier, inspect repo, write `brain/plans/{id}-{slug}.md`, update INDEX.
+3. **`kenmark-plans-execute`** — mark the plan `status: in-progress` and move its INDEX row before the first implementation edit (blocking gate, hard rule 9); implement phases on a feature branch; delegate bounded independent phases to fresh workers when useful; verify; archive to `completed/`.
 4. **`kenmark-tracker-check`** / **`kenmark-tracker-maintain`** — sync acceptance criteria and fix INDEX drift.
 - **Explicit admin:** setup, packs, update, agents — only when user asks.
 
