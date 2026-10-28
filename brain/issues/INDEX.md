@@ -4,8 +4,8 @@
 
 | Field | Value |
 |------|-------|
-| Last Assigned ID | 023 |
-| Next ID | 024 |
+| Last Assigned ID | 024 |
+| Next ID | 025 |
 
 ## Ledger Rules
 
@@ -20,8 +20,8 @@
 | Category | Count |
 |----------|-------|
 | Active issues | 0 |
-| Completed | 25 |
-| **Total** | **25** |
+| Completed | 26 |
+| **Total** | **26** |
 
 > **Note:** IDs 001 and 002 each have two completed issue files (different work shipped under the same numeric ID before ledger discipline). Both files remain in `completed/`; do not delete or renumber.
 
@@ -54,6 +54,7 @@
 | 021 | Make issues-setup and plans-setup manual-only | 2026-06-15 |
 | 022 | Remove duplicated testing contract sections from kenmark-test skills | 2026-06-15 |
 | 023 | Node 24 EISDIR symlink compatibility bug | 2026-07-04 |
+| 024 | kenmark-plans-execute never marks the plan in-progress — implementation starts while status stays "proposed" | 2026-10-28 |
 
 ## Active Issues by Priority
 
@@ -70,6 +71,12 @@
 | _none_ | |
 
 ### P2 — Medium
+
+| ID | Title |
+|----|-------|
+| _none_ | |
+
+### P3 — Low
 
 | ID | Title |
 |----|-------|
