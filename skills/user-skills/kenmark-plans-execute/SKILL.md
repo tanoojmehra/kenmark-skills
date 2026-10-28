@@ -1,6 +1,6 @@
 ---
 name: kenmark-plans-execute
-version: 1.1.0
+version: 1.1.1
 category: plans
 scope: universal
 phase: ship
@@ -61,6 +61,7 @@ Load sibling skills for each phase:
 6. **Knowledge consistency gate** — after verification compare existing canonical KB against durable facts; edit only if documented knowledge changed, otherwise report `KB already consistent`.
 7. **Confirm large or risky work** — pause when a phase touches many unrelated paths or changes public API surface.
 8. **Keep controller context lean** — for separable phases/tasks, use fresh bounded workers with task capsules and compact return envelopes; retain task state, not worker history.
+9. **Plan status gate** — no implementation edit until the plan file reads `status: in-progress` and `INDEX.md` lists it under In progress. Verify with `grep '^status:'` at the start of Phase 3; a plan that still says `proposed`/`approved` during implementation is a governance skip, not a style choice.
 
 ---
 
@@ -92,15 +93,36 @@ Output a short summary: plan ID, title, tier, phases, files likely touched.
 
 ---
 
-## Phase 2 — Mark in progress
+## Phase 2 — Mark in progress (blocking gate)
+
+Phase 3 must not start until this phase is verifiably complete. The plan file and `INDEX.md` are the evidence; a plan still marked `proposed` or `approved` during implementation means governance was skipped.
 
 1. Set `status: in-progress` in plan frontmatter.
 2. Move entry in `INDEX.md` from Approved (or Proposed) to **In progress** table.
 3. Set `approved: YYYY-MM-DD` if not already set.
+4. Confirm both edits landed before continuing:
+
+```bash
+PLAN_FILE=brain/plans/{id}-{slug}.md
+grep -n '^status:' "$PLAN_FILE"        # expected: status: in-progress
+grep -n '{id}' brain/plans/INDEX.md    # expected: row under the In progress table
+```
 
 ---
 
 ## Phase 3 — Implement phases (feature branch)
+
+### Pre-implementation gate (blocking)
+
+Re-read the plan frontmatter before the first code edit and stop if Phase 2 did not land:
+
+```bash
+PLAN_FILE=brain/plans/{id}-{slug}.md
+grep -q '^status: in-progress' "$PLAN_FILE" \
+  || echo "STOP: plan is not in-progress — complete Phase 2 (status + INDEX In progress row) before editing code"
+```
+
+If this prints `STOP`, finish Phase 2 first (or self-correct now and note the correction in the report). Do not implement against a `proposed`/`approved` plan.
 
 ### Branch safety
 
@@ -144,6 +166,7 @@ Follow `kenmark-tracker-check`:
 4. Set `status: done` and `completed: YYYY-MM-DD`.
 5. Update `INDEX.md` — remove from In progress; add to Completed table.
 6. Close related issues via `kenmark-tracker-check` when `related_issues` are listed and work is done.
+7. Confirm the status transition was observable: if the plan never carried `status: in-progress` (the Phase 3 gate was skipped), state that in the report rather than archiving silently.
 
 Skip `AskUserQuestion` when the user explicitly invoked this orchestrator and evidence is clear.
 
