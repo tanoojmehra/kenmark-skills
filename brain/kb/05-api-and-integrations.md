@@ -1,6 +1,6 @@
 # CLI commands and integrations
 
-Last updated: 2026-06-08
+Last updated: 2026-10-29
 Status: reviewed
 
 ## Confirmed facts
@@ -36,20 +36,31 @@ Status: reviewed
 
 | Flag | Purpose |
 | --- | --- |
-| `--ide <target>` | User home IDE paths: `cursor`, `claude`, `codex`, … |
-| `-y` | Skip interactive prompts |
+| `--ide <target>` | Home IDE paths: `cursor`, `claude`, `codex`, `agents`, … ; `all` (every target), `auto` (detected), or a comma list |
+| `-y` / `--yes` | Skip interactive prompts |
 | `--skip-recommended` | Kenmark skills only on `init` |
 | `--skip-npm` | Skip CLI version check / global upgrade on `init`; skip npm step on `update` |
 | `--upgrade-cli` | Non-interactive `init`: upgrade global package to npm `@latest` before installing skills |
 | `--skip-adopt` | Skip post-install adopt pass |
+| `--ids <a,b>` | Select specific catalog packs (`install-recommended`, `init`) |
+| `--preset <id>` / `--profile <id>` | Install a catalog preset (alias of the same thing); see [features/004](features/004-recommended-packs.md) |
+| `--all` | Install every catalog pack (legacy shortcut) |
+| `--list` / `--suggest` / `--explain [id]` / `--list-presets` | Catalog introspection without installing |
+| `--json <path>` / `--markdown <path>` | Report output for `inventory`, `subagents-inventory`, `doctor` |
+| `--include-plugins` / `--include-marketplaces` | Extend inventory scans to Claude plugin caches / marketplaces (`subagents-inventory`) |
+| `--roots <a,b>` | Restrict inventory scan roots by id (`-y` writes reports under `./temp/` by default) |
 | `--mcp-servers <list>` | MCP by name: `playwright`, `context7`, `fetch`, `sequential-thinking`, `browsermcp` |
 | `--mcp-profile <name>` | `none`, `web`, `research`, `deep`, `all` |
 | `--with-mcp` | Profile `all` |
 | `--skip-mcp` | Skip MCP even when profile/servers set |
-| `--copy` / `--symlink` | Windows copy vs junction (setup / packs) |
+| `--copy` / `--symlink` | Windows copy vs junction (`setup` / packs adopt relink) |
+| `--prefer-copy-on-windows` / `--no-prefer-copy-on-windows` | Adopt relink copy policy on Windows |
 | `--force` / `--adopt-overwrite` | Overwrite differing store content on adopt |
 | `--dry-run` | cleanup preview |
 | `--kenmark` / `--recommended` / `--all-managed` / `--full` | cleanup categories |
+| `--broken-only` / `--legacy-only` / `--packs` / `--include-store` | cleanup scope refinements |
+
+`--project` and `--scope project` are rejected (`PROJECT_SCOPE_REMOVED`, exit 1) — installs are global only.
 
 ### IDE skill directories (global)
 

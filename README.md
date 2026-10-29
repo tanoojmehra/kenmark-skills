@@ -25,6 +25,7 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 - [Documentation (brain/)](#documentation-brain)
 - [Agents and automation](#agents-and-automation-non-interactive)
 - [Contributing](#contributing)
+- [Brain 2.0 compatibility](#brain-20-compatibility)
 - [License](#license)
 
 ---
@@ -36,7 +37,7 @@ Published by [Kenmark ITan Solutions](https://github.com/tanoojmehra/kenmark-ski
 | Kenmark skills | 44 | Bundled in `skills/user-skills/` |
 | CLI commands | 12 | [brain/kb/05-api-and-integrations.md](brain/kb/05-api-and-integrations.md) |
 | Recommended packs | 12 | Impeccable, Ponytail, Simplify, improve, Architecture, Vercel React, Constraints, Adverse Review, Context Engineering, draw.io, SEO — [brain/kb/features/004-recommended-packs.md](brain/kb/features/004-recommended-packs.md) |
-| MCP servers | 5 | Opt-in; 8 JSON IDE targets — [brain/kb/features/003-mcp-integration.md](brain/kb/features/003-mcp-integration.md) |
+| MCP servers | 5 | Opt-in; 11 JSON IDE targets — [brain/kb/features/003-mcp-integration.md](brain/kb/features/003-mcp-integration.md) |
 
 Skills install once under `~/.kenmark/store` and link into each IDE's skills directory. See [brain/kb/features/005-kenmark-hub-store.md](brain/kb/features/005-kenmark-hub-store.md).
 
@@ -124,12 +125,14 @@ npx kenmark-skills init --skip-recommended --mcp-profile web -y
 npx kenmark-skills init --with-mcp --skip-recommended -y   # all servers
 ```
 
-### Update, packs, adopt, cleanup, uninstall
+### Update, packs, adopt, inventory, cleanup, uninstall
 
 ```bash
 npx kenmark-skills update --both -y
 npx kenmark-skills install-recommended --ids impeccable,simplify -y
 npx kenmark-skills adopt -y
+npx kenmark-skills inventory --json ./inventory.json --markdown ./inventory.md
+npx kenmark-skills subagents-inventory --json ./subagents.json
 npx kenmark-skills doctor --json ./doctor.json --no-fail
 npx kenmark-skills cleanup --recommended -y
 npx kenmark-skills uninstall -y
@@ -178,12 +181,14 @@ kenmark-skills/
 
 ---
 
+## Brain 2.0 compatibility
+
+Portable Brain is Markdown/Git-owned; see the [versioned Brain format](docs/BRAIN_FORMAT_v2.md). Issue/plan IDs scale beyond 999. Skills perform selective evidence-backed KB maintenance, preserve pre-existing legacy and custom Brain documents, and do not require Studio, MongoDB, embeddings or a background index. See [Studio compatibility requirements](docs/STUDIO_COMPATIBILITY_REQUIRED.md) for separate integration work.
+
+---
+
 ## License
 
 MIT — Kenmark ITan Solutions ([`package.json`](package.json)).
 
 **Links:** [Repository](https://github.com/tanoojmehra/kenmark-skills) · [Issues](https://github.com/tanoojmehra/kenmark-skills/issues)
-
-## Brain 2.0 compatibility
-
-Portable Brain is Markdown/Git-owned; see the [versioned Brain format](docs/BRAIN_FORMAT_v2.md). Issue/plan IDs scale beyond 999. Skills perform selective evidence-backed KB maintenance, preserve pre-existing legacy and custom Brain documents, and do not require Studio, MongoDB, embeddings or a background index. See [Studio compatibility requirements](docs/STUDIO_COMPATIBILITY_REQUIRED.md) for separate integration work.

@@ -17,10 +17,13 @@ Project knowledge base for humans and AI agents working on **kenmark-skills**.
 | [kb/05-api-and-integrations.md](kb/05-api-and-integrations.md) | CLI commands, flags, MCP, IDE targets |
 | [kb/07-features.md](kb/07-features.md) | Feature index → `kb/features/` |
 | [kb/08-flows-and-workflows.md](kb/08-flows-and-workflows.md) | init, update, adopt, cleanup, uninstall |
-| [kb/09-infra-and-deployment.md](kb/09-infra-and-deployment.md) | npm pack, prepublishOnly, files list |
+| [kb/09-infra-and-deployment.md](kb/09-infra-and-deployment.md) | npm pack, prepublishOnly, CI workflow, files list |
 | [kb/10-testing-and-quality.md](kb/10-testing-and-quality.md) | validate-repo, smoke tests, doctor |
 | [kb/11-known-risks-and-decisions.md](kb/11-known-risks-and-decisions.md) | Tradeoffs, TTY/EOF, Windows symlinks |
 | [CHANGELOG.md](CHANGELOG.md) | Versioned log of brain and standards changes |
+| [../docs/BRAIN_FORMAT_v2.md](../docs/BRAIN_FORMAT_v2.md) | Portable Brain 2.0 format contract (ships on npm) |
+| [../docs/STUDIO_COMPATIBILITY_REQUIRED.md](../docs/STUDIO_COMPATIBILITY_REQUIRED.md) | Studio integration follow-up (separate work) |
+| [../docs/BRAIN2_IMPLEMENTATION_REPORT.md](../docs/BRAIN2_IMPLEMENTATION_REPORT.md) | Brain 2.0 implementation report (repo-only) |
 | [issues/INDEX.md](issues/INDEX.md) | Active/completed issue tracker |
 | [plans/INDEX.md](plans/INDEX.md) | Active/completed plan tracker |
 

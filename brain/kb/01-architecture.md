@@ -1,6 +1,6 @@
 # Architecture
 
-Last updated: 2026-06-07
+Last updated: 2026-10-29
 Status: reviewed
 
 ## Confirmed facts
@@ -27,13 +27,23 @@ Status: reviewed
 | Path | Role |
 | --- | --- |
 | `~/.kenmark/store/skills/<name>/` | Canonical skill content |
+| `~/.kenmark/store/agents/<name>/` | Canonical sub-agent content (`subagents-inventory`) |
 | `~/.kenmark/store/mcp.json` | Selected MCP server definitions |
-| `~/.kenmark/manifest.json` | Install metadata |
-| `~/.kenmark/cache/skills-registry.json` | Runtime cache (kenmark-router) |
+| `~/.kenmark/manifest.json` | Skill install metadata |
+| `~/.kenmark/agent-manifest.json` | Sub-agent install metadata |
+| `~/.kenmark/cache/skills-registry.json` | Router cache — created by the `kenmark-router` bootstrap; the CLI never writes it |
 
 **Flow:** Bundled skills copy from package → store → symlink (or copy on Windows) into IDE paths. **Adopt** consolidates catalog skills already on disk into the store and relinks.
 
-Default IDE targets for new installs: **cursor**, **claude**, **codex** (`DEFAULT_AGENT_IDES` in hub).
+Default IDE targets for new installs: **cursor**, **claude**, **codex** (`DEFAULT_AGENT_IDES` in hub); `--ide all` / `--ide auto` expand to every target for the requested kind (skills or agents).
+
+### Brain utilities (not CLI commands)
+
+| Script | Role |
+| --- | --- |
+| `scripts/brain-contract.js` | Portable Brain tracker contract: `audit` / `reserve` issue and plan IDs (width ≥3, high-water, non-destructive duplicates) |
+| `scripts/brain-tracker.js` | Thin CLI over `brain-contract.js`: `audit` or `reserve` for `issues`, `plans`, or `both`, with an optional `[root]` |
+| `scripts/brain-template.js` | Unregistered scaffolding for a `kenmark-troubleshoot-template` command; not in npm `files` and not wired into `cli.js` |
 
 ### Interactive vs non-interactive
 

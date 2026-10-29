@@ -1,6 +1,6 @@
 # Kenmark hub store
 
-Last updated: 2026-06-07
+Last updated: 2026-10-29
 Status: reviewed
 
 ## Summary
@@ -12,10 +12,12 @@ Single canonical store under `~/.kenmark/` with symlinks (or copies) into per-ID
 | Path | Role |
 | --- | --- |
 | `~/.kenmark/store/skills/<name>/` | Canonical skill trees |
+| `~/.kenmark/store/agents/<name>/` | Canonical sub-agent trees (`subagents-inventory`) |
 | `~/.kenmark/store/mcp.json` | Selected MCP definitions |
-| `~/.kenmark/manifest.json` | Install metadata (versions, targets) |
+| `~/.kenmark/manifest.json` | Skill install metadata (versions, targets) |
+| `~/.kenmark/agent-manifest.json` | Sub-agent install metadata |
 | `~/.kenmark/backups/legacy-cleanup/` | Backups from cleanup legacy mode |
-| `~/.kenmark/cache/skills-registry.json` | kenmark-router runtime cache |
+| `~/.kenmark/cache/skills-registry.json` | `kenmark-router` cache, written by the skill's bootstrap — not by the CLI |
 
 ## Install flow
 

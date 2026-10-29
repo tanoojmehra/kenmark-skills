@@ -1,12 +1,12 @@
 # Infra and deployment
 
-Last updated: 2026-06-07
+Last updated: 2026-10-29
 Status: reviewed
 
 ## Confirmed facts
 
 - **Hosting:** npm registry (public package); GitHub source repo.
-- **CI:** No `.github/workflows/` in repo at init time — quality gates via local `npm test` and `prepublishOnly`.
+- **CI:** `.github/workflows/brain2-regression.yml` runs on `main` push and PRs on Node 22: `npm run validate`, `npm test`, `npm run test:all`, `npm run pack:check` (`contents: read`).
 - **Publish gate:** `prepublishOnly` runs `test:all` + `pack:check` (`npm pack --dry-run`).
 - **npm `files`:** Whitelists scripts, skills, config, CHANGELOG — not `brain/`, tests, or IDE dotfolders.
 
@@ -25,7 +25,7 @@ Status: reviewed
 
 ## Unknowns / documentation gaps
 
-- External CI for the GitHub repo (if added later) should mirror `npm test`.
+- No release/tag automation: tagging (`vX.Y.Z`) and `npm publish` remain manual.
 
 ## Organizational defaults (for consumer projects)
 
@@ -35,4 +35,4 @@ This file documents the **kenmark-skills repo's own deployment**. For consumer-p
 
 ## Maintenance notes
 
-- Add GitHub Actions workflow doc here if CI is added.
+- `brain/` and IDE dotfolders stay out of the npm tarball; update this file when `files` or CI jobs change.

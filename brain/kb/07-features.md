@@ -1,6 +1,6 @@
 # Features index
 
-Last updated: 2026-10-04
+Last updated: 2026-10-29
 Status: reviewed
 
 ## Feature index
@@ -12,6 +12,8 @@ Status: reviewed
 | 003 | MCP integration | [features/003-mcp-integration.md](features/003-mcp-integration.md) |
 | 004 | Recommended packs | [features/004-recommended-packs.md](features/004-recommended-packs.md) |
 | 005 | Kenmark hub store | [features/005-kenmark-hub-store.md](features/005-kenmark-hub-store.md) |
+| 006 | Skill activation optimization | [features/006-skill-activation-optimization.md](features/006-skill-activation-optimization.md) |
+| 007 | Context orchestration | [features/007-context-orchestration.md](features/007-context-orchestration.md) |
 
 ## Confirmed facts
 

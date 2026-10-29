@@ -17,14 +17,18 @@
 | `scripts/kenmark-update.js` | Refresh Kenmark + recommended packs |
 | `scripts/kenmark-packs.js` | `install-recommended` (packs section in kenmark-setup) |
 | `scripts/skills-adopt.js` | Standalone adopt |
+| `scripts/kenmark-cleanup.js` | `cleanup` categories (broken links, legacy, kenmark-*, packs) |
+| `scripts/doctor.js` | `doctor` local install diagnostics |
+| `scripts/skills-inventory.js` / `scripts/subagents-inventory.js` | `inventory` / `subagents-inventory` reports |
 | `scripts/validate-repo.js` | Repo invariants (skills, catalog, package.json) |
-| `skills/user-skills/` | 41 bundled skills (flat dirs) |
+| `scripts/brain-contract.js` / `scripts/brain-tracker.js` | Portable Brain issue/plan ID audit + reserve |
+| `skills/user-skills/` | 44 bundled skills (flat dirs) |
 
 ## Skill frontmatter
 
 Every bundled skill uses: `name`, `version`, `category`, `scope`, `phase`, `description`, `triggers`, `allowed-tools`, `risk`, `disable-model-invocation`.
 
-Categories: `onboarding`, `workflow`, `git`, `issues`, `admin`, `testing`. All bundled skills use `scope: universal`.
+Categories: `onboarding`, `workflow`, `git`, `issues`, `plans`, `admin`, `testing` (`VALID_CATEGORIES` in `validate-repo.js`). All bundled skills use `scope: universal`.
 
 See `skills/README.md` for the logical category map.
 

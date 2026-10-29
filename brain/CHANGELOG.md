@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v2026.10.29-2046-kb-sync
+
+- **README:** Corrected MCP-capable JSON IDE targets to **11** (`MCP_CAPABLE_IDES` in `scripts/kenmark-hub.js`; was documented as 8), documented `inventory` / `subagents-inventory` in the non-interactive examples, and moved the Brain 2.0 section ahead of License with a TOC entry.
+- **kb/00, kb/01, kb/05, kb/07, kb/08, kb/10, kb/11:** version 2.3.41; feature-index rows for 006 and 007; `store/agents/`, `agent-manifest.json`, router-owned registry cache and the `brain-contract` / `brain-tracker` / unshipped `brain-template` utilities; full common-flag table (catalog presets, inventory reports, cleanup refinements, `--project` rejection); suite + script test tables including `test:brain`; fixed the duplicated `kenmark-plan` cell and the orphaned "Explicit admin" bullet; catalog v14 references.
+- **kb/09 + rules/stack.md:** recorded the new `.github/workflows/brain2-regression.yml` CI job (validate → test → test:all → pack:check on Node 22) and refreshed the script layout table plus the legal frontmatter categories (`plans` was missing) and the 44-skill count.
+- **brain/INDEX.md:** added the shipped `docs/` format and Studio-compatibility references.
+
+## v2026.10.28-release-2.3.41
+
+- **Release:** Portable Brain 2.0 RC promoted to stable `2.3.41` and published to npm (`latest`, 2026-10-28T15:20:02Z). No functional change since `2.3.41-rc.0`.
+
 ## v2026.10.20-brain2-portable-contract
 
 - Established portable Brain 2.0 compatibility, verified/selective knowledge maintenance, scalable artifact IDs, safe tracker conflict handling and reference-only context capsules. Legacy history preserved; Studio changes remain separate.

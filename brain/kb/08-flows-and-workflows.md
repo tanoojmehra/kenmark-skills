@@ -1,6 +1,6 @@
 # Flows and workflows
 
-Last updated: 2026-10-06
+Last updated: 2026-10-29
 Status: reviewed
 
 ## Confirmed facts
@@ -17,7 +17,7 @@ Status: reviewed
 | --- | --- |
 | Problem unclear | `kenmark-troubleshoot` |
 | Keep long/queued work lean | `kenmark-context` (automatic context-budget policy) |
-| Plan before coding | `kenmark-plan` / `kenmark-plan` (asks tier: Quick / Prototype / Full Feature / Dig Deep / ULTRATHINK; writes `brain/plans/`) |
+| Plan before coding | `kenmark-plan` (explicit — `disable-model-invocation: true`; asks tier: Quick / Prototype / Full Feature / Dig Deep / ULTRATHINK; writes `brain/plans/`) |
 | Execute approved plan | `kenmark-plans-execute` |
 | List or archive plans | `kenmark-tracker-list` / `kenmark-tracker-check` |
 | Deep parallel/specialist orchestration | `kenmark-subagents` (explicit; fresh workers + compact handoffs) |
@@ -56,6 +56,9 @@ npx kenmark-skills adopt --adopt-overwrite -y   # when review-required
 
 - **Core daily:** router, troubleshoot, plan, output, init, repo-quality, commit, maintain, security-review, performance, etc.
 - **Specialist:** repo-docs, test-*, issues-*, plans-*, repo-release, etc. — only when task matches.
+- **Explicit admin:** setup, packs, update, agents — only when user asks.
+
+Documented in `kenmark-router` skill; see feature 002.
 
 ### Plan tracker lifecycle (`brain/plans/`)
 
@@ -63,9 +66,6 @@ npx kenmark-skills adopt --adopt-overwrite -y   # when review-required
 2. **`kenmark-plan`** — ask tier, inspect repo, write `brain/plans/{id}-{slug}.md`, update INDEX.
 3. **`kenmark-plans-execute`** — mark the plan `status: in-progress` and move its INDEX row before the first implementation edit (blocking gate, hard rule 9); implement phases on a feature branch; delegate bounded independent phases to fresh workers when useful; verify; archive to `completed/`.
 4. **`kenmark-tracker-check`** / **`kenmark-tracker-maintain`** — sync acceptance criteria and fix INDEX drift.
-- **Explicit admin:** setup, packs, update, agents — only when user asks.
-
-Documented in `kenmark-router` skill; see feature 002.
 
 ### Spec lifecycle (`brain/specs/`)
 
@@ -77,7 +77,7 @@ Documented in `kenmark-router` skill; see feature 002.
 ## Important files inspected
 
 - `skills/user-skills/kenmark-router/SKILL.md`
-- `README.md` (workflow tables, being moved here)
+- `README.md` — quick-start routing summary (detail lives here)
 
 ## Maintenance notes
 

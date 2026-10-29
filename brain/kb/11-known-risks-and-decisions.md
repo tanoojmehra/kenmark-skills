@@ -1,6 +1,6 @@
 # Known risks and decisions
 
-Last updated: 2026-06-11 (Antigravity IDE target)
+Last updated: 2026-10-29 (catalog v14, Brain contract tests)
 Status: reviewed
 
 ## Confirmed facts / decisions
@@ -18,10 +18,11 @@ Status: reviewed
 | Org: state management tiered (local→server→global→realtime→offline) with decision rules | Agents need clear tier guidance per project — not a one-size-fits-all pick |
 | Org: Ubuntu VPS + PM2 (not Vercel-first) | Full control, no platform lock-in, known stack |
 | Antigravity copy default | CLI/2.0/IDE do not discover symlinked skills — Kenmark copies into Antigravity skill dirs unless `--symlink` |
-| Global-only installs | Kenmark CLI rejects `--project`; catalog v7 is global-only |
+| Global-only installs | `rejectProjectScopeInArgv()` exits non-zero on `--project` / `--scope project`; catalog v14 is global-only |
 | Add `brain/specs/` before adding a spec skill | Specs need usage proof before CLI/skill automation; markdown tracker is enough for now |
 | Windows copy default | Symlinks often fail; copy/junction fallback in hub |
-| Catalog v13 selectable installs | Default lean (impeccable + ponytail); framework/architecture/constraints/assurance specialists and heavy packs opt-in |
+| Catalog v14 selectable installs | Default lean (impeccable + ponytail); framework/architecture/constraints/assurance specialists and heavy packs opt-in |
+| Brain contract tests inside `test:all` | Portable Brain ID/audit rules are enforced by executable tests (`test:brain`) rather than prose alone |
 | `validate` vs `doctor` split | CI-safe repo checks vs local install diagnostics |
 | brain/ in git, not npm | Dev KB for this repo; consumers get their own brain via kenmark-init |
 
